@@ -1,0 +1,139 @@
+<section class="max-w-7xl mx-auto my-16">
+  <header>
+    <h1 class="font-semibold text-2xl text-gray-900">Поиск по объявлениям</h1>
+  </header>
+  <form class="flex space-x-4 mt-6 relative" action="/search">
+    <details class="relative group z-10">
+      <summary class="btn btn-secondary-color btn-lg">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="mr-2 relative"
+        >
+          <path
+            d="M3 8.5H21"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-open:rotate-45 group-open:translate-y-1 duration-300 origin-center"
+          />
+          <path
+            d="M3 15.5H21"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-open:-rotate-45 duration-300 origin-center"
+          />
+        </svg>
+        Все категории
+      </summary>
+      <div
+        class="absolute w-screen max-w-7xl mt-2 bg-white opacity-50 group-open:translate-y-0 group-open:opacity-100 duration-200 shadow-xl rounded-lg overflow-hidden"
+      >
+        <ul
+          class="relative h-96 before:absolute before:block before:w-px before:bg-gray-200 before:h-full before:left-60"
+        >
+          <li class="flex w-60 group-nested">
+            <a
+              href="/real-estate"
+              class="inline-flex items-center py-2.5 px-3 text-sm text-gray-700 w-full group-nested-hover:bg-gray-50 group-nested-hover:text-gray-900 peer"
+            >
+              <svg
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 mr-2"
+              >
+                <path
+                  d="M12 16c1.6569 0 3-1.3432 3-3 0-1.6569-1.3431-3.00002-3-3.00002S9 11.3431 9 13c0 1.6568 1.3431 3 3 3Z"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M3 10.5651c0-.5744 0-.86158.07403-1.12605a1.999826 1.999826 0 0 1 .318-.65019c.16331-.2208.38999-.39711.84336-.74974L11.0177 2.764c.3513-.27325.527-.40988.721-.4624a.999649.999649 0 0 1 .5226 0c.194.05252.3697.18915.721.4624l6.7823 5.27513c.4534.35262.6801.52893.8434.74973.1446.19558.2524.41592.318.65019.074.26447.074.55165.074 1.12605V17.8c0 1.1201 0 1.6801-.218 2.108-.1917.3763-.4977.6823-.874.874-.4278.218-.9879.218-2.108.218H6.2c-1.12011 0-1.68016 0-2.10798-.218-.37633-.1917-.68229-.4977-.87403-.874C3 19.4801 3 18.9201 3 17.8v-7.2349Z"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Недвижимость</a
+            >
+            <ul class="hidden absolute top-0 left-60 mx-px group-nested-hover:block h-full w-full">
+              <li class="text-gray-900 text-lg font-medium px-3 py-2.5">Недвижимость</li>
+              <li>
+                <a
+                  href="/real-estate-rent"
+                  class="inline-block py-2.5 px-4 text-sm text-gray-700 hover:bg-gray-50"
+                  >Аренда недвижимости</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="flex w-60 group-nested">
+            <a
+              href="/accessories"
+              class="inline-flex items-center py-2.5 px-3 text-sm text-gray-700 w-full group-nested-hover:bg-gray-50 group-nested-hover:text-gray-900 peer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 mr-2">
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                >
+                  <path
+                    d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10Z"
+                  />
+                  <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z" />
+                </g>
+              </svg>
+              Транспорт
+            </a>
+            <ul class="hidden absolute top-0 left-60 mx-px group-nested-hover:block h-full w-full">
+              <li class="text-gray-900 text-lg font-medium py-2.5 px-3">Транспорт</li>
+              <li>
+                <a
+                  href="/accessories/phones"
+                  class="inline-block text-sm py-2.5 px-3 text-gray-700 hover:bg-gray-50"
+                  >Телефоны</a
+                >
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </details>
+    <input type="text" class="form-control" placeholder="Напишите ключевое слово" name="q" />
+    <div class="relative max-w-xs w-full">
+      <select name="region" id="" class="form-control" name="region">
+        <option disabled selected>Весь Узбекистан</option>
+        <option value="1">Ташкент</option>
+        <option value="2">Наманган</option>
+      </select>
+      <svg
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+      >
+        <path
+          d="m6 9 6 6 6-6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+    <button class="btn btn-primary btn-lg">Поиск</button>
+  </form>
+</section>

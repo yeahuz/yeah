@@ -1,0 +1,62 @@
+{
+  "name": "s.uz",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start:dev": "node ./src/index.js",
+    "start": "NODE_ENV=production node ./src/index.js",
+    "tailwind": "pnpx tailwindcss -c tailwind.config.cjs -i ./src/public/css/main.css -o ./src/public/css/main.min.css --watch",
+    "nodemon": "nodemon ./src/index.js",
+    "livereload": "browser-sync start --proxy \"localhost:$(grep PORT_DEV .env | cut -d '=' -f2) \"  --files \"src/views/*.html\" \"src/public/js/*.js\"",
+    "dev": "concurrently \"pnpm tailwind\" \"pnpm nodemon\"",
+    "migrate": "NODE_ENV=production knex --env production migrate",
+    "migrate:dev": "knex migrate:latest",
+    "seed": "NODE_ENV=production knex --env production seed",
+    "rollback:dev": "knex migrate:rollback",
+    "seed:dev": "knex seed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcbbb/s.uz.git"
+  },
+  "author": "juraev00",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jcbbb/s.uz/issues"
+  },
+  "homepage": "https://github.com/jcbbb/s.uz#readme",
+  "dependencies": {
+    "@fastify/accepts": "^4.0.0",
+    "@fastify/cookie": "^7.0.0",
+    "@fastify/etag": "4.0.0",
+    "@fastify/flash": "^5.0.0",
+    "@fastify/formbody": "7.0.1",
+    "@fastify/multipart": "^7.1.0",
+    "@fastify/secure-session": "^5.2.0",
+    "@fastify/static": "^6.4.0",
+    "@fastify/view": "^7.0.0",
+    "argon2": "^0.28.5",
+    "dotenv": "^16.0.1",
+    "eta": "^1.12.3",
+    "fastify": "^4.0.3",
+    "fastify-plugin": "^3.0.1",
+    "google-auth-library": "^8.0.2",
+    "i18next": "^21.8.10",
+    "i18next-fs-backend": "^1.1.4",
+    "i18next-http-middleware": "^3.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "2.1.0",
+    "negotiator": "^0.6.3",
+    "node-telegram-bot-api": "^0.57.0",
+    "objection": "^3.0.1",
+    "pg": "^8.7.3"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.27.10",
+    "concurrently": "^7.2.2",
+    "nodemon": "^2.0.16",
+    "tailwindcss": "^3.1.3"
+  }
+}

@@ -1,0 +1,15 @@
+{
+	"generic_internal": "Serverdagi ichki xatolik",
+	"generic_bad_request": "Noto'g'ri so'rov",
+	"generic_unauthorized": "Avtorizatsiya amalga oshmadi",
+	"generic_unauthenticated": "Autentifikatsiya amalga oshmadi",
+	"generic_resource_not_found": "Resurs topilmadi",
+	"generic_bad_gateway": "Tashqi xizmatda nimadir xato ketdi",
+	"generic_validation_error": "Tasdiqlash amalga oshmadi",
+	"generic_conflict": "Konflikt",
+	"user_exists": "{{user}} foydalanuvchi allaqachon mavjud",
+	"!user_exists": "{{user}} foydalanuvchi mavjud emas",
+	"invalid_password": "Noto'g'ri elektron pochta/telefon yoki parol. Balki siz ijtimoiy tarmoqlar orqali kirgansiz?",
+  "!oauth_state_match": "OAuth2 holat parametrlari to'g'ri kelmadi. Iltimos, yana bir bor urinib ko'ring",
+  "tg_data_integrity_compromised": "Autentifikatsiya maʼlumotlari yaxlitligi buzilgan. Iltimos, yana bir bor urinib ko'ring"
+}

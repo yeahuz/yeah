@@ -1,0 +1,30 @@
+<ul class="flex flex-col space-y-2">
+  <li>
+    <a
+      class="btn btn-md <%= it.tab === 'details' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      href="/settings/details"
+      >Мои детали</a
+    >
+  </li>
+  <li>
+    <a
+      class="btn btn-md <%= it.tab === 'privacy' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      href="/settings/privacy"
+      >Конфиденциальность</a
+    >
+  </li>
+  <li>
+    <a
+      class="btn btn-md <%= it.tab === 'billing' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      href="/settings/billing"
+      >Биллинг</a
+    >
+  </li>
+  <li>
+    <a
+      class="btn btn-md <%= it.tab === 'notifications' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      href="/settings/notifications"
+      >Уведомления</a
+    >
+  </li>
+</ul>

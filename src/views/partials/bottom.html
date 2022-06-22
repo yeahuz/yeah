@@ -1,0 +1,13 @@
+<% if (it.scripts) {%>
+	<% it.scripts.forEach(function (src) {%>
+		<script defer async type="module" src="<%=src%>"></script>
+	<% }) %>
+<% } %>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.2.0/quicklink.umd.min.js" integrity="sha512-qmotg4/nCCLv3q14LSbScJnfOSf/TREfWk8d9j77mKDLkDo6eocbdOXM/F9AHVpW4Qv3+PyNhmnXez48lbANGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer>
+	window.addEventListener('load', () =>{
+		quicklink.listen();
+	});
+</script>
+</body>
+</html>

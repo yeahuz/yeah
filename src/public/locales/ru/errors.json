@@ -1,0 +1,15 @@
+{
+	"generic_internal": "Внутренная сервеная ошибка",
+	"generic_bad_request": "Неверный запрос",
+	"generic_unauthorized": "Авторизация не удалась",
+	"generic_unauthenticated": "Ошибка аутентификации",
+	"generic_resource_not_found": "Ресурс не найден",
+	"generic_bad_gateway": "Что-то пошло не так с внешним сервисом",
+	"generic_validation_error": "Проверка не удалась",
+	"generic_conflict": "Конфликт",
+	"user_exists": "Аккаунт с {{user}} уже существует",
+	"!user_exists": "Аккаунт с {{user}} не существует",
+	"invalid_password": "Неверный адрес электронной почты/телефон или пароль. Может быть, вы вошли в систему через социальные сети?",
+  "!oauth_state_match": "Состояние OAuth2 не соответствует. Пожалуйста, попробуйте еще раз",
+  "tg_data_integrity_compromised": "Нарушена целостность данных аутентификации. Пожалуйста, попробуйте еще раз"
+}

@@ -1,0 +1,14 @@
+{
+	"title": "Create account",
+	"email": {
+		"label": "Email or phone number",
+		"placeholder": "juraev@gmail.com"
+	},
+	"password": {
+		"label": "Password",
+		"placeholder": "complicated-passphrase"
+	},
+	"with_google": "Continue with Google",
+	"with_telegram": "Continue with Telegram",
+	"have_account": "Already have an account?"
+}

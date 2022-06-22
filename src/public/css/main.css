@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Inter";
+    font-weight: 400;
+    src: url("/public/fonts/Inter-Regular.ttf");
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Inter";
+    font-weight: 500;
+    src: url("/public/fonts/Inter-Medium.ttf");
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Inter";
+    font-weight: 600;
+    src: url("/public/fonts/Inter-SemiBold.ttf");
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Inter";
+    font-weight: 700;
+    src: url("/public/fonts/Inter-Bold.ttf");
+    font-display: swap;
+  }
+}
+
+:root {
+  /* Base */
+  --white: 255, 255, 255;
+  --black: 0, 0, 0;
+
+  /* Gray */
+  --gray-25: 252, 252, 253;
+  --gray-50: 249, 250, 251;
+  --gray-100: 242, 244, 247;
+  --gray-200: 234, 236, 240;
+  --gray-300: 208, 213, 221;
+  --gray-400: 152, 162, 179;
+  --gray-500: 102, 112, 133;
+  --gray-600: 71, 84, 103;
+  --gray-700: 52, 64, 84;
+  --gray-800: 29, 41, 57;
+  --gray-900: 16, 24, 40;
+
+  /* Primary */
+  --primary-25: 245, 248, 255;
+  --primary-50: 239, 244, 255;
+  --primary-100: 209, 224, 255;
+  --primary-200: 178, 204, 255;
+  --primary-300: 132, 173, 255;
+  --primary-400: 82, 139, 255;
+  --primary-500: 41, 112, 255;
+  /* --primary-600: 21, 94, 239; */
+  --primary-600: 0, 112, 243;
+  /* --primary-700: 0, 78, 235; */
+  --primary-700: 0, 102, 233;
+  --primary-800: 0, 64, 193;
+  --primary-900: 0, 53, 158;
+
+  /* Red */
+  --error-300: 253, 162, 155;
+  --error-500: 240, 68, 56;
+  --error-600: 217, 45, 32;
+  --error-700: 180, 35, 24;
+  --error-25: 255, 251, 250;
+
+  /* Green */
+  --success-700: 2, 122, 72;
+  --success-25: 246, 254, 249;
+  --success-300: 108, 233, 166;
+  --success-600: 3, 152, 85;
+
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(var(--gray-900), 0.05);
+  --shadow-sm: 0 1px 3px rgba(var(--gray-900), 0.1), 0 1px 2px rgba(var(--gray-900), 0.06);
+  --shadow-md: 0 4px 8px -2px rgba(var(--gray-900), 0.1), 0 2px 4px -2px rgba(var(--gray-900), 0.06);
+  --shadow-lg: 0 12px 16px -4px rgba(var(--gray-900), 0.08), 0 4px 6px -2px rgba(var(--gray-900), 0.03);
+  --shadow-xl: 0 20px 24px -4px rgba(var(--gray-900), 0.08), 0 8px 8px -4px rgba(var(--gray-900), 0.03);
+  --shadow-2xl: 0 24px 48px -12px rgba(var(--gray-900), 0.18);
+  --shadow-3xl: 0 32px 64px -12px rgba(var(--gray-900), 0.14);
+}
+
+details > summary {
+  list-style: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::marker {
+  display: none;
+}
+
+form:invalid .btn:not(.btn-enabled) {
+  --events: none;
+  --opacity: 0.7;
+}
+
+details[open] summary::before {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  content: "";
+  cursor: default;
+}
+
+
+.btn {
+  --text-color: var(--gray-500);
+  --bg-color: var(--white);
+  --size: 0.75rem 1.25rem;
+  --border-color: transparent;
+  --shadow: var(--shadow-xs);
+	--bg-hover: var(--gray-50);
+	--text-hover: var(--gray-600);
+  --ring-color: transparent;
+  --events: all;
+  --opacity: 1;
+  --font-size: 1rem;
+  background: rgb(var(--bg-color));
+  color: rgb(var(--text-color));
+  padding: var(--size);
+  border: 1px solid rgb(var(--border-color));
+  box-shadow: var(--shadow);
+	transition-duration: 200ms;
+	border-radius: 0.5rem;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  pointer-events: var(--events);
+  opacity: var(--opacity);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: var(--font-size);
+}
+
+.btn:disabled {
+  --events: none;
+  --opacity: 0.7;
+}
+
+.btn:not(.no-hover):hover {
+  --bg-color: var(--bg-hover);
+  --text-color: var(--text-hover);
+}
+
+.btn:focus {
+  --shadow: 0 0 0 4px rgb(var(--ring-color));
+}
+
+.btn-primary {
+	--text-color: var(--white);
+	--bg-color: var(--primary-600);
+  --shadow: var(--shadow-xs);
+	--bg-hover: var(--primary-700);
+	--text-hover: var(--white);
+  --ring-color: var(--primary-100);
+}
+
+.btn-secondary {
+	--text-color: var(--gray-700);
+	--bg-color: var(--white);
+	--border-color: var(--gray-300);
+	--shadow: var(--shadow-xs);
+  --text-hover: var(--gray-800);
+  --ring-color: var(--gray-100)
+}
+
+.btn-tertiary-color {
+  --text-color: var(--gray-500);
+  --bg-color: transparent;
+  --text-hover: var(--primary-700);
+  --bg-hover: var(--primary-50);
+  --ring-color: var(--primary-100);
+  --shadow: transparent;
+}
+
+.btn-secondary-color {
+  --text-color: var(--primary-700);
+  --bg-color: var(--primary-50);
+  --border-color: transparent;
+  --shadow: var(--shadow-xs);
+  --bg-hover: var(--primary-100);
+  --text-hover: var(--primary-700);
+  --ring-color: var(--primary-100);
+}
+
+.btn-xl {
+  --size: 0.75rem 1.25rem;
+}
+
+.btn-lg {
+  --size: 0.625rem 1.25rem;
+}
+
+.btn-md {
+  --size: 0.625rem 1.25rem;
+  --font-size: 0.875rem;
+}
+
+.tgme_widget_login.large button.tgme_widget_login_button {
+  padding: var(--size);
+}
+
+.form-control {
+  --placeholder-color: var(--gray-500);
+  --text-color: var(--gray-900);
+  --border-color: var(--gray-300);
+  --size: 0.625rem 0.875rem;
+  --bg-color: var(--white);
+  --ring-color: var(--primary-100);
+  --shadow: var(--shadow-xs);
+  border-radius: 0.5rem;
+  padding: var(--size);
+  color: rgb(var(--text-color));
+  border: 1px solid rgb(var(--border-color));
+  box-shadow: var(--shadow);
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  line-height: 1.5;
+  appearance: none;
+}
+
+.form-control:focus {
+  --shadow: 0 0 0 4px rgb(var(--ring-color));
+  --border-color: var(--primary-300);
+}
+
+.form-control:disabled {
+  --bg-color: var(--gray-50);
+  --text-color: var(--gray-500);
+}
+
+.form-control::placeholder {
+  color: rgb(var(--placeholder-color));
+}
+
+.search-menu > li:hover  ul {
+  display: block;
+}
+
+.indicator {
+  --bg-color: var(--white);
+  --border-color: var(--white);
+  --size: 14px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: block;
+  border-radius: 50%;
+  background: rgb(var(--bg-color));
+  border: 2px solid rgb(var(--border-color));
+  width: var(--size);
+  height: var(--size);
+}
+
+.indicator-online {
+  --bg-color: var(--success-600);
+}
+
+.indicator-offline {
+  --bg-color: var(--gray-400);
+}

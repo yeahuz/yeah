@@ -1,0 +1,14 @@
+{
+	"title": "Kirish",
+	"email": {
+		"label": "Email yoki telefon raqam",
+		"placeholder": "juraev@gmail.com"
+	},
+	"password": {
+		"label": "Parol",
+		"placeholder": "complicated-passphrase"
+	},
+	"with_google": "Google orqali kirish",
+	"with_telegram": "Telegram orqali kirish",
+	"no_account": "Akkaunt yoqmi?"
+}

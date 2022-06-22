@@ -1,0 +1,15 @@
+{
+	"generic_internal": "Internal server error",
+	"generic_bad_request": "Bad request",
+	"generic_unauthorized": "Authorization failed",
+	"generic_unauthenticated": "Authentication failed",
+	"generic_resource_not_found": "Resource not found",
+	"generic_bad_gateway": "Something went wrong with external service",
+	"generic_validation_error": "Validation failed",
+	"generic_conflict": "Conflict",
+	"user_exists": "Account with {{user}} already exists",
+	"!user_exists": "Account with {{user}} does doesn't exist",
+	"invalid_password": "Invalid email/phone or password. Maybe you logged in with social media?",
+  "!oauth_state_match": "OAuth2 state params don't match. Pleas try again",
+  "tg_data_integrity_compromised": "Auth data integrity compromised. Please try again"
+}
