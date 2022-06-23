@@ -1,12 +1,16 @@
 import config from "../config/index.js";
 import crypto from "crypto";
+import { DomainError, InternalError } from "./errors.js";
 
 export async function option(promise) {
   try {
     const result = await promise;
     return [result, null];
   } catch (err) {
-    return [null, err];
+    if (err instanceof DomainError) {
+      return [null, err];
+    }
+    return [null, new InternalError()];
   }
 }
 

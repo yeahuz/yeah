@@ -37,6 +37,7 @@
     "@fastify/secure-session": "^5.2.0",
     "@fastify/static": "^6.4.0",
     "@fastify/view": "^7.0.0",
+    "ajv-errors": "^3.0.0",
     "argon2": "^0.28.5",
     "dotenv": "^16.0.1",
     "eta": "^1.12.3",

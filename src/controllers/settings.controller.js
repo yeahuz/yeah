@@ -21,7 +21,7 @@ export async function get_tab(req, reply) {
   const settings = await render_file("/settings/index.html", { tab });
   stream.push(settings);
 
-  const selected_tab = await render_file(`/settings/${tab}`, { user });
+  const selected_tab = await render_file(`/settings/${tab}`, { user, flash });
   if (!selected_tab) {
     const not_found = await render_file("/404.html");
     stream.push(not_found);

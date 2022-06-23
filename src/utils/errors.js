@@ -1,73 +1,94 @@
 import { i18next } from "./i18n.js";
 
 export class DomainError extends Error {
-  constructor(
-    message = "generic_internal",
-    status_code = 500,
-    params = {},
-    view = "home",
-    errors = []
-  ) {
+  #t = i18next.getFixedT("en");
+
+  constructor({ key, status_code, view, errors = [], params } = {}) {
     super();
-    this.message = message;
+    this.key = key;
     this.status_code = status_code;
-    this.name = this.constructor.name;
-    this.errors = errors;
     this.view = view;
+    this.errors = errors.map((err) => ({ ...err, field: err.instancePath.replace(/\//g, "") }));
     this.params = params;
+    this.message = this.#t(key, { ns: "errors", ...this.params });
+    this.name = this.constructor.name;
     Error.captureStackTrace(this, this.constructor);
   }
 
-  translated(t = i18next.getFixedT("en")) {
-    this.message = t(this.message, { ns: "errors", ...this.params });
+  build(t) {
+    let translated_errors = this.errors;
+    if (Array.isArray(this.errors)) {
+      translated_errors = this.errors.map((err) => ({
+        ...err,
+        message: t(err.message, { ns: "errors", ...this.params }),
+      }));
+    } else {
+      for (const key in this.errors) {
+        translated_errors[key] = t(this.errors[key], { ns: "errors", ...this.params });
+      }
+    }
+
+    return {
+      message: t(this.key, { ns: "errors", ...this.params }),
+      status_code: this.status_code,
+      name: this.name,
+      errors: translated_errors,
+    };
+  }
+
+  errors_as_object() {
+    const errors = {};
+    for (const err of this.errors) {
+      errors[err.field] = err.message;
+    }
+    this.errors = errors;
     return this;
   }
 }
 
-export class BadRequestError extends DomainError {
-  constructor(message = "generic_bad_request", view) {
-    super(message, 400, view);
-  }
-}
-
-export class InternalError extends DomainError {
-  constructor(message = "generic_internal", view) {
-    super(message, 500, view);
-  }
-}
-
-export class AuthorizationError extends DomainError {
-  constructor(message = "generic_unauthorized", view) {
-    super(message, 403, view);
-  }
-}
-
-export class AuthenticationError extends DomainError {
-  constructor(message = "generic_unauthenticated", view) {
-    super(message, 401, view);
-  }
-}
-
-export class ResourceNotFoundError extends DomainError {
-  constructor(message = "generic_resource_not_found", view) {
-    super(message, 404, view);
-  }
-}
-
-export class BadGatewayError extends DomainError {
-  constructor(message = "generic_bad_gateway", view) {
-    super(message, 502, view);
-  }
-}
-
 export class ValidationError extends DomainError {
-  constructor(message = "generic_validation_error", view, errors) {
-    super(message, 422, errors, view);
+  constructor({ key = "generic_internal", errors } = {}) {
+    super({ key, errors, status_code: 422 });
   }
 }
 
 export class ConflictError extends DomainError {
-  constructor(message = "generic_conflict", params, view) {
-    super(message, 409, params, view);
+  constructor({ key = "generic_conflict", params } = {}) {
+    super({ key, params, status_code: 409 });
+  }
+}
+
+export class BadRequestError extends DomainError {
+  constructor({ key = "generic_bad_request" } = {}) {
+    super({ key, status_code: 400 });
+  }
+}
+
+export class InternalError extends DomainError {
+  constructor({ key = "generic_internal" } = {}) {
+    super({ key, status_code: 500 });
+  }
+}
+
+export class ResourceNotFoundError extends DomainError {
+  constructor({ key = "generic_resource_not_found", params } = {}) {
+    super({ key, status_code: 404, params });
+  }
+}
+export class AuthenticationError extends DomainError {
+  constructor({ key = "generic_unauthenticated" } = {}) {
+    super({ key, status_code: 401 });
+  }
+}
+
+export class AuthorizationError extends DomainError {
+  constructor({ key = "generic_unauthorized" } = {}) {
+    super({ key, status_code: 403 });
+  }
+}
+
+export class BadGatewayError extends DomainError {
+  constructor({ key = "generic_bad_gateway" } = {}) {
+    super({ key, status_code: 502 });
   }
 }

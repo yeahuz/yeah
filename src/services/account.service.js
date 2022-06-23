@@ -1,5 +1,9 @@
 import { Account, GoogleAccount, TelegramAccount } from "../models/index.js";
+import { ConflictError, InternalError } from "../utils/errors.js";
 import crypto from "crypto";
+
+import pkg from "objection";
+const { UniqueViolationError } = pkg;
 
 const email_regex =
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
@@ -28,11 +32,15 @@ function create_one_impl(trx) {
 }
 
 export async function update_one(id, update) {
-  const { email_phone, ...otherUpdates } = update;
-  const field_name = email_regex.test(email_phone) ? "email" : "phone";
-  return await Account.query()
-    .findById(id)
-    .patch({ [field_name]: email_phone, ...otherUpdates });
+  try {
+    await Account.query().findById(id).patch(update);
+  } catch (err) {
+    if (err instanceof UniqueViolationError) {
+      // TODO: Need to find out which unique field user is violating
+      throw new ConflictError({ key: "user_exists", params: { user: update.username } });
+    }
+    throw new InternalError();
+  }
 }
 
 export async function get_by_email_phone(email_phone) {

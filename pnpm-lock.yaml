@@ -10,6 +10,7 @@ specifiers:
   '@fastify/secure-session': ^5.2.0
   '@fastify/static': ^6.4.0
   '@fastify/view': ^7.0.0
+  ajv-errors: ^3.0.0
   argon2: ^0.28.5
   browser-sync: ^2.27.10
   concurrently: ^7.2.2
@@ -40,6 +41,7 @@ dependencies:
   '@fastify/secure-session': 5.2.0
   '@fastify/static': 6.4.0
   '@fastify/view': 7.0.0
+  ajv-errors: 3.0.0
   argon2: 0.28.5
   dotenv: 16.0.1
   eta: 1.12.3
@@ -293,6 +295,12 @@ packages:
       debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /ajv-errors/3.0.0:
+    resolution: {integrity: sha512-V3wD15YHfHz6y0KdhYFjyy9vWtEVALT9UrxfN3zqlI6dMioHnJrqOYfyPKol3oqrnCM9uwkcdCwkJ0WUcbLMTQ==}
+    peerDependencies:
+      ajv: ^8.0.1
     dev: false
 
   /ajv-formats/2.1.1:

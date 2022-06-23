@@ -4,17 +4,27 @@
       <h2 class="text-gray-900 text-lg font-medium">Личные данные</h2>
       <p class="text-gray-500 mt-1">Update your photo and personal details here</p>
     </header>
+    <%~ includeFile('../partials/flash.html', it) %> 
     <form action="/accounts/<%= it.user.id %>?redirect_uri=/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col">
       <div class="flex space-x-6 mb-6">
         <label class="text-sm font-medium text-gray-700 w-full">
             Name 
             <input type="text" class="form-control mt-2"
-            placeholder="placeholder" name="name" value="<%= it.user.name %>"/>
+            placeholder="placeholder" name="name" value="<%= it.user.name ?? "" %>"/>
           </label>
         <label class="text-sm font-medium text-gray-700 w-full">
-          Email or phone number 
-          <input type="text" class="form-control mt-2"
-          placeholder="placeholder" name="email_phone" value="<%= it.user.email %>" />
+          Email 
+          <input type="text" inputmode="email" class="form-control mt-2"
+          placeholder="placeholder" name="email" value="<%= it.user.email ?? "" %>" />
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
+        </label>
+      </div>
+      <div class="flex space-x-6 mb-6">
+        <label class="text-sm font-medium text-gray-700 w-full">
+          Phone 
+          <input type="text" inputmode="tel" class="form-control mt-2"
+          placeholder="placeholder" name="phone" value="<%= it.user.phone ?? "" %>" />
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
         </label>
       </div>
       <hr class="bg-gray-200 w-full mt-6" />
@@ -31,14 +41,14 @@
         <span class="text-sm font-medium text-gray-700">Никнейм</span>
         <div class="flex mt-2">
           <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">yeah.uz/</span>
-          <input type="text" class="form-control !rounded-l-none" placeholder="olivia" name="username" value="<%= it.user.username %>">
+          <input type="text" class="form-control !rounded-l-none" placeholder="olivia" name="username" value="<%= it.user.username ?? "" %>">
         </div>
       </label>
       <label class="w-full">
         <span class="text-sm font-medium text-gray-700">Вебсайт</span>
         <div class="flex mt-2">
           <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">https://</span>
-          <input type="text" class="form-control !rounded-l-none" placeholder="homeless.dev" name="website_url" value="<%= it.user.website_url %>">
+          <input type="text" class="form-control !rounded-l-none" placeholder="homeless.dev" name="website_url" value="<%= it.user.website_url ?? "" %>">
         </div>
       </label>
       <hr class="bg-gray-200 w-full mt-6" />

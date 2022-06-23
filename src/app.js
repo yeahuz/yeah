@@ -11,6 +11,7 @@ import multipart from "@fastify/multipart";
 import fastify_accepts from "@fastify/accepts";
 import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
+import ajv_errors from "ajv-errors";
 import { i18next } from "./utils/i18n.js";
 // import Negotiator from "negotiator";
 import * as eta from "eta";
@@ -18,8 +19,9 @@ import { routes } from "./routes/index.js";
 import { is_xhr } from "./plugins/is-xhr.js";
 import { chunk_view } from "./plugins/chunk-view.js";
 import { init_stream } from "./plugins/init-stream.js";
-import { DomainError, InternalError } from "./utils/errors.js";
+import { DomainError, InternalError, ValidationError } from "./utils/errors.js";
 import { authenticate } from "./plugins/authenticate.js";
+import { get_time } from "./utils/index.js";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
@@ -27,6 +29,10 @@ export async function start() {
   const app = fastify({
     logger: true,
     ignoreTrailingSlash: true,
+    ajv: {
+      customOptions: { allErrors: true, messages: true },
+      plugins: [ajv_errors],
+    },
   });
 
   try {
@@ -76,18 +82,35 @@ export async function start() {
 
     app.setErrorHandler((err, req, reply) => {
       console.log(err);
-      const t = req.i18n.t;
+      const locale = req.cookies.locale;
+      const t = i18next.getFixedT(locale || "en");
+      const { redirect_uri } = req.query;
+
+      if (err.validation) {
+        if (req.xhr) {
+          reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
+          return reply;
+        }
+        req.flash(
+          "validation_errors",
+          new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
+        );
+        console.log("here", { redirect_uri });
+        return reply.code(302).redirect(`${redirect_uri}?t=${get_time()}`);
+      }
+
       if (err instanceof DomainError) {
-        reply.code(err.status_code).send(err.translated(t));
+        reply.code(err.status_code).send(err.build(t));
         return reply;
       }
-      const internal = new InternalError();
-      reply.code(internal.status_code).send(internal.translated(t));
+
+      reply.code(500).send(new InternalError().build(t));
       return reply;
     });
 
     app.setNotFoundHandler((req, res) => {
-      res.code(404).render("404.html");
+      const referer = req.headers["referer"];
+      res.code(404).render("404.html", { referer });
     });
 
     app.register(fastify_accepts);

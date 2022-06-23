@@ -33,7 +33,7 @@ export async function signup({ email_phone, password, user_agent, name, profile_
   } catch (err) {
     trx.rollback();
     if (err instanceof UniqueViolationError) {
-      throw new ConflictError("user_exists", { user: email_phone });
+      throw new ConflictError({ key: "user_exists", params: { user: email_phone } });
     }
     throw new InternalError();
   }
@@ -41,11 +41,12 @@ export async function signup({ email_phone, password, user_agent, name, profile_
 
 export async function login({ email_phone, password, user_agent }) {
   const account = await AccountService.get_by_email_phone(email_phone);
-  if (!account) throw new ResourceNotFoundError("!user_exists", { user: email_phone });
+  if (!account)
+    throw new ResourceNotFoundError({ key: "!user_exists", params: { user: email_phone } });
 
   const is_valid = await account.verify_password(password);
 
-  if (!is_valid) throw new BadRequestError("invalid_password");
+  if (!is_valid) throw new BadRequestError({ key: "invalid_password" });
 
   const session = await SessionService.create_one({ account_id: account.id, user_agent });
 
@@ -82,7 +83,7 @@ export async function google_auth(payload) {
     console.log(err);
     trx.rollback();
     if (err instanceof UniqueViolationError) {
-      throw new ConflictError("user_exists", { user: email });
+      throw new ConflictError({ key: "user_exists", params: { user: email } });
     }
     throw new InternalError();
   }
@@ -104,7 +105,7 @@ export async function telegram_auth(payload) {
   const { user_agent, ...user } = payload;
   const is_valid = verify_signature(user);
 
-  if (!is_valid) throw new ValidationError("tg_data_integrity_compromised");
+  if (!is_valid) throw new ValidationError({ key: "tg_data_integrity_compromised" });
 
   const account = await AccountService.get_by_telegram_id(user.id);
 
@@ -134,7 +135,7 @@ export async function telegram_auth(payload) {
     console.log(err);
     trx.rollback();
     if (err instanceof UniqueViolationError) {
-      throw new ConflictError("user_exists", { user: email });
+      throw new ConflictError({ key: "user_exists", params: { user: email_phone } });
     }
     throw new InternalError();
   }

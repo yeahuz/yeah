@@ -1,17 +1,23 @@
 import { request, option } from "./utils.js";
+import { disable_form, replace_text } from "./dom.js";
 
 const forms = document.querySelectorAll("form");
 
-async function onSubmit(e) {
+async function on_submit(e) {
   e.preventDefault();
   const form = e.target;
   const data = Object.fromEntries(new FormData(form));
+
+  const enable_form = disable_form(form);
+  const button = form.querySelector("button");
+  const restore_text = replace_text(button, "Saving...");
+
   const [result, err] = await option(
     request(form.action, { method: form.method, body: data, replace_state: true })
   );
-  if (err) {
-    console.log(err);
-  }
+
+  enable_form(err);
+  restore_text();
 }
 
-forms.forEach((form) => form.addEventListener("submit", onSubmit));
+forms.forEach((form) => form.addEventListener("submit", on_submit));

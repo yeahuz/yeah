@@ -274,3 +274,114 @@ details[open] summary::before {
 .indicator-offline {
   --bg-color: var(--gray-400);
 }
+
+/* https://github.com/nzbin/three-dots/blob/master/dist/three-dots.css */
+.dot-pulse {
+  --size: 0.625rem;
+  --bg-color: var(--white);
+  --text-color: var(--white);
+  --animation-duration: 1.5s;
+  position: relative;
+  left: -9999px;
+  width: var(--size);
+  height: var(--size);
+  background-color: rgb(var(--bg-color));
+  color: rgb(var(--bg-color));
+  border-radius: 50%;
+  box-shadow: 9999px 0 0 -5px;
+  animation: dot-pulse var(--animation-duration) infinite linear;
+  animation-delay: 0.25s;
+}
+
+
+.dot-pulse::before, .dot-pulse::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.dot-pulse::before {
+  box-shadow: 9984px 0 0 -5px;
+  animation: dot-pulse-before var(--animation-duration) infinite linear;
+  animation-delay: 0s;
+}
+
+.dot-pulse::after {
+  box-shadow: 10014px 0 0 -5px;
+  animation: dot-pulse-after var(--animation-duration) infinite linear;
+  animation-delay: 0.5s;
+}
+
+@-webkit-keyframes dot-pulse-before {
+  0% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+  30% {
+    box-shadow: 9984px 0 0 2px;
+  }
+  60%, 100% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+}
+
+@keyframes dot-pulse-before {
+  0% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+  30% {
+    box-shadow: 9984px 0 0 2px;
+  }
+  60%, 100% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+}
+@-webkit-keyframes dot-pulse {
+  0% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+  30% {
+    box-shadow: 9999px 0 0 2px;
+  }
+  60%, 100% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+}
+@keyframes dot-pulse {
+  0% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+  30% {
+    box-shadow: 9999px 0 0 2px;
+  }
+  60%, 100% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+}
+@-webkit-keyframes dot-pulse-after {
+  0% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+  30% {
+    box-shadow: 10014px 0 0 2px;
+  }
+  60%, 100% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+}
+@keyframes dot-pulse-after {
+  0% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+  30% {
+    box-shadow: 10014px 0 0 2px;
+  }
+  60%, 100% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+}

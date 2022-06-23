@@ -11,5 +11,7 @@
 	"!user_exists": "{{user}} foydalanuvchi mavjud emas",
 	"invalid_password": "Noto'g'ri elektron pochta/telefon yoki parol. Balki siz ijtimoiy tarmoqlar orqali kirgansiz?",
   "!oauth_state_match": "OAuth2 holat parametrlari to'g'ri kelmadi. Iltimos, yana bir bor urinib ko'ring",
-  "tg_data_integrity_compromised": "Autentifikatsiya maʼlumotlari yaxlitligi buzilgan. Iltimos, yana bir bor urinib ko'ring"
+  "tg_data_integrity_compromised": "Autentifikatsiya maʼlumotlari yaxlitligi buzilgan. Iltimos, yana bir bor urinib ko'ring",
+	"!email": "Noto'g'ri pochta manzili",
+	"!phone_number": "Telefon raqami +998939152000 formatida bo'lishi kerak"
 }

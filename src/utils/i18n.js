@@ -14,6 +14,13 @@ i18next
       addPath: process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.missing.json",
     },
     saveMissing: true,
+    cleanCode: true,
+    cookieName: "locale",
+    detection: {
+      order: ["cookie"],
+      lookupCookie: "locale",
+      caches: ["cookie"],
+    },
   });
 
 export { i18next };

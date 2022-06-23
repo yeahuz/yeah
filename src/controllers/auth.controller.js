@@ -75,7 +75,7 @@ export async function signup(req, reply) {
   const [result, err] = await option(AuthService.signup({ email_phone, password, user_agent }));
 
   if (err) {
-    req.flash("err", err.translated(t));
+    req.flash("err", err.build(t));
     return reply.redirect(req.url);
   }
 
@@ -91,8 +91,9 @@ export async function login(req, reply) {
   const t = req.i18n.t;
 
   const [result, err] = await option(AuthService.login({ email_phone, password, user_agent }));
+
   if (err) {
-    req.flash("err", err.translated(t));
+    req.flash("err", err.build(t));
     return reply.redirect(req.url);
   }
 
@@ -108,7 +109,7 @@ export async function logout(req, reply) {
   const [result, err] = await option(AuthService.logout(sid));
 
   if (err) {
-    req.flash("err", err.translated(t));
+    req.flash("err", err.build(t));
     return reply.redirect(req.url);
   }
 
@@ -124,7 +125,7 @@ export async function google_callback(req, reply) {
   const t = req.i18n.t;
 
   if (state !== originalState) {
-    req.flash("err", new AuthenticationError("!oauth_state_match").translated(t));
+    req.flash("err", new AuthenticationError({ key: "!oauth_state_match" }).build(t));
     return reply.redirect(decrypted.came_from);
   }
 
@@ -138,7 +139,7 @@ export async function google_callback(req, reply) {
   const [result, err] = await option(AuthService.google_auth({ ...userInfo.data, user_agent }));
 
   if (err) {
-    req.flash("err", err.translated(t));
+    req.flash("err", err.build(t));
     return reply.redirect(decrypted.came_from);
   }
 

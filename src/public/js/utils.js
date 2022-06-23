@@ -57,3 +57,27 @@ export async function option(promise) {
     return [null, err];
   }
 }
+
+export function debounce(fn, timeout = 300) {
+  let timer;
+  return function debouncedFn(...args) {
+    const later = () => {
+      clearTimeout(timer);
+      fn(...args);
+    };
+    clearTimeout(timer);
+    timer = setTimeout(later, timeout);
+  };
+}
+
+export function first(arr = []) {
+  return arr[0];
+}
+
+export function prop(key) {
+  return (obj) => obj[key];
+}
+
+export function redirect(path) {
+  window.location.href = path;
+}

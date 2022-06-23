@@ -714,6 +714,10 @@ video {
   margin-bottom: 1.5rem;
 }
 
+.mt-12 {
+  margin-top: 3rem;
+}
+
 .block {
   display: block;
 }
@@ -756,6 +760,10 @@ video {
 
 .h-full {
   height: 100%;
+}
+
+.h-screen {
+  height: 100vh;
 }
 
 .max-h-48 {
@@ -804,6 +812,10 @@ video {
 
 .max-w-2xl {
   max-width: 42rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
 }
 
 .flex-shrink-0 {
@@ -897,6 +909,12 @@ video {
   margin-left: calc(7rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
+.space-x-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(2rem * var(--tw-space-x-reverse));
+  margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -920,11 +938,6 @@ video {
   border-bottom-left-radius: 0.5rem;
 }
 
-.rounded-l-none {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-}
-
 .\!rounded-l-none {
   border-top-left-radius: 0px !important;
   border-bottom-left-radius: 0px !important;
@@ -940,10 +953,6 @@ video {
 
 .border-t {
   border-top-width: 1px;
-}
-
-.border-r {
-  border-right-width: 1px;
 }
 
 .border-l {
@@ -1020,6 +1029,10 @@ video {
   padding: 1.5rem;
 }
 
+.p-8 {
+  padding: 2rem;
+}
+
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1043,14 +1056,6 @@ video {
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
-}
-
-.\!pl-24 {
-  padding-left: 6rem !important;
-}
-
-.\!pl-28 {
-  padding-left: 7rem !important;
 }
 
 .text-center {
@@ -1087,14 +1092,14 @@ video {
   line-height: 1rem;
 }
 
-.text-base {
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
 }
 
 .font-semibold {
@@ -1103,10 +1108,6 @@ video {
 
 .font-medium {
   font-weight: 500;
-}
-
-.font-normal {
-  font-weight: 400;
 }
 
 .text-gray-900 {
@@ -1139,6 +1140,14 @@ video {
 
 .text-success-700 {
   color: rgb(var(--success-700));
+}
+
+.text-primary-700 {
+  color: rgb(var(--primary-700));
+}
+
+.text-error-500 {
+  color: rgb(var(--error-500));
 }
 
 .opacity-50 {
@@ -1419,6 +1428,139 @@ details[open] summary::before {
 
 .indicator-offline {
   --bg-color: var(--gray-400);
+}
+
+/* https://github.com/nzbin/three-dots/blob/master/dist/three-dots.css */
+
+.dot-pulse {
+  --size: 0.625rem;
+  --bg-color: var(--white);
+  --text-color: var(--white);
+  --animation-duration: 1.5s;
+  position: relative;
+  left: -9999px;
+  width: var(--size);
+  height: var(--size);
+  background-color: rgb(var(--bg-color));
+  color: rgb(var(--bg-color));
+  border-radius: 50%;
+  box-shadow: 9999px 0 0 -5px;
+  -webkit-animation: dot-pulse var(--animation-duration) infinite linear;
+          animation: dot-pulse var(--animation-duration) infinite linear;
+  -webkit-animation-delay: 0.25s;
+          animation-delay: 0.25s;
+}
+
+.dot-pulse::before, .dot-pulse::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.dot-pulse::before {
+  box-shadow: 9984px 0 0 -5px;
+  -webkit-animation: dot-pulse-before var(--animation-duration) infinite linear;
+          animation: dot-pulse-before var(--animation-duration) infinite linear;
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+}
+
+.dot-pulse::after {
+  box-shadow: 10014px 0 0 -5px;
+  -webkit-animation: dot-pulse-after var(--animation-duration) infinite linear;
+          animation: dot-pulse-after var(--animation-duration) infinite linear;
+  -webkit-animation-delay: 0.5s;
+          animation-delay: 0.5s;
+}
+
+@-webkit-keyframes dot-pulse-before {
+  0% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+
+  30% {
+    box-shadow: 9984px 0 0 2px;
+  }
+
+  60%, 100% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+}
+
+@keyframes dot-pulse-before {
+  0% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+
+  30% {
+    box-shadow: 9984px 0 0 2px;
+  }
+
+  60%, 100% {
+    box-shadow: 9984px 0 0 -5px;
+  }
+}
+
+@-webkit-keyframes dot-pulse {
+  0% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+
+  30% {
+    box-shadow: 9999px 0 0 2px;
+  }
+
+  60%, 100% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+}
+
+@keyframes dot-pulse {
+  0% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+
+  30% {
+    box-shadow: 9999px 0 0 2px;
+  }
+
+  60%, 100% {
+    box-shadow: 9999px 0 0 -5px;
+  }
+}
+
+@-webkit-keyframes dot-pulse-after {
+  0% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+
+  30% {
+    box-shadow: 10014px 0 0 2px;
+  }
+
+  60%, 100% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+}
+
+@keyframes dot-pulse-after {
+  0% {
+    box-shadow: 10014px 0 0 -5px;
+  }
+
+  30% {
+    box-shadow: 10014px 0 0 2px;
+  }
+
+  60%, 100% {
+    box-shadow: 10014px 0 0 -5px;
+  }
 }
 
 .before\:absolute::before {
