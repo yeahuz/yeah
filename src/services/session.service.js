@@ -1,8 +1,8 @@
 import { Session } from "../models/index.js";
 
 function create_one_impl(trx) {
-  return async ({ user_agent, account_id }) =>
-    await Session.query(trx).insert({ user_agent, account_id });
+  return async ({ user_agent, user_id }) =>
+    await Session.query(trx).insert({ user_agent, user_id });
 }
 
 export async function get_one(id) {

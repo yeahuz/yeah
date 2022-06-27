@@ -1,5 +1,6 @@
 import * as SessionService from "../services/session.service.js";
 import * as AccountService from "../services/account.service.js";
+import * as UserService from "../services/user.service.js";
 import {
   InternalError,
   ConflictError,
@@ -14,22 +15,22 @@ import objection from "objection";
 const { UniqueViolationError } = objection;
 
 export async function signup({ email_phone, password, user_agent, name, profile_photo_url }) {
-  const trx = await AccountService.start_transaction();
+  const trx = await UserService.start_transaction();
   try {
-    const account = await AccountService.create_one_trx(trx)({
+    const user = await UserService.create_one_trx(trx)({
       email_phone,
       password,
       name,
       profile_photo_url,
     });
     const session = await SessionService.create_one_trx(trx)({
-      account_id: account.id,
+      user_id: user.id,
       user_agent,
     });
 
     await trx.commit();
 
-    return { session, account: account.toJSON() };
+    return { session, user: user.toJSON() };
   } catch (err) {
     trx.rollback();
     if (err instanceof UniqueViolationError) {
@@ -40,45 +41,47 @@ export async function signup({ email_phone, password, user_agent, name, profile_
 }
 
 export async function login({ email_phone, password, user_agent }) {
-  const account = await AccountService.get_by_email_phone(email_phone);
-  if (!account)
+  const user = await UserService.get_by_email_phone(email_phone);
+  if (!user)
     throw new ResourceNotFoundError({ key: "!user_exists", params: { user: email_phone } });
 
-  const is_valid = await account.verify_password(password);
+  const is_valid = await user.verify_password(password);
 
   if (!is_valid) throw new BadRequestError({ key: "invalid_password" });
 
-  const session = await SessionService.create_one({ account_id: account.id, user_agent });
+  const session = await SessionService.create_one({ user_id: user.id, user_agent });
 
-  return { account: account.toJSON(), session };
+  return { user: user.toJSON(), session };
 }
 
 export async function google_auth(payload) {
   const { email, name, given_name, user_agent, picture, sub } = payload;
-  const account = await AccountService.get_by_google_id(sub);
+  const account = await AccountService.get_by_provider_id(sub);
 
   if (account) {
-    const session = await SessionService.create_one({ user_agent, account_id: account.account_id });
-    return { session, account };
+    const session = await SessionService.create_one({ user_agent, user_id: account.user_id });
+    return { session, user: account };
   }
 
-  const trx = await AccountService.start_transaction();
+  const trx = await UserService.start_transaction();
   try {
-    const account = await AccountService.create_one_trx(trx)({
+    const user = await UserService.create_one_trx(trx)({
       email_phone: email,
       name: name || given_name,
       profile_photo_url: picture,
     });
+    console.log(user);
 
     const session = await SessionService.create_one_trx(trx)({
       user_agent,
-      account_id: account.id,
+      user_id: user.id,
     });
 
-    await AccountService.link_google_trx(trx)({ account_id: account.id, google_id: sub });
+    await AccountService.link_google_trx(trx)({ user_id: user.id, provider_account_id: sub });
+
     await trx.commit();
 
-    return { session, account };
+    return { session, user };
   } catch (err) {
     console.log(err);
     trx.rollback();
@@ -102,35 +105,35 @@ const verify_signature = ({ hash, ...data }) => {
 };
 
 export async function telegram_auth(payload) {
-  const { user_agent, ...user } = payload;
+  const { user_agent, ...tg_user } = payload;
   const is_valid = verify_signature(user);
 
   if (!is_valid) throw new ValidationError({ key: "tg_data_integrity_compromised" });
 
-  const account = await AccountService.get_by_telegram_id(user.id);
+  const account = await AccountService.get_by_provider_id(tg_user.id);
 
   if (account) {
-    const session = await SessionService.create_one({ user_agent, account_id: account.account_id });
-    return { session, account };
+    const session = await SessionService.create_one({ user_agent, user_id: account.user_id });
+    return { session, user: account };
   }
 
-  const trx = await AccountService.start_transaction();
+  const trx = await UserService.start_transaction();
 
   try {
-    const account = await AccountService.create_one_trx(trx)({
-      name: user.first_name || user.username,
-      profile_photo_url: user.photo_url,
+    const user = await UserService.create_one_trx(trx)({
+      name: tg_user.first_name || tg_user.username,
+      profile_photo_url: tg_user.photo_url,
     });
 
     const session = await SessionService.create_one_trx(trx)({
       user_agent,
-      account_id: account.id,
+      user_id: user.id,
     });
 
-    await AccountService.link_telegram_trx(trx)({ account_id: account.id, telegram_id: user.id });
+    await AccountService.link_telegram_trx(trx)({ user_id: user.id, provider_account_id: user.id });
 
     await trx.commit();
-    return { session, account };
+    return { session, user };
   } catch (err) {
     console.log(err);
     trx.rollback();

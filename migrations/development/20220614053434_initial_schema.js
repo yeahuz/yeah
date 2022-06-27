@@ -1,6 +1,6 @@
 export function up(knex) {
   return knex.schema
-    .createTable("accounts", (table) => {
+    .createTable("users", (table) => {
       table.increments("id");
       table.string("phone", 15).unique();
       table.string("name");
@@ -13,54 +13,64 @@ export function up(knex) {
       table.timestamp("last_activity_date").defaultTo(knex.fn.now());
       table.timestamps(false, true);
     })
-    .createTable("google_accounts", (table) => {
+    .createTable("auth_providers", (table) => {
+      table.increments("id");
+      table.string("name").unique();
+      table.string("logo_url");
+      table.boolean("active");
+      table.timestamps(false, true);
+    })
+    .createTable("accounts", (table) => {
       table.increments("id");
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
-      table.string("google_id").unique();
-      table.unique(["google_id", "account_id"]);
-      table.timestamps(false, true);
-    })
-    .createTable("telegram_accounts", (table) => {
-      table.increments("id");
       table
-        .integer("account_id")
+        .string("provider")
         .index()
         .notNullable()
-        .references("id")
-        .inTable("accounts")
+        .references("name")
+        .inTable("auth_providers")
         .onDelete("CASCADE");
-      table.string("telegram_id").unique();
-      table.unique(["telegram_id", "account_id"]);
+      table.string("provider_account_id").index();
+      table.unique(["provider_account_id", "user_id"]);
       table.timestamps(false, true);
     })
-    .createTable("account_cards", (table) => {
+    .createTable("notifications", (table) => {
+      table.increments("id").primary();
+      table.integer("entity_id").index();
+      table.integer("entity_type_id");
+      table.integer("from").index().notNullable().references("id").inTable("users");
+      table.integer("to").index().notNullable().references("id").inTable("users");
+      table.boolean("status");
+      table.timestamps(false, true);
+    })
+    .createTable("user_cards", (table) => {
       table.increments("id");
       table.string("pan");
       table.string("expiry");
       table.boolean("default").defaultTo(false);
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
       table.timestamps(false, true);
     })
-    .createTable("account_reviews", (table) => {
+    .createTable("user_reviews", (table) => {
       table.increments("id");
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
       table.text("comment");
       table.smallint("rating");
@@ -69,7 +79,7 @@ export function up(knex) {
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
     })
     .createTable("credentials", (table) => {
@@ -81,11 +91,11 @@ export function up(knex) {
       table.json("transports");
       table.timestamps(false, true);
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
     })
     .createTable("sessions", (table) => {
@@ -94,11 +104,11 @@ export function up(knex) {
       table.string("user_agent");
       table.timestamps(false, true);
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
     })
     .createTable("sessions_credentials", (table) => {
@@ -190,11 +200,11 @@ export function up(knex) {
     })
     .createTable("posting_bookmarks", (table) => {
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
       table
         .integer("posting_id")
@@ -203,7 +213,7 @@ export function up(knex) {
         .references("id")
         .inTable("postings")
         .onDelete("CASCADE");
-      table.unique(["account_id", "posting_id"]);
+      table.unique(["user_id", "posting_id"]);
     })
     .createTable("posting_categories", (table) => {
       table
@@ -317,11 +327,11 @@ export function up(knex) {
     .createTable("transactions", (table) => {
       table.increments("id");
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
       table.integer("amount");
       table
@@ -329,7 +339,7 @@ export function up(knex) {
         .index()
         .notNullable()
         .references("id")
-        .inTable("account_cards")
+        .inTable("user_cards")
         .onDelete("CASCADE");
       table.timestamps(false, true);
     })
@@ -358,11 +368,11 @@ export function up(knex) {
     .createTable("conversations", (table) => {
       table.increments("id");
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
       table
         .integer("posting_id")
@@ -382,13 +392,13 @@ export function up(knex) {
         .inTable("conversations")
         .onDelete("CASCADE");
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
-      table.unique(["conversation_id", "account_id"]);
+      table.unique(["conversation_id", "user_id"]);
     })
     .createTable("messages", (table) => {
       table.increments("id");
@@ -399,7 +409,7 @@ export function up(knex) {
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
       table
         .integer("conversation_id")
@@ -420,15 +430,16 @@ export function down(knex) {
     .dropTable("transaction_status_translations")
     .dropTable("transaction_statuses")
     .dropTable("transactions")
-    .dropTable("account_reviews")
-    .dropTable("account_cards")
+    .dropTable("user_reviews")
+    .dropTable("user_cards")
     .dropTable("posting_bookmarks")
     .dropTable("conversation_members")
     .dropTable("messages")
     .dropTable("conversations")
-    .dropTable("google_accounts")
-    .dropTable("telegram_accounts")
+    .dropTable("notifications")
     .dropTable("accounts")
+    .dropTable("users")
+    .dropTable("auth_providers")
     .dropTable("posting_categories")
     .dropTable("posting_attributes")
     .dropTable("posting_status_translations")

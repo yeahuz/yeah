@@ -1,10 +1,10 @@
-import * as AccountController from "../controllers/account.controller.js";
+import * as UserController from "../controllers/user.controller.js";
 
-export const account = async (fastify) => {
+export const user = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/:id",
-    handler: AccountController.update_one,
+    handler: UserController.update_one,
     schema: {
       body: {
         type: "object",

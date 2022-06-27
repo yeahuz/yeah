@@ -11,11 +11,11 @@
     "nodemon": "nodemon ./src/index.js",
     "livereload": "browser-sync start --proxy \"localhost:$(grep PORT_DEV .env | cut -d '=' -f2) \"  --files \"src/views/*.html\" \"src/public/js/*.js\"",
     "dev": "concurrently \"pnpm tailwind\" \"pnpm nodemon\"",
-    "migrate": "NODE_ENV=production knex --env production migrate",
+    "migrate": "NODE_ENV=production knex:migrate --env production",
     "migrate:dev": "knex migrate:latest",
-    "seed": "NODE_ENV=production knex --env production seed",
+    "seed": "NODE_ENV=production knex seed:run --env production",
     "rollback:dev": "knex migrate:rollback",
-    "seed:dev": "knex seed"
+    "seed:dev": "knex seed:run"
   },
   "repository": {
     "type": "git",
