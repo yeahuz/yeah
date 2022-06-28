@@ -1,0 +1,18 @@
+{
+  "personal": {
+    "title": "Shaxsiy ma'lumotlar",
+    "description": "Suratingizni yoki shaxsiy maʼlumotlaringizni shu yerda yangilang.",
+    "name": {
+      "label": "Ism",
+      "placeholder": "Kristina"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "juraev@gmail.com"
+    },
+    "phone": {
+      "label": "Telefon raqam",
+      "placeholder": "+998939152000"
+    }
+  }
+}

@@ -7,7 +7,7 @@
   "scripts": {
     "start:dev": "node ./src/index.js",
     "start": "NODE_ENV=production node ./src/index.js",
-    "tailwind": "pnpx tailwindcss -c tailwind.config.cjs -i ./src/public/css/main.css -o ./src/public/css/main.min.css --watch",
+    "tailwind": "tailwindcss -c tailwind.config.cjs -i ./src/public/css/main.css -o ./src/public/css/main.min.css --watch",
     "nodemon": "nodemon ./src/index.js",
     "livereload": "browser-sync start --proxy \"localhost:$(grep PORT_DEV .env | cut -d '=' -f2) \"  --files \"src/views/*.html\" \"src/public/js/*.js\"",
     "dev": "concurrently \"pnpm tailwind\" \"pnpm nodemon\"",

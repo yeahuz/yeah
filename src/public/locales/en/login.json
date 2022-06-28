@@ -1,14 +1,14 @@
 {
-	"title": "Log in",
-	"email": {
-		"label": "Email or phone number",
-		"placeholder": "juraev@gmail.com"
-	},
-	"password": {
-		"label": "Password",
-		"placeholder": "complicated-passphrase"
-	},
-	"with_google": "Continue with Google",
-	"with_telegram": "Continue with Telegram",
-	"no_account": "Don't have an account?"
+  "title": "Log in",
+  "email": {
+    "label": "Email or phone number",
+    "placeholder": "juraev@gmail.com"
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "complicated-passphrase"
+  },
+  "with_google": "Continue with Google",
+  "with_telegram": "Continue with Telegram",
+  "no_account": "Don't have an account?"
 }

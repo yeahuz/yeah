@@ -7,20 +7,15 @@ i18next
   .use(i18n_http_middleware.LanguageDetector)
   .init({
     preload: ["uz", "ru", "en"],
-    ns: ["common", "signup", "login", "errors"],
+    ns: ["common", "signup", "login", "errors", "settings", "settings-details"],
     fallbackLng: "ru",
     backend: {
       loadPath: process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.json",
-      addPath: process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.missing.json",
+      addPath:
+        process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.missing.json",
     },
     saveMissing: true,
     cleanCode: true,
-    cookieName: "locale",
-    detection: {
-      order: ["cookie"],
-      lookupCookie: "locale",
-      caches: ["cookie"],
-    },
   });
 
 export { i18next };

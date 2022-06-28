@@ -3,28 +3,28 @@
     <a
       class="btn btn-md <%= it.tab === 'details' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/details"
-      >Мои детали</a
+      ><%= it.t("tabs.details", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
       class="btn btn-md <%= it.tab === 'privacy' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/privacy"
-      >Конфиденциальность</a
+      ><%= it.t("tabs.privacy", { ns: "settings" })%></a
     >
   </li>
   <li>
     <a
       class="btn btn-md <%= it.tab === 'billing' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/billing"
-      >Биллинг</a
+      ><%= it.t("tabs.billing", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
       class="btn btn-md <%= it.tab === 'notifications' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/notifications"
-      >Уведомления</a
+      ><%= it.t("tabs.notifications", { ns: "settings" })%></a
     >
   </li>
 </ul>

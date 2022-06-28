@@ -1,0 +1,10 @@
+{
+  "title": "title",
+  "description": "description",
+  "tabs": {
+    "details": "tabs.details",
+    "privacy": "tabs.privacy",
+    "billing": "tabs.billing",
+    "notifications": "tabs.notifications"
+  }
+}

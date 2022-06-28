@@ -18,12 +18,17 @@ export async function get_tab(req, reply) {
   });
   stream.push(header);
 
-  const settings = await render_file("/settings/index.html", { tab });
+  const settings = await render_file("/settings/index.html", { tab, t });
   stream.push(settings);
 
-  const selected_tab = await render_file(`/settings/${tab}`, { user, flash });
+  const selected_tab = await render_file(`/settings/${tab}`, {
+    user,
+    flash,
+    t,
+  });
+
   if (!selected_tab) {
-    const not_found = await render_file("/404.html");
+    const not_found = await render_file("/partials/404.html");
     stream.push(not_found);
   } else {
     stream.push(selected_tab);

@@ -1,5 +1,6 @@
 {
-	"login": "Login",
-	"create_poster": "Create a posting",
-	"create_account": "Create account"
+  "login": "Login",
+  "create_poster": "Create a posting",
+  "create_account": "Create account",
+  "save_changes": "Save changes"
 }

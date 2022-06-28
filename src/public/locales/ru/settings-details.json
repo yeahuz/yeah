@@ -1,0 +1,18 @@
+{
+  "personal": {
+    "title": "Личные данные",
+    "description": "Обновите свою фотографию или личные данные здесь.",
+    "name": {
+      "label": "Имя",
+      "placeholder": "Кристина"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "juraev@gmail.com"
+    },
+    "phone": {
+      "label": "Номер телефона",
+      "placeholder": "+998939152000"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Sozlamalar",
+  "description": "Bu yerda oʻz sozlamalaringizmi boshqaring",
+  "tabs": {
+    "details": "Mening ma'lumotlarim",
+    "privacy": "Maxfiylik",
+    "billing": "Hisob-kitob",
+    "notifications": "Xabarnomalar"
+  }
+}

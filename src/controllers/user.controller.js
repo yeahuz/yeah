@@ -1,5 +1,5 @@
 import { get_time, option } from "../utils/index.js";
-import * as AccountService from "../services/account.service.js";
+import * as UserService from "../services/user.service.js";
 
 export async function update_one(req, reply) {
   const { id } = req.params;
@@ -8,7 +8,7 @@ export async function update_one(req, reply) {
   const t = req.i18n.t;
 
   const [result, err] = await option(
-    AccountService.update_one(id, {
+    UserService.update_one(id, {
       name,
       email,
       phone,

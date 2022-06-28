@@ -1,5 +1,6 @@
 {
-	"login": "Kirish",
-	"create_poster": "E'lon berish",
-	"create_account": "Akkaunt yaratish"
+  "login": "Kirish",
+  "create_poster": "E'lon berish",
+  "create_account": "Akkaunt yaratish",
+  "save_changes": "Saqlash"
 }

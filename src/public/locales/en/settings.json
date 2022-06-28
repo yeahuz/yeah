@@ -1,0 +1,10 @@
+{
+  "title": "Settings",
+  "description": "Control your preferences here",
+  "tabs": {
+    "details": "My details",
+    "privacy": "Privacy",
+    "billing": "Billing",
+    "notifications": "Notifications"
+  }
+}

@@ -13,7 +13,6 @@ import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
 import { i18next } from "./utils/i18n.js";
-// import Negotiator from "negotiator";
 import * as eta from "eta";
 import { routes } from "./routes/index.js";
 import { is_xhr } from "./plugins/is-xhr.js";
@@ -88,12 +87,16 @@ export async function start() {
 
       if (err.validation) {
         if (req.xhr) {
-          reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
+          reply
+            .code(422)
+            .send(new ValidationError({ errors: err.validation }).build(t));
           return reply;
         }
         req.flash(
           "validation_errors",
-          new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
+          new ValidationError({ errors: err.validation })
+            .errors_as_object()
+            .build(t).errors
         );
         console.log("here", { redirect_uri });
         return reply.code(302).redirect(`${redirect_uri}?t=${get_time()}`);

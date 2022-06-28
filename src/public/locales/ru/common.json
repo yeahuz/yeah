@@ -1,5 +1,6 @@
 {
-	"login": "Войти",
-	"create_poster": "Подать объявление",
-	"create_account": "Создать аккаунт"
+  "login": "Войти",
+  "create_poster": "Подать объявление",
+  "create_account": "Создать аккаунт",
+  "save_changes": "Сохранить изменения"
 }

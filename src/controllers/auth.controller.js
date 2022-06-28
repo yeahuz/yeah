@@ -9,7 +9,10 @@ export async function get_login(req, reply) {
   const { return_to = "/" } = req.query;
   const flash = reply.flash();
 
-  const oauth_state = encrypt(JSON.stringify({ came_from: req.url, return_to }));
+  const oauth_state = encrypt(
+    JSON.stringify({ came_from: req.url, return_to })
+  );
+
   req.session.set("oauth_state", oauth_state);
 
   const stream = reply.init_stream();
@@ -72,7 +75,9 @@ export async function signup(req, reply) {
   const user_agent = req.headers["user-agent"];
   const t = req.i18n.t;
 
-  const [result, err] = await option(AuthService.signup({ email_phone, password, user_agent }));
+  const [result, err] = await option(
+    AuthService.signup({ email_phone, password, user_agent })
+  );
 
   if (err) {
     req.flash("err", err.build(t));
@@ -90,7 +95,9 @@ export async function login(req, reply) {
   const user_agent = req.headers["user-agent"];
   const t = req.i18n.t;
 
-  const [result, err] = await option(AuthService.login({ email_phone, password, user_agent }));
+  const [result, err] = await option(
+    AuthService.login({ email_phone, password, user_agent })
+  );
 
   if (err) {
     req.flash("err", err.build(t));
@@ -125,7 +132,10 @@ export async function google_callback(req, reply) {
   const t = req.i18n.t;
 
   if (state !== originalState) {
-    req.flash("err", new AuthenticationError({ key: "!oauth_state_match" }).build(t));
+    req.flash(
+      "err",
+      new AuthenticationError({ key: "!oauth_state_match" }).build(t)
+    );
     return reply.redirect(decrypted.came_from);
   }
 
@@ -136,7 +146,9 @@ export async function google_callback(req, reply) {
     url: "https://www.googleapis.com/oauth2/v3/userinfo",
   });
 
-  const [result, err] = await option(AuthService.google_auth({ ...userInfo.data, user_agent }));
+  const [result, err] = await option(
+    AuthService.google_auth({ ...userInfo.data, user_agent })
+  );
 
   if (err) {
     req.flash("err", err.build(t));

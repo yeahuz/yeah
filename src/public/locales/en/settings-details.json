@@ -1,0 +1,18 @@
+{
+  "personal": {
+    "title": "Personal",
+    "description": "Update your photo or personal details here.",
+    "name": {
+      "label": "Name",
+      "placeholder": "Jane Doe"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "juraev@gmail.com"
+    },
+    "phone": {
+      "label": "Phone",
+      "placeholder": "+998939152000"
+    }
+  }
+}
