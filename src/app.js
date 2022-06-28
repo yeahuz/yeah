@@ -19,7 +19,8 @@ import { is_xhr } from "./plugins/is-xhr.js";
 import { chunk_view } from "./plugins/chunk-view.js";
 import { init_stream } from "./plugins/init-stream.js";
 import { DomainError, InternalError, ValidationError } from "./utils/errors.js";
-import { authenticate } from "./plugins/authenticate.js";
+import { attach_user } from "./plugins/attach-user.js";
+import { can } from "./plugins/can.js";
 import { get_time } from "./utils/index.js";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
@@ -80,9 +81,7 @@ export async function start() {
     });
 
     app.setErrorHandler((err, req, reply) => {
-      console.log(err);
-      const locale = req.cookies.locale;
-      const t = i18next.getFixedT(locale || "en");
+      const t = i18next.getFixedT(req.language || "en");
       const { redirect_uri } = req.query;
 
       if (err.validation) {
@@ -98,7 +97,6 @@ export async function start() {
             .errors_as_object()
             .build(t).errors
         );
-        console.log("here", { redirect_uri });
         return reply.code(302).redirect(`${redirect_uri}?t=${get_time()}`);
       }
 
@@ -119,31 +117,8 @@ export async function start() {
     app.register(fastify_accepts);
     app.register(fastify_etag);
 
-    // const customResponseTypeStrategy = {
-    //   name: "accept",
-    //   storage: function () {
-    //     let handlers = {};
-    //     return {
-    //       get: (type) => {
-    //         const negotiator = new Negotiator({ headers: { accept: type } });
-    //         const accepted = negotiator.mediaType([type]);
-    //         console.log(accepted);
-    //         return handlers[accepted] || null;
-    //       },
-    //       set: (type, handler, ...otherStuff) => {
-    //         console.log({ type, handler, otherStuff });
-    //         handlers[type] = handler;
-    //       },
-    //     };
-    //   },
-    //   deriveConstraint: (req, ctx) => {
-    //     return req.headers.accept;
-    //   },
-    //   mustMatchWhenDerived: true,
-    // };
-
-    // app.addConstraintStrategy(customResponseTypeStrategy);
-    app.register(authenticate);
+    app.register(attach_user);
+    app.register(can);
     app.register(routes);
 
     await app.listen({ port: config.port });
