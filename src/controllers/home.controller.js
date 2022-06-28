@@ -26,6 +26,7 @@ export async function get_index(req, reply) {
 
 export async function get_profile(req, reply) {
   const { username } = req.params;
+  const { ps } = req.query;
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
@@ -43,12 +44,18 @@ export async function get_profile(req, reply) {
     user?.username === username
       ? user
       : await UserService.get_by_username(username);
-  const profile_html = await render_file("/profile.html", {
-    t,
-    profile,
-  });
 
-  stream.push(profile_html);
+  if (!profile) {
+    const not_found = await render_file("/partials/404.html");
+    stream.push(not_found);
+  } else {
+    const profile_html = await render_file("/profile.html", {
+      t,
+      profile,
+      ps,
+    });
+    stream.push(profile_html);
+  }
 
   const bottom = await render_file("/partials/bottom.html");
   stream.push(bottom);

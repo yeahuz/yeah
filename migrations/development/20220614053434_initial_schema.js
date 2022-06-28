@@ -44,8 +44,18 @@ export function up(knex) {
       table.increments("id").primary();
       table.integer("entity_id").index();
       table.integer("entity_type_id");
-      table.integer("from").index().notNullable().references("id").inTable("users");
-      table.integer("to").index().notNullable().references("id").inTable("users");
+      table
+        .integer("from")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users");
+      table
+        .integer("to")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users");
       table.boolean("status");
       table.timestamps(false, true);
     })
@@ -135,6 +145,8 @@ export function up(knex) {
     })
     .createTable("posting_statuses", (table) => {
       table.increments("id");
+      table.boolean("active").defaultTo(false);
+      table.string("code").notNullable();
       table.timestamps(false, true);
     })
     .createTable("postings", (table) => {
@@ -249,7 +261,15 @@ export function up(knex) {
         ])
         .defaultTo("text");
       table
-        .enu("input_mode", ["text", "decimal", "numeric", "tel", "search", "email", "url"])
+        .enu("input_mode", [
+          "text",
+          "decimal",
+          "numeric",
+          "tel",
+          "search",
+          "email",
+          "url",
+        ])
         .defaultTo("text");
       table.string("placeholder");
       table.string("key");

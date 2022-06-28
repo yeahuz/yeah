@@ -10,10 +10,14 @@ async function on_submit(e) {
 
   const enable_form = disable_form(form);
   const button = form.querySelector("button");
-  const restore_text = replace_text(button, "Saving...");
+  const restore_text = replace_text(button, button.dataset.loading_text);
 
   const [result, err] = await option(
-    request(form.action, { method: form.method, body: data, replace_state: true })
+    request(form.action, {
+      method: form.method,
+      body: data,
+      replace_state: true,
+    })
   );
 
   enable_form(err);

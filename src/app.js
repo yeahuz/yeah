@@ -30,7 +30,7 @@ export async function start() {
     logger: true,
     ignoreTrailingSlash: true,
     ajv: {
-      customOptions: { allErrors: true, messages: true },
+      customOptions: { allErrors: true, messages: true, useDefaults: true },
       plugins: [ajv_errors],
     },
   });
@@ -81,7 +81,12 @@ export async function start() {
     });
 
     app.setErrorHandler((err, req, reply) => {
-      const t = i18next.getFixedT(req.language || "en");
+      console.log(err);
+      const t = i18next.getFixedT(
+        (req.language instanceof Function ? req.language() : req.language) ||
+          "en"
+      );
+
       const { redirect_uri } = req.query;
 
       if (err.validation) {

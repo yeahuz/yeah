@@ -28,7 +28,7 @@
         </label>
       </div>
       <hr class="bg-gray-200 w-full mt-6" />
-      <button class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>
+      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>
     </form>
   </section>
   <section>
@@ -52,7 +52,7 @@
         </div>
       </label>
       <hr class="bg-gray-200 w-full mt-6" />
-      <button class="btn btn-primary btn-md ml-auto mt-4">Save changes</button>
+      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>
     </form>
   </section>
 </div>

@@ -16,6 +16,7 @@ i18next
     },
     saveMissing: true,
     cleanCode: true,
+    order: ["header"],
   });
 
 export { i18next };

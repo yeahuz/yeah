@@ -2,5 +2,6 @@
   "login": "Войти",
   "create_poster": "Подать объявление",
   "create_account": "Создать аккаунт",
-  "save_changes": "Сохранить изменения"
+  "save_changes": "Сохранить изменения",
+  "saving_changes": "Сохранение изменений"
 }
