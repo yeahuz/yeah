@@ -1,4 +1,5 @@
 import * as AuthService from "../services/auth.service.js";
+import * as SessionService from "../services/session.service.js";
 import { render_file } from "../utils/eta.js";
 import { decrypt, encrypt, option, get_time } from "../utils/index.js";
 import { AuthenticationError } from "../utils/errors.js";
@@ -73,10 +74,11 @@ export async function signup(req, reply) {
   const { return_to = "/" } = req.query;
   const { email_phone, password } = req.body;
   const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
   const t = req.i18n.t;
 
   const [result, err] = await option(
-    AuthService.signup({ email_phone, password, user_agent })
+    AuthService.signup({ email_phone, password, user_agent, ip })
   );
 
   if (err) {
@@ -93,10 +95,11 @@ export async function login(req, reply) {
   const { return_to = "/" } = req.query;
   const { email_phone, password } = req.body;
   const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
   const t = req.i18n.t;
 
   const [result, err] = await option(
-    AuthService.login({ email_phone, password, user_agent })
+    AuthService.login({ email_phone, password, user_agent, ip })
   );
 
   if (err) {
@@ -127,6 +130,7 @@ export async function logout(req, reply) {
 export async function google_callback(req, reply) {
   const { state, code } = req.query;
   const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
   const originalState = req.session.get("oauth_state");
   const decrypted = JSON.parse(decrypt(state));
   const t = req.i18n.t;
@@ -147,7 +151,7 @@ export async function google_callback(req, reply) {
   });
 
   const [result, err] = await option(
-    AuthService.google_auth({ ...userInfo.data, user_agent })
+    AuthService.google_auth({ ...userInfo.data, user_agent, ip })
   );
 
   if (err) {
@@ -161,6 +165,7 @@ export async function google_callback(req, reply) {
 
 export async function google_one_tap(req, reply) {
   const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
   const { credential } = req.body;
 
   const ticket = await google_oauth_client.verifyIdToken({
@@ -170,7 +175,11 @@ export async function google_one_tap(req, reply) {
 
   const payload = ticket.getPayload();
 
-  const { session } = await AuthService.google_auth({ ...payload, user_agent });
+  const { session } = await AuthService.google_auth({
+    ...payload,
+    user_agent,
+    ip,
+  });
 
   req.session.set("sid", session.id);
   return { status: "oke" };
@@ -178,10 +187,32 @@ export async function google_one_tap(req, reply) {
 
 export async function telegram_callback(req, reply) {
   const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
   const { user } = req.body;
 
-  const { session } = await AuthService.telegram_auth({ ...user, user_agent });
+  const { session } = await AuthService.telegram_auth({
+    ...user,
+    user_agent,
+    ip,
+  });
 
   req.session.set("sid", session.id);
   return { status: "oke" };
+}
+
+export async function update_sessions(req, reply) {
+  const user = req.user;
+  const sid = req.session.get("sid");
+  const { _action } = req.body;
+  const { redirect_uri } = req.query;
+
+  switch (_action) {
+    case "terminate_other_sessions":
+      await SessionService.delete_many_for(user.id, [sid]);
+      break;
+    default:
+      break;
+  }
+
+  reply.redirect(`${redirect_uri}?t=${get_time()}`);
 }

@@ -1,0 +1,17 @@
+{
+  "title": "Xavfsizlik",
+  "description": "Xavfsizlik va maxfiylik sozlamalari",
+  "devices": {
+    "title": "Qurilmalar",
+    "name": "Nomi",
+    "ip": "IP",
+    "status": "Holat"
+  },
+  "passkeys": {
+    "title": "Kirish kalitlari",
+    "public_key": "Umumiy kalit",
+    "ip": "IP",
+    "status": "Holat"
+  },
+  "terminate_other_sessions": "Boshqa barcha seanslarni tugatish"
+}

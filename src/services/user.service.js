@@ -1,4 +1,4 @@
-import { User, GoogleAccount, TelegramAccount } from "../models/index.js";
+import { User } from "../models/index.js";
 import { ConflictError, InternalError } from "../utils/errors.js";
 import crypto from "crypto";
 

@@ -21,11 +21,16 @@ export function format_relations(relations = []) {
 }
 
 export function async_pipe(...fns) {
-  return (...args) => fns.reduce((promise, fn) => promise.then(fn), Promise.resolve(...args));
+  return (...args) =>
+    fns.reduce((promise, fn) => promise.then(fn), Promise.resolve(...args));
 }
 
 export function pipe(...fns) {
-  return (...args) => fns.reduce((previousOutput, currentFn) => currentFn(previousOutput), ...args);
+  return (...args) =>
+    fns.reduce(
+      (previousOutput, currentFn) => currentFn(previousOutput),
+      ...args
+    );
 }
 
 export function prop(key) {
@@ -65,4 +70,15 @@ export function decrypt(hash) {
 
 export function get_time() {
   return Math.floor(new Date().getTime() / 1000);
+}
+
+export function create_date_formatter(locale) {
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "numeric",
+    hourCycle: "h24",
+    minute: "numeric",
+  });
 }

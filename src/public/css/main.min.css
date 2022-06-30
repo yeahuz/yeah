@@ -718,6 +718,10 @@ video {
   margin-bottom: 1.5rem;
 }
 
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
+
 .block {
   display: block;
 }
@@ -732,6 +736,10 @@ video {
 
 .inline-flex {
   display: inline-flex;
+}
+
+.table {
+  display: table;
 }
 
 .grid {
@@ -836,6 +844,10 @@ video {
 
 .basis-72 {
   flex-basis: 18rem;
+}
+
+.table-auto {
+  table-layout: auto;
 }
 
 .origin-center {
@@ -1028,6 +1040,10 @@ video {
   background-color: rgb(var(--gray-200));
 }
 
+.bg-gray-100 {
+  background-color: rgb(var(--gray-100));
+}
+
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
@@ -1076,6 +1092,10 @@ video {
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
+}
+
+.text-left {
+  text-align: left;
 }
 
 .text-center {
@@ -1232,17 +1252,24 @@ video {
   --error-600: 217, 45, 32;
   --error-700: 180, 35, 24;
   --error-25: 255, 251, 250;
+  --error-50: 254, 243, 242;
+  --error-800: 144, 32, 24;
   /* Green */
   --success-700: 2, 122, 72;
   --success-25: 246, 254, 249;
+  --success-50: 236, 253, 243;
   --success-300: 108, 233, 166;
   --success-600: 3, 152, 85;
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(var(--gray-900), 0.05);
-  --shadow-sm: 0 1px 3px rgba(var(--gray-900), 0.1), 0 1px 2px rgba(var(--gray-900), 0.06);
-  --shadow-md: 0 4px 8px -2px rgba(var(--gray-900), 0.1), 0 2px 4px -2px rgba(var(--gray-900), 0.06);
-  --shadow-lg: 0 12px 16px -4px rgba(var(--gray-900), 0.08), 0 4px 6px -2px rgba(var(--gray-900), 0.03);
-  --shadow-xl: 0 20px 24px -4px rgba(var(--gray-900), 0.08), 0 8px 8px -4px rgba(var(--gray-900), 0.03);
+  --shadow-sm: 0 1px 3px rgba(var(--gray-900), 0.1),
+    0 1px 2px rgba(var(--gray-900), 0.06);
+  --shadow-md: 0 4px 8px -2px rgba(var(--gray-900), 0.1),
+    0 2px 4px -2px rgba(var(--gray-900), 0.06);
+  --shadow-lg: 0 12px 16px -4px rgba(var(--gray-900), 0.08),
+    0 4px 6px -2px rgba(var(--gray-900), 0.03);
+  --shadow-xl: 0 20px 24px -4px rgba(var(--gray-900), 0.08),
+    0 8px 8px -4px rgba(var(--gray-900), 0.03);
   --shadow-2xl: 0 24px 48px -12px rgba(var(--gray-900), 0.18);
   --shadow-3xl: 0 32px 64px -12px rgba(var(--gray-900), 0.14);
 }
@@ -1286,6 +1313,8 @@ details[open] summary::before {
   --events: all;
   --opacity: 1;
   --font-size: 1rem;
+  --align: center;
+  --justify: center;
   background: rgb(var(--bg-color));
   color: rgb(var(--text-color));
   padding: var(--size);
@@ -1295,8 +1324,8 @@ details[open] summary::before {
   border-radius: 0.5rem;
   text-decoration: none;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: var(--justify);
+  align-items: var(--align);
   outline: none;
   pointer-events: var(--events);
   opacity: var(--opacity);
@@ -1320,6 +1349,10 @@ details[open] summary::before {
   --shadow: 0 0 0 4px rgb(var(--ring-color));
 }
 
+.btn-left {
+  --justify: flex-start;
+}
+
 .btn-primary {
   --text-color: var(--white);
   --bg-color: var(--primary-600);
@@ -1335,8 +1368,7 @@ details[open] summary::before {
   --border-color: var(--gray-300);
   --shadow: var(--shadow-xs);
   --text-hover: var(--gray-800);
-  --ring-color: var(--gray-100)
-
+  --ring-color: var(--gray-100);
 }
 
 .btn-tertiary-color {
@@ -1345,6 +1377,15 @@ details[open] summary::before {
   --text-hover: var(--primary-700);
   --bg-hover: var(--primary-50);
   --ring-color: var(--primary-100);
+  --shadow: transparent;
+}
+
+.btn-tertiary-danger {
+  --text-color: var(--error-700);
+  --bg-color: transparent;
+  --bg-hover: var(--error-50);
+  --text-hover: var(--error-800);
+  --ring-color: var(--error-50);
   --shadow: transparent;
 }
 
@@ -1419,7 +1460,7 @@ details[open] summary::before {
   color: rgb(var(--placeholder-color));
 }
 
-.search-menu > li:hover  ul {
+.search-menu > li:hover ul {
   display: block;
 }
 
@@ -1446,6 +1487,36 @@ details[open] summary::before {
   --bg-color: var(--gray-400);
 }
 
+.badge {
+  --font-size: 0.75rem;
+  --color: var(--gray-700);
+  --bg-color: var(--gray-100);
+  --size: 0.125rem 0.5rem;
+  font-weight: 500;
+  color: rgb(var(--color));
+  background-color: rgb(var(--bg-color));
+  padding: var(--size);
+  font-size: var(--font-size);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+}
+
+.badge-md {
+  --font-size: 0.875rem;
+}
+
+.badge-lg {
+  --font-size: 0.875rem;
+  --size: 0.25rem 0.75rem;
+}
+
+.badge-success {
+  --bg-color: var(--success-50);
+  --color: var(--success-700);
+}
+
 /* https://github.com/nzbin/three-dots/blob/master/dist/three-dots.css */
 
 .dot-pulse {
@@ -1467,7 +1538,8 @@ details[open] summary::before {
           animation-delay: 0.25s;
 }
 
-.dot-pulse::before, .dot-pulse::after {
+.dot-pulse::before,
+.dot-pulse::after {
   content: "";
   display: inline-block;
   position: absolute;
@@ -1504,7 +1576,8 @@ details[open] summary::before {
     box-shadow: 9984px 0 0 2px;
   }
 
-  60%, 100% {
+  60%,
+  100% {
     box-shadow: 9984px 0 0 -5px;
   }
 }
@@ -1518,7 +1591,8 @@ details[open] summary::before {
     box-shadow: 9984px 0 0 2px;
   }
 
-  60%, 100% {
+  60%,
+  100% {
     box-shadow: 9984px 0 0 -5px;
   }
 }
@@ -1532,7 +1606,8 @@ details[open] summary::before {
     box-shadow: 9999px 0 0 2px;
   }
 
-  60%, 100% {
+  60%,
+  100% {
     box-shadow: 9999px 0 0 -5px;
   }
 }
@@ -1546,7 +1621,8 @@ details[open] summary::before {
     box-shadow: 9999px 0 0 2px;
   }
 
-  60%, 100% {
+  60%,
+  100% {
     box-shadow: 9999px 0 0 -5px;
   }
 }
@@ -1560,7 +1636,8 @@ details[open] summary::before {
     box-shadow: 10014px 0 0 2px;
   }
 
-  60%, 100% {
+  60%,
+  100% {
     box-shadow: 10014px 0 0 -5px;
   }
 }
@@ -1574,7 +1651,8 @@ details[open] summary::before {
     box-shadow: 10014px 0 0 2px;
   }
 
-  60%, 100% {
+  60%,
+  100% {
     box-shadow: 10014px 0 0 -5px;
   }
 }

@@ -7,7 +7,15 @@ i18next
   .use(i18n_http_middleware.LanguageDetector)
   .init({
     preload: ["uz", "ru", "en"],
-    ns: ["common", "signup", "login", "errors", "settings", "settings-details"],
+    ns: [
+      "common",
+      "signup",
+      "login",
+      "errors",
+      "settings",
+      "settings-details",
+      "settings-privacy",
+    ],
     fallbackLng: "ru",
     backend: {
       loadPath: process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.json",

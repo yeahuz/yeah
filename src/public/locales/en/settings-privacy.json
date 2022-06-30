@@ -1,0 +1,17 @@
+{
+  "title": "Security",
+  "description": "Privacy and security settings",
+  "devices": {
+    "title": "Devices",
+    "name": "Name",
+    "ip": "IP address",
+    "status": "Status"
+  },
+  "passkeys": {
+    "title": "Passkeys",
+    "public_key": "Public key",
+    "ip": "IP address",
+    "status": "Status"
+  },
+  "terminate_other_sessions": "Terminate all other sessions"
+}

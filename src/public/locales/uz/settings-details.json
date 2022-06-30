@@ -14,5 +14,17 @@
       "label": "Telefon raqam",
       "placeholder": "+998939152000"
     }
+  },
+  "general": {
+    "title": "Umumiy",
+    "description": "Bu yerda foydalanuvchi nomi va veb-sayt url-ni yangilang.",
+    "username": {
+      "label": "Foydalanuvchi nomi",
+      "placeholder": "juraev00"
+    },
+    "website": {
+      "label": "Veb-sayt",
+      "placeholder": "homeless.dev"
+    }
   }
 }

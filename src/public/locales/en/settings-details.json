@@ -14,5 +14,17 @@
       "label": "Phone",
       "placeholder": "+998939152000"
     }
+  },
+  "general": {
+    "title": "General",
+    "description": "Update your username and website url here.",
+    "username": {
+      "label": "Username",
+      "placeholder": "juraev00"
+    },
+    "website": {
+      "label": "Website",
+      "placeholder": "homeless.dev"
+    }
   }
 }

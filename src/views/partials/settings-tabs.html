@@ -1,28 +1,28 @@
 <ul class="flex flex-col space-y-2">
   <li>
     <a
-      class="btn btn-md <%= it.tab === 'details' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      class="btn btn-md btn-left <%= it.tab === 'details' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/details"
       ><%= it.t("tabs.details", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
-      class="btn btn-md <%= it.tab === 'privacy' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      class="btn btn-md btn-left <%= it.tab === 'privacy' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/privacy"
       ><%= it.t("tabs.privacy", { ns: "settings" })%></a
     >
   </li>
   <li>
     <a
-      class="btn btn-md <%= it.tab === 'billing' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      class="btn btn-md btn-left <%= it.tab === 'billing' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/billing"
       ><%= it.t("tabs.billing", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
-      class="btn btn-md <%= it.tab === 'notifications' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+      class="btn btn-md btn-left <%= it.tab === 'notifications' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
       href="/settings/notifications"
       ><%= it.t("tabs.notifications", { ns: "settings" })%></a
     >

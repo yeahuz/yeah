@@ -1,7 +1,7 @@
 import { request, option } from "./utils.js";
 import { disable_form, replace_text } from "./dom.js";
 
-const forms = document.querySelectorAll("form");
+const forms = document.querySelectorAll(".js-details-form");
 
 async function on_submit(e) {
   e.preventDefault();

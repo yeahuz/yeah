@@ -54,4 +54,9 @@ export const auth = async (fastify) => {
       body: auth_schema.telegram,
     },
   });
+  fastify.route({
+    method: "POST",
+    url: "/sessions",
+    handler: AuthController.update_sessions,
+  });
 };

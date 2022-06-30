@@ -14,5 +14,17 @@
       "label": "Номер телефона",
       "placeholder": "+998939152000"
     }
+  },
+  "general": {
+    "title": "Общее",
+    "description": "Обновите свое имя пользователя и адрес веб-сайта здесь.",
+    "username": {
+      "label": "Никнейм",
+      "placeholder": "juraev00"
+    },
+    "website": {
+      "label": "Вебсайт",
+      "placeholder": "homeless.dev"
+    }
   }
 }

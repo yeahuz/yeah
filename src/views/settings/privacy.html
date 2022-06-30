@@ -1,0 +1,49 @@
+<div class="w-full">
+  <section>
+    <header>
+      <h2 class="text-gray-900 text-lg font-medium"><%= it.t("title", { ns: "settings-privacy" }) %></h2>
+      <p class="text-gray-500 mt-1"><%= it.t("description", { ns: "settings-privacy" }) %></p>
+    </header>
+    <%~ includeFile('../partials/flash.html', it) %> 
+    <hr class="bg-gray-200 w-full mt-5 mb-6" />
+    <div>
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-gray-700 font-medium">
+          <%= it.t("devices.title", { ns: "settings-privacy" }) %>
+        </h3>
+        <% if (it.sessions.length > 1) { %>
+        <form action="/auth/sessions?redirect_uri=/settings/privacy" method="post">
+          <button class="btn btn-md btn-tertiary-danger" name="_action" value="terminate_other_sessions">
+            <%= it.t("terminate_other_sessions", { ns: "settings-privacy" } )%>
+          </button>
+        </form>
+        <%}%>
+      </div>
+      <table class="table-auto w-full rounded-lg overflow-hidden">
+        <thead class="text-left text-gray-500 text-sm">
+          <tr>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.name", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.ip", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.status", { ns: 'settings-privacy' })%></th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <% it.sessions.forEach(function (session) { %>
+            <tr>
+              <td class="font-medium p-3 text-gray-900"><%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %></td>
+              <td class="p-3 text-gray-500"><%= session.ip %></td>
+              <td class="p-3 text-gray-500">
+                <span class="badge badge-lg <%= session.id === it.current_sid ? "badge-success" : ""%>">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <%= session.id === it.current_sid ? it.t("online", { ns: "common" }) : it.date_formatter.format(session.created_at) %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

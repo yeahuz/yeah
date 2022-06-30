@@ -29,6 +29,7 @@ export async function start() {
   const app = fastify({
     logger: true,
     ignoreTrailingSlash: true,
+    trustProxy: true,
     ajv: {
       customOptions: { allErrors: true, messages: true, useDefaults: true },
       plugins: [ajv_errors],

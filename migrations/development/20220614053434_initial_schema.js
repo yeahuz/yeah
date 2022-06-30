@@ -111,7 +111,7 @@ export function up(knex) {
     .createTable("sessions", (table) => {
       table.increments("id");
       table.boolean("active").defaultTo(true);
-      table.string("user_agent");
+      table.string("ip");
       table.timestamps(false, true);
       table
         .integer("user_id")
@@ -120,6 +120,24 @@ export function up(knex) {
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
+    })
+    .createTable("user_agents", (table) => {
+      table.increments("id");
+      table.string("browser_name");
+      table.string("browser_version");
+      table.string("engine_name");
+      table.string("engine_version");
+      table.string("device_type");
+      table.string("device_model");
+      table.string("device_vendor");
+      table
+        .integer("session_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("sessions")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
     })
     .createTable("sessions_credentials", (table) => {
       table
@@ -166,12 +184,14 @@ export function up(knex) {
       table.increments("id");
       table
         .integer("status_id")
+        .index()
         .notNullable()
         .references("id")
         .inTable("posting_statuses")
         .onDelete("CASCADE");
       table
         .string("language_code")
+        .index()
         .notNullable()
         .references("code")
         .inTable("languages")
@@ -179,6 +199,48 @@ export function up(knex) {
       table.string("name");
       table.unique(["status_id", "language_code"]);
       table.timestamps(false, true);
+    })
+    .createTable("roles", (table) => {
+      table.increments("id");
+      table.enu("code", ["admin", "moderator"]);
+      table.timestamps(false, true);
+    })
+    .createTable("role_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("role_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("roles")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("title");
+      table.unique(["language_code", "role_id"]);
+      table.timestamps(false, true);
+    })
+    .createTable("user_roles", (table) => {
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .integer("role_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("roles")
+        .onDelete("CASCADE");
+      table.unique(["user_id", "role_id"]);
     })
     .createTable("categories", (table) => {
       table.increments("id");
@@ -445,6 +507,7 @@ export function up(knex) {
 export function down(knex) {
   return knex.schema
     .dropTable("sessions_credentials")
+    .dropTable("user_agents")
     .dropTable("sessions")
     .dropTable("credentials")
     .dropTable("transaction_status_translations")
@@ -452,6 +515,9 @@ export function down(knex) {
     .dropTable("transactions")
     .dropTable("user_reviews")
     .dropTable("user_cards")
+    .dropTable("user_roles")
+    .dropTable("role_translations")
+    .dropTable("roles")
     .dropTable("posting_bookmarks")
     .dropTable("conversation_members")
     .dropTable("messages")
