@@ -19,7 +19,7 @@
         </form>
         <%}%>
       </div>
-      <table class="table-auto w-full rounded-lg overflow-hidden">
+      <table class="table-auto w-full rounded-lg overflow-hidden shadow-sm">
         <thead class="text-left text-gray-500 text-sm">
           <tr>
             <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.name", { ns: 'settings-privacy' })%></th>
@@ -33,8 +33,8 @@
               <td class="font-medium p-3 text-gray-900"><%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %></td>
               <td class="p-3 text-gray-500"><%= session.ip %></td>
               <td class="p-3 text-gray-500">
-                <span class="badge badge-lg <%= session.id === it.current_sid ? "badge-success" : ""%>">
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2">
+                <span class="badge badge-sm <%= session.id === it.current_sid ? "badge-success" : ""%>">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-2">
                     <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   <%= session.id === it.current_sid ? it.t("online", { ns: "common" }) : it.date_formatter.format(session.created_at) %>
