@@ -47,8 +47,8 @@ export class DomainError extends Error {
 }
 
 export class ValidationError extends DomainError {
-  constructor({ key = "generic_internal", errors } = {}) {
-    super({ key, errors, status_code: 422 });
+  constructor({ key = "generic_validation_error", errors, params } = {}) {
+    super({ key, errors, status_code: 422, params });
   }
 }
 

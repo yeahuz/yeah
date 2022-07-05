@@ -15,6 +15,10 @@ import {
   GOOGLE_OAUTH_CLIENT_ID,
   TELEGRAM_BOT_TOKEN,
   NODE_ENV,
+  RP_ID,
+  RP_ID_DEV,
+  RP_NAME,
+  RP_NAME_DEV
 } from "./secrets.js";
 
 export const configs = {
@@ -30,6 +34,8 @@ export const configs = {
     google_oauth_client_id: GOOGLE_OAUTH_CLIENT_ID,
     telegram_bot_token: TELEGRAM_BOT_TOKEN,
     node_env: NODE_ENV,
+    rp_id: RP_ID,
+    rp_name: RP_NAME,
   },
   development: {
     port: PORT_DEV,
@@ -43,5 +49,7 @@ export const configs = {
     google_oauth_client_id: GOOGLE_OAUTH_CLIENT_ID,
     telegram_bot_token: TELEGRAM_BOT_TOKEN,
     node_env: NODE_ENV,
+    rp_id: RP_ID_DEV,
+    rp_name: RP_NAME_DEV,
   },
 };

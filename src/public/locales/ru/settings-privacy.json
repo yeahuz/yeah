@@ -9,9 +9,12 @@
   },
   "passkeys": {
     "title": "Ключа доступа",
-    "public_key": "Публичный ключ",
+    "name": "Название",
     "ip": "IP адрес",
     "status": "Статус"
   },
-  "terminate_other_sessions": "Завершить все остальные сеансы"
+  "terminate_other_sessions": "Завершить все остальные сеансы",
+  "add": "Добавить",
+  "passkey_name": "Название ключа",
+  "delete_all_keys": "Удалить все ключи"
 }

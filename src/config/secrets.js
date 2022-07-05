@@ -22,4 +22,8 @@ export const {
   GOOGLE_OAUTH_CLIENT_SECRET,
   GOOGLE_OAUTH_CLIENT_ID,
   TELEGRAM_BOT_TOKEN,
+  RP_ID,
+  RP_ID_DEV,
+  RP_NAME,
+  RP_NAME_DEV,
 } = process.env;

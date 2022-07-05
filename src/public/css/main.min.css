@@ -862,8 +862,8 @@ video {
   flex-basis: 18rem;
 }
 
-.table-auto {
-  table-layout: auto;
+.table-fixed {
+  table-layout: fixed;
 }
 
 .origin-center {

@@ -82,7 +82,7 @@ export async function start() {
     });
 
     app.setErrorHandler((err, req, reply) => {
-      console.log(err);
+      console.log({ err })
       const t = i18next.getFixedT(
         (req.language instanceof Function ? req.language() : req.language) ||
           "en"

@@ -9,9 +9,12 @@
   },
   "passkeys": {
     "title": "Passkeys",
-    "public_key": "Public key",
+    "name": "Name",
     "ip": "IP address",
     "status": "Status"
   },
-  "terminate_other_sessions": "Terminate all other sessions"
+  "terminate_other_sessions": "Terminate all other sessions",
+  "add": "Add",
+  "passkey_name": "Passkey name",
+  "delete_all_keys": "Delete all keys"
 }

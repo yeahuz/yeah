@@ -18,6 +18,10 @@ export async function update_one(req, reply) {
   );
 
   if (err) {
+    if (req.xhr) {
+      reply.code(err.status_code).send(err.build(t))
+      return reply
+    }
     req.flash("err", err.build(t));
     return reply.redirect(redirect_uri);
   }

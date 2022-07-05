@@ -1,5 +1,6 @@
-import { render_file } from "../utils/eta.js";
 import * as SessionService from "../services/session.service.js";
+import * as CredentialService from '../services/credential.service.js'
+import { render_file } from "../utils/eta.js";
 import { create_date_formatter } from "../utils/index.js";
 
 export async function get_tab(req, reply) {
@@ -115,23 +116,25 @@ export async function get_privacy(req, reply) {
   stream.push(settings_top);
 
   const sessions = await SessionService.get_many_for(user.id);
+  const credentials = await CredentialService.get_many().for(user.id)
 
   const privacy = await render_file("/settings/privacy.html", {
     user,
     flash,
     t,
     sessions,
+    credentials,
     current_sid,
     date_formatter: create_date_formatter(req.language),
   });
   stream.push(privacy);
 
-  const settings_bottom = await render_file("/settings/bottom.html");
+  const settings_bottom = await render_file("/settings/bottom.html", {
+    scripts: ["/public/js/settings.js"]
+  });
   stream.push(settings_bottom);
 
-  const bottom = await render_file("/partials/bottom.html", {
-    scripts: ["/public/js/settings.js"],
-  });
+  const bottom = await render_file("/partials/bottom.html");
 
   stream.push(bottom);
   stream.push(null);

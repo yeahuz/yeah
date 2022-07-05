@@ -1,5 +1,6 @@
 import { User } from "../models/index.js";
-import { ConflictError, InternalError } from "../utils/errors.js";
+import { ConflictError, InternalError, ValidationError } from "../utils/errors.js";
+import { parse_unique_error } from "../utils/index.js";
 import crypto from "crypto";
 
 import pkg from "objection";
@@ -34,11 +35,7 @@ export async function update_one(id, update) {
     await User.query().findById(id).patch(update);
   } catch (err) {
     if (err instanceof UniqueViolationError) {
-      // TODO: Need to find out which unique field user is violating
-      throw new ConflictError({
-        key: "user_exists",
-        params: { user: update.username },
-      });
+      throw new ValidationError({ errors: [ { message: "user_exists", instancePath:  err.columns[0] } ], params: { user: update[err.columns[0]] } })
     }
     throw new InternalError();
   }

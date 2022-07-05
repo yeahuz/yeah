@@ -6,7 +6,7 @@
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
     <hr class="bg-gray-200 w-full mt-5 mb-6" />
-    <div>
+    <div class="mb-8">
       <div class="flex justify-between items-center mb-5">
         <h3 class="text-gray-700 font-medium">
           <%= it.t("devices.title", { ns: "settings-privacy" }) %>
@@ -19,7 +19,7 @@
         </form>
         <%}%>
       </div>
-      <table class="table-auto w-full rounded-lg overflow-hidden shadow-sm">
+      <table class="table-fixed w-full rounded-lg overflow-hidden shadow-sm">
         <thead class="text-left text-gray-500 text-sm">
           <tr>
             <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.name", { ns: 'settings-privacy' })%></th>
@@ -44,6 +44,57 @@
           <% }) %>
         </tbody>
       </table>
+    </div>
+    <div>
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-gray-700 font-medium">
+          <%= it.t("passkeys.title", { ns: "settings-privacy" }) %>
+        </h3>
+        <% if (it.credentials.length > 1) { %>
+        <form action="/auth/sessions?redirect_uri=/settings/privacy" method="post">
+          <button class="btn btn-md btn-tertiary-danger" name="_action" value="terminate_other_sessions">
+            <%= it.t("delete_all_keys", { ns: "settings-privacy" } )%>
+          </button>
+        </form>
+        <%}%>
+      </div>
+      <% if(it.credentials.length) { %>
+      <table class="table-fixed w-full rounded-lg overflow-hidden shadow-sm mb-5">
+        <thead class="text-left text-gray-500 text-sm">
+          <tr>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.name", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.ip", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.status", { ns: 'settings-privacy' })%></th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <% it.credentials.forEach(function (credential) { %>
+            <tr>
+              <td class="font-medium p-3 text-gray-900"><%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %></td>
+              <td class="p-3 text-gray-500"><%= credential.title %></td>
+              <td class="p-3 text-gray-500">
+                <span class="badge badge-sm <%= session.id === it.current_sid ? "badge-success" : ""%>">
+                  <%= credential.status %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } %>
+      <form action="/auth/requests">
+        <label class="text-sm font-medium text-gray-700 block">
+          <%= it.t("passkey_name", { ns: "settings-privacy" })%>
+          <input type="text" name="title" class="form-control mt-2" placeholder="Macbook TouchID"/>
+        </label>
+        <input type="hidden" name="type" value="create" />
+        <button class="btn btn-md btn-primary mt-4">
+          <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <%= it.t("add", { ns: "settings-privacy" })%>
+        </button>
+      </form>
     </div>
   </section>
 </div>

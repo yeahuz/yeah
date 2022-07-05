@@ -1,10 +1,13 @@
 import * as AuthService from "../services/auth.service.js";
 import * as SessionService from "../services/session.service.js";
+import * as CredentialService from "../services/credential.service.js";
 import { render_file } from "../utils/eta.js";
 import { decrypt, encrypt, option, get_time } from "../utils/index.js";
 import { AuthenticationError } from "../utils/errors.js";
 import { google_oauth_client } from "../utils/google-oauth.js";
+import { CredentialRequest, AssertionRequest } from '../utils/webauthn.js'
 import config from "../config/index.js";
+
 
 export async function get_login(req, reply) {
   const { return_to = "/" } = req.query;
@@ -215,4 +218,32 @@ export async function update_sessions(req, reply) {
   }
 
   reply.redirect(`${redirect_uri}?t=${get_time()}`);
+}
+
+export async function generate_request(req, reply) {
+  const { type } = req.query
+  const user = req.user
+  let request
+
+  switch(type) {
+    case "create": {
+      request = CredentialRequest.from(user)
+      break
+    }
+    case "get": {
+      const credentials = await CredentialService.get_many().for(user.id)
+      request = AssertionRequest.from(credentials)
+      break
+    }
+    default:
+      break
+  }
+
+  reply.send(request)
+
+  return reply
+}
+
+export async function create_credential(req, reply) {
+
 }

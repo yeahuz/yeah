@@ -72,6 +72,10 @@ export function get_time() {
   return Math.floor(new Date().getTime() / 1000);
 }
 
+export function parse_unique_error(detail) {
+  return detail.match(/\((?<key>[^)]+)\)=\((?<value>[^)]+)\)/g)?.groups;
+}
+
 export function create_date_formatter(locale) {
   return new Intl.DateTimeFormat(locale, {
     year: "numeric",
@@ -81,4 +85,12 @@ export function create_date_formatter(locale) {
     hourCycle: "h24",
     minute: "numeric",
   });
+}
+
+export function hash_sha256(data) {
+  return crypto.createHash("SHA256").update(data).digest()
+}
+
+export function verify_signature(signature, data, public_key) {
+  return crypto.createVerify("SHA256").update(data).verify(public_key, signature)
 }

@@ -22,8 +22,9 @@ export function disable_form(form) {
       errorObject.errors.forEach((err, index) => {
         const field = form.querySelector(`[name=${err.field}]`);
         if (index === 0) field.focus();
-        const message_field = field.nextElementSibling;
-        if (message_field?.nodeName === "SMALL") message_field.textContent = err.message;
+        const label = field.closest("label")
+        const message_field = label.querySelector("small");
+        if (message_field) message_field.textContent = err.message;
       });
     }
   };

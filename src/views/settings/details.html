@@ -42,6 +42,7 @@
           <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">yeah.uz/</span>
           <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.username.placeholder", { ns: "settings-details" }) %>" name="username" value="<%= it.user.username ?? "" %>">
         </div>
+        <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.username ?? ""%></small>
       </label>
       <label class="w-full">
         <span class="text-sm font-medium text-gray-700"><%= it.t("general.website.label", { ns: "settings-details" }) %></span>
@@ -49,6 +50,7 @@
           <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">https://</span>
           <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.website.placeholder", { ns: "settings-details" }) %>" name="website_url" value="<%= it.user.website_url ?? "" %>">
         </div>
+        <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.website_url ?? ""%></small>
       </label>
       <hr class="bg-gray-200 w-full mt-6" />
       <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>

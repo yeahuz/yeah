@@ -55,6 +55,16 @@ export const auth = async (fastify) => {
     },
   });
   fastify.route({
+    method: "GET",
+    url: "/requests",
+    handler: AuthController.generate_request,
+  });
+  fastify.route({
+    method: "POST",
+    url: "/credentials",
+    handler: AuthController.create_credential
+  });
+  fastify.route({
     method: "POST",
     url: "/sessions",
     handler: AuthController.update_sessions,
