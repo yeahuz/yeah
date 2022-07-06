@@ -115,7 +115,7 @@ export async function get_privacy(req, reply) {
   });
   stream.push(settings_top);
 
-  const sessions = await SessionService.get_many_for(user.id);
+  const sessions = await SessionService.get_many().for(user.id, current_sid)
   const credentials = await CredentialService.get_many().for(user.id)
 
   const privacy = await render_file("/settings/privacy.html", {
@@ -124,13 +124,12 @@ export async function get_privacy(req, reply) {
     t,
     sessions,
     credentials,
-    current_sid,
     date_formatter: create_date_formatter(req.language),
   });
   stream.push(privacy);
 
   const settings_bottom = await render_file("/settings/bottom.html", {
-    scripts: ["/public/js/settings.js"]
+    scripts: ["/public/js/privacy.js"]
   });
   stream.push(settings_bottom);
 

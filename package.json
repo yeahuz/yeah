@@ -48,6 +48,7 @@
     "i18next": "^21.8.10",
     "i18next-fs-backend": "^1.1.4",
     "i18next-http-middleware": "^3.2.1",
+    "ioredis": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "2.1.0",
     "negotiator": "^0.6.3",

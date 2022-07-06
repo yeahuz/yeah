@@ -62,11 +62,21 @@ export const auth = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/credentials",
-    handler: AuthController.create_credential
+    handler: AuthController.add_credential
+  });
+  fastify.route({
+    method: "POST",
+    url: "/credentials/:id",
+    handler: AuthController.update_credential
   });
   fastify.route({
     method: "POST",
     url: "/sessions",
     handler: AuthController.update_sessions,
   });
+  fastify.route({
+    method: "POST",
+    url: "/sessions/:id",
+    handler: AuthController.update_session,
+  })
 };

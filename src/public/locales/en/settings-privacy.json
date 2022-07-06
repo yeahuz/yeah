@@ -10,8 +10,7 @@
   "passkeys": {
     "title": "Passkeys",
     "name": "Name",
-    "ip": "IP address",
-    "status": "Status"
+    "reg_date": "Registration date"
   },
   "terminate_other_sessions": "Terminate all other sessions",
   "add": "Add",

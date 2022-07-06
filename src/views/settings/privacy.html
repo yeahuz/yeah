@@ -19,27 +19,41 @@
         </form>
         <%}%>
       </div>
-      <table class="table-fixed w-full rounded-lg overflow-hidden shadow-sm">
+      <table class="w-full rounded-lg overflow-hidden shadow-sm">
         <thead class="text-left text-gray-500 text-sm">
-          <tr>
-            <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.name", { ns: 'settings-privacy' })%></th>
+          <tr class="border-b border-b-gray-200">
+            <th class="font-medium p-3 bg-gray-100 w-1/2"><%= it.t("devices.name", { ns: 'settings-privacy' })%></th>
             <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.ip", { ns: 'settings-privacy' })%></th>
             <th class="font-medium p-3 bg-gray-100"><%= it.t("devices.status", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"></th>
           </tr>
         </thead>
-        <tbody class="text-sm">
-          <% it.sessions.forEach(function (session) { %>
+        <tbody class="text-sm divide-y divide-gray-200">
+          <% it.sessions.forEach(function (session, idx) { %>
             <tr>
               <td class="font-medium p-3 text-gray-900"><%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %></td>
               <td class="p-3 text-gray-500"><%= session.ip %></td>
               <td class="p-3 text-gray-500">
-                <span class="badge badge-sm <%= session.id === it.current_sid ? "badge-success" : ""%>">
+                <span class="badge badge-sm <%= idx === 0 ? "badge-success" : ""%>">
+                  <% if (idx === 0) {%>
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-2">
                     <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <%= session.id === it.current_sid ? it.t("online", { ns: "common" }) : it.date_formatter.format(session.created_at) %>
+                  <% } %>
+                  <%= idx === 0 ? it.t("online", { ns: "common" }) : it.date_formatter.format(session.created_at) %>
                 </span>
               </td>
+              <% if (idx !== 0) { %>
+                <td class="p-3 text-gray-500 w-16">
+                  <form action="/auth/sessions/<%= session.id %>?redirect_uri=/settings/privacy" method="post" class="flex justify-center items-center">
+                    <button class="text-error-700 hover:bg-error-50 duration-200 rounded-lg p-2.5" name="_action" value="delete_one">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </form>
+                </td>
+              <% } %>
             </tr>
           <% }) %>
         </tbody>
@@ -51,38 +65,42 @@
           <%= it.t("passkeys.title", { ns: "settings-privacy" }) %>
         </h3>
         <% if (it.credentials.length > 1) { %>
-        <form action="/auth/sessions?redirect_uri=/settings/privacy" method="post">
-          <button class="btn btn-md btn-tertiary-danger" name="_action" value="terminate_other_sessions">
+        <form action="/auth/credentials?redirect_uri=/settings/privacy" method="post">
+          <button class="btn btn-md btn-tertiary-danger" name="_action" value="delete_credentials">
             <%= it.t("delete_all_keys", { ns: "settings-privacy" } )%>
           </button>
         </form>
         <%}%>
       </div>
-      <% if(it.credentials.length) { %>
-      <table class="table-fixed w-full rounded-lg overflow-hidden shadow-sm mb-5">
+      <% if (it.credentials.length) { %>
+      <table class="w-full rounded-lg overflow-hidden shadow-sm mb-5">
         <thead class="text-left text-gray-500 text-sm">
-          <tr>
-            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.name", { ns: 'settings-privacy' })%></th>
-            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.ip", { ns: 'settings-privacy' })%></th>
-            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.status", { ns: 'settings-privacy' })%></th>
+          <tr class="border-b border-b-gray-200">
+            <th class="font-medium p-3 bg-gray-100 w-3/5"><%= it.t("passkeys.name", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"><%= it.t("passkeys.reg_date", { ns: 'settings-privacy' })%></th>
+            <th class="font-medium p-3 bg-gray-100"></th>
           </tr>
         </thead>
-        <tbody class="text-sm">
+        <tbody class="text-sm divide-y divide-gray-200">
           <% it.credentials.forEach(function (credential) { %>
             <tr>
-              <td class="font-medium p-3 text-gray-900"><%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %></td>
-              <td class="p-3 text-gray-500"><%= credential.title %></td>
-              <td class="p-3 text-gray-500">
-                <span class="badge badge-sm <%= session.id === it.current_sid ? "badge-success" : ""%>">
-                  <%= credential.status %>
-                </span>
+              <td class="p-3 text-gray-900 font-medium"><%= credential.title %></td>
+              <td class="p-3 text-gray-500"><%= it.date_formatter.format(credential.created_at) %></td>
+              <td class="p-3 text-gray-500 w-16">
+                <form action="/auth/credentials/<%= credential.id %>?redirect_uri=/settings/privacy" method="post" class="flex justify-center items-center">
+                  <button class="text-error-700 hover:bg-error-50 duration-200 rounded-lg p-2.5" name="_action" value="delete_one">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </form>
               </td>
             </tr>
           <% }) %>
         </tbody>
       </table>
       <% } %>
-      <form action="/auth/requests">
+      <form action="/auth/requests" class="js-credential-request-form">
         <label class="text-sm font-medium text-gray-700 block">
           <%= it.t("passkey_name", { ns: "settings-privacy" })%>
           <input type="text" name="title" class="form-control mt-2" placeholder="Macbook TouchID"/>

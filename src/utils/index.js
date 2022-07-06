@@ -91,6 +91,15 @@ export function hash_sha256(data) {
   return crypto.createHash("SHA256").update(data).digest()
 }
 
-export function verify_signature(signature, data, public_key) {
+export function verify_sha256(signature, data, public_key) {
   return crypto.createVerify("SHA256").update(data).verify(public_key, signature)
+}
+
+export function get_domain_without_subdomain(url) {
+  const urlParts = new URL(url).hostname.split(".");
+
+  return urlParts
+    .slice(0)
+    .slice(-(urlParts.length === 4 ? 3 : 2))
+    .join(".");
 }

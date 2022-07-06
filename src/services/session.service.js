@@ -35,14 +35,15 @@ export async function validate_one(id) {
   return session?.active;
 }
 
-export async function get_many_for(
-  user_id,
-  relations = ["user_agent(browser_selects)"]
-) {
-  if (!user_id) return [];
-  return await Session.query()
-    .where({ user_id })
-    .withGraphJoined(format_relations(relations));
+export function get_many(query, relations = ["user_agent(browser_selects)"]) {
+  return {
+    async for(user_id, current_sid) {
+      return await Session.query()
+        .where({user_id})
+        .withGraphFetched(format_relations(relations))
+        .orderByRaw(`(case when id = ? then 1 end) asc, created_at desc`, [current_sid])
+    }
+  }
 }
 
 export async function delete_many(ids) {

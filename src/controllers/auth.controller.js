@@ -1,11 +1,13 @@
 import * as AuthService from "../services/auth.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
+import { redis_client } from '../services/redis.service.js'
 import { render_file } from "../utils/eta.js";
 import { decrypt, encrypt, option, get_time } from "../utils/index.js";
 import { AuthenticationError } from "../utils/errors.js";
 import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from '../utils/webauthn.js'
+import { randomBytes } from "crypto";
 import config from "../config/index.js";
 
 
@@ -13,11 +15,13 @@ export async function get_login(req, reply) {
   const { return_to = "/" } = req.query;
   const flash = reply.flash();
 
+  const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
   const oauth_state = encrypt(
     JSON.stringify({ came_from: req.url, return_to })
   );
 
   req.session.set("oauth_state", oauth_state);
+  req.session.set("nonce", nonce);
 
   const stream = reply.init_stream();
   const user = req.user;
@@ -39,8 +43,10 @@ export async function get_login(req, reply) {
     flash,
     google_oauth_client_id: config.google_oauth_client_id,
     oauth_state,
+    nonce
   });
   stream.push(login);
+  redis_client.setex(nonce, 86400, 1);
 
   const bottom = await render_file("/partials/bottom.html");
   stream.push(bottom);
@@ -50,7 +56,17 @@ export async function get_login(req, reply) {
 }
 
 export async function get_signup(req, reply) {
+  const { return_to = "/" } = req.query
   const flash = reply.flash();
+
+  const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
+  const oauth_state = encrypt(
+    JSON.stringify({ came_from: req.url, return_to })
+  );
+
+  req.session.set("oauth_state", oauth_state);
+  req.session.set("nonce", nonce);
+
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
@@ -63,8 +79,15 @@ export async function get_signup(req, reply) {
   const header = await render_file("/partials/header.html", { t, user: user });
   stream.push(header);
 
-  const signup = await render_file("/auth/signup.html", { t, flash });
+  const signup = await render_file("/auth/signup.html", {
+    t,
+    flash,
+    google_oauth_client_id: config.google_oauth_client_id,
+    oauth_state,
+    nonce
+  });
   stream.push(signup);
+  redis_client.setex(nonce, 86400, 1);
 
   const bottom = await render_file("/partials/bottom.html");
   stream.push(bottom);
@@ -90,6 +113,8 @@ export async function signup(req, reply) {
   }
 
   req.session.set("sid", result.session.id);
+  req.session.set("oauth_state", null);
+  req.session.set("nonce", null);
   reply.redirect(`${return_to}?t=${get_time()}`);
   return reply;
 }
@@ -111,6 +136,8 @@ export async function login(req, reply) {
   }
 
   req.session.set("sid", result.session.id);
+  req.session.set("oauth_state", null);
+  req.session.set("nonce", null);
   reply.redirect(`${return_to}?t=${get_time()}`);
   return reply;
 }
@@ -163,6 +190,8 @@ export async function google_callback(req, reply) {
   }
 
   req.session.set("sid", result.session.id);
+  req.session.set("oauth_state", null);
+  req.session.set("nonce", null);
   reply.redirect(`${decrypted.return_to}?t=${get_time()}`);
 }
 
@@ -185,6 +214,8 @@ export async function google_one_tap(req, reply) {
   });
 
   req.session.set("sid", session.id);
+  req.session.set("oauth_state", null);
+  req.session.set("nonce", null);
   return { status: "oke" };
 }
 
@@ -200,6 +231,8 @@ export async function telegram_callback(req, reply) {
   });
 
   req.session.set("sid", session.id);
+  req.session.set("oauth_state", null);
+  req.session.set("nonce", null);
   return { status: "oke" };
 }
 
@@ -218,6 +251,22 @@ export async function update_sessions(req, reply) {
   }
 
   reply.redirect(`${redirect_uri}?t=${get_time()}`);
+}
+
+export async function update_session(req, reply) {
+  const { id } = req.params
+  const { _action } = req.body
+  const { redirect_uri } = req.query
+
+  switch(_action) {
+    case "delete_one":
+      await SessionService.delete_one(id);
+      break;
+    default:
+      break;
+  }
+
+  reply.redirect(`${redirect_uri}?t=${get_time()}`)
 }
 
 export async function generate_request(req, reply) {
@@ -239,11 +288,55 @@ export async function generate_request(req, reply) {
       break
   }
 
+  req.session.set("challenge", request.challenge);
   reply.send(request)
 
   return reply
 }
 
-export async function create_credential(req, reply) {
+export async function add_credential(req, reply) {
+  const credential = req.body
+  const challenge = req.session.get("challenge");
+  const user = req.user;
 
+  const [client_result, client_err] = await option(CredentialRequest.validate_client_data(credential, challenge))
+
+  if (client_err) {
+    reply.code(client_err.status_code).send(client_err)
+    return reply;
+  }
+
+  const [response_result, response_err] = CredentialRequest.validate_response(credential);
+
+  if (response_err) {
+    reply.code(response_err.status_code).send(response_err);
+    return reply;
+  }
+
+  await CredentialService.create_one({
+    public_key: response_result.public_key,
+    counter: response_result.counter,
+    credential_id: response_result.cred_id,
+    transports: credential.transports,
+    title: credential.title,
+    user_id: user.id
+  })
+
+  return { status: 'oke' }
+}
+
+export async function update_credential(req, reply) {
+  const { id } = req.params
+  const { _action } = req.body
+  const { redirect_uri } = req.query
+
+  switch(_action) {
+    case "delete_one":
+      await CredentialService.delete_one(id);
+      break;
+    default:
+      break;
+  }
+
+  reply.redirect(`${redirect_uri}?t=${get_time()}`)
 }

@@ -10,8 +10,7 @@
   "passkeys": {
     "title": "Kirish kalitlari",
     "name": "Nomi",
-    "ip": "IP",
-    "status": "Holat"
+    "reg_date": "Qo'shilgan sana"
   },
   "terminate_other_sessions": "Boshqa barcha seanslarni tugatish",
   "add": "Qo'shish",
