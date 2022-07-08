@@ -88,7 +88,7 @@ export async function start() {
           "en"
       );
 
-      const { redirect_uri } = req.query;
+      const { return_to } = req.query;
 
       if (err.validation) {
         if (req.xhr) {
@@ -103,7 +103,7 @@ export async function start() {
             .errors_as_object()
             .build(t).errors
         );
-        return reply.code(302).redirect(`${redirect_uri}?t=${get_time()}`);
+        return reply.code(302).redirect(`${return_to}?t=${get_time()}`);
       }
 
       if (err instanceof DomainError) {

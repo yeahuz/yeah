@@ -1,11 +1,11 @@
 <div class="max-w-2xl w-full">
-  <section>
+  <section class="personal-details">
     <header>
       <h2 class="text-gray-900 text-lg font-medium"><%= it.t("personal.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1"><%= it.t("personal.description", { ns: "settings-details" }) %></p>
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
-    <form action="/users/<%= it.user.id %>?redirect_uri=/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
       <div class="flex space-x-6 mb-6">
         <label class="text-sm font-medium text-gray-700 w-full"> <%= it.t("personal.name.label", { ns: "settings-details" }) %>
             <input type="text" class="form-control mt-2"
@@ -30,12 +30,12 @@
       <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>
     </form>
   </section>
-  <section>
+  <section id="general-details">
     <header>
       <h2 class="text-gray-900 text-lg font-medium"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1"><%= it.t("general.description", { ns: "settings-details" }) %></p>
     </header>
-    <form action="/users/<%= it.user.id %>?redirect_uri=/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
       <label class="w-full mb-6">
         <span class="text-sm font-medium text-gray-700"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>
         <div class="flex mt-2">

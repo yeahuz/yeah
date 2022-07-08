@@ -1,6 +1,7 @@
 import * as AuthService from "../services/auth.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
+import * as UserService from "../services/user.service.js";
 import { redis_client } from '../services/redis.service.js'
 import { render_file } from "../utils/eta.js";
 import { decrypt, encrypt, option, get_time } from "../utils/index.js";
@@ -126,16 +127,28 @@ export async function login(req, reply) {
   const ip = req.ip;
   const t = req.i18n.t;
 
-  const [result, err] = await option(
-    AuthService.login({ email_phone, password, user_agent, ip })
-  );
+  const [ user, user_err ] = await option(AuthService.verify_password({ email_phone, password }));
+  if (user_err) {
+    req.flash("err", user_err.build(t));
+    return reply.redirect(req.url);
+  }
+
+  const has_credential = await CredentialService.exists_for(user.id);
+
+  if (has_credential) {
+    req.session.set("user_id", user.id);
+    reply.redirect(`/auth/webauthn?return_to=${return_to}`)
+    return reply;
+  }
+
+  const [session, err] = await option(SessionService.create_one({ user_id: user.id, user_agent, ip }))
 
   if (err) {
     req.flash("err", err.build(t));
     return reply.redirect(req.url);
   }
 
-  req.session.set("sid", result.session.id);
+  req.session.set("sid", session.id);
   req.session.set("oauth_state", null);
   req.session.set("nonce", null);
   reply.redirect(`${return_to}?t=${get_time()}`);
@@ -240,7 +253,7 @@ export async function update_sessions(req, reply) {
   const user = req.user;
   const sid = req.session.get("sid");
   const { _action } = req.body;
-  const { redirect_uri } = req.query;
+  const { return_to } = req.query;
 
   switch (_action) {
     case "terminate_other_sessions":
@@ -250,13 +263,13 @@ export async function update_sessions(req, reply) {
       break;
   }
 
-  reply.redirect(`${redirect_uri}?t=${get_time()}`);
+  reply.redirect(`${return_to}?t=${get_time()}`);
 }
 
 export async function update_session(req, reply) {
   const { id } = req.params
   const { _action } = req.body
-  const { redirect_uri } = req.query
+  const { return_to } = req.query
 
   switch(_action) {
     case "delete_one":
@@ -266,12 +279,13 @@ export async function update_session(req, reply) {
       break;
   }
 
-  reply.redirect(`${redirect_uri}?t=${get_time()}`)
+  reply.redirect(`${return_to}?t=${get_time()}`)
 }
 
 export async function generate_request(req, reply) {
   const { type } = req.query
-  const user = req.user
+  const user_id = req.session.get("user_id")
+  const user = req.user || await UserService.get_one(user_id);
   let request
 
   switch(type) {
@@ -299,19 +313,8 @@ export async function add_credential(req, reply) {
   const challenge = req.session.get("challenge");
   const user = req.user;
 
-  const [client_result, client_err] = await option(CredentialRequest.validate_client_data(credential, challenge))
-
-  if (client_err) {
-    reply.code(client_err.status_code).send(client_err)
-    return reply;
-  }
-
-  const [response_result, response_err] = CredentialRequest.validate_response(credential);
-
-  if (response_err) {
-    reply.code(response_err.status_code).send(response_err);
-    return reply;
-  }
+  CredentialRequest.validate_client_data(credential, challenge)
+  const response_result = CredentialRequest.validate_response(credential);
 
   await CredentialService.create_one({
     public_key: response_result.public_key,
@@ -325,10 +328,35 @@ export async function add_credential(req, reply) {
   return { status: 'oke' }
 }
 
+export async function verify_assertion(req, reply) {
+  const user_id = req.session.get("user_id");
+  const challenge = req.session.get("challenge");
+  const assertion = req.body;
+  const user_agent = req.headers['user-agent'];
+  const ip = req.ip;
+  const { return_to = "/" } = req.query;
+
+  AssertionRequest.validate_client_data(assertion, challenge)
+
+  const credential = await CredentialService.get_one(assertion.id);
+  const auth_data = await AssertionRequest.validate_response(assertion, credential);
+
+  await credential.$query().patch({ counter: auth_data.counter });
+
+  const [session, err] = await option(SessionService.create_one({ user_id, user_agent, ip }))
+
+  req.session.set("sid", session.id);
+  req.session.set("nonce", null);
+  req.session.set("oauth_state", null);
+  req.session.set("user_id", null);
+
+  return reply.redirect(`${return_to}?t=${get_time()}`);
+}
+
 export async function update_credential(req, reply) {
   const { id } = req.params
   const { _action } = req.body
-  const { redirect_uri } = req.query
+  const { return_to } = req.query
 
   switch(_action) {
     case "delete_one":
@@ -338,5 +366,39 @@ export async function update_credential(req, reply) {
       break;
   }
 
-  reply.redirect(`${redirect_uri}?t=${get_time()}`)
+  reply.redirect(`${return_to}?t=${get_time()}`)
+}
+
+
+export async function get_webauthn(req, reply) {
+  const user_id = req.session.get("user_id");
+  const { return_to = "/" } = req.query;
+
+  if (!user_id) {
+    reply.redirect(`/auth/login?return_to=${return_to}`);
+    return reply;
+  }
+
+  const stream = reply.init_stream();
+  const t = req.i18n.t;
+
+  const top = await render_file("/partials/top.html", {
+    meta: { title: t("title", { ns: "signup" }), lang: req.language },
+  });
+  stream.push(top);
+
+  const header = await render_file("/partials/header.html", { t });
+  stream.push(header);
+
+  const webauthn = await render_file("/auth/webauthn.html", { t })
+  stream.push(webauthn);
+
+  const bottom = await render_file("/partials/bottom.html", {
+    scripts: ["/public/js/webauthn.js"]
+  });
+  stream.push(bottom);
+
+  stream.push(null);
+
+  return reply;
 }

@@ -1,4 +1,5 @@
 {
   "must be object": "must be object",
-  "!": "!"
+  "!": "!",
+  "must have required property 'password'": "must have required property 'password'"
 }

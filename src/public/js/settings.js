@@ -16,7 +16,9 @@ async function on_submit(e) {
     request(form.action, {
       method: form.method,
       body: data,
-      replace_state: true,
+      state: {
+        replace: true,
+      }
     })
   );
 

@@ -3,7 +3,7 @@ import * as UserService from "../services/user.service.js";
 
 export async function update_one(req, reply) {
   const { id } = req.params;
-  const { redirect_uri } = req.query;
+  const { return_to } = req.query;
   const { name, email, phone, website_url, username } = req.body;
   const t = req.i18n.t;
 
@@ -23,8 +23,8 @@ export async function update_one(req, reply) {
       return reply
     }
     req.flash("err", err.build(t));
-    return reply.redirect(redirect_uri);
+    return reply.redirect(return_to);
   }
 
-  return reply.redirect(`${redirect_uri}?t=${get_time()}`);
+  return reply.redirect(`${return_to}?t=${get_time()}`);
 }

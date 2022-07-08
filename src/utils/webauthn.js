@@ -35,7 +35,7 @@ function parse_auth_data(buffer) {
 
   const counter_buf = buffer.slice(0, 4);
   buffer = buffer.slice(4);
-  const counter = counter_buf.readUInt32BE();
+  const counter = counter_buf.readUInt32BE(0);
 
   const aaguid = buffer.slice(0, 16);
   buffer = buffer.slice(16);
@@ -43,7 +43,7 @@ function parse_auth_data(buffer) {
   const cred_id_len_buf = buffer.slice(0, 2);
   buffer = buffer.slice(2);
 
-  const cred_id_len = cred_id_len_buf.readUInt16BE();
+  const cred_id_len = cred_id_len_buf.readUInt16BE(0);
   const cred_id_buf = buffer.slice(0, cred_id_len);
   buffer = buffer.slice(cred_id_len);
 
@@ -85,7 +85,7 @@ function parse_authenticator_data(buffer) {
 }
 
 function client_data_validator(type) {
-  return async function validate_cient_data(credential, challenge) {
+  return function validate_cient_data(credential, challenge) {
     const client_data = JSON.parse(base64url.decode(credential.response.client_data_json));
 
     if (client_data.type !== type) {
@@ -160,30 +160,25 @@ export class CredentialRequest {
     return new CredentialRequest(user)
   }
 
-  static async validate_client_data(credential, challenge) {
+  static validate_client_data(credential, challenge) {
     const validate = client_data_validator("webauthn.create");
-    return await validate(credential, challenge);
+    return validate(credential, challenge);
   }
 
   static validate_response(credential) {
-    try {
-      const attestation_buffer = base64url.toBuffer(credential.response.attestation_object);
-      const attestation_object = cbor.decodeAllSync(attestation_buffer)[0];
-      const result = parse_auth_data(attestation_object.authData);
+    const attestation_buffer = base64url.toBuffer(credential.response.attestation_object);
+    const attestation_object = cbor.decodeAllSync(attestation_buffer)[0];
+    const auth_data = parse_auth_data(attestation_object.authData);
 
-      if (result.cred_id_len > 1023) {
-        throw new ValidationError({ key: "!valid_cred_len" });
-      }
-
-      if (!result.flags.up) {
-        throw new ValidationError({ key: "!user_present" })
-      }
-
-      return [result, null]
-    } catch (err) {
-      console.log('here', err)
-      return [null, new ValidationError()]
+    if (auth_data.cred_id_len > 1023) {
+      throw new ValidationError({ key: "!valid_cred_len" });
     }
+
+    if (!auth_data.flags.up) {
+      throw new ValidationError({ key: "!user_present" })
+    }
+
+    return auth_data;
   }
 }
 
@@ -204,38 +199,29 @@ export class AssertionRequest {
     return new AssertionRequest(credentials)
   }
 
-  static async validate_client_data(assertion, challenge) {
+  static validate_client_data(assertion, challenge) {
     const validate = client_data_validator("webauthn.get");
-    return await validate(assertion, challenge);
+    return validate(assertion, challenge);
   }
 
-  static async validate_response(assertion) {
-    try {
-      const authenticator_data = base64url.toBuffer(assertion.response.authenticator_data);
-      const auth_data = parse_authenticator_data(authenticator_data);
-      const credential = await CredentialService.get_one(assertion.id);
+  static validate_response(assertion, credential) {
+    const authenticator_data = base64url.toBuffer(assertion.response.authenticator_data);
+    const auth_data = parse_authenticator_data(authenticator_data);
 
-      if (!auth_data.flags.up) {
-        throw new ValidationError({ key: "!user_present" });
-      }
-
-      if (auth_data.counter <= credential.counter) {
-        throw new ValidationErrror({ key: "!counter_increased" });
-      }
-
-      const client_data_hash = hash_sha256(base64url.toBuffer(assertion.response.client_data_json));
-      const signature_base = Buffer.concat([authenticator_data, client_data_hash]);
-      const public_key = asn1_to_pem(base64url.toBuffer(credential.public_key));
-      const signature = base64url.toBuffer(assertion.response.signature);
-      const is_valid = verify_sha256(signature, signature_base, public_key);
-
-      if (!is_valid) {
-        throw new ValidationError({ key: "!signagure_verified" })
-      }
-
-      return [auth_data, null];
-    } catch (err) {
-      return [null, new ValidationError()];
+    if (!auth_data.flags.up) {
+      throw new ValidationError({ key: "!user_present" });
     }
+
+    const client_data_hash = hash_sha256(base64url.toBuffer(assertion.response.client_data_json));
+    const signature_base = Buffer.concat([authenticator_data, client_data_hash]);
+    const public_key = asn1_to_pem(base64url.toBuffer(credential.public_key));
+    const signature = base64url.toBuffer(assertion.response.signature);
+    const is_valid = verify_sha256(signature, signature_base, public_key);
+
+    if (!is_valid) {
+      throw new ValidationError({ key: "!signagure_verified" })
+    }
+
+    return auth_data;
   }
 }

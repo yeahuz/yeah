@@ -1,6 +1,6 @@
 export async function request(
   url,
-  { body, query, method, timeout = 60000, replace_state, ...custom_config } = {}
+  { body, query, method, timeout = 60000, state = {}, ...custom_config } = {}
 ) {
   if (query) {
     url += `?${new URLSearchParams(query).toString()}`;
@@ -22,8 +22,11 @@ export async function request(
   };
 
   return window.fetch(url, config).then(async (response) => {
-    if (replace_state && response.redirected) {
+    if (state.replace && response.redirected) {
       window.history.replaceState(null, "", response.url);
+      if (state.reload) {
+        window.location.reload();
+      }
     }
     clearTimeout(timerId);
     const accept = config.headers["Accept"];

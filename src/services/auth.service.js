@@ -51,6 +51,21 @@ export async function signup({
   }
 }
 
+export async function verify_password({ email_phone, password }) {
+  const user = await UserService.get_by_email_phone(email_phone);
+  if (!user)
+    throw new ResourceNotFoundError({
+      key: "!user_exists",
+      params: { user: email_phone },
+    });
+
+  const is_valid = await user.verify_password(password);
+
+  if (!is_valid) throw new BadRequestError({ key: "invalid_password" });
+
+  return user;
+}
+
 export async function login({ email_phone, password, user_agent, ip }) {
   const user = await UserService.get_by_email_phone(email_phone);
   if (!user)

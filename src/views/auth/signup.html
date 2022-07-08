@@ -4,7 +4,7 @@
   <form action="/auth/signup" method="post">
     <input type="hidden" name="nonce" value="<%= it.nonce %>" />
     <label class="text-sm font-medium text-gray-700">
-      <%= it.t("email.label", { ns: "signup"}) %> <input type="text" class="form-control mt-2"
+      <%= it.t("email.label", { ns: "signup"}) %> <input type="text" autocomplete="tel email" class="form-control mt-2"
       placeholder="<%= it.t("email.placeholder", { ns: "signup" }) %>" name="email_phone"
       pattern="^(\+?998[0-9]{9})|(\w+@\w+\.\w{2,3})$" required />
     </label>
@@ -30,7 +30,7 @@
     <noscript>
       <a
         class="btn btn-secondary btn-lg btn-enabled w-full mt-4"
-        href="//accounts.google.com/o/oauth2/auth?client_id=<%= it.google_oauth_client_id %>&state=<%= it.oauth_state %>&scope=email profile&response_type=code&redirect_uri=http://localhost:3000/auth/google"
+        href="//accounts.google.com/o/oauth2/auth?client_id=<%= it.google_oauth_client_id %>&state=<%= it.oauth_state %>&scope=email profile&response_type=code&return_to=http://localhost:3000/auth/google"
       >
         <svg
           width="25"
