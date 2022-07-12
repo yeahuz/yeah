@@ -49,7 +49,17 @@ export class User extends BaseModel {
   }
 
   set_username() {
-    this.username = this.name + randomBytes(4).readUInt32LE();
+    const random_suffix = randomBytes(4).readUInt32LE();
+
+    if (this.name) {
+      this.username = this.name + random_suffix;
+      return;
+    }
+
+    if (this.phone || this.email) {
+      this.username = btoa(this.phone || this.email) + random_suffix;
+      return;
+    }
   }
 
   set_avatar() {
