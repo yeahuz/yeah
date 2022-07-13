@@ -24,3 +24,12 @@ export async function exists_for(user_id) {
   const credentials = await Credential.query().select(1).whereExists(Credential.query().select(1).where({ user_id }).limit(1))
   return !!credentials.length;
 }
+
+
+export function delete_many() {
+  return {
+    async for(user_id) {
+      return await Credential.query().where({ user_id }).delete();
+    }
+  }
+}

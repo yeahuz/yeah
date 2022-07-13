@@ -1,15 +1,8 @@
 import { option, request } from './utils.js'
-import * as base64url from './base64-url.js';
+import { toast } from './toast.js'
+import { add_credential, format_credential_request } from './webauthn.js'
 
 const credential_request_form = document.querySelector(".js-credential-request-form");
-
-
-function format_credential_request(credential_request) {
-  credential_request.challenge = base64url.decode(credential_request.challenge);
-  credential_request.user.id = base64url.decode(credential_request.user.id);
-
-  return credential_request;
-}
 
 credential_request_form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -24,7 +17,7 @@ credential_request_form.addEventListener("submit", async (e) => {
   const [credential_request, credential_request_err] = await option(request(resource));
 
   if (credential_request_err) {
-    console.log(credential_request_err)
+    toast(credential_request_err.message, "err");
     return
   }
 
@@ -36,33 +29,7 @@ credential_request_form.addEventListener("submit", async (e) => {
   const [result, err] = await option(add_credential(Object.assign(credential, { title: data.get("title") })))
 
   if (err) {
-    console.log(err);
+    toast(err.message, "err")
     return
   }
 });
-
-async function add_credential(credential) {
-  const [raw_id, attestation_object, client_data_json] = await Promise.all([
-    base64url.encode(credential.rawId),
-    base64url.encode(credential.response.attestationObject),
-    base64url.encode(credential.response.clientDataJSON),
-  ])
-
-  return await request("/auth/credentials?return_to=/settings/privacy", {
-    body: {
-      id: credential.id,
-      raw_id,
-      type: credential.type,
-      response: {
-        attestation_object,
-        client_data_json
-      },
-      transports: credential.response.getTransports?.() || [],
-      title: credential.title
-    },
-    state: {
-      reload: true,
-      replace: true,
-    }
-  })
-}

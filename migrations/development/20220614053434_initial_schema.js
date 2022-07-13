@@ -95,7 +95,7 @@ export function up(knex) {
     .createTable("credentials", (table) => {
       table.increments("id");
       table.string("credential_id", 1024);
-      table.string("title");
+      table.string("title").notNullable().unique();
       table.text("public_key");
       table.integer("counter");
       table.json("transports");

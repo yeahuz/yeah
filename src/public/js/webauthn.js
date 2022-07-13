@@ -1,10 +1,9 @@
 import { option, request } from './utils.js';
 import { disable_form, replace_text } from './dom.js'
 import { decode, encode } from './base64-url.js';
+import { toast } from './toast.js'
 
-const assertion_request_form = document.querySelector(".js-assertion-request-form");
-
-function format_assertion_request(assertion) {
+export function format_assertion_request(assertion) {
   assertion.allowCredentials = assertion.allowCredentials.map((credential) => ({
     ...credential,
     id: decode(credential.id)
@@ -14,38 +13,14 @@ function format_assertion_request(assertion) {
   return assertion;
 }
 
-assertion_request_form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+export function format_credential_request(credential_request) {
+  credential_request.challenge = decode(credential_request.challenge);
+  credential_request.user.id = decode(credential_request.user.id);
 
-  const form = e.target;
-  const resource = new URL(form.action);
-  const data = new FormData(form);
+  return credential_request;
+}
 
-  resource.search = new URLSearchParams(data);
-
-  const enable_form = disable_form(form);
-  const button = form.querySelector("button");
-  const restore_text = replace_text(button, button.dataset.loading_text);
-
-  const [assertion_request, assertion_request_err] = await option(request(resource));
-
-  const [assertion, assertion_err] = await option(window.navigator.credentials.get({
-    publicKey: format_assertion_request(assertion_request),
-  }))
-
-  if (assertion_err) {
-    enable_form(assertion_err);
-    restore_text();
-    return
-  }
-
-  enable_form(assertion_request_err);
-  restore_text();
-
-  const [_, verification_err] = await option(verify_assertion(assertion));
-})
-
-async function verify_assertion(assertion) {
+export async function verify_assertion(assertion) {
   const [raw_id, authenticator_data, client_data_json, signature, user_handle] = await Promise.all([
     encode(assertion.rawId),
     encode(assertion.response.authenticatorData),
@@ -68,6 +43,32 @@ async function verify_assertion(assertion) {
     state: {
       replace: true,
       reload: true,
+    }
+  })
+}
+
+export async function add_credential(credential) {
+  const [raw_id, attestation_object, client_data_json] = await Promise.all([
+    encode(credential.rawId),
+    encode(credential.response.attestationObject),
+    encode(credential.response.clientDataJSON),
+  ])
+
+  return await request("/auth/credentials?return_to=/settings/privacy", {
+    body: {
+      id: credential.id,
+      raw_id,
+      type: credential.type,
+      response: {
+        attestation_object,
+        client_data_json
+      },
+      transports: credential.response.getTransports?.() || [],
+      title: credential.title
+    },
+    state: {
+      reload: true,
+      replace: true,
     }
   })
 }

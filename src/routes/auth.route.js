@@ -77,7 +77,7 @@ export const auth = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/credentials",
-    handler: AuthController.add_credential,
+    handler: AuthController.update_credentials,
     onRequest: fastify.can(authenticated_user),
   });
   fastify.route({

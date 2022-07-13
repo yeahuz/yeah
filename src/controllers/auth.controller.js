@@ -171,7 +171,7 @@ export async function logout(req, reply) {
 }
 
 export async function google_callback(req, reply) {
-  const { state, code } = req.query;
+  const { state, code} = req.query;
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
   const originalState = req.session.get("oauth_state");
@@ -308,23 +308,31 @@ export async function generate_request(req, reply) {
   return reply
 }
 
-export async function add_credential(req, reply) {
+export async function update_credentials(req, reply) {
   const credential = req.body
   const challenge = req.session.get("challenge");
   const user = req.user;
   const { return_to } = req.query
+  const { _action } = req.body
 
-  CredentialRequest.validate_client_data(credential, challenge)
-  const response_result = CredentialRequest.validate_response(credential);
+  switch (_action) {
+    case "delete_credentials":
+      await CredentialService.delete_many().for(user.id)
+      break
+    default:
+      CredentialRequest.validate_client_data(credential, challenge)
+      const response_result = CredentialRequest.validate_response(credential);
 
-  await CredentialService.create_one({
-    public_key: response_result.public_key,
-    counter: response_result.counter,
-    credential_id: response_result.cred_id,
-    transports: credential.transports,
-    title: credential.title,
-    user_id: user.id
-  })
+      await CredentialService.create_one({
+        public_key: response_result.public_key,
+        counter: response_result.counter,
+        credential_id: response_result.cred_id,
+        transports: credential.transports,
+        title: credential.title,
+        user_id: user.id
+      });
+    break;
+  }
 
   reply.redirect(`${return_to}?t=${get_time()}`)
 }
@@ -395,7 +403,7 @@ export async function get_webauthn(req, reply) {
   stream.push(webauthn);
 
   const bottom = await render_file("/partials/bottom.html", {
-    scripts: ["/public/js/webauthn.js"]
+    scripts: ["/public/js/2fa.js"]
   });
   stream.push(bottom);
 

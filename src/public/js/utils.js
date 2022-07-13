@@ -86,17 +86,29 @@ export function redirect(path) {
   window.location.href = path;
 }
 
-function addListener(node, events) {
+function add_listener(node, events) {
   const types = Object.keys(events);
   types.forEach(type => node.addEventListener(type, events[type]))
 }
 
-export function addListeners(nodeOrNodes, events) {
+export function add_listeners(nodeOrNodes, events) {
   if (nodeOrNodes instanceof NodeList) {
-    nodeOrNodes.forEach((node) => addListener(node, events));
+    nodeOrNodes.forEach((node) => add_listener(node, events));
   }
 
   if (nodeOrNodes instanceof Node) {
-    addEventListener(nodeOrNodes, events);
+    add_listener(nodeOrNodes, events);
   }
+}
+
+export function create_node(tag, attributes) {
+  const node = document.createElement(tag);
+
+  if (attributes) {
+    Object.entries(attributes).forEach(([key, value]) => {
+      node.setAttribute(key, value);
+    });
+  }
+
+  return node;
 }

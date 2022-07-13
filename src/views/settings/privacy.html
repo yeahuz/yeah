@@ -103,7 +103,7 @@
       <form action="/auth/requests" class="js-credential-request-form">
         <label class="text-sm font-medium text-gray-700 block">
           <%= it.t("passkey_name", { ns: "settings-privacy" })%>
-          <input type="text" name="title" class="form-control mt-2" placeholder="Macbook TouchID" autofocus />
+          <input type="text" name="title" class="form-control mt-2" placeholder="Macbook TouchID" required />
         </label>
         <input type="hidden" name="type" value="create" />
         <button class="btn btn-md btn-primary mt-4">

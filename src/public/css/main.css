@@ -324,6 +324,48 @@ details[open] summary::before {
   --bg-color: var(--success-50);
   --color: var(--success-700);
 }
+
+.toast-group {
+  position: fixed;
+  z-index: 1;
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding-block-end: 5vh;
+  display: grid;
+  justify-items: center;
+  justify-content: center;
+  gap: 1vh;
+}
+
+.toast-item {
+  --bg-color: var(--gray-25);
+  --border-color: var(--gray-300);
+  --color: var(--gray-700);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid rgb(var(--border-color));
+  background-color: rgb(var(--bg-color));
+  display: flex;
+  align-items: center;
+  max-inline-size: min(50ch, 90vw);
+  will-change: transform;
+  animation: fade-in 300ms ease, slide-in 300ms ease, fade-out 300ms ease 3000ms;
+  color: rgb(var(--color));
+}
+
+.toast-item-err {
+  --bg-color: var(--error-25);
+  --border-color: var(--error-300);
+  --color: var(--error-700);
+}
+
+.toast-item-success {
+  --bg-color: var(--success-25);
+  --border-color: var(--success-300);
+  --color: var(--success-700);
+}
+
 /* https://github.com/nzbin/three-dots/blob/master/dist/three-dots.css */
 .dot-pulse {
   --size: 0.625rem;
@@ -438,5 +480,24 @@ details[open] summary::before {
   60%,
   100% {
     box-shadow: 10014px 0 0 -5px;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(5vh);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(5vh);
   }
 }
