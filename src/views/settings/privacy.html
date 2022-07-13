@@ -6,7 +6,7 @@
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
     <hr class="bg-gray-200 w-full mt-5 mb-6" />
-    <div class="mb-8">
+    <div class="mb-8" id="devices">
       <div class="flex justify-between items-center mb-5">
         <h3 class="text-gray-700 font-medium">
           <%= it.t("devices.title", { ns: "settings-privacy" }) %>
@@ -46,7 +46,7 @@
               <% if (idx !== 0) { %>
                 <td class="p-3 text-gray-500 w-16">
                   <form action="/auth/sessions/<%= session.id %>?return_to=/settings/privacy" method="post" class="flex justify-center items-center">
-                    <button class="text-error-700 hover:bg-error-50 duration-200 rounded-lg p-2.5" name="_action" value="delete_one">
+                    <button class="hover:bg-error-50 hover:text-error-700 duration-200 rounded-lg p-2.5" name="_action" value="delete_one">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -59,7 +59,7 @@
         </tbody>
       </table>
     </div>
-    <div>
+    <div id="passkeys">
       <div class="flex justify-between items-center mb-5">
         <h3 class="text-gray-700 font-medium">
           <%= it.t("passkeys.title", { ns: "settings-privacy" }) %>
@@ -87,8 +87,8 @@
               <td class="p-3 text-gray-900 font-medium"><%= credential.title %></td>
               <td class="p-3 text-gray-500"><%= it.date_formatter.format(credential.created_at) %></td>
               <td class="p-3 text-gray-500 w-16">
-                <form action="/auth/credentials/<%= credential.id %>?return_to=/settings/privacy" method="post" class="flex justify-center items-center">
-                  <button class="text-error-700 hover:bg-error-50 duration-200 rounded-lg p-2.5" name="_action" value="delete">
+                <form action="/auth/credentials/<%= credential.id %>?return_to=/settings/privacy#passkeys" method="post" class="flex justify-center items-center">
+                  <button class="hover:bg-error-50 hover:text-error-700 duration-200 rounded-lg p-2.5" name="_action" value="delete_one">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -103,7 +103,7 @@
       <form action="/auth/requests" class="js-credential-request-form">
         <label class="text-sm font-medium text-gray-700 block">
           <%= it.t("passkey_name", { ns: "settings-privacy" })%>
-          <input type="text" name="title" class="form-control mt-2" placeholder="Macbook TouchID"/>
+          <input type="text" name="title" class="form-control mt-2" placeholder="Macbook TouchID" autofocus />
         </label>
         <input type="hidden" name="type" value="create" />
         <button class="btn btn-md btn-primary mt-4">

@@ -790,6 +790,10 @@ video {
   height: 0.75rem;
 }
 
+.h-8 {
+  height: 2rem;
+}
+
 .max-h-48 {
   max-height: 12rem;
 }
@@ -844,6 +848,10 @@ video {
 
 .w-1\/2 {
   width: 50%;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .max-w-lg {
@@ -1157,6 +1165,10 @@ video {
   padding: 0.625rem;
 }
 
+.p-1 {
+  padding: 0.25rem;
+}
+
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1272,6 +1284,10 @@ video {
 
 .text-error-500 {
   color: rgb(var(--error-500));
+}
+
+.text-gray-400 {
+  color: rgb(var(--gray-400));
 }
 
 .opacity-50 {
@@ -1808,6 +1824,10 @@ details[open] summary::before {
 
 .hover\:text-primary-600:hover {
   color: rgb(var(--primary-600));
+}
+
+.hover\:text-error-700:hover {
+  color: rgb(var(--error-700));
 }
 
 .group[open] .group-open\:translate-y-1 {

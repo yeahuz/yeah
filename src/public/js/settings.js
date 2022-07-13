@@ -6,7 +6,7 @@ const forms = document.querySelectorAll(".js-details-form");
 async function on_submit(e) {
   e.preventDefault();
   const form = e.target;
-  const data = Object.fromEntries(new FormData(form));
+  const data =Object.fromEntries(new FormData(form));
 
   const enable_form = disable_form(form);
   const button = form.querySelector("button");

@@ -312,6 +312,7 @@ export async function add_credential(req, reply) {
   const credential = req.body
   const challenge = req.session.get("challenge");
   const user = req.user;
+  const { return_to } = req.query
 
   CredentialRequest.validate_client_data(credential, challenge)
   const response_result = CredentialRequest.validate_response(credential);
@@ -325,7 +326,7 @@ export async function add_credential(req, reply) {
     user_id: user.id
   })
 
-  return { status: 'oke' }
+  reply.redirect(`${return_to}?t=${get_time()}`)
 }
 
 export async function verify_assertion(req, reply) {

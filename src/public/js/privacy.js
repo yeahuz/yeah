@@ -48,7 +48,7 @@ async function add_credential(credential) {
     base64url.encode(credential.response.clientDataJSON),
   ])
 
-  return await request("/auth/credentials", {
+  return await request("/auth/credentials?return_to=/settings/privacy", {
     body: {
       id: credential.id,
       raw_id,
@@ -59,6 +59,10 @@ async function add_credential(credential) {
       },
       transports: credential.response.getTransports?.() || [],
       title: credential.title
+    },
+    state: {
+      reload: true,
+      replace: true,
     }
   })
 }

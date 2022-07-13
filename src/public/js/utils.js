@@ -22,12 +22,6 @@ export async function request(
   };
 
   return window.fetch(url, config).then(async (response) => {
-    if (state.replace && response.redirected) {
-      window.history.replaceState(null, "", response.url);
-      if (state.reload) {
-        window.location.reload();
-      }
-    }
     clearTimeout(timerId);
     const accept = config.headers["Accept"];
     let data = response;
@@ -46,6 +40,13 @@ export async function request(
 
     if (!response.ok) {
       return Promise.reject(data);
+    }
+
+    if (state.replace && response.redirected) {
+      window.history.replaceState(null, "", response.url);
+      if (state.reload) {
+        window.location.reload();
+      }
     }
 
     return data;
@@ -85,61 +86,17 @@ export function redirect(path) {
   window.location.href = path;
 }
 
-// export async function request2(entity, { body, timeout = 60000, replace_state, ...custom_config }) {
-//   const is_form_element = entity instanceof HTMLFormElement;
-//   let resource = is_form_element ? new URL(entity.action || window.location.href) : entity;
+function addListener(node, events) {
+  const types = Object.keys(events);
+  types.forEach(type => node.addEventListener(type, events[type]))
+}
 
-//   const controller = new AbortController();
-//   const timer_id = setTimeout(controller.abort, timeout);
+export function addListeners(nodeOrNodes, events) {
+  if (nodeOrNodes instanceof NodeList) {
+    nodeOrNodes.forEach((node) => addListener(node, events));
+  }
 
-//   const d = new FormData(entity)
-//   console.log(d.get("phone"))
-//   console.log(Object.fromEntries(new FormData(entity)));
-//   const config = {
-//     signal: controller.signal,
-//     method: (is_form_element && entity.method) || body ? "post" : "get",
-//     body: (body && JSON.stringify(body)) || is_form_element ? JSON.stringify(Object.fromEntries(new FormData(entity))) : undefined,
-//     ...custom_config,
-//     headers: {
-//       "X-Requested-With": "XMLHttpRequest",
-//       Accept: "application/json",
-//       ...(!is_form_element && { "Content-Type": "application/json" }),
-//       ...custom_config.headers
-//     }
-//   }
-
-
-//   if(is_form_element && config.method === "get") {
-//     resource.search = new URLSearchParams(new FormData(entity))
-//   }
-
-//   return window.fetch(resource, config).then(async response => {
-//     clearTimeout(timer_id);
-
-//     if (replace_state && response.redirected) {
-//       window.history.replaceState(null, "", response.url);
-//     }
-
-//     const accept = config.headers['Accept'];
-//     let data = response
-
-//     switch(accept) {
-//       case "application/json": {
-//         data = await response.json().catch(() => {});
-//         break;
-//       }
-//       case "text/html": {
-//         data = await response.text();
-//         break;
-//       }
-//       default:
-//         break;
-//     }
-
-//     if (!response.ok) {
-//       return Promise.reject(data);
-//     }
-
-//     return data;
-//   })
-// }
+  if (nodeOrNodes instanceof Node) {
+    addEventListener(nodeOrNodes, events);
+  }
+}

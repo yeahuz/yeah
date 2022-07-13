@@ -4,7 +4,6 @@ import { decode, encode } from './base64-url.js';
 
 const assertion_request_form = document.querySelector(".js-assertion-request-form");
 
-
 function format_assertion_request(assertion) {
   assertion.allowCredentials = assertion.allowCredentials.map((credential) => ({
     ...credential,
@@ -22,7 +21,6 @@ assertion_request_form.addEventListener("submit", async (e) => {
   const resource = new URL(form.action);
   const data = new FormData(form);
 
-
   resource.search = new URLSearchParams(data);
 
   const enable_form = disable_form(form);
@@ -36,7 +34,6 @@ assertion_request_form.addEventListener("submit", async (e) => {
   }))
 
   if (assertion_err) {
-    console.log({ assertion_err })
     enable_form(assertion_err);
     restore_text();
     return
@@ -46,8 +43,6 @@ assertion_request_form.addEventListener("submit", async (e) => {
   restore_text();
 
   const [_, verification_err] = await option(verify_assertion(assertion));
-
-  console.log({verification_err})
 })
 
 async function verify_assertion(assertion) {

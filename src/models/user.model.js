@@ -48,17 +48,14 @@ export class User extends BaseModel {
     return hash;
   }
 
-  set_username() {
+  set_username(){
     const random_suffix = randomBytes(4).readUInt32LE();
-
     if (this.name) {
       this.username = this.name + random_suffix;
-      return;
     }
 
     if (this.phone || this.email) {
-      this.username = btoa(this.phone || this.email) + random_suffix;
-      return;
+      this.username = Buffer.from(this.phone || this.email).toString('base64url') + random_suffix;
     }
   }
 
