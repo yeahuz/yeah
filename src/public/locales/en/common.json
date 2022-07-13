@@ -4,5 +4,8 @@
   "create_account": "Create account",
   "save_changes": "Save changes",
   "saving_changes": "Saving changes",
-  "online": "Online"
+  "online": "Online",
+  "profile": "Profile",
+  "settings": "Settings",
+  "log_out": "Log out"
 }

@@ -4,5 +4,8 @@
   "create_account": "Akkaunt yaratish",
   "save_changes": "Saqlash",
   "saving_changes": "Saqlanmoqda",
-  "online": "Onlayn"
+  "online": "Onlayn",
+  "profile": "Profil",
+  "settings": "Sozlamalar",
+  "log_out": "Chiqish"
 }

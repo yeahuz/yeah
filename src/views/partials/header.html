@@ -68,9 +68,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
-                </svg>
-                Профиль
-              </a>
+                </svg> <%= it.t("profile", { ns: " common" }) %> </a>
             </li>
             <li>
               <a
@@ -97,9 +95,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
-                </svg>
-                Настройки
-              </a>
+                </svg> <%= it.t("settings", { ns: "common" }) %> </a>
             </li>
             <li>
               <form action="/auth/logout" method="post" class="w-full">
@@ -120,7 +116,9 @@
                       stroke-linejoin="round"
                     />
                   </svg>
-                  Выйти
+                  
+    <%= it.t("log_out", { ns: "common" }) %>
+                  
                 </button>
               </form>
             </li>

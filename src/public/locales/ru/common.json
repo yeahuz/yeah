@@ -4,5 +4,8 @@
   "create_account": "Создать аккаунт",
   "save_changes": "Сохранить изменения",
   "saving_changes": "Сохранение изменений",
-  "online": "Онлайн"
+  "online": "Онлайн",
+  "profile": "Профиль",
+  "settings": "Настройки",
+  "log_out": "Выйти"
 }
