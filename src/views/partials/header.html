@@ -42,7 +42,7 @@
               <span class="text-gray-700 text-sm font-medium"
                 ><%= it.user.name %></span
               >
-              <% } %> <% if (it.user.phone || it.user.email) {%>
+              <%} %> <% if (it.user.phone || it.user.email) {%>
               <span class="text-sm text-gray-500 truncate"
                 ><%= it.user.formatted_phone || it.user.email %></span
               >
@@ -130,7 +130,7 @@
       <% } else { %>
       <a class="btn btn-secondary" href="/auth/login"><%= it.t("login", { ns: "common" }) %></a>
       <% } %>
-      <a class="btn btn-primary" href="/create"><%= it.t("create_poster", { ns: "common" }) %></a>
+      <a class="btn btn-primary" href="/postings/new"><%= it.t("create_poster", { ns: "common" }) %></a>
     </div>
   </div>
 </header>
