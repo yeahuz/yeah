@@ -15,7 +15,10 @@ i18next
       "settings",
       "settings-details",
       "settings-privacy",
-      "2fa"
+      "2fa",
+      "home",
+      "search-bar",
+      "profile"
     ],
     fallbackLng: "ru",
     backend: {

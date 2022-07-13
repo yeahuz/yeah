@@ -1,14 +1,14 @@
 {
-	"title": "Akkaunt yaratish",
-	"email": {
-		"label": "Email yoki telefon raqam",
-		"placeholder": "juraev@gmail.com"
-	},
-	"password": {
-		"label": "Parol",
-		"placeholder": "complicated-passphrase"
-	},
-	"with_google": "Google orqali kirish",
-	"with_telegram": "Telegram orqali kirish",
-	"have_account": "Akkaunt bormi?"
+  "title": "Akkaunt yaratish",
+  "email": {
+    "label": "Email yoki telefon raqam",
+    "placeholder": "sample@gmail.com"
+  },
+  "password": {
+    "label": "Parol",
+    "placeholder": "complicated-passphrase"
+  },
+  "with_google": "Google orqali kirish",
+  "with_telegram": "Telegram orqali kirish",
+  "have_account": "Akkaunt bormi?"
 }

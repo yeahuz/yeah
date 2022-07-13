@@ -2,7 +2,9 @@
 
 <section class="max-w-7xl mx-auto">
   <header>
-    <h1 class="font-semibold text-2xl text-gray-900">Новые объявления</h1>
+    <h1 class="font-semibold text-2xl text-gray-900">
+    <%= it.t("new_posting", { ns: "home" }) %>
+    </h1>
   </header>
   <div class="flex mt-6"><%~ includeFile('./partials/posting-card.html', it) %></div>
 </section>

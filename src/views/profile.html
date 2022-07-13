@@ -18,7 +18,11 @@
       </div>
     <% } %>
     <span class="text-gray-500 text-sm"><%= it.profile.username %></span>
-    <a href="/settings/details" class="btn btn-secondary-color mt-6">Изменить профиль</a>
+    <a href="/settings/details" class="btn btn-secondary-color mt-6">
+
+    <%= it.t("edit_profile", { ns: "profile" }) %>
+
+    </a>
   </div>
   <div class="w-full">
     <ul class="flex gap-2">
@@ -26,14 +30,19 @@
         <a
           class="btn btn-md <%= it.ps === 'active' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%> w-full"
           href="/<%= it.profile.username %>?ps=active">
-          Активные</a
+    <%= it.t("active", { ns: "profile" }) %>
+          
+          </a
         >
       </li>
       <li class="flex-1">
         <a
           class="btn btn-md <%= it.ps === 'archived' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
           href="/<%= it.profile.username %>?ps=archived"
-          >Архивирован</a
+          >
+    <%= it.t("archived", { ns: "profile" }) %>
+          
+          </a
         >
       </li>
     </ul>
