@@ -21,7 +21,7 @@ import { init_stream } from "./plugins/init-stream.js";
 import { DomainError, InternalError, ValidationError } from "./utils/errors.js";
 import { attach_user } from "./plugins/attach-user.js";
 import { can } from "./plugins/can.js";
-import { get_time } from "./utils/index.js";
+import { add_t } from "./utils/index.js";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
@@ -87,7 +87,6 @@ export async function start() {
         (req.language instanceof Function ? req.language() : req.language) ||
           "en"
       );
-
       const { return_to } = req.query;
 
       if (err.validation) {
@@ -97,13 +96,14 @@ export async function start() {
             .send(new ValidationError({ errors: err.validation }).build(t));
           return reply;
         }
+
         req.flash(
           "validation_errors",
           new ValidationError({ errors: err.validation })
             .errors_as_object()
             .build(t).errors
         );
-        return reply.code(302).redirect(`${return_to}?t=${get_time()}`);
+        return reply.code(302).redirect(add_t(return_to || req.url));
       }
 
       if (err instanceof DomainError) {

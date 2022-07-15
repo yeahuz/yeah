@@ -26,11 +26,7 @@ export function async_pipe(...fns) {
 }
 
 export function pipe(...fns) {
-  return (...args) =>
-    fns.reduce(
-      (previousOutput, currentFn) => currentFn(previousOutput),
-      ...args
-    );
+  return (...args) => fns.reduce((output, current_fn) => current_fn(output), ...args);
 }
 
 export function prop(key) {
@@ -96,10 +92,92 @@ export function verify_sha256(signature, data, public_key) {
 }
 
 export function get_domain_without_subdomain(url) {
-  const urlParts = new URL(url).hostname.split(".");
+  const url_parts = new URL(url).hostname.split(".");
 
-  return urlParts
+  return url_parts
     .slice(0)
-    .slice(-(urlParts.length === 4 ? 3 : 2))
+    .slice(-(url_parts.length === 4 ? 3 : 2))
     .join(".");
+}
+
+function has_query_params(path) {
+  return path.includes("?");
+}
+
+export function add_t(path) {
+  if (!path) return;
+  if (has_query_params(path)) {
+    return `${path}&t=${get_time()}`;
+  }
+
+  return `${path}?t=${get_time()}`;
+}
+
+export function group_by(key, root_id = "0") {
+  const result = {}
+  return (arr) => {
+    for (const item of arr) {
+      let parent_id = item[key];
+      if (!parent_id) {
+        parent_id = root_id
+      };
+      if (!result[parent_id]) result[parent_id] = []
+      result[parent_id].push(item);
+    }
+    return result;
+  }
+}
+
+export function create_tree(children_prop, root_id = "0", custom_id = "id") {
+  return function t(grouped) {
+    let tree = [];
+    const root_nodes = grouped[root_id];
+
+    for (const root_node in root_nodes) {
+      const node = root_nodes[root_node];
+      const child_node = grouped[node[custom_id]];
+
+      if (!node && !root_nodes.hasOwnProperty(root_node)) {
+        continue;
+      }
+
+      if (child_node) {
+        node[children_prop] = create_tree(children_prop, root_id, custom_id)(child_node);
+      }
+
+      tree.push(node)
+    }
+    return tree;
+  }
+}
+
+export function array_to_tree(arr, parent_id = null) {
+  return arr.filter(item => item.parent_id === parent_id)
+            .map(child => ({ ...child, children: array_to_tree(arr, child.id) }));
+}
+
+export function create_tree2(array, rootNodes, customID, childrenProperty) {
+  var tree = [];
+
+  for (var rootNode in rootNodes) {
+    var node = rootNodes[rootNode];
+    var childNode = array[node[customID]];
+
+    if (!node && !rootNodes.hasOwnProperty(rootNode)) {
+      continue;
+    }
+
+    if (childNode) {
+      node[childrenProperty] = create_tree2(
+        array,
+        childNode,
+        customID,
+        childrenProperty
+      );
+    }
+
+    tree.push(node);
+  }
+
+  return tree;
 }

@@ -25,6 +25,7 @@ i18next
     },
     saveMissing: true,
     cleanCode: true,
+    lowerCaseLng: true,
     order: ["header"],
   });
 

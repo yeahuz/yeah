@@ -6,3 +6,5 @@ export * from "./telegram-account.model.js";
 export * from "./account.model.js";
 export * from "./user.model.js";
 export * from "./credential.model.js";
+export * from "./category.model.js";
+export * from "./category-translation.model.js";

@@ -247,7 +247,6 @@ export function up(knex) {
       table
         .integer("parent_id")
         .index()
-        .notNullable()
         .references("id")
         .inTable("categories")
         .onDelete("CASCADE");
