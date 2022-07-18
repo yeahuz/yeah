@@ -242,6 +242,7 @@ details[open] summary::before {
   --bg-color: var(--white);
   --ring-color: var(--primary-100);
   --shadow: var(--shadow-xs);
+  background: rgb(var(--bg-color));
   border-radius: 0.5rem;
   padding: var(--size);
   color: rgb(var(--text-color));
@@ -365,6 +366,55 @@ details[open] summary::before {
   --border-color: var(--success-300);
   --color: var(--success-700);
 }
+
+checkbox-control {
+  transition: all 150ms ease-in;
+  transition-delay: 100ms;
+}
+
+.checkbox-input:checked ~ .checkbox-control {
+  border: 1px solid rgb(var(--primary-600));
+  background-color: rgb(var(--primary-600));
+  transition: background-color 100ms ease-out;
+  transition-delay: 50ms;
+}
+
+.checkbox-input:checked + .checkbox-control .checkbox-icon {
+  color: white;
+}
+
+.checkbox-icon path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: all 200ms linear;
+}
+
+.checkbox-input:checked + .checkbox-control .checkbox-icon path {
+  stroke-dashoffset: 0;
+  transition: all 200ms linear;
+  transition-delay: 100ms;
+}
+
+.checkbox-input:checked ~ .checkbox-label {
+  color: rgb(var(--gray-900))
+}
+
+
+@keyframes check-offset {
+  from {
+    stroke-dashoffset: -24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes check-offset2 {
+  to {
+    stroke-dashoffset: 24;
+  }
+}
+
 
 /* https://github.com/nzbin/three-dots/blob/master/dist/three-dots.css */
 .dot-pulse {

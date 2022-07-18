@@ -1,0 +1,32 @@
+<form action="/postings/new" method="post" class="max-w-md">
+  <input type="hidden" name="step" value="2" />
+  <% it.fields.forEach(function (field) { %>
+    <% if (field.type === "input") { %>
+      <label class="text-sm font-medium text-gray-700 block">
+        <%= field?.label %>
+        <input type="<%= field.type %>" autocomplete="off" inputmode="<%= field.inputmode %>" class="form-control mt-2" placeholder="<%= field.placeholder %>" name="<%= field.key %>" />
+      </label>
+    <% } %>
+    <% if (field.type === "checkbox") {%>
+      <div class="space-y-2">
+          <span class="text-sm font-medium text-gray-700 block"><%= field?.label %></span>
+          <% field.values.forEach(function (val) { %>
+            <div class="flex items-center">
+              <input type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input absolute opacity-0 -z-10 w-0 peer" value="<%= val.id %>"/>
+              <label for="checkbox-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 rounded p-px peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </label>
+              <% if (val?.label) {%>
+                <label for="checkbox-<%= val.id %>" class="checkbox-label cursor-pointer ml-2 text-gray-500">
+                  <%= val.label %>
+                </label>
+              <% } %>
+            </div>
+          <% }) %>
+      </div>
+    <% } %>
+  <% }) %>
+  <button class="btn btn-lg btn-primary mt-6">Далее</button>
+</form>

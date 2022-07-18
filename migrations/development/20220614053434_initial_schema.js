@@ -263,6 +263,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       table
         .string("language_code")
+        .index()
         .notNullable()
         .references("code")
         .inTable("languages")
@@ -307,7 +308,17 @@ export function up(knex) {
     })
     .createTable("category_fields", (table) => {
       table.increments("id");
-      table.string("label");
+      table.boolean("required").defaultTo(true);
+      table.boolean("read_only").defaultTo(false);
+      table.boolean("disabled").defaultTo(false);
+      table.boolean("multiple").defaultTo(false);
+      table.boolean("checked").defaultTo(false);
+      table.smallint("min").defaultTo(0);
+      table.smallint("max").defaultTo(0);
+      table.smallint("max_length").defaultTo(0);
+      table.smallint("min_length").defaultTo(0);
+      table.string("accept");
+      table.string("pattern");
       table
         .enu("type", [
           "range",
@@ -319,6 +330,9 @@ export function up(knex) {
           "url",
           "number",
           "password",
+          "file",
+          "search",
+          "tel"
         ])
         .defaultTo("text");
       table
@@ -332,8 +346,7 @@ export function up(knex) {
           "url",
         ])
         .defaultTo("text");
-      table.string("placeholder");
-      table.string("key");
+      table.string("name");
       table
         .integer("category_id")
         .index()
@@ -341,6 +354,27 @@ export function up(knex) {
         .references("id")
         .inTable("categories")
         .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("category_field_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("category_field_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("category_fields")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("label");
+      table.string("placeholder");
+      table.string("hint");
       table.timestamps(false, true);
     })
     .createTable("category_field_values", (table) => {
@@ -352,6 +386,25 @@ export function up(knex) {
         .references("id")
         .inTable("category_fields")
         .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("category_field_value_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("category_field_value_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("category_field_values")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("label");
       table.timestamps(false, true);
     })
     .createTable("posting_attributes", (table) => {
@@ -432,12 +485,14 @@ export function up(knex) {
       table.increments("id");
       table
         .integer("status_id")
+        .index()
         .notNullable()
         .references("id")
         .inTable("transaction_statuses")
         .onDelete("CASCADE");
       table
         .string("language_code")
+        .index()
         .notNullable()
         .references("code")
         .inTable("languages")
@@ -532,6 +587,8 @@ export function down(knex) {
     .dropTable("postings")
     .dropTable("posting_statuses")
     .dropTable("category_translations")
+    .dropTable("category_field_translations")
+    .dropTable("category_field_value_translations")
     .dropTable("languages")
     .dropTable("category_field_values")
     .dropTable("category_fields")

@@ -22,7 +22,6 @@ export class Category extends BaseModel {
           from: "categories.id",
           to: "category_translations.category_id"
         },
-        // filter: (query) => query.select("title"),
       }
     }
   }

@@ -7,9 +7,8 @@ export async function get_new(req, reply) {
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
-  const { step = "1" } = req.query
+  const step = parseInt(req.query.step || "1", 10);
 
-  const categories = await CategoryService.get_many({ lang: req.language });
   const posting_data = JSON.parse(req.session.get("new-posting") || null)
 
   const top = await render_file("/partials/top.html", {
@@ -23,16 +22,28 @@ export async function get_new(req, reply) {
   });
   stream.push(header);
 
-  const posting_top = await render_file("/posting/new/top.html", { step: parseInt(step, 10) })
+  const posting_top = await render_file("/posting/new/top.html", { step })
   stream.push(posting_top);
 
-  const current_step = await render_file(`/posting/new/step-${step}`, { categories: array_to_tree(categories) });
-  if (!current_step) {
-    const not_found =  await render_file("/partials/404.html");
-    stream.push(not_found);
-  } else {
-    stream.push(current_step);
+
+  let rendered_step
+
+  switch (step) {
+    case 1: {
+      const categories = await CategoryService.get_many({ lang: req.language });
+      rendered_step = await render_file(`/posting/new/step-${step}`, { categories: array_to_tree(categories) });
+      break;
+    }
+    case 2: {
+      const fields = await CategoryService.get_fields({ category_id: posting_data.category_id, lang: req.language });
+      rendered_step = await render_file(`/posting/new/step-${step}`, { fields })
+      break;
+    }
+    default:
+      rendered_step = await render_file("/partials/404.html");
+      break
   }
+  stream.push(rendered_step)
 
   const step_bottom = await render_file("/posting/new/bottom.html");
   stream.push(step_bottom);

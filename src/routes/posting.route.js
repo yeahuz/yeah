@@ -15,7 +15,7 @@ export const posting = async (fastify) => {
         type: "object",
         properties: {
           title: { type: "string", minLength: 5, errorMessage: { minLength: "!posting_title_minlength" } },
-          category: { type: "string" },
+          category_id: { type: "string" },
           step: { type: "string", enum: ["1", "2", "3", "4"] }
         },
         if: {
@@ -26,7 +26,7 @@ export const posting = async (fastify) => {
           }
         },
         then: {
-          required: ["title", "category"]
+          required: ["title", "category_id"]
         }
       }
     }

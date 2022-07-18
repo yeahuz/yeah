@@ -8,3 +8,7 @@ export * from "./user.model.js";
 export * from "./credential.model.js";
 export * from "./category.model.js";
 export * from "./category-translation.model.js";
+export * from "./category-field.model.js";
+export * from "./category-field-value.model.js";
+export * from "./category-field-value-translation.model.js";
+export * from "./category-field-translation.model.js";
