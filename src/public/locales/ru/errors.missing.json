@@ -1,8 +1,0 @@
-{
-  "must be object": "must be object",
-  "!": "!",
-  "must have required property 'password'": "must have required property 'password'",
-  "must match \"then\" schema": "must match \"then\" schema",
-  "must NOT have fewer than 5 characters": "must NOT have fewer than 5 characters",
-  "!posting_title_minlength": "!posting_title_minlength"
-}

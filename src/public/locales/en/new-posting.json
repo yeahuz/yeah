@@ -1,0 +1,36 @@
+{
+  "title": "Create posting",
+  "steps": {
+    "first": {
+      "title": "Important",
+      "description": "Title and category"
+    },
+    "second": {
+      "title": "General",
+      "description": "Detailed information"
+    },
+    "third": {
+      "title": "Contacts",
+      "description": "How to contact"
+    },
+    "fourth": {
+      "title": "Preview",
+      "description": "What will the ad look like?"
+    }
+  },
+  "form": {
+    "title": {
+      "label": "Title",
+      "placeholder": "e.g, Macbook Pro 16",
+      "hint": "Minumum 20 characters"
+    },
+    "category": {
+      "label": "Category",
+      "placeholder": "Choose category"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Describe your posting in more detail"
+    }
+  }
+}

@@ -1,5 +1,37 @@
-<form action="/postings/new" method="post" class="max-w-md">
+<form action="/postings/new" method="post" class="max-w-3xl space-y-5">
   <input type="hidden" name="step" value="2" />
+  <div>
+    <span class="text-sm font-medium text-gray-700 inline-block mb-2 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5">
+      <%= it.t("form.photos.label", { ns: "new-posting" }) %>
+    </span>
+    <div class="rounded-lg border border-gray-200 flex flex-col items-center justify-center p-4 shadow-xs duration-500 js-photos-area">
+      <span class="inline-block p-3 rounded-full bg-gray-100 text-gray-600 inline-block mb-3">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+          <path d="M8 16L12 12M12 12L16 16M12 12V21M20 16.7428C21.2215 15.734 22 14.2079 22 12.5C22 9.46243 19.5376 7 16.5 7C16.2815 7 16.0771 6.886 15.9661 6.69774C14.6621 4.48484 12.2544 3 9.5 3C5.35786 3 2 6.35786 2 10.5C2 12.5661 2.83545 14.4371 4.18695 15.7935" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="text-center">
+        <p class="text-sm">
+          <input type="file" name="photos" accept="image/*" class="absolute -z-10 opacity-0 peer js-photos-input" id="photos-input" multiple />
+          <label class="font-medium text-primary-700 cursor-pointer peer-focus:outline" for="photos-input">
+            Click to upload
+          </label>
+          <span class="text-gray-500">or drag and drop</span>
+        </p>
+        <span class="text-gray-500 text-xs">
+          SVG, PNG, JPG
+        </span>
+      </div>
+    </div>
+  </div>
+  <label class="block">
+    <span class="relative text-sm font-medium text-gray-700 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5">
+      <%= it.t("form.description.label", { ns: "new-posting" }) %>
+    </span>
+    <elastic-textarea>
+      <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" class="form-control mt-2"></textarea>
+    </elastic-textarea>
+  </label/>
   <% it.fields.forEach(function (field) { %>
     <% if (field.type === "input") { %>
       <label class="text-sm font-medium text-gray-700 block">
@@ -9,7 +41,11 @@
     <% } %>
     <% if (field.type === "checkbox") {%>
       <div class="space-y-2">
-          <span class="text-sm font-medium text-gray-700 block"><%= field?.label %></span>
+          <div class="text-sm block">
+            <span class="font-medium text-gray-700">
+              <%= field?.label %>
+            </span>
+          </div>
           <% field.values.forEach(function (val) { %>
             <div class="flex items-center">
               <input type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input absolute opacity-0 -z-10 w-0 peer" value="<%= val.id %>"/>

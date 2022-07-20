@@ -22,6 +22,7 @@ export async function seed(knex) {
       name: "O'zbek"
     }
   ]);
+
   await knex("auth_providers").insert([
     {
       name: "google",
@@ -52,7 +53,13 @@ export async function seed(knex) {
       name: "repair",
       category_id: 2,
     },
-  ])
+    {
+      id: 2,
+      type: "checkbox",
+      name: "exists",
+      category_id: 2
+    }
+  ]);
 
   await knex("category_field_values").insert([
     {
@@ -67,7 +74,27 @@ export async function seed(knex) {
       id: 3,
       category_field_id: 1,
     },
-  ])
+    {
+      id: 4,
+      category_field_id: 2,
+    },
+    {
+      id: 5,
+      category_field_id: 2,
+    },
+    {
+      id: 6,
+      category_field_id: 2,
+    },
+    {
+      id: 7,
+      category_field_id: 2,
+    },
+    {
+      id: 8,
+      category_field_id: 2,
+    },
+  ]);
 
   await knex("category_field_value_translations").insert([
     {
@@ -114,8 +141,83 @@ export async function seed(knex) {
       category_field_value_id: 3,
       language_code: "uz",
       label: "Dizayner",
+    },
+    {
+      category_field_value_id: 4,
+      language_code: "ru",
+      label: "Интернет",
+    },
+    {
+      category_field_value_id: 4,
+      language_code: "en",
+      label: "Internet",
+    },
+    {
+      category_field_value_id: 4,
+      language_code: "uz",
+      label: "Internet",
+    },
+    {
+      category_field_value_id: 5,
+      language_code: "ru",
+      label: "Телефон",
+    },
+    {
+      category_field_value_id: 5,
+      language_code: "en",
+      label: "Phone",
+    },
+    {
+      category_field_value_id: 5,
+      language_code: "uz",
+      label: "Telefon",
+    },
+    {
+      category_field_value_id: 6,
+      language_code: "ru",
+      label: "Холодильник",
+    },
+    {
+      category_field_value_id: 6,
+      language_code: "en",
+      label: "Refrigirator",
+    },
+    {
+      category_field_value_id: 6,
+      language_code: "uz",
+      label: "Muzlatgich",
+    },
+    {
+      category_field_value_id: 7,
+      language_code: "ru",
+      label: "Телевизор",
+    },
+    {
+      category_field_value_id: 7,
+      language_code: "en",
+      label: "TV",
+    },
+    {
+      category_field_value_id: 7,
+      language_code: "uz",
+      label: "Televizor",
+    },
+    {
+      category_field_value_id: 8,
+      language_code: "ru",
+      label: "Стиральная машина",
+    },
+    {
+      category_field_value_id: 8,
+      language_code: "en",
+      label: "Washing machine",
+    },
+    {
+      category_field_value_id: 8,
+      language_code: "uz",
+      label: "Kir uvish mashinasi",
     }
-  ])
+  ]);
 
   await knex("category_field_translations").insert([
     {
@@ -123,6 +225,31 @@ export async function seed(knex) {
       language_code: "ru",
       label: "Ремонт",
     },
+    {
+      category_field_id: 1,
+      language_code: "en",
+      label: "Repair",
+    },
+    {
+      category_field_id: 1,
+      language_code: "uz",
+      label: "Ta'mir",
+    },
+    {
+      category_field_id: 2,
+      language_code: "ru",
+      label: "В квартире есть",
+    },
+    {
+      category_field_id: 2,
+      language_code: "en",
+      label: "Apartment has",
+    },
+    {
+      category_field_id: 2,
+      language_code: "uz",
+      label: "Kvartirada bor",
+    }
   ])
 
   await knex("category_translations").insert([

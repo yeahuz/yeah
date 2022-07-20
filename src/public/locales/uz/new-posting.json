@@ -1,0 +1,36 @@
+{
+  "title": "E'lon yaratish",
+  "steps": {
+    "first": {
+      "title": "Muhim",
+      "description": "Sarlavha va toifa "
+    },
+    "second": {
+      "title": "Umumiy",
+      "description": "Batafsil ma'lumot"
+    },
+    "third": {
+      "title": "Kontaktlar",
+      "description": "Qanday bog'lanish kerak"
+    },
+    "fourth": {
+      "title": "Ko'rinish",
+      "description": "Reklama qanday ko'rinishga ega bo'ladi?"
+    }
+  },
+  "form": {
+    "title": {
+      "label": "Sarlavha",
+      "placeholder": "Macbook Pro 16",
+      "hint": "Kamida 20 ta belgi"
+    },
+    "category": {
+      "label": "Toifa",
+      "placeholder": "Toifani tanlang"
+    },
+    "description": {
+      "label": "Tavsif",
+      "placeholder": "E'loningizni batafsilroq tasvirlab bering"
+    }
+  }
+}

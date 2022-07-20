@@ -1,20 +1,15 @@
 <form action="/postings/new" method="post" class="max-w-md">
   <input type="hidden" name="step" value="1" />
   <label class="text-sm font-medium text-gray-700 block">
-      Название
-      <div class="relative mt-2">
-          <input type="text" autocomplete="off" class="form-control" placeholder="Например, Macbook Pro 16”" name="title" />
-          <svg class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-      </div>
-      <span class="font-normal text-gray-500 block mt-1.5">Минимум 20 символов</span>
+    <%= it.t("form.title.label", { ns: "new-posting" }) %>
+    <input type="text" value="<%= it.posting_data?.title ?? "" %>" autocomplete="off" class="form-control mt-2" placeholder="<%= it.t("form.title.placeholder", { ns: "new-posting" }) %>" name="title" />
+    <span class="font-normal text-gray-500 block mt-1.5"><%= it.t("form.title.hint", { ns: "new-posting"}) %></span>
   </label>
   <label class="text-sm font-medium text-gray-700 block mt-5">
-    Категория
+    <%= it.t("form.category.label", { ns: "new-posting" }) %>
     <div class="relative mt-2">
     <select name="category_id" class="form-control" required>
-      <option disabled selected value="">Выберите категорию</option>
+      <option disabled selected value=""> <%= it.t("form.category.placeholder", { ns: "new-posting" }) %> </option>
       <option disabled>&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;</option>
       <% it.categories.forEach(function render (category, i, a, depth = 0) { %>
         <optgroup label="<%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= category.title %>" class="ml-2">
@@ -22,7 +17,7 @@
             <% if (child.children?.length) { %>
               <% render (child, i, a, depth + 1) %>
             <% } else {%>
-              <option value="<%= child.id %>"><%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= child.title %></option>
+              <option <%= it.posting_data?.category_id === String(child.id) ? "selected" : "" %> value="<%= child.id %>"><%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= child.title %></option>
             <% } %>
           <% }) %>
         </optgroup>
