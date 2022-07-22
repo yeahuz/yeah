@@ -49,7 +49,7 @@ export async function seed(knex) {
   await knex("category_fields").insert([
     {
       id: 1,
-      type: "checkbox",
+      type: "radio",
       name: "repair",
       category_id: 2,
     },

@@ -1,3 +1,4 @@
+import { new_posting_schema } from '../schemas/new-posting.schema.js'
 import * as PostingController from '../controllers/posting.controller.js';
 
 export const posting = async (fastify) => {
@@ -5,6 +6,27 @@ export const posting = async (fastify) => {
     method: "GET",
     url: "/new",
     handler: PostingController.get_new,
+  });
+  fastify.route({
+    method: "GET",
+    url: "/wizard/:id/:step",
+    handler: PostingController.get_step
+  });
+  fastify.route({
+    method: "POST",
+    url: "/wizard/:id/1",
+    handler: PostingController.submit_first_step,
+    schema: {
+      body: new_posting_schema.essential
+    }
+  });
+  fastify.route({
+    method: "POST",
+    url: "/wizard/:id/2",
+    handler: PostingController.submit_second_step,
+    schema: {
+      body: new_posting_schema.general
+    }
   });
   fastify.route({
     method: "POST",
@@ -18,6 +40,13 @@ export const posting = async (fastify) => {
           category_id: { type: "string" },
           step: { type: "string", enum: ["1", "2", "3", "4"] }
         },
+        // if: {
+        //   properties: {
+        //     step: {
+        //       const: "2"<
+        //     }
+        //   }
+        // }
         if: {
           properties: {
             step: {

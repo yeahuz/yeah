@@ -30,7 +30,14 @@
     },
     "description": {
       "label": "Tavsif",
-      "placeholder": "E'loningizni batafsilroq tasvirlab bering"
+      "placeholder": "E'loningizni batafsilroq tasvirlab bering",
+      "hint": "Kamida 80 ta belgi"
+    },
+    "photos": {
+      "label": "Rasm",
+      "hint": "Birinchi fotosurat e'lonning muqovasida bo'ladi",
+      "click_to_upload": "Yuklash uchun bosing",
+      "or_drag_drop": "yoki sudrab olib tashlang"
     }
   }
 }

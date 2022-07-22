@@ -13,5 +13,6 @@
   "!oauth_state_match": "OAuth2 holat parametrlari to'g'ri kelmadi. Iltimos, yana bir bor urinib ko'ring",
   "tg_data_integrity_compromised": "Autentifikatsiya maʼlumotlari yaxlitligi buzilgan. Iltimos, yana bir bor urinib ko'ring",
 	"!email": "Noto'g'ri pochta manzili",
-	"!phone_number": "Telefon raqami +998939152000 formatida bo'lishi kerak"
+	"!phone_number": "Telefon raqami +998939152000 formatida bo'lishi kerak",
+	"!posting_title_minlength": "Sarlavha kamida 20 belgidan iborat bo'lishi kerak"
 }

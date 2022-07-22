@@ -130,7 +130,7 @@
       <% } else { %>
       <a class="btn btn-secondary" href="/auth/login"><%= it.t("login", { ns: "common" }) %></a>
       <% } %>
-      <a class="btn btn-primary" href="/postings/new"><%= it.t("create_poster", { ns: "common" }) %></a>
+      <a class="btn btn-primary" href="/postings/wizard/<%= Math.random().toString(32).slice(2) %>/1"><%= it.t("create_poster", { ns: "common" }) %></a>
     </div>
   </div>
 </header>

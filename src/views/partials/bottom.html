@@ -8,7 +8,8 @@
 	window.addEventListener('load', () =>{
 		quicklink.listen({
 			ignores: [
-				uri => window.location.pathname === new URL(uri).pathname
+				uri => window.location.pathname === new URL(uri).pathname,
+				(uri, elem) => elem.hasAttribute('noprefetch')
 			]
 		});
 	});

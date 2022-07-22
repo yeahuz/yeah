@@ -1,10 +1,11 @@
-<form action="/postings/new" method="post" class="max-w-md">
+<form method="post" class="max-w-md">
   <input type="hidden" name="step" value="1" />
   <label class="text-sm font-medium text-gray-700 block">
     <%= it.t("form.title.label", { ns: "new-posting" }) %>
     <input type="text" value="<%= it.posting_data?.title ?? "" %>" autocomplete="off" class="form-control mt-2" placeholder="<%= it.t("form.title.placeholder", { ns: "new-posting" }) %>" name="title" />
-    <span class="font-normal text-gray-500 block mt-1.5"><%= it.t("form.title.hint", { ns: "new-posting"}) %></span>
+    <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.title ?? "" %></small>
   </label>
+  <span class="font-normal text-gray-500 text-sm block mt-1.5"><%= it.t("form.title.hint", { ns: "new-posting"}) %></span>
   <label class="text-sm font-medium text-gray-700 block mt-5">
     <%= it.t("form.category.label", { ns: "new-posting" }) %>
     <div class="relative mt-2">

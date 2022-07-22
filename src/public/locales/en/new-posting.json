@@ -30,7 +30,14 @@
     },
     "description": {
       "label": "Description",
-      "placeholder": "Describe your posting in more detail"
+      "placeholder": "Describe your posting in more detail",
+      "hint": "Minumum 80 characters"
+    },
+    "photos": {
+      "label": "Photos",
+      "hint": "The first photo will be on the cover of the posting",
+      "click_to_upload": "Click to upload",
+      "or_drag_drop": "or drag and drop"
     }
   }
 }
