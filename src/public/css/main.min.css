@@ -2290,6 +2290,22 @@ checkbox-control {
   content: var(--tw-content);
 }
 
+.checked\:border-4:checked {
+  border-width: 4px;
+}
+
+.checked\:border-8:checked {
+  border-width: 8px;
+}
+
+.checked\:border-\[6px\]:checked {
+  border-width: 6px;
+}
+
+.checked\:border-\[5px\]:checked {
+  border-width: 5px;
+}
+
 .checked\:border-primary-600:checked {
   border-color: rgb(var(--primary-600));
 }

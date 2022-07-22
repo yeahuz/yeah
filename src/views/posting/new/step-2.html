@@ -61,10 +61,9 @@
         </span>
         <% field.values.forEach(function (val) { %>
           <div class="flex items-center">
-            <input type="radio" name="<%= field.name %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+            <input type="radio" name="<%= field.name %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white m-0 relative grid place-content-center
-                        font-inherit w-4 h-4 border border-gray-300 rounded-full relative before:w-4 before:h-4 before:rounded-full
-                        before:scale-0 before:bg-primary-600 before:block checked:before:scale-100 checked:border-primary-600 before:duration-200" />
+                        font-inherit w-4 h-4 border border-gray-300 rounded-full checked:border-[5px] relative checked:before:scale-100 checked:border-primary-600 before:duration-200" />
             <label for="<%= field.name %>-<%= val.id %>" class="cursor-pointer ml-2 text-gray-500"><%= val.label %></label>
           </div>
         <% }) %>
@@ -79,7 +78,7 @@
           </div>
           <% field.values.forEach(function (val) { %>
             <div class="flex items-center">
-              <input type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input absolute opacity-0 -z-10 w-0 peer" value="<%= val.id %>"/>
+              <input type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/>
               <label for="checkbox-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 rounded p-px peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
