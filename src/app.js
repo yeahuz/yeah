@@ -12,6 +12,7 @@ import fastify_accepts from "@fastify/accepts";
 import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
+import * as S3Service from './services/s3.service.js'
 import { i18next } from "./utils/i18n.js";
 import * as eta from "eta";
 import { routes } from "./routes/index.js";
@@ -41,7 +42,8 @@ export async function start() {
     app.register(chunk_view);
     app.register(init_stream);
     app.register(form_body);
-    app.register(multipart, { attachFieldsToBody: true });
+    app.register(multipart);
+
     app.register(i18n_http_middleware.plugin, {
       i18next,
     });

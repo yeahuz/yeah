@@ -12,3 +12,5 @@ export * from "./category-field.model.js";
 export * from "./category-field-value.model.js";
 export * from "./category-field-value-translation.model.js";
 export * from "./category-field-translation.model.js";
+export * from "./attachment.model.js";
+export * from "./posting.model.js";

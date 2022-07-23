@@ -1,6 +1,6 @@
 export async function* async_pool(concurrency, iterable, iteratorFn) {
   const executing = new Set();
-  for (const item of iterable) {
+  for await (const item of iterable) {
     const promise = Promise.resolve().then(() => iteratorFn(item, iterable));
     executing.add(promise);
     const clean = () => executing.delete(promise);

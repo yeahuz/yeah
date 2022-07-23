@@ -1,10 +1,10 @@
-<form action="/postings/new" method="post" class="max-w-3xl space-y-5">
+<form method="post" class="max-w-3xl space-y-5" enctype="multipart/form-data">
   <input type="hidden" name="step" value="2" />
-  <% if (it.posting_data?.title) { %>
-    <input type="hidden" name="title" value="<%= it.posting_data.title %>" />
+  <% if (it.first_step_data?.title) { %>
+    <input type="hidden" name="title" value="<%= it.first_step_data.title %>" />
   <% } %>
-  <% if (it.posting_data?.category_id) { %>
-    <input type="hidden" name="category_id" value="<%= it.posting_data.category_id %>" />
+  <% if (it.first_step_data?.category_id) { %>
+    <input type="hidden" name="category_id" value="<%= it.first_step_data.category_id %>" />
   <% } %>
   <div>
     <span class="text-sm font-medium text-gray-700 inline-block mb-2 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5">
@@ -39,7 +39,7 @@
         <%= it.t("form.description.label", { ns: "new-posting" }) %>
       </span>
       <elastic-textarea>
-        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" class="form-control mt-2"></textarea>
+        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" class="form-control mt-2"><%= it.second_step_data?.description ?? ""%></textarea>
         <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.description ?? "" %></small>
       </elastic-textarea>
     </label/>
@@ -61,7 +61,7 @@
         </span>
         <% field.values.forEach(function (val) { %>
           <div class="flex items-center">
-            <input type="radio" name="<%= field.name %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+            <input <%= it.second_step_data?.[field.name] === String(val.id) ? "checked" : ""%> type="radio" name="<%= field.name %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white m-0 relative grid place-content-center
                         font-inherit w-4 h-4 border border-gray-300 rounded-full checked:border-[5px]
                         relative checked:before:scale-100 checked:border-primary-600 duration-200 peer" />
@@ -79,7 +79,7 @@
           </div>
           <% field.values.forEach(function (val) { %>
             <div class="flex items-center">
-              <input type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/>
+              <input <%= it.second_step_data?.[field.name].includes(String(val.id)) ? "checked" : "" %> type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/>
               <label for="checkbox-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 rounded p-px peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

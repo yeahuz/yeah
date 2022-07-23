@@ -24,9 +24,9 @@ export const posting = async (fastify) => {
     method: "POST",
     url: "/wizard/:id/2",
     handler: PostingController.submit_second_step,
-    schema: {
-      body: new_posting_schema.general
-    }
+    // schema: {
+    //   body: new_posting_schema.general
+    // }
   });
   fastify.route({
     method: "POST",

@@ -18,7 +18,12 @@ import {
   RP_ID,
   RP_ID_DEV,
   RP_NAME,
-  RP_NAME_DEV
+  RP_NAME_DEV,
+  AWS_ACCESS_KEY,
+  AWS_SECRET_KEY,
+  AWS_S3_REGION,
+  AWS_S3_BUCKET_NAME,
+  S3_ORIGIN,
 } from "./secrets.js";
 
 export const configs = {
@@ -36,6 +41,11 @@ export const configs = {
     node_env: NODE_ENV,
     rp_id: RP_ID,
     rp_name: RP_NAME,
+    s3_origin: S3_ORIGIN,
+    aws_access_key: AWS_ACCESS_KEY,
+    aws_secret_key: AWS_SECRET_KEY,
+    aws_s3_region: AWS_S3_REGION,
+    aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
   },
   development: {
     port: PORT_DEV,
@@ -51,5 +61,10 @@ export const configs = {
     node_env: NODE_ENV,
     rp_id: RP_ID_DEV,
     rp_name: RP_NAME_DEV,
+    s3_origin: S3_ORIGIN,
+    aws_access_key: AWS_ACCESS_KEY,
+    aws_secret_key: AWS_SECRET_KEY,
+    aws_s3_region: AWS_S3_REGION,
+    aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
   },
 };

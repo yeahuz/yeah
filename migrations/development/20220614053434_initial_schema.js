@@ -448,8 +448,24 @@ export function up(knex) {
       table.string("caption");
       table.timestamps(false, true);
     })
+    .createTable("posting_attachments", (table) => {
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table
+        .integer("attachment_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
+    })
     .createTable("entity_attachments", (table) => {
-      table.integer("entity_id");
+      table.integer("entity_id").notNullable().index();
       table
         .integer("attachment_id")
         .index()
@@ -580,6 +596,7 @@ export function down(knex) {
     .dropTable("accounts")
     .dropTable("users")
     .dropTable("auth_providers")
+    .dropTable("posting_attachments")
     .dropTable("posting_categories")
     .dropTable("posting_attributes")
     .dropTable("posting_status_translations")

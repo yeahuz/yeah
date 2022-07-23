@@ -2116,66 +2116,14 @@ checkbox-control {
   height: 100%;
 }
 
-.before\:h-2\.5::before {
-  content: var(--tw-content);
-  height: 0.625rem;
-}
-
-.before\:h-2::before {
-  content: var(--tw-content);
-  height: 0.5rem;
-}
-
-.before\:h-4::before {
-  content: var(--tw-content);
-  height: 1rem;
-}
-
 .before\:w-px::before {
   content: var(--tw-content);
   width: 1px;
 }
 
-.before\:w-2\.5::before {
-  content: var(--tw-content);
-  width: 0.625rem;
-}
-
-.before\:w-2::before {
-  content: var(--tw-content);
-  width: 0.5rem;
-}
-
-.before\:w-4::before {
-  content: var(--tw-content);
-  width: 1rem;
-}
-
-.before\:scale-0::before {
-  content: var(--tw-content);
-  --tw-scale-x: 0;
-  --tw-scale-y: 0;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
-.before\:rounded-full::before {
-  content: var(--tw-content);
-  border-radius: 9999px;
-}
-
 .before\:bg-gray-200::before {
   content: var(--tw-content);
   background-color: rgb(var(--gray-200));
-}
-
-.before\:bg-primary-600::before {
-  content: var(--tw-content);
-  background-color: rgb(var(--primary-600));
-}
-
-.before\:duration-200::before {
-  content: var(--tw-content);
-  transition-duration: 200ms;
 }
 
 .after\:absolute::after {
@@ -2290,18 +2238,6 @@ checkbox-control {
   content: var(--tw-content);
 }
 
-.checked\:border-4:checked {
-  border-width: 4px;
-}
-
-.checked\:border-8:checked {
-  border-width: 8px;
-}
-
-.checked\:border-\[6px\]:checked {
-  border-width: 6px;
-}
-
 .checked\:border-\[5px\]:checked {
   border-width: 5px;
 }
@@ -2412,10 +2348,6 @@ checkbox-control {
   --tw-scale-x: 1;
   --tw-scale-y: 1;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
-.peer:focus ~ .peer-focus\:text-gray-900 {
-  color: rgb(var(--gray-900));
 }
 
 .peer:focus ~ .peer-focus\:outline {

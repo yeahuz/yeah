@@ -26,4 +26,9 @@ export const {
   RP_ID_DEV,
   RP_NAME,
   RP_NAME_DEV,
+  AWS_ACCESS_KEY,
+  AWS_SECRET_KEY,
+  AWS_S3_REGION,
+  AWS_S3_BUCKET_NAME,
+  S3_ORIGIN,
 } = process.env;
