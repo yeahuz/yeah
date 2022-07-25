@@ -1,15 +1,44 @@
 <form method="post" class="max-w-3xl space-y-5" enctype="multipart/form-data">
   <input type="hidden" name="step" value="2" />
-  <% if (it.first_step_data?.title) { %>
-    <input type="hidden" name="title" value="<%= it.first_step_data.title %>" />
+  <% if (it.posting_data?.uploaded_files?.length) { %>
+    <% it.posting_data.uploaded_files.forEach(function (photo) { %>
+      <input type="hidden" name="photos" value="<%= photo.id %>" id="photos-<%= photo.id %>" />
+    <% })%>
   <% } %>
-  <% if (it.first_step_data?.category_id) { %>
-    <input type="hidden" name="category_id" value="<%= it.first_step_data.category_id %>" />
+  <% if (it.posting_data?.title) { %>
+    <input type="hidden" name="title" value="<%= it.posting_data.title %>" />
+  <% } %>
+  <% if (it.posting_data?.category_id) { %>
+    <input type="hidden" name="category_id" value="<%= it.posting_data.category_id %>" />
   <% } %>
   <div>
     <span class="text-sm font-medium text-gray-700 inline-block mb-2 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5">
       <%= it.t("form.photos.label", { ns: "new-posting" }) %>
     </span>
+    <% if (it.posting_data?.uploaded_files?.length) { %>
+      <ul class="js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6">
+        <% it.posting_data?.uploaded_files.forEach(function (photo, i) { %>
+          <li class="relative group rounded-lg">
+            <img src="<%= photo.s3_url %>" alt="" class="min-h-[128px] object-fit rounded-lg aspect-video"/>
+            <button type="button" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
+                                          focus:ring-offset-2 focus:ring-error-500 group-focus:scale-100 md:scale-0 duration-200
+                                          absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white
+                                          rounded-full p-0.5 js-preview-delete-btn" data-photo_id="<%= photo.id %>">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="pointer-events-none">
+                <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <input type="radio" name="cover_index" value="<%= i %>" id="cover-<%= i %>" class="absolute opacity-0 w-0 -z-10 peer js-preview-radio-input" <%= it.posting_data?.cover_index === String(i) ? "checked" : "" %> />
+            <label for="cover-<%= i %>" class="group-hover:scale-100 peer-focus:scale-100 peer-focus:ring-2
+                    peer-focus:ring-offset-2 peer-focus:ring-primary-600 group-focus:scale-100
+                    absolute bottom-0 text-xs rounded-bl-lg rounded-tr-lg bg-primary-600 text-white p-2
+                    peer-checked:scale-100 will-change-transform scale-0 origin-bottom-left duration-200">
+              <%= it.posting_data?.cover_index === String(i) ? "Обложка" : "Выбрать как обложку" %>
+            </label>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
     <div class="rounded-lg border border-gray-200 flex flex-col items-center justify-center p-4 shadow-xs duration-500 js-photos-area">
       <span class="inline-block p-3 rounded-full bg-gray-100 text-gray-600 inline-block mb-3">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
@@ -18,7 +47,7 @@
       </span>
       <div class="text-center">
         <p class="text-sm">
-          <input type="file" name="photos" accept="image/*" class="absolute -z-10 opacity-0 peer js-photos-input" id="photos-input" multiple />
+          <input type="file" name="files" accept="image/*" class="absolute -z-10 opacity-0 peer js-photos-input" id="photos-input" multiple />
           <label class="font-medium text-primary-700 cursor-pointer peer-focus:outline" for="photos-input">
             <%= it.t("form.photos.click_to_upload", { ns: "new-posting" }) %>
           </label>
@@ -39,7 +68,7 @@
         <%= it.t("form.description.label", { ns: "new-posting" }) %>
       </span>
       <elastic-textarea>
-        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" class="form-control mt-2"><%= it.second_step_data?.description ?? ""%></textarea>
+        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" class="form-control mt-2"><%= it.posting_data?.description ?? ""%></textarea>
         <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.description ?? "" %></small>
       </elastic-textarea>
     </label/>
@@ -61,7 +90,7 @@
         </span>
         <% field.values.forEach(function (val) { %>
           <div class="flex items-center">
-            <input <%= it.second_step_data?.[field.name] === String(val.id) ? "checked" : ""%> type="radio" name="<%= field.name %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+            <input <%= it.posting_data?.[field.name] === String(val.id) ? "checked" : ""%> type="radio" name="<%= field.name %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white m-0 relative grid place-content-center
                         font-inherit w-4 h-4 border border-gray-300 rounded-full checked:border-[5px]
                         relative checked:before:scale-100 checked:border-primary-600 duration-200 peer" />
@@ -79,7 +108,7 @@
           </div>
           <% field.values.forEach(function (val) { %>
             <div class="flex items-center">
-              <input <%= it.second_step_data?.[field.name].includes(String(val.id)) ? "checked" : "" %> type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/>
+              <input <%= it.posting_data?.[field.name]?.includes(String(val.id)) ? "checked" : "" %> type="<%= field.type %>" name="<%= field.name %>" id="checkbox-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/>
               <label for="checkbox-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 rounded p-px peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

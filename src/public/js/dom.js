@@ -1,8 +1,3 @@
-export function add_listener(node, listeners) {
-  const types = Object.keys(listeners);
-  types.forEach((type) => node.addEventListenerr(type, listeners[type]));
-}
-
 export function hide_form_errors(elements) {
   elements.forEach((element) => {
     const message_field = element.nextElementSibling;
@@ -58,4 +53,23 @@ export function replace_text(node, text) {
   return function restore_text() {
     node.textContent = original;
   };
+}
+
+export function get_siblings(node) {
+  return [...node.parentElement.children].filter(c => c !== node);
+}
+
+function add_listener(node, events) {
+  const types = Object.keys(events);
+  types.forEach(type => node.addEventListener(type, events[type]))
+}
+
+export function add_listeners(nodeOrNodes, events) {
+  if (nodeOrNodes instanceof NodeList) {
+    nodeOrNodes.forEach((node) => add_listener(node, events));
+  }
+
+  if (nodeOrNodes instanceof Node) {
+    add_listener(nodeOrNodes, events);
+  }
 }

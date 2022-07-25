@@ -26,31 +26,38 @@ function get_url(key) {
 }
 
 export async function upload(data) {
-  const key = get_key(data.filename);
-  const upload = new Upload({
-    client: s3,
-    params: {
-      Bucket: config.aws_s3_bucket_name,
-      Key: key,
-      Body: data.file,
-      ContentType: data.mimetype,
-      CacheControl: "max-age=31536000",
-    },
-    queueSize: 4,
-    partSize: 1024 * 1024 * 5,
-    leavePartsOnError: false,
-  });
+  if (data.file.bytesRead > 0) {
+    const key = get_key(data.filename);
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: config.aws_s3_bucket_name,
+        Key: key,
+        Body: data.file,
+        ContentType: data.mimetype,
+        CacheControl: "max-age=31536000",
+      },
+      queueSize: 4,
+      partSize: 1024 * 1024 * 5,
+      leavePartsOnError: false,
+    });
 
-  await upload.done();
+    await upload.done();
 
-  return {
-    s3_url: get_s3_url(key),
-    url: get_url(key),
-    s3_key: key,
-    name: data.filename,
-    mimetype: data.mimetype,
-    fields: data.fields,
+    return {
+      fields: data.fields,
+      attachment: {
+        s3_url: get_s3_url(key),
+        url: get_url(key),
+        s3_key: key,
+        name: data.filename,
+        mimetype: data.mimetype,
+      }
+    }
   }
+
+  await data.toBuffer()
+  return { fields: data.fields }
 }
 
 export async function* upload_multiple(files) {

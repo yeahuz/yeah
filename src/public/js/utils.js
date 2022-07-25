@@ -85,30 +85,3 @@ export function prop(key) {
 export function redirect(path) {
   window.location.href = path;
 }
-
-function add_listener(node, events) {
-  const types = Object.keys(events);
-  types.forEach(type => node.addEventListener(type, events[type]))
-}
-
-export function add_listeners(nodeOrNodes, events) {
-  if (nodeOrNodes instanceof NodeList) {
-    nodeOrNodes.forEach((node) => add_listener(node, events));
-  }
-
-  if (nodeOrNodes instanceof Node) {
-    add_listener(nodeOrNodes, events);
-  }
-}
-
-export function create_node(tag, attributes) {
-  const node = document.createElement(tag);
-
-  if (attributes) {
-    Object.entries(attributes).forEach(([key, value]) => {
-      node.setAttribute(key, value);
-    });
-  }
-
-  return node;
-}
