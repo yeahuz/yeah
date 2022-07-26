@@ -41,6 +41,14 @@ export function create_node(tag, attributes = {}) {
   return node;
 }
 
+export function remove_node(node) {
+  const parent = node.parentElement;
+  const original = parent.removeChild(node);
+  return function restore_node() {
+    parent.appendChild(original);
+  }
+}
+
 export function html_to_node(html) {
   const template = create_node("template");
   template.innerHTML = html.trim();

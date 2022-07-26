@@ -10,6 +10,7 @@ export function up(knex) {
       table.string("profile_photo_url");
       table.string("email").unique();
       table.string("password").notNullable();
+      table.string("hash_id");
       table.timestamp("last_activity_date").defaultTo(knex.fn.now());
       table.timestamps(false, true);
     })
@@ -56,6 +57,7 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("users");
+      table.string("hash_id");
       table.boolean("status");
       table.timestamps(false, true);
     })
@@ -439,7 +441,7 @@ export function up(knex) {
       table.timestamps(false, true);
     })
     .createTable("attachments", (table) => {
-      table.increments("id");
+      table.uuid("id").defaultTo(knex.raw("gen_random_uuid()")).primary();
       table.string("url", 512);
       table.string("mimetype");
       table.string("name");
@@ -457,7 +459,7 @@ export function up(knex) {
         .inTable("postings")
         .onDelete("CASCADE");
       table
-        .integer("attachment_id")
+        .uuid("attachment_id")
         .index()
         .notNullable()
         .references("id")
@@ -467,7 +469,7 @@ export function up(knex) {
     .createTable("entity_attachments", (table) => {
       table.integer("entity_id").notNullable().index();
       table
-        .integer("attachment_id")
+        .uuid("attachment_id")
         .index()
         .notNullable()
         .references("id")

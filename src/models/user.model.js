@@ -1,4 +1,5 @@
 import { BaseModel } from "./index.js";
+import { hashids } from '../utils/hashid.js'
 import * as argon2 from "argon2";
 import { createHash, randomBytes } from "crypto";
 
@@ -21,6 +22,11 @@ export class User extends BaseModel {
     await this.hash_password();
     this.set_avatar();
     this.set_username();
+  }
+
+  async $afterInsert(ctx) {
+    await super.$afterInsert(ctx);
+    await this.$query(ctx.transaction).patch({ hash_id: hashids.encode(this.id) });
   }
 
   async $beforeUpdate(opts, ...args) {

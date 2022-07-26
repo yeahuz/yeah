@@ -40,6 +40,7 @@ export async function signup({
 
     return { session, user: user.toJSON() };
   } catch (err) {
+    console.log(err);
     trx.rollback();
     if (err instanceof UniqueViolationError) {
       throw new ConflictError({

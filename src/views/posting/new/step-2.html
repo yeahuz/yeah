@@ -1,4 +1,4 @@
-<form method="post" class="max-w-3xl space-y-5" enctype="multipart/form-data">
+<form method="post" class="max-w-3xl space-y-5 js-posting-step-2" enctype="multipart/form-data">
   <input type="hidden" name="step" value="2" />
   <% if (it.posting_data?.uploaded_files?.length) { %>
     <% it.posting_data.uploaded_files.forEach(function (photo) { %>
@@ -20,7 +20,7 @@
         <% it.posting_data?.uploaded_files.forEach(function (photo, i) { %>
           <li class="relative group rounded-lg">
             <img src="<%= photo.s3_url %>" alt="" class="min-h-[128px] object-fit rounded-lg aspect-video"/>
-            <button type="button" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
+            <button formaction="/attachments/<%= photo.id %>" formmethod="POST" type="button" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
                                           focus:ring-offset-2 focus:ring-error-500 group-focus:scale-100 md:scale-0 duration-200
                                           absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white
                                           rounded-full p-0.5 js-preview-delete-btn" data-photo_id="<%= photo.id %>">
@@ -28,13 +28,15 @@
                 <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
-            <input type="radio" name="cover_index" value="<%= i %>" id="cover-<%= i %>" class="absolute opacity-0 w-0 -z-10 peer js-preview-radio-input" <%= it.posting_data?.cover_index === String(i) ? "checked" : "" %> />
-            <label for="cover-<%= i %>" class="group-hover:scale-100 peer-focus:scale-100 peer-focus:ring-2
-                    peer-focus:ring-offset-2 peer-focus:ring-primary-600 group-focus:scale-100
-                    absolute bottom-0 text-xs rounded-bl-lg rounded-tr-lg bg-primary-600 text-white p-2
-                    peer-checked:scale-100 will-change-transform scale-0 origin-bottom-left duration-200">
-              <%= it.posting_data?.cover_index === String(i) ? "Обложка" : "Выбрать как обложку" %>
-            </label>
+            <input type="radio" name="cover_index" value="<%= i %>" id="cover-<%= i %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.posting_data?.cover_index === String(i) ? "checked" : "" %> />
+            <label for="cover-<%= i %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-posting" }) %>"
+                        data-cover_text="<%= it.t("form.photos.cover", { ns: "new-posting" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
+                        peer-focus:after:scale-100 peer-focus:after:ring-2
+                        peer-focus:after:ring-offset-2 peer-focus:after:ring-primary-600 group-focus:after:scale-100 group-focus:after:opacity-100
+                        relative text-xs after:opacity-100 md:after:opacity-50 md:after:scale-0 after:duration-200 after:origin-bottom-left after:absolute after:rounded-bl-lg
+                        after:rounded-tr-lg after:whitespace-nowrap after:p-2
+                        after:content-[attr(data-choose\_cover\_text)] after:bottom-0 after:bg-primary-600
+                        after:text-white peer-checked:after:scale-100 peer-checked:after:opacity-100 peer-checked:after:content-[attr(data-cover\_text)]"></label>
           </li>
         <% }) %>
       </ul>
@@ -69,7 +71,7 @@
       </span>
       <elastic-textarea>
         <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" class="form-control mt-2"><%= it.posting_data?.description ?? ""%></textarea>
-        <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.description ?? "" %></small>
+        <small class="text-error-500 mt-1 text-sm block"><%= it.flash?.validation_errors?.[0]?.description ?? "" %></small>
       </elastic-textarea>
     </label/>
     <span class="font-normal text-gray-500 block mt-1.5 text-sm"><%= it.t("form.description.hint", { ns: "new-posting"}) %></span>

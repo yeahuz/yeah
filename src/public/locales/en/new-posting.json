@@ -37,7 +37,9 @@
       "label": "Photos",
       "hint": "The first photo will be on the cover of the posting",
       "click_to_upload": "Click to upload",
-      "or_drag_drop": "or drag and drop"
+      "or_drag_drop": "or drag and drop",
+      "choose_as_cover": "Choose as cover",
+      "cover": "Cover"
     }
   }
 }

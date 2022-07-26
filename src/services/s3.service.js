@@ -25,6 +25,10 @@ function get_url(key) {
   return `https://${config.s3_origin}/${key}`
 }
 
+export async function delete_one(s3_key) {
+  return await s3.send(new DeleteObjectCommand({ Key: s3_key, Bucket: config.aws_s3_bucket_name }));
+}
+
 export async function upload(data) {
   if (data.file.bytesRead > 0) {
     const key = get_key(data.filename);

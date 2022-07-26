@@ -704,6 +704,10 @@ video {
   right: 14px;
 }
 
+.left-0 {
+  left: 0px;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -2170,6 +2174,26 @@ checkbox-control {
   left: 50%;
 }
 
+.after\:left-0::after {
+  content: var(--tw-content);
+  left: 0px;
+}
+
+.after\:left-2::after {
+  content: var(--tw-content);
+  left: 0.5rem;
+}
+
+.after\:top-0::after {
+  content: var(--tw-content);
+  top: 0px;
+}
+
+.after\:bottom-0::after {
+  content: var(--tw-content);
+  bottom: 0px;
+}
+
 .after\:-z-10::after {
   content: var(--tw-content);
   z-index: -10;
@@ -2210,6 +2234,11 @@ checkbox-control {
   width: 2rem;
 }
 
+.after\:origin-bottom-left::after {
+  content: var(--tw-content);
+  transform-origin: bottom left;
+}
+
 .after\:-translate-y-1\/2::after {
   content: var(--tw-content);
   --tw-translate-y: -50%;
@@ -2222,9 +2251,31 @@ checkbox-control {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.after\:scale-0::after {
+  content: var(--tw-content);
+  --tw-scale-x: 0;
+  --tw-scale-y: 0;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.after\:whitespace-nowrap::after {
+  content: var(--tw-content);
+  white-space: nowrap;
+}
+
 .after\:rounded-full::after {
   content: var(--tw-content);
   border-radius: 9999px;
+}
+
+.after\:rounded-bl-lg::after {
+  content: var(--tw-content);
+  border-bottom-left-radius: 0.5rem;
+}
+
+.after\:rounded-tr-lg::after {
+  content: var(--tw-content);
+  border-top-right-radius: 0.5rem;
 }
 
 .after\:border-4::after {
@@ -2252,13 +2303,89 @@ checkbox-control {
   background-color: rgb(var(--gray-200));
 }
 
+.after\:p-2::after {
+  content: var(--tw-content);
+  padding: 0.5rem;
+}
+
 .after\:text-error-500::after {
   content: var(--tw-content);
   color: rgb(var(--error-500));
 }
 
+.after\:text-white::after {
+  content: var(--tw-content);
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.after\:opacity-50::after {
+  content: var(--tw-content);
+  opacity: 0.5;
+}
+
+.after\:opacity-100::after {
+  content: var(--tw-content);
+  opacity: 1;
+}
+
+.after\:duration-200::after {
+  content: var(--tw-content);
+  transition-duration: 200ms;
+}
+
 .after\:content-\[\'\*\'\]::after {
   --tw-content: '*';
+  content: var(--tw-content);
+}
+
+.after\:content-\[\'Hello\'\]::after {
+  --tw-content: 'Hello';
+  content: var(--tw-content);
+}
+
+.after\:content-\[\'\412\44B\431\440\430\442\44C_\43E\431\43B\43E\436\43A\443\'\]::after {
+  --tw-content: 'Выбрать обложку';
+  content: var(--tw-content);
+}
+
+.after\:content-\[\'Choose_cover\'\]::after {
+  --tw-content: 'Choose cover';
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(data-choose-cover\)\]::after {
+  --tw-content: attr(data-choose-cover);
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(data-choose-cover-text\)\]::after {
+  --tw-content: attr(data-choose-cover-text);
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(data-choose_cover_text\)\]::after {
+  --tw-content: attr(data-choose cover text);
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(choose_cover_text\)\]::after {
+  --tw-content: attr(choose cover text);
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(data-choose\\_cover\\_text\)\]::after {
+  --tw-content: attr(data-choose_cover_text);
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(data-choose_sd\)\]::after {
+  --tw-content: attr(data-choose sd);
+  content: var(--tw-content);
+}
+
+.after\:content-\[attr\(data-choose\\\\_cover\\\\_text\)\]::after {
+  --tw-content: attr(data-choose\_cover\_text);
   content: var(--tw-content);
 }
 
@@ -2322,6 +2449,13 @@ checkbox-control {
   --tw-ring-offset-width: 2px;
 }
 
+.focus\:after\:ring-2:focus::after {
+  content: var(--tw-content);
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 .group[open] .group-open\:translate-y-1 {
   --tw-translate-y: 0.25rem;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -2352,10 +2486,34 @@ checkbox-control {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.group:hover .group-hover\:after\:scale-100::after {
+  content: var(--tw-content);
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.group:hover .group-hover\:after\:opacity-100::after {
+  content: var(--tw-content);
+  opacity: 1;
+}
+
 .group:focus .group-focus\:scale-100 {
   --tw-scale-x: 1;
   --tw-scale-y: 1;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.group:focus .group-focus\:after\:scale-100::after {
+  content: var(--tw-content);
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.group:focus .group-focus\:after\:opacity-100::after {
+  content: var(--tw-content);
+  opacity: 1;
 }
 
 .peer:checked ~ .peer-checked\:scale-100 {
@@ -2366,6 +2524,48 @@ checkbox-control {
 
 .peer:checked ~ .peer-checked\:text-gray-900 {
   color: rgb(var(--gray-900));
+}
+
+.peer:checked ~ .peer-checked\:after\:scale-100::after {
+  content: var(--tw-content);
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.peer:checked ~ .peer-checked\:after\:opacity-100::after {
+  content: var(--tw-content);
+  opacity: 1;
+}
+
+.peer:checked ~ .peer-checked\:after\:content-\[\'Cover\'\]::after {
+  --tw-content: 'Cover';
+  content: var(--tw-content);
+}
+
+.peer:checked ~ .peer-checked\:after\:content-\[attr\(data-cover-text\)\]::after {
+  --tw-content: attr(data-cover-text);
+  content: var(--tw-content);
+}
+
+.peer:checked ~ .peer-checked\:after\:content-\[attr\(data_cover_text\)\]::after {
+  --tw-content: attr(data cover text);
+  content: var(--tw-content);
+}
+
+.peer:checked ~ .peer-checked\:after\:content-\[attr\(data-cover_text\)\]::after {
+  --tw-content: attr(data-cover text);
+  content: var(--tw-content);
+}
+
+.peer:checked ~ .peer-checked\:after\:content-\[attr\(data-cover\\_text\)\]::after {
+  --tw-content: attr(data-cover_text);
+  content: var(--tw-content);
+}
+
+.peer:checked ~ .peer-checked\:after\:content-\[attr\(data-cover\\\\_text\)\]::after {
+  --tw-content: attr(data-cover\_text);
+  content: var(--tw-content);
 }
 
 .peer:focus ~ .peer-focus\:scale-100 {
@@ -2389,6 +2589,30 @@ checkbox-control {
 }
 
 .peer:focus ~ .peer-focus\:ring-offset-2 {
+  --tw-ring-offset-width: 2px;
+}
+
+.peer:focus ~ .peer-focus\:after\:scale-100::after {
+  content: var(--tw-content);
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.peer:focus ~ .peer-focus\:after\:ring-2::after {
+  content: var(--tw-content);
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.peer:focus ~ .peer-focus\:after\:ring-primary-600::after {
+  content: var(--tw-content);
+  --tw-ring-color: rgb(var(--primary-600));
+}
+
+.peer:focus ~ .peer-focus\:after\:ring-offset-2::after {
+  content: var(--tw-content);
   --tw-ring-offset-width: 2px;
 }
 
@@ -2424,6 +2648,23 @@ checkbox-control {
 
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md\:after\:scale-0::after {
+    content: var(--tw-content);
+    --tw-scale-x: 0;
+    --tw-scale-y: 0;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  }
+
+  .md\:after\:opacity-100::after {
+    content: var(--tw-content);
+    opacity: 1;
+  }
+
+  .md\:after\:opacity-50::after {
+    content: var(--tw-content);
+    opacity: 0.5;
   }
 }
 
