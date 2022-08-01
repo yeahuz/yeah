@@ -13,6 +13,8 @@ import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
 import * as S3Service from './services/s3.service.js'
+import * as RegionService from './services/region.service.js'
+import { elastic_client } from './services/es.service.js'
 import { i18next } from "./utils/i18n.js";
 import * as eta from "eta";
 import { routes } from "./routes/index.js";
@@ -127,6 +129,102 @@ export async function start() {
 
     app.register(attach_user);
     app.register(can);
+    // app.get("/elastic/regions", async (req, reply) => {
+    //   const { lang = "en" } = req.query;
+    //   const regions = await RegionService.get_many({ lang });
+
+    //   let reduced = regions.reduce((acc, cur) => {
+    //     acc[cur.lang] = cur;
+    //     acc[cur.lang].districts = cur.districts.reduce((a, c) => {
+    //       if(!(a[c.lang])) a[c.lang] = []
+    //       a[c.lang].push(c)
+    //       return a;
+    //     }, {})
+    //     return acc;
+    //   }, {});
+
+    //   for (const lng in reduced) {
+    //     const region = reduced[lng];
+    //     const districts = region.districts[lng];
+    //     const keys = Object.keys(region.districts).filter(k => k !== lng);
+
+    //     for (const district of districts) {
+    //       let combined = `${district.long_name}, ${region.long_name}`
+    //       for (const key of keys) {
+    //         const siblings_districts = region.districts[key];
+    //         const sibling_region = reduced[key];
+    //         const friend = siblings_districts.find(d => d.id === district.id);
+    //         combined += `; ${friend.long_name}, ${sibling_region.long_name}`;
+    //       }
+
+    //       await elastic_client.index({
+    //         index: `regions_${lng}`,
+    //         body: {
+    //           region_id: region.id,
+    //           district_id: district.id,
+    //           formatted_address: `${district.long_name}, ${region.long_name}`,
+    //           combined_address: combined,
+    //           coords: {
+    //             lat: district.coords.x,
+    //             lon: district.coords.y
+    //           }
+    //         }
+    //       })
+    //     }
+    //   }
+
+    //   // for( const region of regions ) {
+    //   //   for (const district of region.districts) {
+    //   //       console.log( {district} );
+    //   //   }
+    //   // }
+    //   // const languages = ["ru", "uz", "en"];
+
+    //   // for (const region of regions) {
+    //   //   for (const district of region.districts) {
+    //   //     await elastic_client.index({
+    //   //       index: `reg_v2_${lang}`,
+    //   //       body: {
+    //   //         region_id: region.id,
+    //   //         district_id: district.id,
+    //   //         formatted_address: `${district.long_name}, ${region.long_name}`,
+    //   //         coords: [district.coords.x, district.coords.y],
+    //   //       }
+    //   //     })
+    //   //   }
+    //   // }
+
+    //   return { status: "oke" }
+    // });
+
+    app.get("/elastic/regions/search", async (req, reply) => {
+      const { q, lang = "en" } = req.query;
+      const accept = req.accepts();
+
+      const languages = accept.languages().slice(0, 3);
+      console.log(languages);
+      let boosts = []
+
+      for (let i = languages.length - 1; i >= 0; i--) {
+        boosts.push({
+          [`regions_${languages[i]}`]: languages.length - i
+        })
+      }
+
+      // Search only in one index, index should contain translation for all languages in one field (raw), formatted_address should contain translation for that index;
+
+      console.log(boosts);
+
+      console.time("Hits");
+      const response = await elastic_client.search({ index: `regions_${lang}`, body: {
+                                        query: { multi_match: { query: q, type: "bool_prefix", fields: ["combined_address", "combined_address._2gram", "combined_address._3gram"] } },
+                                        collapse: { field: "district_id" }, _source: ["formatted_address", "district_id", "region_id", "coords"] }});
+      console.timeEnd("Hits");
+
+      console.log(response)
+      return response.body.hits.hits;
+    });
+
     app.register(routes);
 
     await app.listen({ port: config.port });

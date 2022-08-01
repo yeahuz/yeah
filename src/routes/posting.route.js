@@ -30,6 +30,21 @@ export const posting = async (fastify) => {
   });
   fastify.route({
     method: "POST",
+    url: "/wizard/:id/3",
+    handler: PostingController.submit_third_step
+  });
+  fastify.route({
+    method: "POST",
+    url: "/wizard/:id/2/attachments/:attachment_id",
+    handler: PostingController.update_attachment,
+  });
+  fastify.route({
+    method: "DELETE",
+    url: "/wizard/:id/2/attachments/:attachment_id",
+    handler: PostingController.delete_attachment,
+  })
+  fastify.route({
+    method: "POST",
     url: "/new",
     handler: PostingController.submit_step,
     schema: {

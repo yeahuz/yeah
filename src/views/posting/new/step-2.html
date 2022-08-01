@@ -1,3 +1,8 @@
+<% it.posting_data?.uploaded_files?.forEach(function (photo, i) { %>
+  <form class="js-preview-delete-form" action="/postings/wizard/<%= it.id %>/<%= it.step %>/attachments/<%= photo.id %>?return_to=/postings/wizard/<%= it.id %>/<%= it.step %>" method="POST" id="form-<%= photo.id %>">
+    <input type="hidden" name="photo_id" value="<%= photo.id %>" />
+  </form>
+<% }) %>
 <form method="post" class="max-w-3xl space-y-5 js-posting-step-2" enctype="multipart/form-data">
   <input type="hidden" name="step" value="2" />
   <% if (it.posting_data?.uploaded_files?.length) { %>
@@ -19,8 +24,8 @@
       <ul class="js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6">
         <% it.posting_data?.uploaded_files.forEach(function (photo, i) { %>
           <li class="relative group rounded-lg">
-            <img src="<%= photo.s3_url %>" alt="" class="min-h-[128px] object-fit rounded-lg aspect-video"/>
-            <button formaction="/attachments/<%= photo.id %>" formmethod="POST" type="button" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
+            <img src="<%= photo.url %>" alt="" class="min-h-[128px] object-fit rounded-lg aspect-video"/>
+            <button name="_action" value="delete_attachment" form="form-<%= photo.id %>" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
                                           focus:ring-offset-2 focus:ring-error-500 group-focus:scale-100 md:scale-0 duration-200
                                           absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white
                                           rounded-full p-0.5 js-preview-delete-btn" data-photo_id="<%= photo.id %>">
@@ -128,3 +133,6 @@
   <% }) %>
   <button class="btn btn-lg btn-primary mt-6">Далее</button>
 </form>
+<script defer async type="module" src="/public/js/elastic-textarea.js"></script>
+<script defer async type="module" src="/public/js/new-posting-step-2.js"></script>
+</main>

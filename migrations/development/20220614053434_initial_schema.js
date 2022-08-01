@@ -573,6 +573,90 @@ export function up(knex) {
         .inTable("conversations")
         .onDelete("CASCADE");
       table.timestamps(false, true);
+    })
+    .createTable("countries", (table) => {
+      table.string("code").primary();
+      table.timestamps(false, true);
+    })
+    .createTable("country_translations", (table) => {
+      table
+        .string("country_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("countries")
+        .onDelete("CASCADE")
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("name");
+      table.timestamps(false, true);
+    })
+    .createTable("regions", (table) => {
+      table.increments("id");
+      table
+        .string("country_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("countries")
+        .onDelete("CASCADE")
+      table.point("coords")
+      table.timestamps(false, true);
+    })
+    .createTable("region_translations", (table) => {
+      table
+        .integer("region_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("regions")
+        .onDelete("CASCADE")
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("short_name");
+      table.string("long_name");
+      table.timestamps(false, true);
+    })
+    .createTable("districts", (table) => {
+      table.increments("id");
+      table
+        .integer("region_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("regions")
+        .onDelete("CASCADE")
+      table.point("coords")
+      table.timestamps(false, true);
+    })
+    .createTable("district_translations", (table) => {
+      table
+        .integer("district_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("districts")
+        .onDelete("CASCADE")
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("short_name");
+      table.string("long_name");
+      table.timestamps(false, true);
     });
 }
 
@@ -602,6 +686,12 @@ export function down(knex) {
     .dropTable("posting_categories")
     .dropTable("posting_attributes")
     .dropTable("posting_status_translations")
+    .dropTable("district_translations")
+    .dropTable("districts")
+    .dropTable("region_translations")
+    .dropTable("regions")
+    .dropTable("country_translations")
+    .dropTable("countries")
     .dropTable("promotions")
     .dropTable("postings")
     .dropTable("posting_statuses")

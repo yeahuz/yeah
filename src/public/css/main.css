@@ -153,6 +153,11 @@ details[open] summary::before {
   font-size: var(--font-size);
 }
 
+button:disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
 .btn:disabled {
   --events: none;
   --opacity: 0.7;
@@ -253,6 +258,7 @@ details[open] summary::before {
   font-size: 16px;
   line-height: 1.5;
   appearance: none;
+  font-weight: 400;
 }
 
 .form-control:focus {

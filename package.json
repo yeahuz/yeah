@@ -29,6 +29,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.135.0",
     "@aws-sdk/lib-storage": "^3.135.0",
+    "@elastic/elasticsearch": "7",
     "@fastify/accepts": "^4.0.0",
     "@fastify/cookie": "^7.2.0",
     "@fastify/etag": "4.0.0",
@@ -38,6 +39,8 @@
     "@fastify/secure-session": "^5.2.0",
     "@fastify/static": "^6.4.0",
     "@fastify/view": "^7.0.0",
+    "@googlemaps/google-maps-services-js": "^3.3.16",
+    "@googlemaps/js-api-loader": "^1.14.3",
     "ajv-errors": "^3.0.0",
     "argon2": "^0.28.7",
     "base64url": "^3.0.1",

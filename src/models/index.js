@@ -14,3 +14,5 @@ export * from "./category-field-value-translation.model.js";
 export * from "./category-field-translation.model.js";
 export * from "./attachment.model.js";
 export * from "./posting.model.js";
+export * from "./region.model.js";
+export * from "./district.model.js";

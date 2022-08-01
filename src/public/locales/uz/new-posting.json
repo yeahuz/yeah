@@ -40,6 +40,14 @@
       "or_drag_drop": "yoki sudrab olib tashlang",
       "choose_as_cover": "Asosiy sifatida tanlang",
       "cover": "Asosiy"
+    },
+    "location": {
+      "label": "Manzil",
+      "placeholder": "Shahar yoki ko'cha nomi"
+    },
+    "phone": {
+      "label": "Telefon raqam",
+      "placeholder": "+998939152000"
     }
   }
 }

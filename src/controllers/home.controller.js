@@ -1,5 +1,6 @@
 import { render_file } from "../utils/eta.js";
 import * as UserService from "../services/user.service.js";
+import { get_many } from '../services/region.service.js'
 
 export async function get_index(req, reply) {
   const stream = reply.init_stream();

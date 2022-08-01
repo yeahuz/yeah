@@ -31,4 +31,8 @@ export const {
   AWS_S3_REGION,
   AWS_S3_BUCKET_NAME,
   S3_ORIGIN,
+  GOOGLE_JS_MAPS_API_KEY,
+  GOOGLE_MAPS_API_KEY,
+  ES_PASSWORD,
+  ES_USERNAME
 } = process.env;

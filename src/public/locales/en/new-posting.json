@@ -40,6 +40,14 @@
       "or_drag_drop": "or drag and drop",
       "choose_as_cover": "Choose as cover",
       "cover": "Cover"
+    },
+    "location": {
+      "label": "Location",
+      "placeholder": "City or street name"
+    },
+    "phone": {
+      "label": "Phone",
+      "placeholder": "+998939152000"
     }
   }
 }

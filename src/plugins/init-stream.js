@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import { Readable } from "stream";
 
+import Stream from 'stream';
 export const init_stream = fp(function init_stream(fastify, opts, next) {
   fastify.decorateReply("init_stream", init_stream_impl);
   next();
