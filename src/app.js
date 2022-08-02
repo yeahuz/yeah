@@ -77,12 +77,18 @@ export async function start() {
       root: path.join(process.cwd(), "src/public"),
       prefix: "/public",
       decorateReply: false,
+      setHeaders: (res) => {
+        res.setHeader("Service-Worker-Allowed", "/");
+      }
     });
 
     app.register(fastify_static, {
       root: path.join(process.cwd(), "node_modules"),
       prefix: "/node_modules",
       decorateReply: false,
+      setHeaders: (res) => {
+        res.setHeader("Service-Worker-Allowed", "/");
+      }
     });
 
     app.setErrorHandler((err, req, reply) => {
@@ -202,7 +208,6 @@ export async function start() {
       const accept = req.accepts();
 
       const languages = accept.languages().slice(0, 3);
-      console.log(languages);
       let boosts = []
 
       for (let i = languages.length - 1; i >= 0; i--) {

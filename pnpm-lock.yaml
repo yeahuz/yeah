@@ -63,7 +63,7 @@ dependencies:
   cbor: 8.1.0
   dotenv: 16.0.1
   eta: 1.12.3
-  fastify: github.com/fastify/fastify/5a785ee49b2119d66cc08597d4f8d2f9cb506ab1
+  fastify: github.com/fastify/fastify/c6cd0e9aa4d2a88a34ebb551edb958b7a5597d50
   fastify-plugin: 4.0.0
   google-auth-library: 8.1.1
   hashids: 2.2.10
@@ -4586,8 +4586,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  github.com/fastify/fastify/5a785ee49b2119d66cc08597d4f8d2f9cb506ab1:
-    resolution: {tarball: https://codeload.github.com/fastify/fastify/tar.gz/5a785ee49b2119d66cc08597d4f8d2f9cb506ab1}
+  github.com/fastify/fastify/c6cd0e9aa4d2a88a34ebb551edb958b7a5597d50:
+    resolution: {tarball: https://codeload.github.com/fastify/fastify/tar.gz/c6cd0e9aa4d2a88a34ebb551edb958b7a5597d50}
     name: fastify
     version: 4.3.0
     dependencies:
