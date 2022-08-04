@@ -2,33 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  @font-face {
-    font-family: "Inter";
-    font-weight: 400;
-    src: url("/public/fonts/Inter-Regular.ttf");
-    font-display: swap;
-  }
-  @font-face {
-    font-family: "Inter";
-    font-weight: 500;
-    src: url("/public/fonts/Inter-Medium.ttf");
-    font-display: swap;
-  }
-  @font-face {
-    font-family: "Inter";
-    font-weight: 600;
-    src: url("/public/fonts/Inter-SemiBold.ttf");
-    font-display: swap;
-  }
-  @font-face {
-    font-family: "Inter";
-    font-weight: 700;
-    src: url("/public/fonts/Inter-Bold.ttf");
-    font-display: swap;
-  }
-}
-
 :root {
   /* Base */
   --white: 255, 255, 255;

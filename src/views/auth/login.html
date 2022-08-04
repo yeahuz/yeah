@@ -1,7 +1,7 @@
 <div class="max-w-sm mx-auto space-y-8 mt-20 px-4">
   <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "login"}) %></h1>
   <%~ includeFile('../partials/flash.html', it) %>
-  <form action="/auth/login" method="post">
+  <form action="/auth/login" method="post" class="js-login-form">
     <input type="hidden" name="nonce" value="<%= it.nonce %>" />
     <label class="text-sm font-medium text-gray-700">
       <%= it.t("email.label", { ns: "login"}) %> <input type="text" autocomplete="tel email" class="form-control mt-2"
@@ -94,3 +94,4 @@
 ></div>
 <script type="module" src="/public/js/identity-handlers.js" defer></script>
 <script src="https://accounts.google.com/gsi/client" defer></script>
+<script type="module" src="/public/js/auth.js" async defer></script>

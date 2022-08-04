@@ -4,22 +4,21 @@ import { render_file } from "../utils/eta.js";
 import { create_date_formatter } from "../utils/index.js";
 
 export async function get_tab(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { tab } = req.params;
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
-  const top = await render_file("/partials/top.html", {
-    meta: { title: "Settings", lang: req.language },
-  });
-  stream.push(top);
-
-  const header = await render_file("/partials/header.html", {
-    t,
-    user: user,
-  });
-  stream.push(header);
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: "Settings", lang: req.language },
+      t,
+      user
+    });
+    stream.push(top);
+  }
 
   const settings_top = await render_file("/settings/top.html", { tab, t });
   stream.push(settings_top);
@@ -40,31 +39,32 @@ export async function get_tab(req, reply) {
   const settings_bottom = await render_file("/settings/bottom.html");
   stream.push(settings_bottom);
 
-  const bottom = await render_file("/partials/bottom.html", {
-    scripts: ["/public/js/settings.js"],
-  });
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html", {
+      scripts: ["/public/js/settings.js"],
+    });
+    stream.push(bottom);
+  }
 
-  stream.push(bottom);
   stream.push(null);
   return reply;
 }
 
 export async function get_details(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
-  const top = await render_file("/partials/top.html", {
-    meta: { title: "Settings", lang: req.language },
-  });
-  stream.push(top);
-
-  const header = await render_file("/partials/header.html", {
-    t,
-    user: user,
-  });
-  stream.push(header);
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: "Settings", lang: req.language },
+      t,
+      user
+    });
+    stream.push(top);
+  }
 
   const settings_top = await render_file("/settings/top.html", {
     tab: "details",
@@ -82,32 +82,33 @@ export async function get_details(req, reply) {
   const settings_bottom = await render_file("/settings/bottom.html");
   stream.push(settings_bottom);
 
-  const bottom = await render_file("/partials/bottom.html", {
-    scripts: ["/public/js/settings.js"],
-  });
-  stream.push(bottom);
-  stream.push(null);
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html", {
+      scripts: ["/public/js/settings.js"],
+    });
+    stream.push(bottom);
+  }
 
+  stream.push(null);
   return reply;
 }
 
 export async function get_privacy(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
   const current_sid = req.session.get("sid");
 
-  const top = await render_file("/partials/top.html", {
-    meta: { title: "Settings", lang: req.language },
-  });
-  stream.push(top);
-
-  const header = await render_file("/partials/header.html", {
-    t,
-    user: user,
-  });
-  stream.push(header);
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: "Settings", lang: req.language },
+      t,
+      user
+    });
+    stream.push(top);
+  }
 
   const settings_top = await render_file("/settings/top.html", {
     tab: "privacy",
@@ -133,9 +134,11 @@ export async function get_privacy(req, reply) {
   });
   stream.push(settings_bottom);
 
-  const bottom = await render_file("/partials/bottom.html");
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html");
+    stream.push(bottom);
+  }
 
-  stream.push(bottom);
   stream.push(null);
   return reply;
 }

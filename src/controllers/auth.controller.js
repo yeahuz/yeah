@@ -14,6 +14,7 @@ import config from "../config/index.js";
 
 export async function get_login(req, reply) {
   const { return_to = "/" } = req.query;
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
 
   const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
@@ -28,16 +29,14 @@ export async function get_login(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
 
-  const top = await render_file("/partials/top.html", {
-    meta: { title: t("title", { ns: "login" }), lang: req.language },
-  });
-  stream.push(top);
-
-  const header = await render_file("/partials/header.html", {
-    user,
-    t,
-  });
-  stream.push(header);
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("title", { ns: "login" }), lang: req.language },
+      t,
+      user
+    });
+    stream.push(top);
+  }
 
   const login = await render_file("/auth/login.html", {
     t,
@@ -49,8 +48,10 @@ export async function get_login(req, reply) {
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);
 
-  const bottom = await render_file("/partials/bottom.html");
-  stream.push(bottom);
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html");
+    stream.push(bottom);
+  }
 
   stream.push(null);
   return reply;
@@ -59,6 +60,7 @@ export async function get_login(req, reply) {
 export async function get_signup(req, reply) {
   const { return_to = "/" } = req.query
   const flash = reply.flash();
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
 
   const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
   const oauth_state = encrypt(
@@ -72,13 +74,14 @@ export async function get_signup(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
 
-  const top = await render_file("/partials/top.html", {
-    meta: { title: t("title", { ns: "signup" }), lang: req.language },
-  });
-  stream.push(top);
-
-  const header = await render_file("/partials/header.html", { t, user: user });
-  stream.push(header);
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("title", { ns: "signup" }), lang: req.language },
+      t,
+      user
+    });
+    stream.push(top);
+  }
 
   const signup = await render_file("/auth/signup.html", {
     t,
@@ -90,8 +93,10 @@ export async function get_signup(req, reply) {
   stream.push(signup);
   redis_client.setex(nonce, 86400, 1);
 
-  const bottom = await render_file("/partials/bottom.html");
-  stream.push(bottom);
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html");
+    stream.push(bottom);
+  }
 
   stream.push(null);
   return reply;
@@ -381,6 +386,7 @@ export async function update_credential(req, reply) {
 
 export async function get_webauthn(req, reply) {
   const user_id = req.session.get("user_id");
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { return_to = "/" } = req.query;
 
   if (!user_id) {
@@ -391,21 +397,23 @@ export async function get_webauthn(req, reply) {
   const stream = reply.init_stream();
   const t = req.i18n.t;
 
-  const top = await render_file("/partials/top.html", {
-    meta: { title: t("title", { ns: "signup" }), lang: req.language },
-  });
-  stream.push(top);
-
-  const header = await render_file("/partials/header.html", { t });
-  stream.push(header);
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("title", { ns: "signup" }), lang: req.language },
+      t
+    });
+    stream.push(top);
+  }
 
   const webauthn = await render_file("/auth/webauthn.html", { t })
   stream.push(webauthn);
 
-  const bottom = await render_file("/partials/bottom.html", {
-    scripts: ["/public/js/2fa.js"]
-  });
-  stream.push(bottom);
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html", {
+      scripts: ["/public/js/2fa.js"]
+    });
+    stream.push(bottom);
+  }
 
   stream.push(null);
 

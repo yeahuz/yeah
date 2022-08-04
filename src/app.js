@@ -79,7 +79,7 @@ export async function start() {
       decorateReply: false,
       setHeaders: (res) => {
         res.setHeader("Service-Worker-Allowed", "/");
-      }
+      },
     });
 
     app.register(fastify_static, {

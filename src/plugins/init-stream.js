@@ -12,6 +12,7 @@ function init_stream_impl() {
   stream._read = () => {};
   this.header("content-type", "text/html; charset=utf-8");
   this.header("transfer-encoding", "chunked");
+  this.header("vary", "Service-Worker-Navigation-Preload, X-Content-Mode")
   this.send(stream);
   return stream;
 }

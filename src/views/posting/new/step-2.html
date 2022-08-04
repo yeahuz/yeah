@@ -133,6 +133,9 @@
   <% }) %>
   <button class="btn btn-lg btn-primary mt-6">Далее</button>
 </form>
+</main>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
 <script defer async type="module" src="/public/js/new-posting-step-2.js"></script>
-</main>
+<script>
+ document.title = "<%= it.t("title", { ns: "new-posting" })%> | YeaH"
+</script>
