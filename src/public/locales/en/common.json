@@ -4,5 +4,13 @@
   "create_account": "Create account",
   "save_changes": "Save changes",
   "saving_changes": "Saving changes",
-  "online": "Online"
+  "online": "Online",
+  "home": "Home",
+  "profile": "Profile",
+  "page_not_found": "Page not found",
+  "js_feature_only": "This feature doesn't work without JavaScript",
+  "create": "Create",
+  "liked": "Liked",
+  "post": "Post",
+  "search": "Search"
 }

@@ -5,7 +5,7 @@
       <p class="text-gray-500 mt-1"><%= it.t("personal.description", { ns: "settings-details" }) %></p>
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
       <div class="flex space-x-6 mb-6">
         <label class="text-sm font-medium text-gray-700 w-full"> <%= it.t("personal.name.label", { ns: "settings-details" }) %>
             <input type="text" class="form-control mt-2"
@@ -35,7 +35,7 @@
       <h2 class="text-gray-900 text-lg font-medium"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1"><%= it.t("general.description", { ns: "settings-details" }) %></p>
     </header>
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
       <label class="w-full mb-6">
         <span class="text-sm font-medium text-gray-700"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>
         <div class="flex mt-2">
@@ -57,3 +57,9 @@
     </form>
   </section>
 </div>
+</div>
+</main>
+<script>
+ document.title = "<%= it.t("tabs.details", { ns: "settings" })%> | YeaH"
+</script>
+<script src="/public/js/details.js" type="module" defer async> </script>

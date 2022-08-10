@@ -1,7 +1,7 @@
 import * as SessionService from "../services/session.service.js";
 import * as CredentialService from '../services/credential.service.js'
 import { render_file } from "../utils/eta.js";
-import { create_date_formatter } from "../utils/index.js";
+import { create_date_formatter, parse_url } from "../utils/index.js";
 
 export async function get_tab(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
@@ -13,7 +13,7 @@ export async function get_tab(req, reply) {
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: "Settings", lang: req.language },
+      meta: { title: t("title", { ns: "settings" }), lang: req.language },
       t,
       user
     });
@@ -30,7 +30,7 @@ export async function get_tab(req, reply) {
   });
 
   if (!selected_tab) {
-    const not_found = await render_file("/partials/404.html");
+    const not_found = await render_file("/partials/404.html", { t });
     stream.push(not_found);
   } else {
     stream.push(selected_tab);
@@ -40,9 +40,7 @@ export async function get_tab(req, reply) {
   stream.push(settings_bottom);
 
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html", {
-      scripts: ["/public/js/settings.js"],
-    });
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
 
@@ -59,7 +57,7 @@ export async function get_details(req, reply) {
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: "Settings", lang: req.language },
+      meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
       t,
       user
     });
@@ -79,13 +77,8 @@ export async function get_details(req, reply) {
   });
   stream.push(details);
 
-  const settings_bottom = await render_file("/settings/bottom.html");
-  stream.push(settings_bottom);
-
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html", {
-      scripts: ["/public/js/settings.js"],
-    });
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
 
@@ -103,7 +96,7 @@ export async function get_privacy(req, reply) {
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: "Settings", lang: req.language },
+      meta: { title: t("tabs.privacy", { ns: "settings" }), lang: req.language },
       t,
       user
     });
@@ -129,13 +122,8 @@ export async function get_privacy(req, reply) {
   });
   stream.push(privacy);
 
-  const settings_bottom = await render_file("/settings/bottom.html", {
-    scripts: ["/public/js/privacy.js"]
-  });
-  stream.push(settings_bottom);
-
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html");
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
 

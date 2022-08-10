@@ -1,9 +1,19 @@
+import pkg from 'objection'
+const { raw, ref } = pkg;
+
 import { Category, CategoryField } from '../models/index.js'
 
 export async function get_many({ lang = "en" }) {
   return await Category.query().select("ct.title as title", "categories.id", "categories.parent_id")
                        .join('category_translations as ct', "ct.category_id", "categories.id")
                        .where({ language_code: lang.substring(0, 2) });
+}
+
+export async function get_parents({ lang = "en" }) {
+  return await Category.query().select("ct.title as title", "categories.id", "categories.parent_id", raw("exists (select * from categories where parent_id = ?? and parent_id is not null limit 1) as has_children", [ref("ct.category_id")]))
+                       .join('category_translations as ct', "ct.category_id", "categories.id")
+                       .where({ parent_id: null })
+                       .where({ language_code: lang.substring(0, 2) })
 }
 
 export async function get_fields({ category_id, lang = "en" }) {

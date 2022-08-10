@@ -1,0 +1,5 @@
+{
+  "title": "You are offline",
+  "description": "You currently do not have an internet connection. The page will automatically reload when the connection is restored.",
+  "reload": "Reload"
+}

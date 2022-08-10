@@ -34,5 +34,7 @@ export const {
   GOOGLE_JS_MAPS_API_KEY,
   GOOGLE_MAPS_API_KEY,
   ES_PASSWORD,
-  ES_USERNAME
+  ES_USERNAME,
+  ORIGIN,
+  ORIGIN_DEV
 } = process.env;

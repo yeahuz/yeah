@@ -43,9 +43,10 @@ export async function request(
     }
 
     if (state.replace && response.redirected) {
-      window.history.replaceState(null, "", response.url);
       if (state.reload) {
-        window.location.reload();
+        window.location.href = response.url;
+      } else {
+        window.history.pushState(null, "", response.url);
       }
     }
 
@@ -84,4 +85,20 @@ export function prop(key) {
 
 export function redirect(path) {
   window.location.href = path;
+}
+
+export function message_sw(data) {
+  return new Promise(async (resolve) => {
+    const message_channel = new MessageChannel();
+    const reg = await navigator.serviceWorker.getRegistration()
+    const sw = reg.active || reg.installing || reg.waiting;
+    if (sw) {
+      message_channel.port1.onmessage = resolve;
+      sw.postMessage(data, [message_channel.port2]);
+    } else resolve()
+  })
+}
+
+export function is_apple_device() {
+  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
 }

@@ -24,7 +24,7 @@
       <ul class="js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6">
         <% it.posting_data?.uploaded_files.forEach(function (photo, i) { %>
           <li class="relative group rounded-lg">
-            <img src="<%= photo.url %>" alt="" class="min-h-[128px] object-fit rounded-lg aspect-video"/>
+            <img src="<%= photo.url %>" alt="" class="min-h-[128px] object-fit rounded-lg aspect-video" crossorigin />
             <button name="_action" value="delete_attachment" form="form-<%= photo.id %>" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
                                           focus:ring-offset-2 focus:ring-error-500 group-focus:scale-100 md:scale-0 duration-200
                                           absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white

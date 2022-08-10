@@ -1,7 +1,45 @@
-<header class="bg-white border-b border-b-gray-200 py-8 px-4 sm:px-0">
+<header class="bg-white border-b border-b-gray-200 py-4 px-4 xl:px-0 sticky top-0 z-50 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <a href="/" class="font-semibold text-lg" noprefetch>YeaH</a>
-    <div class="flex space-x-5 ml-auto items-center">
+    <a href="/" class="font-semibold text-lg p-3 -m-3 text-primary-600 hidden" noprefetch>YeaH</a>
+    <a href="#menu" class="text-gray-600">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 8.5H21M3 15.5H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <div id="menu" class="fixed left-0 top-0 h-full w-full group will-change-transform -translate-x-full target:translate-x-0">
+      <div class="absolute left-0 top-0 w-full h-full -z-10 bg-black/10"></div>
+      <a href="#" class="absolute left-0 top-0 w-full h-full"></a>
+      <ul class="bg-white w-64 w-full h-full relative z-20 -translate-x-2/3 opacity-0 will-change-transform duration-300 group-target:translate-x-0 group-target:opacity-100">
+        <li>
+          <a href="/auth/logout" class="p-3 w-full block">Log out</a>
+        </li>
+      </ul>
+    </div>
+    <% if (it.user) { %>
+      <a href="/settings/details" class="block bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
+        <% if (it.user.profile_photo_url) { %>
+          <img
+            referrerpolicy="no-referrer"
+            src="<%= it.user.profile_photo_url %>"
+            alt=""
+            class="w-10 h-10 object-cover"
+            crossorigin
+          />
+        <% } else { %>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10">
+          <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <% } %>
+      </a>
+    <% } else { %>
+      <a href="/auth/login" class="p-3 -m-3">
+        <svg class="w-6 h-6 text-primary-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15C8.8299 15 6.01077 16.5306 4.21597 18.906C3.82968 19.4172 3.63653 19.6728 3.64285 20.0183C3.64773 20.2852 3.81533 20.6219 4.02534 20.7867C4.29716 21 4.67384 21 5.4272 21H18.5727C19.3261 21 19.7028 21 19.9746 20.7867C20.1846 20.6219 20.3522 20.2852 20.3571 20.0183C20.3634 19.6728 20.1703 19.4172 19.784 18.906C17.9892 16.5306 15.17 15 12 15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 12C14.4853 12 16.5 9.98528 16.5 7.5C16.5 5.01472 14.4853 3 12 3C9.51469 3 7.49997 5.01472 7.49997 7.5C7.49997 9.98528 9.51469 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    <% } %>
+    <div class="space-x-5 ml-auto items-center hidden md:flex">
       <% if (it.user) { %>
       <details class="relative">
         <summary class="bg-gray-300 w-12 h-12 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500">
@@ -11,6 +49,7 @@
               src="<%= it.user.profile_photo_url %>"
               alt=""
               class="w-12 h-12 object-cover"
+              crossorigin
             />
           <% } else { %>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8">
@@ -29,6 +68,7 @@
                   alt=""
                   class="w-12 h-12 object-cover rounded-full"
                   referrerpolicy="no-referrer"
+                  crossorigin
                 />
               <% } else { %>
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8">
@@ -130,7 +170,14 @@
       <% } else { %>
       <a class="btn btn-secondary" href="/auth/login"><%= it.t("login", { ns: "common" }) %></a>
       <% } %>
-      <a class="btn btn-primary" href="/postings/wizard/<%= Math.random().toString(32).slice(2) %>/1"><%= it.t("create_poster", { ns: "common" }) %></a>
+      <a class="btn btn-primary" href="/postings/new" noprefetch><%= it.t("create_poster", { ns: "common" }) %></a>
     </div>
   </div>
 </header>
+<script>
+ window.addEventListener("hashchange", (e) => {
+   if (location.hash === "#menu" || !location.hash) {
+     window.history.replaceState(null, null, ' ');
+   }
+ })
+</script>

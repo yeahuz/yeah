@@ -23,7 +23,8 @@ async function init_map({ lat, lng }) {
   const loader = new Loader({
     apiKey: "AIzaSyCOBscE5wKHhTlQBx20mKN5-abTzLzn3P4",
     version: "weekly",
-    libraries: ["places"]
+    libraries: ["places"],
+    region: "uz"
   });
 
   const google = await loader.load();

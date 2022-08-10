@@ -1,21 +1,29 @@
+<%~ includeFile('./toolbar.html', it) %>
 <% if (it.scripts) {%>
 	<% it.scripts.forEach(function (src) {%>
 		<script defer async type="module" src="<%= src %>"></script>
 	<% }) %>
 <% } %>
 <script defer async type="module" src="/public/js/init-sw.js"></script>
-<script defer async type="module" src="/public/js/auth.js">
+<script defer async type="module" src="/public/js/auth.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.min.js" integrity="sha512-XmXJdyJwwkMu/jMgwXUwIXx0VzBdvjW48UTLxodSOz3GuGtpDjAQ1+E4eROpoxPpvM279i5JjpGCMbTaNZjLmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+ window.addEventListener('load', () =>{
+	 quicklink.listen({
+		 ignores: [
+			 uri => window.location.pathname === new URL(uri).pathname,
+			 (uri, elem) => elem.hasAttribute('noprefetch')
+		 ]
+	 });
+ });
 </script>
-<script defer async src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.2.0/quicklink.umd.min.js" integrity="sha512-qmotg4/nCCLv3q14LSbScJnfOSf/TREfWk8d9j77mKDLkDo6eocbdOXM/F9AHVpW4Qv3+PyNhmnXez48lbANGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script defer async>
-	window.addEventListener('load', () =>{
-		quicklink.listen({
-			ignores: [
-				uri => window.location.pathname === new URL(uri).pathname,
-				(uri, elem) => elem.hasAttribute('noprefetch')
-			]
-		});
-	});
-</script>
+<!-- <noscript>
+     <style>
+     .js-enabled {
+     pointer-events: none;
+     opacity: 0.7;
+     }
+     </style>
+     </noscript> -->
 </body>
 </html>

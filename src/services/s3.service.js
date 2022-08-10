@@ -14,6 +14,7 @@ const s3 = new S3Client({
 });
 
 function get_key(file_name) {
+  if (!file_name) return randomUUID();
   return `${randomUUID()}-${file_name}`
 }
 
@@ -27,6 +28,34 @@ function get_url(key) {
 
 export async function delete_one(s3_key) {
   return await s3.send(new DeleteObjectCommand({ Key: s3_key, Bucket: config.aws_s3_bucket_name }));
+}
+
+export async function upload_url(url) {
+  const key = get_key();
+  const response = await fetch(url);
+  const content_type = response.headers.get("content-type");
+
+  const upload = new Upload({
+    client: s3,
+    params: {
+      Bucket: config.aws_s3_bucket_name,
+      Key: key,
+      Body: response.body,
+      ContentType: content_type,
+      CacheControl: "max-age=31536000",
+    },
+    leavePartsOnError: false,
+  });
+
+  await upload.done();
+
+  return {
+    s3_url: get_s3_url(key),
+    url: get_url(key),
+    s3_key: key,
+    name: key,
+    mimetype: content_type
+  }
 }
 
 export async function upload(data) {

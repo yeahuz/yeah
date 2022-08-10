@@ -1,0 +1,9 @@
+{
+  "title": "Ikki faktorli autentifikatsiya",
+  "security_key": {
+    "title": "Xavfsizlik kaliti",
+    "description": "Kalitni tekshirishga tayyor boʻlgach, quyidagi tugmani bosing.",
+    "use_key": "Kalitdan foydalanish",
+    "checking": "Tekshirilmoqda..."
+  }
+}

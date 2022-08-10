@@ -1,9 +1,9 @@
-import { get_time, option } from "../utils/index.js";
+import { get_time, option, add_t } from "../utils/index.js";
 import * as UserService from "../services/user.service.js";
 
 export async function update_one(req, reply) {
   const { id } = req.params;
-  const { return_to } = req.query;
+  const { return_to = "/" } = req.query;
   const { name, email, phone, website_url, username } = req.body;
   const t = req.i18n.t;
 
@@ -26,5 +26,6 @@ export async function update_one(req, reply) {
     return reply.redirect(return_to);
   }
 
-  return reply.redirect(`${return_to}?t=${get_time()}`);
+  reply.redirect(return_to);
+  return reply;
 }

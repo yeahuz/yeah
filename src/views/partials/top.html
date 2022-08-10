@@ -5,14 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/public/images/favicon.svg" />
     <link rel="icon" type="image/png" href="/public/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/public/images/yeah-logo-192-bg.png" />
     <title><%= it.meta.title %> | YeaH</title>
     <link rel="stylesheet" href="/public/css/main.min.css" />
     <link rel="manifest" href="/public/app.webmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="preload" as="style" onload="this.onload = null;this.rel='stylesheet'">
+
+    <!--  Shared element transitions origin trial -->
+    <meta http-equiv="origin-trial" content="Aqweaq3dM8+Qm46hxdvkT1Ht2bG0Vk6vQz8gromNFhzIzWl57OjZnLJpF+SfKySMqAvmKG6y4PnkveHiOWEWpAsAAABXeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJmZWF0dXJlIjoiRG9jdW1lbnRUcmFuc2l0aW9uVjIiLCJleHBpcnkiOjE2NjYxMzc1OTl9">
+    <!-- -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
     <meta name="google-signin-client_id" content="600896005100-u88qclbcs8clv5mllc2h7dbl9cngppb5.apps.googleusercontent.com">
     <meta name="google-signin-scope" content="profile email">
+    <meta name="theme-color" content="#0070f3">
   </head>
   <body>
     <%~ includeFile("./header.html", it) %>

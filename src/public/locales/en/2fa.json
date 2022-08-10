@@ -1,0 +1,9 @@
+{
+  "title": "Two-factor authentication",
+  "security_key": {
+    "title": "Security key",
+    "description": "When you're ready to authenticate, click the button below.",
+    "use_key": "Use key",
+    "checking": "Verifying..."
+  }
+}

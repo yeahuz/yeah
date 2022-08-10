@@ -4,5 +4,13 @@
   "create_account": "Создать аккаунт",
   "save_changes": "Сохранить изменения",
   "saving_changes": "Сохранение изменений",
-  "online": "Онлайн"
+  "online": "Онлайн",
+  "home": "Главная",
+  "profile": "Профиль",
+  "page_not_found": "Страница не найдена",
+  "js_feature_only": "Эта функция не работает без JavaScript",
+  "create": "Создать",
+  "liked": "Избранное",
+  "post": "Разместить",
+  "search": "Поиск"
 }

@@ -530,3 +530,7 @@ checkbox-control {
     transform: translateY(5vh);
   }
 }
+
+.toolbar-font-size {
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+}

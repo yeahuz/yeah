@@ -16,7 +16,8 @@ i18next
       "settings-details",
       "settings-privacy",
       "2fa",
-      "new-posting"
+      "new-posting",
+      "offline"
     ],
     fallbackLng: "ru",
     backend: {

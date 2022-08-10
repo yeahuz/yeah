@@ -135,6 +135,26 @@ export async function start() {
 
     app.register(attach_user);
     app.register(can);
+    const customResponseTypeStrategy = {
+      // strategy name for referencing in the route handler `constraints` options
+      name: 'accept',
+      // storage factory for storing routes in the find-my-way route tree
+      storage: function () {
+        let handlers = {}
+        return {
+          get: (type) => { return handlers[type] || null },
+          set: (type, store) => { handlers[type] = store }
+        }
+      },
+      // function to get the value of the constraint from each incoming request
+      deriveConstraint: (req, ctx) => {
+        return req.headers['accept']
+      },
+      // optional flag marking if handlers without constraints can match requests that have a value for this constraint
+      // mustMatchWhenDerived: true
+    }
+
+    app.addConstraintStrategy(customResponseTypeStrategy);
     // app.get("/elastic/regions", async (req, reply) => {
     //   const { lang = "en" } = req.query;
     //   const regions = await RegionService.get_many({ lang });

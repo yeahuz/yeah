@@ -1,4 +1,4 @@
-import { create_node, add_listeners } from './utils.js'
+import { create_node, add_listeners } from './dom.js'
 
 const ICONS = {
   info: ``,
@@ -49,7 +49,7 @@ function pause_animation(e) {
   animations.forEach((animation) => animation.pause());
 }
 
-function resume_animation() {
+function resume_animation(e) {
   const animations = e.target.getAnimations();
   animations.forEach((animation) => animation.play());
 }

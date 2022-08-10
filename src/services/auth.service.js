@@ -1,6 +1,7 @@
 import * as SessionService from "../services/session.service.js";
 import * as AccountService from "../services/account.service.js";
 import * as UserService from "../services/user.service.js";
+import * as S3Service from '../services/s3.service.js';
 import {
   InternalError,
   ConflictError,
@@ -91,7 +92,6 @@ export async function login({ email_phone, password, user_agent, ip }) {
 export async function google_auth(payload) {
   const { email, name, given_name, user_agent, picture, sub, ip } = payload;
   const account = await AccountService.get_by_provider_id(sub);
-
   if (account) {
     const session = await SessionService.create_one({
       user_agent,
@@ -106,7 +106,7 @@ export async function google_auth(payload) {
     const user = await UserService.create_one_trx(trx)({
       email_phone: email,
       name: name || given_name,
-      profile_photo_url: picture,
+      profile_photo_url: picture
     });
 
     const session = await SessionService.create_one_trx(trx)({

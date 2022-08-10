@@ -26,5 +26,19 @@
   "lang": "en",
   "orientation": "any",
   "description": "Search and create postings with ease.",
-  "categories": ["business", "shopping"]
+  "categories": ["business", "shopping"],
+  "shortcuts": [
+    {
+      "name": "Create new posting",
+      "short_name": "New posting",
+      "description": "Quickly create an amazing posting for free.",
+      "url": "/postings/new"
+    },
+    {
+      "name": "Browse postings",
+      "short_name": "Browse",
+      "description": "Looking for something? Browse our postings",
+      "url": "/postings"
+    }
+  ]
 }

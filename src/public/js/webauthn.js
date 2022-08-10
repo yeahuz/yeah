@@ -65,10 +65,6 @@ export async function add_credential(credential) {
       },
       transports: credential.response.getTransports?.() || [],
       title: credential.title
-    },
-    state: {
-      reload: true,
-      replace: true,
     }
   })
 }

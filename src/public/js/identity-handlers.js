@@ -1,4 +1,4 @@
-import { request, option } from "./utils.js";
+import { request, option, message_sw } from "./utils.js";
 
 const get_time = () => Math.floor(new Date().getTime() / 1000);
 
@@ -7,6 +7,7 @@ async function handle_google_one_tap({ credential }) {
   if (!err) {
     const params = new window.URLSearchParams(window.location.search);
     const return_to = params.get("return_to") || "/";
+    await message_sw({ type: "expire_partials" });
     window.location.href = `${return_to}?t=${get_time()}`;
   }
 }
@@ -16,6 +17,7 @@ async function telegram_callback(user) {
   if (!err) {
     const params = new window.URLSearchParams(window.location.search);
     const return_to = params.get("return_to") || "/";
+    await message_sw({ type: "expire_partials" });
     window.location.href = `${return_to}?t=${get_time()}`;
   }
 }

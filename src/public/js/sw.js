@@ -2,23 +2,30 @@ importScripts(
   'https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js'
 );
 
+workbox.setConfig({
+  debug: false,
+});
+
 const { cacheNames } = workbox.core;
-const { registerRoute, Route, NavigationRoute, setCatchHandler } = workbox.routing;
+const { registerRoute, Route, NavigationRoute, setCatchHandler, setDefaultHandler } = workbox.routing;
 const { enable: enable_navigation_preload } = workbox.navigationPreload;
 const { CacheFirst, StaleWhileRevalidate, NetworkFirst, Strategy } = workbox.strategies;
 const { ExpirationPlugin } = workbox.expiration;
-const { matchPrecache, precacheAndRoute, addPlugins, getCacheKeyForURL, precache, cleanupOutdatedCaches: cleanup_outdated_caches } = workbox.precaching;
+const { matchPrecache, precacheAndRoute, precache, cleanupOutdatedCaches: cleanup_outdated_caches } = workbox.precaching;
 const { strategy: compose_strategies } = workbox.streams;
 const { googleFontsCache: google_fonts_cache, warmStrategyCache: warm_strategy_cache } = workbox.recipes;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
+const { BackgroundSyncPlugin } = workbox.backgroundSync
 
-const GOOGLE_GSTATIC_REGEX = new RegExp('https://maps\\.gstatic\\.com.*');
-const GOOGLE_APIS_REGEX = new RegExp('https://maps\\.googleapis\\.com.*');
+const GOOGLE_GSTATIC_REGEX = new RegExp("https://maps\\.gstatic\\.com.*");
+const GOOGLE_APIS_REGEX = new RegExp("https://maps\\.googleapis\\.com.*");
+const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
 const GLOBAL_VERSION = 1;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
   static_assets: `static_assets-${GLOBAL_VERSION}.1`,
-  content: `content-${GLOBAL_VERSION}.1`,
+  swr_content: `swr_content-${GLOBAL_VERSION}.1`,
+  nf_content: `nf_content-${GLOBAL_VERSION}.1`,
   partials: `partials-${GLOBAL_VERSION}.1`,
   google_fonts_sheets: `google_fonts_stylesheets-${GLOBAL_VERSION}.1`,
   google_fonts_webfonts: `google_fonts_webfonts-${GLOBAL_VERSION}.1`,
@@ -58,29 +65,33 @@ const precache_expiration_plugin = new ExpirationPlugin({
   purgeOnQuotaError: true
 });
 
-const image_route = new Route(({ request, sameOrigin }) => {
+const bg_sync_plugin = new BackgroundSyncPlugin({
+  maxRetentionTime: 24 * 60
+});
+
+const image_route = new Route(({ request, sameOrigin, url }) => {
   if (request.destination === "image" && !GOOGLE_APIS_REGEX.test(request.url) && !GOOGLE_GSTATIC_REGEX.test(request.url)) {
     return request.destination === "image"
   }
 }, new StaleWhileRevalidate({
   cacheName: CACHE_NAMES.images,
-  plugins: [image_expiration_plugin]
+  plugins: [image_expiration_plugin, bg_sync_plugin]
 }));
 
 const static_assets_route = new Route(({ request, sameOrigin }) => {
   return sameOrigin && ["script", "style"].includes(request.destination)
 }, new CacheFirst({
   cacheName: CACHE_NAMES.static_assets,
-  plugins: [static_expiration_plugin]
+  plugins: [static_expiration_plugin, bg_sync_plugin]
 }));
 
 const partial_strategy = new CacheFirst({
   cacheName: CACHE_NAMES.partials,
-  plugins: [partial_expiration_plugin]
+  plugins: [partial_expiration_plugin, bg_sync_plugin]
 });
 
-const content_strategy = new NetworkFirst({
-  cacheName: CACHE_NAMES.content,
+const swr_content_strategy = new StaleWhileRevalidate({
+  cacheName: CACHE_NAMES.swr_content,
   plugins: [
     {
       requestWillFetch: ({ request }) => {
@@ -92,20 +103,53 @@ const content_strategy = new NetworkFirst({
           redirect: "follow"
         });
       },
-      handlerDidError: async ({ request }) => {
-        console.log("here");
-        return await matchPrecache("/offile.html")
+      handlerDidError: ({ request }) => {
+        return matchPrecache("/partials/offline.html")
       }
     },
-    content_expiration_plugin
+    content_expiration_plugin,
+    bg_sync_plugin,
+    new CacheableResponsePlugin({
+      statuses: [200]
+    })
   ]
 });
 
-const navigation_handler = compose_strategies([
+precacheAndRoute([
+  {
+    url: "/partials/offline.html",
+    revision: GLOBAL_VERSION + 1
+  }
+]);
+
+const swr_content_handler = compose_strategies([
   ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/top.html") }),
-  ({ event }) => content_strategy.handle(event),
+  ({ event }) => swr_content_strategy.handle(event),
   ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/bottom.html") }),
 ]);
+
+const nf_content_handler = compose_strategies([
+  ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/top.html") }),
+  ({ event }) => new NetworkFirst({ cacheName: CACHE_NAMES.nf_content }).handle(event),
+  ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/bottom.html") }),
+]);
+
+const swr_content_route = new Route(({ request, url }) => {
+  if (url.pathname === "/postings/new") return;
+  if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
+  return request.mode === "navigate"
+}, swr_content_handler)
+
+const nf_content_route = new Route(({ request, url }) => {
+  if (url.pathname === "/postings/new") return;
+  return request.mode === "navigate" && POSTING_WIZARD_REGEX.test(url.pathname);
+}, nf_content_handler)
+
+setCatchHandler(async ({ request }) => {
+  if (request.destination === "document") {
+    return matchPrecache("/partials/offline.html")
+  }
+});
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys().then((cache_keys) => {
@@ -115,20 +159,30 @@ self.addEventListener("activate", (event) => {
   }))
 });
 
-registerRoute(({ request }) => request.mode === "navigate", navigation_handler);
+registerRoute(swr_content_route);
+registerRoute(nf_content_route);
 registerRoute(image_route);
 registerRoute(static_assets_route);
 warm_strategy_cache({ urls: ["/partials/top.html", "/partials/bottom.html"], strategy: partial_strategy })
 enable_navigation_preload();
 google_fonts_cache();
 cleanup_outdated_caches();
+// setDefaultHandler(({ sameOrigin, event }) => swr_content_handler);
+// setDefaultHandler(swr_content_strategy)
 
-self.addEventListener("message", async (e) => {
-  const { type, payload } = e.data;
+self.addEventListener("message", async (event) => {
+  const port = event.ports[0]
+  const { type, payload } = event.data;
   switch(type) {
-    case "refetch_partials":
+    case "expire_partials":
       await partial_expiration_plugin.deleteCacheAndMetadata();
-      break
+      port.postMessage({ type, acknowledged: true })
+      break;
+    case "delete_content":
+      const cache = await caches.open(CACHE_NAMES[payload.cache_name]);
+      await cache.delete(payload.url)
+      port.postMessage({ type, acknowledged: true })
+      break;
     default:
       break;
   }

@@ -1,0 +1,29 @@
+<div class="max-w-sm mx-auto mt-20 px-4">
+  <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "offline"}) %></h1>
+  <p class="text-sm text-gray-900 mt-3 mb-8"><%= it.t("description", { ns: "offline" }) %></p>
+  <button class="btn btn-primary btn-lg w-full js-reload-btn"><%= it.t("reload", { ns: "offline" }) %></button>
+</div>
+<script>
+ const reload_btn = document.querySelector(".js-reload-btn");
+
+ reload_btn.addEventListener("click", () => {
+   window.location.reload()
+ });
+
+ window.addEventListener("online", () => {
+   window.location.reload()
+ });
+
+ async function check_network_and_reload() {
+   try {
+     const response = await fetch('.');
+     if (response.ok) {
+       window.location.reload();
+       return;
+     }
+   } catch {}
+   window.setTimeout(check_network_and_reload, 2500);
+ }
+
+ check_network_and_reload();
+</script>

@@ -9,11 +9,6 @@ export const home = async (fastify) => {
   });
   fastify.route({
     method: "GET",
-    url: "/create",
-    handler: PostingController.get_new,
-  });
-  fastify.route({
-    method: "GET",
     url: "/partials/:partial",
     handler: HomeController.get_partial
   })

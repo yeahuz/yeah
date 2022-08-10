@@ -1,3 +1,5 @@
+import { is_apple_device } from './utils.js';
+
 export function hide_form_errors(elements) {
   elements.forEach((element) => {
     const message_field = element.nextElementSibling;
@@ -79,5 +81,16 @@ export function add_listeners(nodeOrNodes, events) {
 
   if (nodeOrNodes instanceof Node) {
     add_listener(nodeOrNodes, events);
+  }
+}
+
+export function adjust_geo_links() {
+  if (is_apple_device()) {
+    const links = document.querySelectorAll("a[href*='geo:']");
+    for (const link of links) {
+      const loc = link.href.split(":")[1]
+      const [lat, lon] = loc.split(",");
+      link.href = `maps:?q=${lat}, ${lon}`
+    }
   }
 }

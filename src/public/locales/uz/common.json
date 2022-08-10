@@ -4,5 +4,13 @@
   "create_account": "Akkaunt yaratish",
   "save_changes": "Saqlash",
   "saving_changes": "Saqlanmoqda",
-  "online": "Onlayn"
+  "online": "Onlayn",
+  "home": "Asosiy",
+  "profile": "Profil",
+  "page_not_found": "Sahifa topilmadi",
+  "js_feature_only": "Bu funksiya JavaScriptsiz ishlamaydi",
+  "create": "Yaratish",
+  "liked": "Saralangan",
+  "post": "E'lon",
+  "search": "Izlash"
 }

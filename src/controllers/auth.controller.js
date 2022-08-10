@@ -4,7 +4,7 @@ import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
 import { redis_client } from '../services/redis.service.js'
 import { render_file } from "../utils/eta.js";
-import { decrypt, encrypt, option, get_time } from "../utils/index.js";
+import { decrypt, encrypt, option, get_time, add_t, parse_unique_error, parse_url } from "../utils/index.js";
 import { AuthenticationError } from "../utils/errors.js";
 import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from '../utils/webauthn.js'
@@ -49,7 +49,7 @@ export async function get_login(req, reply) {
   redis_client.setex(nonce, 86400, 1);
 
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html");
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
 
@@ -94,7 +94,7 @@ export async function get_signup(req, reply) {
   redis_client.setex(nonce, 86400, 1);
 
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html");
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
 
@@ -134,6 +134,10 @@ export async function login(req, reply) {
 
   const [ user, user_err ] = await option(AuthService.verify_password({ email_phone, password }));
   if (user_err) {
+    if (req.xhr) {
+      reply.code(user_err.status_code).send(user_err.build(t))
+      return reply
+    }
     req.flash("err", user_err.build(t));
     return reply.redirect(req.url);
   }
@@ -149,6 +153,10 @@ export async function login(req, reply) {
   const [session, err] = await option(SessionService.create_one({ user_id: user.id, user_agent, ip }))
 
   if (err) {
+    if (req.xhr) {
+      reply.code(err.status_code).send(err.build(t))
+      return reply
+    }
     req.flash("err", err.build(t));
     return reply.redirect(req.url);
   }
@@ -172,7 +180,7 @@ export async function logout(req, reply) {
   }
 
   req.session.delete();
-  reply.redirect(`/?t=${get_time()}`);
+  reply.redirect(add_t("/"))
 }
 
 export async function google_callback(req, reply) {
@@ -327,7 +335,6 @@ export async function update_credentials(req, reply) {
     default:
       CredentialRequest.validate_client_data(credential, challenge)
       const response_result = CredentialRequest.validate_response(credential);
-
       await CredentialService.create_one({
         public_key: response_result.public_key,
         counter: response_result.counter,
@@ -339,7 +346,7 @@ export async function update_credentials(req, reply) {
     break;
   }
 
-  reply.redirect(`${return_to}?t=${get_time()}`)
+  reply.redirect(add_t(return_to));
 }
 
 export async function verify_assertion(req, reply) {
@@ -364,7 +371,7 @@ export async function verify_assertion(req, reply) {
   req.session.set("oauth_state", null);
   req.session.set("user_id", null);
 
-  return reply.redirect(`${return_to}?t=${get_time()}`);
+  reply.redirect(add_t(return_to));
 }
 
 export async function update_credential(req, reply) {
@@ -380,9 +387,35 @@ export async function update_credential(req, reply) {
       break;
   }
 
-  reply.redirect(`${return_to}?t=${get_time()}`)
+  reply.redirect(add_t(return_to));
 }
 
+export async function delete_credential(req, reply) {
+  const { id } = req.params;
+  const { return_to = "/" } = req.query
+
+  const [result, err] = await option(CredentialService.delete_one(id));
+
+  if (err) {
+    reply.code(err.status_code).send(err.build(t))
+    return reply
+  }
+
+  return result;
+}
+
+export async function delete_credentials(req, reply) {
+  const user = req.user;
+  const t = req.i18n.t;
+  const [result, err] = await option(CredentialService.delete_many().for(user.id));
+
+  if (err) {
+    reply.code(err.status_code).send(err.build(t))
+    return reply;
+  }
+
+  return result;
+}
 
 export async function get_webauthn(req, reply) {
   const user_id = req.session.get("user_id");
@@ -399,7 +432,7 @@ export async function get_webauthn(req, reply) {
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: t("title", { ns: "signup" }), lang: req.language },
+      meta: { title: t("title", { ns: "2fa" }), lang: req.language },
       t
     });
     stream.push(top);
@@ -409,13 +442,10 @@ export async function get_webauthn(req, reply) {
   stream.push(webauthn);
 
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html", {
-      scripts: ["/public/js/2fa.js"]
-    });
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
 
   stream.push(null);
-
   return reply;
 }

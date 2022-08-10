@@ -27,7 +27,9 @@ import {
   AWS_S3_BUCKET_NAME,
   S3_ORIGIN,
   ES_PASSWORD,
-  ES_USERNAME
+  ES_USERNAME,
+  ORIGIN,
+  ORIGIN_DEV
 } from "./secrets.js";
 
 export const configs = {
@@ -53,7 +55,8 @@ export const configs = {
     aws_s3_region: AWS_S3_REGION,
     aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
     es_username: ES_USERNAME,
-    es_password: ES_PASSWORD
+    es_password: ES_PASSWORD,
+    origin: ORIGIN
   },
   development: {
     port: PORT_DEV,
@@ -77,6 +80,7 @@ export const configs = {
     aws_s3_region: AWS_S3_REGION,
     aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
     es_username: ES_USERNAME,
-    es_password: ES_PASSWORD
+    es_password: ES_PASSWORD,
+    origin: ORIGIN_DEV
   },
 };

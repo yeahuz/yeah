@@ -53,6 +53,7 @@ export const auth = async (fastify) => {
       body: auth_schema.google_one_tap,
     },
     onRequest: fastify.can(guest_user),
+    constraints: { accept: "application/json" }
   });
   fastify.route({
     method: "POST",
@@ -67,6 +68,7 @@ export const auth = async (fastify) => {
     method: "GET",
     url: "/requests",
     handler: AuthController.generate_request,
+    constraints: { accept: "application/json" }
   });
   fastify.route({
     method: "GET",
@@ -81,15 +83,30 @@ export const auth = async (fastify) => {
     onRequest: fastify.can(authenticated_user),
   });
   fastify.route({
+    method: "DELETE",
+    url: "/credentials",
+    handler: AuthController.delete_credentials,
+    onRequest: fastify.can(authenticated_user),
+    constraints: { accept: "application/json" }
+  });
+  fastify.route({
     method: "POST",
     url: "/credentials/:id",
     handler: AuthController.update_credential,
     onRequest: fastify.can(authenticated_user),
   });
   fastify.route({
+    method: "DELETE",
+    url: "/credentials/:id",
+    handler: AuthController.delete_credential,
+    onRequest: fastify.can(authenticated_user),
+    constraints: { accept: "application/json" }
+  });
+  fastify.route({
     method: "POST",
     url: "/assertions",
     handler: AuthController.verify_assertion,
+    constraints: { accept: "application/json" }
   });
   fastify.route({
     method: "POST",
