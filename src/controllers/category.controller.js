@@ -1,13 +1,13 @@
-import * as CategoryService from '../services/category.service.js';
 import { parse_url } from '../utils/index.js'
-import { render_file } from "../utils/eta.js";
+import { render_file } from '../utils/eta.js';
+import * as CategoryService from '../services/category.service.js';
 
-export async function get_search(req, reply) {
+export async function get_many(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
-  const { q } = req.query;
+  const { category_id } = req.params;
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
@@ -18,9 +18,8 @@ export async function get_search(req, reply) {
     stream.push(top);
   }
 
-  const categories = await CategoryService.get_by_parent({ lang: req.language });
-  const search_index = await render_file("/search/index.html", { q, t, user, categories });
-  stream.push(search_index);
+  const categories = await CategoryService.get_by_parent({ lang: req.language, parent_id: category_id ?? null });
+  console.log(categories);
 
   if (!is_navigation_preload) {
     const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });

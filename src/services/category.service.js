@@ -9,10 +9,10 @@ export async function get_many({ lang = "en" }) {
                        .where({ language_code: lang.substring(0, 2) });
 }
 
-export async function get_parents({ lang = "en" }) {
+export async function get_by_parent({ lang = "en", parent_id = null } = {}) {
   return await Category.query().select("ct.title as title", "categories.id", "categories.parent_id", raw("exists (select * from categories where parent_id = ?? and parent_id is not null limit 1) as has_children", [ref("ct.category_id")]))
                        .join('category_translations as ct', "ct.category_id", "categories.id")
-                       .where({ parent_id: null })
+                       .where({ parent_id })
                        .where({ language_code: lang.substring(0, 2) })
 }
 

@@ -6,6 +6,7 @@ import { posting } from "./posting.route.js";
 import { attachment } from "./attachment.route.js";
 import { geo } from "./geo.route.js";
 import { search } from "./search.route.js";
+import { category } from "./category.route.js";
 
 export const routes = async (fastify) => {
   fastify.register(home);
@@ -16,4 +17,6 @@ export const routes = async (fastify) => {
   fastify.register(attachment, { prefix: "/attachments" });
   fastify.register(geo, { prefix: "/geo" });
   fastify.register(search, { prefix: "/search" });
+  fastify.register(category, { prefix: "/categories" });
+  fastify.register(category, { prefix: "/c" });
 };

@@ -378,6 +378,20 @@ checkbox-control {
   color: rgb(var(--gray-900))
 }
 
+.ripple {
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  position: absolute;
+  transform: scale(0);
+  animation: ripple 800ms linear;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
 
 @keyframes check-offset {
   from {
