@@ -5,6 +5,9 @@ module.exports = {
   theme: {
     groups: ["nested"],
     extend: {
+      screens: {
+        xs: "360px",
+      },
       fontFamily: {
         sans: ["Inter"],
       },
@@ -68,7 +71,10 @@ module.exports = {
       const groups = theme("groups") || [];
 
       groups.forEach((group) => {
-        addVariant(`group-${group}-hover`, () => `:merge(.group-${group}):hover &`);
+        addVariant(
+          `group-${group}-hover`,
+          () => `:merge(.group-${group}):hover &`
+        );
       });
     }),
   ],

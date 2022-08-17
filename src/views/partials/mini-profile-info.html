@@ -1,0 +1,25 @@
+<div class="flex items-center p-3 space-x-3 border-b border-gray-200">
+  <div class="relative flex-shrink-0 text-gray-500">
+    <% if (it.user.profile_photo_url) { %>
+      <img
+        src="<%= it.user.profile_photo_url %>"
+        alt=""
+        class="w-12 h-12 object-cover rounded-full"
+        referrerpolicy="no-referrer"
+        crossorigin
+      />
+    <% } else { %>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8">
+        <path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    <% } %>
+    <span class="indicator indicator-online"></span>
+  </div>
+  <div class="flex flex-col truncate">
+    <% if (it.user.name) { %>
+      <span class="text-gray-700 text-sm font-medium"><%= it.user.name %></span>
+    <%} %> <% if (it.user.phone || it.user.email) {%>
+      <span class="text-sm text-gray-500 truncate"><%= it.user.formatted_phone || it.user.email %></span>
+    <% } %>
+  </div>
+</div>

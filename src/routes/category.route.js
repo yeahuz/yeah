@@ -1,5 +1,4 @@
 import * as CategoryController from "../controllers/category.controller.js"
-import { guest_user } from '../utils/roles.js'
 
 export const category = async (fastify) => {
   fastify.route({

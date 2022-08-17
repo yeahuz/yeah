@@ -1,7 +1,7 @@
 import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
 import { render_file } from "../utils/eta.js";
-import { get_many } from '../services/region.service.js'
+import { get_many } from "../services/region.service.js";
 import { parse_url, array_to_tree } from "../utils/index.js";
 
 export async function get_partial(req, reply) {
@@ -11,10 +11,10 @@ export async function get_partial(req, reply) {
   const html = await render_file(`/partials/${partial}`, {
     meta: { title: t("home", { ns: "common" }), lang: req.language, t },
     t,
-    user
+    user,
   });
 
-  reply.header("Content-Type", "text/html").send(html)
+  reply.header("Content-Type", "text/html").send(html);
   return reply;
 }
 
@@ -54,19 +54,16 @@ export async function get_profile(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
 
-  if(!is_navigation_preload) {
+  if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
       meta: { title: "Home", lang: req.language },
       t,
-      user
+      user,
     });
     stream.push(top);
   }
 
-  const profile =
-    user?.username === username
-      ? user
-      : await UserService.get_by_username(username);
+  const profile = user?.username === username ? user : await UserService.get_by_username(username);
 
   if (!profile) {
     const not_found = await render_file("/partials/404.html", { t });

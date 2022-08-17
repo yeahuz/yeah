@@ -36,12 +36,13 @@
   --primary-900: 0, 53, 158;
 
   /* Red */
+  --error-25: 255, 251, 250;
+  --error-50: 254, 243, 242;
   --error-300: 253, 162, 155;
+  --error-400: 249, 112, 102;
   --error-500: 240, 68, 56;
   --error-600: 217, 45, 32;
   --error-700: 180, 35, 24;
-  --error-25: 255, 251, 250;
-  --error-50: 254, 243, 242;
   --error-800: 144, 32, 24;
 
   /* Green */
@@ -106,6 +107,7 @@ details[open] summary::before {
   --font-size: 1rem;
   --align: center;
   --justify: center;
+  --ripple-bg: var(--gray-400);
   background: rgb(var(--bg-color));
   color: rgb(var(--text-color));
   padding: var(--size);
@@ -124,6 +126,8 @@ details[open] summary::before {
   cursor: pointer;
   white-space: nowrap;
   font-size: var(--font-size);
+  position: relative;
+  overflow: hidden;
 }
 
 button:disabled {
@@ -156,6 +160,7 @@ button:disabled {
   --bg-hover: var(--primary-700);
   --text-hover: var(--white);
   --ring-color: var(--primary-100);
+  --ripple-bg: var(--white);
 }
 
 .btn-secondary {
@@ -174,6 +179,7 @@ button:disabled {
   --bg-hover: var(--primary-50);
   --ring-color: var(--primary-100);
   --shadow: transparent;
+  --ripple-bg: var(--primary-400);
 }
 
 .btn-tertiary-danger {
@@ -183,6 +189,7 @@ button:disabled {
   --text-hover: var(--error-800);
   --ring-color: var(--error-50);
   --shadow: transparent;
+  --ripple-bg: var(--error-400);
 }
 
 .btn-secondary-color {
@@ -193,6 +200,7 @@ button:disabled {
   --bg-hover: var(--primary-100);
   --text-hover: var(--primary-700);
   --ring-color: var(--primary-100);
+  --ripple-bg: var(--primary-400);
 }
 
 .btn-xl {
@@ -380,7 +388,7 @@ checkbox-control {
 
 .ripple {
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(var(--ripple-bg), 0.3);
   position: absolute;
   transform: scale(0);
   animation: ripple 800ms linear;

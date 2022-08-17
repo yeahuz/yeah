@@ -1,5 +1,5 @@
 importScripts(
-  'https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js'
+  "https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js"
 );
 
 workbox.setConfig({
@@ -7,20 +7,35 @@ workbox.setConfig({
 });
 
 const { cacheNames } = workbox.core;
-const { registerRoute, Route, NavigationRoute, setCatchHandler, setDefaultHandler } = workbox.routing;
+const {
+  registerRoute,
+  Route,
+  NavigationRoute,
+  setCatchHandler,
+  setDefaultHandler,
+} = workbox.routing;
 const { enable: enable_navigation_preload } = workbox.navigationPreload;
-const { CacheFirst, StaleWhileRevalidate, NetworkFirst, Strategy } = workbox.strategies;
+const { CacheFirst, StaleWhileRevalidate, NetworkFirst, Strategy } =
+  workbox.strategies;
 const { ExpirationPlugin } = workbox.expiration;
-const { matchPrecache, precacheAndRoute, precache, cleanupOutdatedCaches: cleanup_outdated_caches } = workbox.precaching;
+const {
+  matchPrecache,
+  precacheAndRoute,
+  precache,
+  cleanupOutdatedCaches: cleanup_outdated_caches,
+} = workbox.precaching;
 const { strategy: compose_strategies } = workbox.streams;
-const { googleFontsCache: google_fonts_cache, warmStrategyCache: warm_strategy_cache } = workbox.recipes;
+const {
+  googleFontsCache: google_fonts_cache,
+  warmStrategyCache: warm_strategy_cache,
+} = workbox.recipes;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
-const { BackgroundSyncPlugin } = workbox.backgroundSync
+const { BackgroundSyncPlugin } = workbox.backgroundSync;
 
 const GOOGLE_GSTATIC_REGEX = new RegExp("https://maps\\.gstatic\\.com.*");
 const GOOGLE_APIS_REGEX = new RegExp("https://maps\\.googleapis\\.com.*");
 const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
-const GLOBAL_VERSION = 1;
+const GLOBAL_VERSION = 2;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
   static_assets: `static_assets-${GLOBAL_VERSION}.1`,
@@ -38,56 +53,66 @@ self.__WB_DISABLE_DEV_LOGS = true;
 const image_expiration_plugin = new ExpirationPlugin({
   maxEntries: 60,
   maxAgeSeconds: 30 * 24 * 60 * 60,
-  purgeOnQuotaError: true
+  purgeOnQuotaError: true,
 });
 
 const static_expiration_plugin = new ExpirationPlugin({
   maxEntries: 20,
   maxAgeSeconds: 31556926,
-  purgeOnQuotaError: true
+  purgeOnQuotaError: true,
 });
 
 const partial_expiration_plugin = new ExpirationPlugin({
   maxEntries: 10,
   maxAgeSeconds: 30 * 24 * 60 * 60,
-  purgeOnQuotaError: true
+  purgeOnQuotaError: true,
 });
 
 const content_expiration_plugin = new ExpirationPlugin({
   maxEntries: 60,
   maxAgeSeconds: 30 * 24 * 60 * 60,
-  purgeOnQuotaError: true
+  purgeOnQuotaError: true,
 });
 
 const precache_expiration_plugin = new ExpirationPlugin({
   maxEntries: 10,
   maxAgeSeconds: 30 * 24 * 60 * 60,
-  purgeOnQuotaError: true
+  purgeOnQuotaError: true,
 });
 
 const bg_sync_plugin = new BackgroundSyncPlugin({
-  maxRetentionTime: 24 * 60
+  maxRetentionTime: 24 * 60,
 });
 
-const image_route = new Route(({ request, sameOrigin, url }) => {
-  if (request.destination === "image" && !GOOGLE_APIS_REGEX.test(request.url) && !GOOGLE_GSTATIC_REGEX.test(request.url)) {
-    return request.destination === "image"
-  }
-}, new StaleWhileRevalidate({
-  cacheName: CACHE_NAMES.images,
-  plugins: [image_expiration_plugin, bg_sync_plugin]
-}));
+const image_route = new Route(
+  ({ request }) => {
+    if (
+      request.destination === "image" &&
+      !GOOGLE_APIS_REGEX.test(request.url) &&
+      !GOOGLE_GSTATIC_REGEX.test(request.url)
+    ) {
+      return request.destination === "image";
+    }
+  },
+  new StaleWhileRevalidate({
+    cacheName: CACHE_NAMES.images,
+    plugins: [image_expiration_plugin, bg_sync_plugin],
+  })
+);
 
-const static_assets_route = new Route(({ request, sameOrigin }) => {
-  return sameOrigin && ["script", "style"].includes(request.destination)
-}, new CacheFirst({
-  cacheName: CACHE_NAMES.static_assets,
-  plugins: [static_expiration_plugin, bg_sync_plugin]
-}));
+const static_assets_route = new Route(
+  ({ request, sameOrigin }) => {
+    return sameOrigin && ["script", "style"].includes(request.destination);
+  },
+  new CacheFirst({
+    cacheName: CACHE_NAMES.static_assets,
+    plugins: [static_expiration_plugin, bg_sync_plugin],
+  })
+);
 
 const partial_strategy = new CacheFirst({
   cacheName: CACHE_NAMES.partials,
-  plugins: [partial_expiration_plugin, bg_sync_plugin]
+  plugins: [partial_expiration_plugin, bg_sync_plugin],
 });
 
 const swr_content_strategy = new StaleWhileRevalidate({
@@ -98,72 +123,94 @@ const swr_content_strategy = new StaleWhileRevalidate({
         const headers = new Headers();
         headers.append("X-Content-Mode", "partial");
         return new Request(request.url, {
-          method: 'GET',
+          method: "GET",
           headers,
-          redirect: "follow"
+          redirect: "follow",
         });
       },
       handlerDidError: ({ request }) => {
-        return matchPrecache("/partials/offline.html")
-      }
+        return matchPrecache("/partials/offline.html");
+      },
     },
     content_expiration_plugin,
     bg_sync_plugin,
     new CacheableResponsePlugin({
-      statuses: [200]
-    })
-  ]
+      statuses: [200],
+    }),
+  ],
 });
 
 precacheAndRoute([
   {
     url: "/partials/offline.html",
-    revision: GLOBAL_VERSION + 1
-  }
+    revision: GLOBAL_VERSION + 1,
+  },
 ]);
 
 const swr_content_handler = compose_strategies([
-  ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/top.html") }),
+  ({ event }) =>
+    partial_strategy.handle({
+      event,
+      request: new Request("/partials/top.html"),
+    }),
   ({ event }) => swr_content_strategy.handle(event),
-  ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/bottom.html") }),
+  ({ event }) =>
+    partial_strategy.handle({
+      event,
+      request: new Request("/partials/bottom.html"),
+    }),
 ]);
 
 const nf_content_handler = compose_strategies([
-  ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/top.html") }),
-  ({ event }) => new NetworkFirst({ cacheName: CACHE_NAMES.nf_content }).handle(event),
-  ({ event }) => partial_strategy.handle({ event, request: new Request("/partials/bottom.html") }),
+  ({ event }) =>
+    partial_strategy.handle({
+      event,
+      request: new Request("/partials/top.html"),
+    }),
+  ({ event }) =>
+    new NetworkFirst({ cacheName: CACHE_NAMES.nf_content }).handle(event),
+  ({ event }) =>
+    partial_strategy.handle({
+      event,
+      request: new Request("/partials/bottom.html"),
+    }),
 ]);
 
 const swr_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
-  return request.mode === "navigate"
-}, swr_content_handler)
+  return request.mode === "navigate";
+}, swr_content_handler);
 
 const nf_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   return request.mode === "navigate" && POSTING_WIZARD_REGEX.test(url.pathname);
-}, nf_content_handler)
+}, nf_content_handler);
 
 setCatchHandler(async ({ request }) => {
   if (request.destination === "document") {
-    return matchPrecache("/partials/offline.html")
+    return matchPrecache("/partials/offline.html");
   }
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(caches.keys().then((cache_keys) => {
-    const valid_caches = new Set(Object.values(CACHE_NAMES));
-    const to_delete = cache_keys.filter((key) => !valid_caches.has(key));
-    return Promise.all(to_delete.map((name) => caches.delete(name)));
-  }))
+  event.waitUntil(
+    caches.keys().then((cache_keys) => {
+      const valid_caches = new Set(Object.values(CACHE_NAMES));
+      const to_delete = cache_keys.filter((key) => !valid_caches.has(key));
+      return Promise.all(to_delete.map((name) => caches.delete(name)));
+    })
+  );
 });
 
 registerRoute(swr_content_route);
 registerRoute(nf_content_route);
 registerRoute(image_route);
 registerRoute(static_assets_route);
-warm_strategy_cache({ urls: ["/partials/top.html", "/partials/bottom.html"], strategy: partial_strategy })
+warm_strategy_cache({
+  urls: ["/partials/top.html", "/partials/bottom.html"],
+  strategy: partial_strategy,
+});
 enable_navigation_preload();
 google_fonts_cache();
 cleanup_outdated_caches();
@@ -171,17 +218,17 @@ cleanup_outdated_caches();
 // setDefaultHandler(swr_content_strategy)
 
 self.addEventListener("message", async (event) => {
-  const port = event.ports[0]
+  const port = event.ports[0];
   const { type, payload } = event.data;
-  switch(type) {
+  switch (type) {
     case "expire_partials":
       await partial_expiration_plugin.deleteCacheAndMetadata();
-      port.postMessage({ type, acknowledged: true })
+      port.postMessage({ type, acknowledged: true });
       break;
     case "delete_content":
       const cache = await caches.open(CACHE_NAMES[payload.cache_name]);
-      await cache.delete(payload.url)
-      port.postMessage({ type, acknowledged: true })
+      await cache.delete(payload.url);
+      port.postMessage({ type, acknowledged: true });
       break;
     default:
       break;

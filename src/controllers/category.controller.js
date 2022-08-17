@@ -1,6 +1,6 @@
-import { parse_url } from '../utils/index.js'
-import { render_file } from '../utils/eta.js';
-import * as CategoryService from '../services/category.service.js';
+import { parse_url } from "../utils/index.js";
+import { render_file } from "../utils/eta.js";
+import * as CategoryService from "../services/category.service.js";
 
 export async function get_many(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
@@ -18,11 +18,19 @@ export async function get_many(req, reply) {
     stream.push(top);
   }
 
-  const categories = await CategoryService.get_by_parent({ lang: req.language, parent_id: category_id ?? null });
-  console.log(categories);
+  const categories = await CategoryService.get_by_parent({
+    lang: req.language,
+    parent_id: category_id ?? null,
+  });
+  const list = await render_file("/category/list", { categories });
+  stream.push(list);
 
   if (!is_navigation_preload) {
-    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", {
+      user,
+      t,
+      url: parse_url(req.url),
+    });
     stream.push(bottom);
   }
 
