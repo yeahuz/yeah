@@ -1,6 +1,6 @@
 import * as AuthController from "../controllers/auth.controller.js";
 import { auth_schema } from "../schemas/auth.schema.js";
-import { authenticated_user, guest_user } from '../utils/roles.js'
+import { authenticated_user, guest_user } from "../utils/roles.js";
 
 export const auth = async (fastify) => {
   fastify.route({
@@ -23,6 +23,16 @@ export const auth = async (fastify) => {
       body: auth_schema.common,
     },
     onRequest: fastify.can(guest_user),
+  });
+  // fastify.route({
+  //   method: "GET",
+  //   url: "/qr",
+  //   handler: AuthController.generate_qr,
+  // });
+  fastify.route({
+    method: "GET",
+    url: "/qr",
+    handler: AuthController.qr_login,
   });
   fastify.route({
     method: "POST",
@@ -53,7 +63,7 @@ export const auth = async (fastify) => {
       body: auth_schema.google_one_tap,
     },
     onRequest: fastify.can(guest_user),
-    constraints: { accept: "application/json" }
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "POST",
@@ -68,7 +78,7 @@ export const auth = async (fastify) => {
     method: "GET",
     url: "/requests",
     handler: AuthController.generate_request,
-    constraints: { accept: "application/json" }
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "GET",
@@ -87,7 +97,7 @@ export const auth = async (fastify) => {
     url: "/credentials",
     handler: AuthController.delete_credentials,
     onRequest: fastify.can(authenticated_user),
-    constraints: { accept: "application/json" }
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "POST",
@@ -100,13 +110,13 @@ export const auth = async (fastify) => {
     url: "/credentials/:id",
     handler: AuthController.delete_credential,
     onRequest: fastify.can(authenticated_user),
-    constraints: { accept: "application/json" }
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "POST",
     url: "/assertions",
     handler: AuthController.verify_assertion,
-    constraints: { accept: "application/json" }
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "POST",
@@ -119,5 +129,5 @@ export const auth = async (fastify) => {
     url: "/sessions/:id",
     handler: AuthController.update_session,
     onRequest: fastify.can(authenticated_user),
-  })
+  });
 };

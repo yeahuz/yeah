@@ -29,7 +29,8 @@ import {
   ES_PASSWORD,
   ES_USERNAME,
   ORIGIN,
-  ORIGIN_DEV
+  ORIGIN_DEV,
+  JWT_SECRET,
 } from "./secrets.js";
 
 export const configs = {
@@ -56,7 +57,8 @@ export const configs = {
     aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
     es_username: ES_USERNAME,
     es_password: ES_PASSWORD,
-    origin: ORIGIN
+    origin: ORIGIN,
+    jwt_secret: JWT_SECRET,
   },
   development: {
     port: PORT_DEV,
@@ -81,6 +83,7 @@ export const configs = {
     aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
     es_username: ES_USERNAME,
     es_password: ES_PASSWORD,
-    origin: ORIGIN_DEV
+    origin: ORIGIN_DEV,
+    jwt_secret: JWT_SECRET,
   },
 };

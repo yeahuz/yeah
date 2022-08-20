@@ -36,5 +36,6 @@ export const {
   ES_PASSWORD,
   ES_USERNAME,
   ORIGIN,
-  ORIGIN_DEV
+  ORIGIN_DEV,
+  JWT_SECRET,
 } = process.env;

@@ -9,12 +9,13 @@ import config from "./config/index.js";
 import form_body from "@fastify/formbody";
 import multipart from "@fastify/multipart";
 import fastify_accepts from "@fastify/accepts";
+import fastify_rate_limit from "@fastify/rate-limit";
 import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
-import * as S3Service from './services/s3.service.js'
-import * as RegionService from './services/region.service.js'
-import { elastic_client } from './services/es.service.js'
+// import fastify_ws from "@fastify/websocket";
+// import WebSocket from "ws";
+import { elastic_client } from "./services/es.service.js";
 import { i18next } from "./utils/i18n.js";
 import * as eta from "eta";
 import { routes } from "./routes/index.js";
@@ -24,7 +25,10 @@ import { init_stream } from "./plugins/init-stream.js";
 import { DomainError, InternalError, ValidationError } from "./utils/errors.js";
 import { attach_user } from "./plugins/attach-user.js";
 import { can } from "./plugins/can.js";
+import { ws } from "./plugins/ws.js";
 import { add_t } from "./utils/index.js";
+import { redis_client } from "./services/redis.service.js";
+import { PackBytes, string, array } from "packBytes";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
@@ -45,6 +49,12 @@ export async function start() {
     app.register(init_stream);
     app.register(form_body);
     app.register(multipart);
+    app.register(fastify_rate_limit, {
+      max: 100,
+      timeWindow: 1000,
+      ban: 2,
+      redis: redis_client,
+    });
 
     app.register(i18n_http_middleware.plugin, {
       i18next,
@@ -63,6 +73,24 @@ export async function start() {
     });
 
     app.register(fastify_flash);
+
+    // const ws = new WebSocket("ws://localhost:3020");
+
+    // const encoder = new PackBytes({
+    //   op: string,
+    //   payload: string,
+    // });
+
+    // ws.on("open", () => {
+    //   ws.send(encoder.encode({ op: "subscribe", payload: "channel-name" }));
+    // });
+
+    // ws.on("message", (message) => {
+    //   const decoded = encoder.decode(Buffer.from(message));
+    //   console.log(decoded);
+    // });
+
+    app.register(ws);
 
     app.register(view, {
       engine: {
@@ -88,30 +116,25 @@ export async function start() {
       decorateReply: false,
       setHeaders: (res) => {
         res.setHeader("Service-Worker-Allowed", "/");
-      }
+      },
     });
 
     app.setErrorHandler((err, req, reply) => {
       console.log({ err });
       const t = i18next.getFixedT(
-        (req.language instanceof Function ? req.language() : req.language) ||
-          "en"
+        (req.language instanceof Function ? req.language() : req.language) || "en"
       );
       const { return_to } = req.query;
 
       if (err.validation) {
         if (req.xhr) {
-          reply
-            .code(422)
-            .send(new ValidationError({ errors: err.validation }).build(t));
+          reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
           return reply;
         }
 
         req.flash(
           "validation_errors",
-          new ValidationError({ errors: err.validation })
-            .errors_as_object()
-            .build(t).errors
+          new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
         );
         return reply.code(302).redirect(add_t(return_to || req.url));
       }
@@ -137,22 +160,26 @@ export async function start() {
     app.register(can);
     const customResponseTypeStrategy = {
       // strategy name for referencing in the route handler `constraints` options
-      name: 'accept',
+      name: "accept",
       // storage factory for storing routes in the find-my-way route tree
       storage: function () {
-        let handlers = {}
+        let handlers = {};
         return {
-          get: (type) => { return handlers[type] || null },
-          set: (type, store) => { handlers[type] = store }
-        }
+          get: (type) => {
+            return handlers[type] || null;
+          },
+          set: (type, store) => {
+            handlers[type] = store;
+          },
+        };
       },
       // function to get the value of the constraint from each incoming request
       deriveConstraint: (req, ctx) => {
-        return req.headers['accept']
+        return req.headers["accept"];
       },
       // optional flag marking if handlers without constraints can match requests that have a value for this constraint
       // mustMatchWhenDerived: true
-    }
+    };
 
     app.addConstraintStrategy(customResponseTypeStrategy);
     // app.get("/elastic/regions", async (req, reply) => {
@@ -228,12 +255,12 @@ export async function start() {
       const accept = req.accepts();
 
       const languages = accept.languages().slice(0, 3);
-      let boosts = []
+      let boosts = [];
 
       for (let i = languages.length - 1; i >= 0; i--) {
         boosts.push({
-          [`regions_${languages[i]}`]: languages.length - i
-        })
+          [`regions_${languages[i]}`]: languages.length - i,
+        });
       }
 
       // Search only in one index, index should contain translation for all languages in one field (raw), formatted_address should contain translation for that index;
@@ -241,12 +268,23 @@ export async function start() {
       console.log(boosts);
 
       console.time("Hits");
-      const response = await elastic_client.search({ index: `regions_${lang}`, body: {
-                                        query: { multi_match: { query: q, type: "bool_prefix", fields: ["combined_address", "combined_address._2gram", "combined_address._3gram"] } },
-                                        collapse: { field: "district_id" }, _source: ["formatted_address", "district_id", "region_id", "coords"] }});
+      const response = await elastic_client.search({
+        index: `regions_${lang}`,
+        body: {
+          query: {
+            multi_match: {
+              query: q,
+              type: "bool_prefix",
+              fields: ["combined_address", "combined_address._2gram", "combined_address._3gram"],
+            },
+          },
+          collapse: { field: "district_id" },
+          _source: ["formatted_address", "district_id", "region_id", "coords"],
+        },
+      });
       console.timeEnd("Hits");
 
-      console.log(response)
+      console.log(response);
       return response.body.hits.hits;
     });
 
