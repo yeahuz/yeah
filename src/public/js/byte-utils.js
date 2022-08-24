@@ -1,4 +1,4 @@
-import { PackBytes, string, array, bits, schemas } from "packBytes";
+import { PackBytes, string, array, bits, schemas } from "/node_modules/packBytes/packbytes.mjs";
 
 const schema = schemas({
   auth_scan: {

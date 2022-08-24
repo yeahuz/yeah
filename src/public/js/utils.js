@@ -90,15 +90,19 @@ export function redirect(path) {
 export function message_sw(data) {
   return new Promise(async (resolve) => {
     const message_channel = new MessageChannel();
-    const reg = await navigator.serviceWorker.getRegistration()
+    const reg = await navigator.serviceWorker.getRegistration();
     const sw = reg.active || reg.installing || reg.waiting;
     if (sw) {
       message_channel.port1.onmessage = resolve;
       sw.postMessage(data, [message_channel.port2]);
-    } else resolve()
-  })
+    } else resolve();
+  });
 }
 
 export function is_apple_device() {
   return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+}
+
+export function wait(ms = 0) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

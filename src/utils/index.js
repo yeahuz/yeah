@@ -21,8 +21,7 @@ export function format_relations(relations = []) {
 }
 
 export function async_pipe(...fns) {
-  return (...args) =>
-    fns.reduce((promise, fn) => promise.then(fn), Promise.resolve(...args));
+  return (...args) => fns.reduce((promise, fn) => promise.then(fn), Promise.resolve(...args));
 }
 
 export function pipe(...fns) {
@@ -84,11 +83,11 @@ export function create_date_formatter(locale) {
 }
 
 export function hash_sha256(data) {
-  return crypto.createHash("SHA256").update(data).digest()
+  return crypto.createHash("SHA256").update(data).digest();
 }
 
 export function verify_sha256(signature, data, public_key) {
-  return crypto.createVerify("SHA256").update(data).verify(public_key, signature)
+  return crypto.createVerify("SHA256").update(data).verify(public_key, signature);
 }
 
 export function get_domain_without_subdomain(url) {
@@ -114,18 +113,18 @@ export function add_t(path) {
 }
 
 export function group_by(key, root_id = "0") {
-  const result = {}
+  const result = {};
   return (arr) => {
     for (const item of arr) {
       let parent_id = item[key];
       if (!parent_id) {
-        parent_id = root_id
-      };
-      if (!result[parent_id]) result[parent_id] = []
+        parent_id = root_id;
+      }
+      if (!result[parent_id]) result[parent_id] = [];
       result[parent_id].push(item);
     }
     return result;
-  }
+  };
 }
 
 export function create_tree(children_prop, root_id = "0", custom_id = "id") {
@@ -145,15 +144,16 @@ export function create_tree(children_prop, root_id = "0", custom_id = "id") {
         node[children_prop] = create_tree(children_prop, root_id, custom_id)(child_node);
       }
 
-      tree.push(node)
+      tree.push(node);
     }
     return tree;
-  }
+  };
 }
 
 export function array_to_tree(arr, parent_id = null) {
-  return arr.filter(item => item.parent_id === parent_id)
-            .map(child => ({ ...child, children: array_to_tree(arr, child.id) }));
+  return arr
+    .filter((item) => item.parent_id === parent_id)
+    .map((child) => ({ ...child, children: array_to_tree(arr, child.id) }));
 }
 
 export function create_tree2(array, rootNodes, customID, childrenProperty) {
@@ -168,12 +168,7 @@ export function create_tree2(array, rootNodes, customID, childrenProperty) {
     }
 
     if (childNode) {
-      node[childrenProperty] = create_tree2(
-        array,
-        childNode,
-        customID,
-        childrenProperty
-      );
+      node[childrenProperty] = create_tree2(array, childNode, customID, childrenProperty);
     }
 
     tree.push(node);

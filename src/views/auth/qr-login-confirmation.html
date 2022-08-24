@@ -6,8 +6,8 @@
   </div>
   <h1 class="font-medium text-lg text-gray-900">Вы хотите войти в систему на компьютере?</h1>
   <p class="text-error-600 text-sm mt-2 mb-6">Сканируйте только QR-коды, полученные непосредственно из вашего браузера. Никогда не используйте код, отправленный вам другим пользователем.</p>
-  <div class="flex flex-col space-y-3 w-full">
-    <button class="btn btn-primary btn-lg w-full">Да, войти</button>
-    <button class="btn btn-secondary btn-lg w-full">Отменить</button>
-  </div>
+  <form action="/auth/qr/<%= it.token %>/confirmation?return_to=/"  method="post" class="flex flex-col space-y-3 w-full">
+    <button class="btn btn-primary btn-lg w-full" name="_action" value="confirm">Да, войти</button>
+    <button class="btn btn-secondary btn-lg w-full" name="_action" value="deny">Отменить</button>
+  </form>
 </div>

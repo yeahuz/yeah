@@ -34,7 +34,12 @@ process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
 export async function start() {
   const app = fastify({
-    logger: true,
+    maxParamLength: 1000,
+    logger: {
+      transport: {
+        target: "pino-pretty",
+      },
+    },
     ignoreTrailingSlash: true,
     trustProxy: true,
     ajv: {

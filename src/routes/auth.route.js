@@ -31,6 +31,16 @@ export const auth = async (fastify) => {
   // });
   fastify.route({
     method: "GET",
+    url: "/qr/:token",
+    handler: AuthController.get_qr_login,
+  });
+  fastify.route({
+    method: "POST",
+    url: "/qr/:token/confirmation",
+    handler: AuthController.qr_login_confirm,
+  });
+  fastify.route({
+    method: "POST",
     url: "/qr",
     handler: AuthController.qr_login,
   });

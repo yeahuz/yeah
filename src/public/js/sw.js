@@ -1,22 +1,14 @@
-importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js"
-);
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js");
 
 workbox.setConfig({
   debug: false,
 });
 
 const { cacheNames } = workbox.core;
-const {
-  registerRoute,
-  Route,
-  NavigationRoute,
-  setCatchHandler,
-  setDefaultHandler,
-} = workbox.routing;
+const { registerRoute, Route, NavigationRoute, setCatchHandler, setDefaultHandler } =
+  workbox.routing;
 const { enable: enable_navigation_preload } = workbox.navigationPreload;
-const { CacheFirst, StaleWhileRevalidate, NetworkFirst, Strategy } =
-  workbox.strategies;
+const { CacheFirst, StaleWhileRevalidate, NetworkFirst, Strategy } = workbox.strategies;
 const { ExpirationPlugin } = workbox.expiration;
 const {
   matchPrecache,
@@ -25,10 +17,8 @@ const {
   cleanupOutdatedCaches: cleanup_outdated_caches,
 } = workbox.precaching;
 const { strategy: compose_strategies } = workbox.streams;
-const {
-  googleFontsCache: google_fonts_cache,
-  warmStrategyCache: warm_strategy_cache,
-} = workbox.recipes;
+const { googleFontsCache: google_fonts_cache, warmStrategyCache: warm_strategy_cache } =
+  workbox.recipes;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
 const { BackgroundSyncPlugin } = workbox.backgroundSync;
 
@@ -96,7 +86,7 @@ const image_route = new Route(
   },
   new StaleWhileRevalidate({
     cacheName: CACHE_NAMES.images,
-    plugins: [image_expiration_plugin, bg_sync_plugin],
+    plugins: [image_expiration_plugin],
   })
 );
 
@@ -106,13 +96,13 @@ const static_assets_route = new Route(
   },
   new CacheFirst({
     cacheName: CACHE_NAMES.static_assets,
-    plugins: [static_expiration_plugin, bg_sync_plugin],
+    plugins: [static_expiration_plugin],
   })
 );
 
 const partial_strategy = new CacheFirst({
   cacheName: CACHE_NAMES.partials,
-  plugins: [partial_expiration_plugin, bg_sync_plugin],
+  plugins: [partial_expiration_plugin],
 });
 
 const swr_content_strategy = new StaleWhileRevalidate({
@@ -167,8 +157,7 @@ const nf_content_handler = compose_strategies([
       event,
       request: new Request("/partials/top.html"),
     }),
-  ({ event }) =>
-    new NetworkFirst({ cacheName: CACHE_NAMES.nf_content }).handle(event),
+  ({ event }) => new NetworkFirst({ cacheName: CACHE_NAMES.nf_content }).handle(event),
   ({ event }) =>
     partial_strategy.handle({
       event,
@@ -214,14 +203,13 @@ warm_strategy_cache({
 enable_navigation_preload();
 google_fonts_cache();
 cleanup_outdated_caches();
-// setDefaultHandler(({ sameOrigin, event }) => swr_content_handler);
-// setDefaultHandler(swr_content_strategy)
 
 self.addEventListener("message", async (event) => {
   const port = event.ports[0];
   const { type, payload } = event.data;
   switch (type) {
     case "expire_partials":
+      console.log("Here");
       await partial_expiration_plugin.deleteCacheAndMetadata();
       port.postMessage({ type, acknowledged: true });
       break;

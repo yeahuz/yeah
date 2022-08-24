@@ -1,36 +1,13 @@
-import { PackBytes, string, bits } from "/node_modules/packBytes/packBytes.mjs";
 import { toDataURL } from "/node_modules/qrcode/build/qrcode.esm.js";
-import { create_node } from "./dom.js";
+import { create_node, add_listeners } from "./dom.js";
 import { scan_profile_tmpl } from "./templates.js";
+import { encoder } from "./byte-utils.js";
+import { option, request, wait, message_sw } from "./utils.js";
+import { toast } from "./toast.js";
 
+const MAX_RETRIES = 5;
 const qr_container = document.querySelector(".js-qr-container");
 const qr_code_img = document.querySelector(".js-qr-code");
-
-const encoder = new PackBytes({
-  op: string,
-  payload: string,
-});
-
-const operation_encoder = new PackBytes({
-  op: bits(8),
-});
-
-const simple_message_encoder = new PackBytes({
-  op: bits(8),
-  payload: string,
-});
-
-const auth_scan_encoder = new PackBytes({
-  op: bits(8),
-  payload: {
-    topic: string,
-    data: {
-      name: string,
-      username: string,
-      profile_photo_url: string,
-    },
-  },
-});
 
 const listeners = {};
 
@@ -38,56 +15,71 @@ function on(op, callback) {
   listeners[op] = callback;
 }
 
-function connect() {
-  const ws = new WebSocket("ws://localhost:3020/auth");
+let ws = null;
+function connect({ retries }) {
+  if (retries === 0) return;
+
+  ws = new WebSocket("ws://localhost:3020/qr-auth");
 
   ws.binaryType = "arraybuffer";
 
-  ws.addEventListener("close", () => {
-    setTimeout(connect, 1000);
+  ws.addEventListener("close", (e) => {
+    if (is_tab_in_focus()) connect({ retries: MAX_RETRIES });
   });
 
-  ws.addEventListener("open", () => {
-    ws.send(operation_encoder.encode({ op: 1 }));
-    // ws.send(encoder.encode({ op: "auth_init", payload: "what up" }));
+  ws.addEventListener("error", async (err) => {
+    await wait(3000);
+    connect({ retries: retries - 1 });
   });
-
-  ws.addEventListener("error", console.error);
 
   ws.addEventListener("message", (e) => {
-    const op = new Uint8Array(e.data, 0, 1)[0];
-    console.log({ op });
-    let encoder;
-    switch (op) {
-      case 1:
-        encoder = simple_message_encoder;
-        break;
-      case 2:
-        encoder = auth_scan_encoder;
-        break;
-      default:
-        break;
-    }
-    const packet = encoder.decode(e.data);
-    if (listeners[op]) listeners[op](packet);
+    const [op, payload] = encoder.decode(e.data);
+    if (listeners[op]) listeners[op](payload);
   });
 }
 
-async function on_auth_init(packet) {
-  const qr_url = await toDataURL(packet.payload, {
+async function on_auth_init(url) {
+  const qr_url = await toDataURL(url, {
     margin: 0,
-    color: { dark: "#0070f3", ligth: "#fff" },
+    color: { dark: "#101828", light: "#fff" },
   });
 
   qr_code_img.src = qr_url;
 }
 
-async function on_auth_scan(packet) {
+function on_auth_scan(data) {
   qr_container.innerHTML = "";
-  qr_container.innerHTML = scan_profile_tmpl(packet.payload.data);
+  qr_container.append(scan_profile_tmpl(data));
 }
 
-on(1, on_auth_init);
-on(2, on_auth_scan);
+async function on_auth_confirm(data) {
+  const [result, err] = await option(
+    request("/auth/qr", { method: "POST", body: { token: data.token }, state: { replace: true } })
+  );
 
-connect();
+  if (err) {
+    toast(err.message, "err");
+    return;
+  }
+
+  await message_sw({ type: "expire_partials" });
+  window.location.reload();
+}
+
+function is_tab_in_focus() {
+  return document.visibilityState === "visible";
+}
+
+function on_visibility_change() {
+  if (is_tab_in_focus() && ws && ws.readState === 3) connect({ retries: MAX_RETRIES });
+}
+
+on("auth_init", on_auth_init);
+on("auth_scan", on_auth_scan);
+on("auth_confirmed", on_auth_confirm);
+
+add_listeners(document, {
+  visibilitychange: on_visibility_change,
+});
+
+connect({ retries: MAX_RETRIES });

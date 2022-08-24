@@ -2,6 +2,9 @@ import * as AuthService from "../services/auth.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
+import config from "../config/index.js";
+import QRCode from "qrcode";
+import jwt from "jsonwebtoken";
 import { redis_client } from "../services/redis.service.js";
 import { render_file } from "../utils/eta.js";
 import { decrypt, encrypt, option, get_time, add_t, parse_url } from "../utils/index.js";
@@ -10,11 +13,10 @@ import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
 import { randomBytes, randomUUID } from "crypto";
 import { PassThrough } from "stream";
-import { PackBytes, string } from "packBytes";
-import { auth_scan_encoder, operation_encoder } from "../utils/byte-utils.js";
-import config from "../config/index.js";
-import QRCode from "qrcode";
-import jwt from "jsonwebtoken";
+import { encoder } from "../utils/byte-utils.js";
+import { promisify } from "util";
+
+const jwt_verify = promisify(jwt.verify);
 
 function generate_qr_login_url() {
   const random_bullshit = randomBytes(16).toString("hex");
@@ -33,25 +35,80 @@ export async function generate_qr(req, reply) {
   return reply;
 }
 
-export async function qr_login(req, reply) {
-  const { token } = req.query;
+export async function get_qr_login(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+  const { token } = req.params;
   const { name, username, profile_photo_url } = req.user || {};
-  const server = req.server;
-  const decoded = jwt.verify(token, config.jwt_secret);
-
-  server.ws.send(
-    auth_scan_encoder.encode({
-      op: 2,
-      payload: { topic: decoded.data, data: { name, username, profile_photo_url } },
-    })
-  );
-
+  const ws = req.server.ws;
   const stream = reply.init_stream();
-  const qr_confirmation = await render_file("/auth/qr-login-confirmation.html");
-  stream.push(qr_confirmation);
+  const t = req.i18n.t;
+  const user = req.user;
+
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: "Confirm qr code", lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  const [decoded, err] = await option(jwt_verify(token, config.jwt_secret));
+
+  if (err) {
+    stream.push("<h1>Some error<h1>");
+  } else {
+    ws.send(
+      encoder.encode("auth_scan", { topic: decoded.data, name, username, profile_photo_url })
+    );
+
+    const qr_confirmation = await render_file("/auth/qr-login-confirmation.html", { token });
+    stream.push(qr_confirmation);
+  }
 
   stream.push(null);
+
   return reply;
+}
+
+export async function qr_login_confirm(req, reply) {
+  const { return_to = "/" } = req.query;
+  const { token } = req.params;
+  const { _action } = req.body;
+  const user = req.user;
+  const ws = req.server.ws;
+
+  switch (_action) {
+    case "confirm": {
+      const decoded = jwt.verify(token, config.jwt_secret);
+      const auth_token = jwt.sign({ user_id: user.id }, config.jwt_secret, { expiresIn: 120 });
+      ws.send(encoder.encode("auth_confirmed", { topic: decoded.data, token: auth_token }));
+      reply.redirect(return_to);
+      return reply;
+    }
+    case "deny": {
+      ws.send(encoder.encode("auth_denied"));
+      reply.redirect(return_to);
+      return reply;
+    }
+  }
+
+  return reply;
+}
+
+export async function qr_login(req, reply) {
+  const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
+  const { token } = req.body;
+
+  const [decoded, decoding_err] = await option(jwt_verify(token, config.jwt_secret));
+
+  const [session, err] = await option(
+    SessionService.create_one({ user_id: decoded.user_id, user_agent, ip })
+  );
+
+  req.session.set("sid", session.id);
+  reply.redirect("/");
   return reply;
 }
 
@@ -79,18 +136,12 @@ export async function get_login(req, reply) {
     stream.push(top);
   }
 
-  // const qr_url = await QRCode.toDataURL(generate_qr_login_url(), {
-  //   margin: 0,
-  //   color: { dark: "#0070f3", ligth: "#fff" },
-  // });
-
   const login = await render_file("/auth/login.html", {
     t,
     flash,
     google_oauth_client_id: config.google_oauth_client_id,
     oauth_state,
     nonce,
-    // qr_url,
   });
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);
@@ -217,7 +268,7 @@ export async function login(req, reply) {
   req.session.set("sid", session.id);
   req.session.set("oauth_state", null);
   req.session.set("nonce", null);
-  reply.redirect(`${return_to}?t=${get_time()}`);
+  reply.redirect(add_t(return_to));
   return reply;
 }
 

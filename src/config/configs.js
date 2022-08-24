@@ -31,6 +31,7 @@ import {
   ORIGIN,
   ORIGIN_DEV,
   JWT_SECRET,
+  WS_URI,
 } from "./secrets.js";
 
 export const configs = {
@@ -59,6 +60,7 @@ export const configs = {
     es_password: ES_PASSWORD,
     origin: ORIGIN,
     jwt_secret: JWT_SECRET,
+    ws_uri: WS_URI,
   },
   development: {
     port: PORT_DEV,
@@ -85,5 +87,6 @@ export const configs = {
     es_password: ES_PASSWORD,
     origin: ORIGIN_DEV,
     jwt_secret: JWT_SECRET,
+    ws_uri: WS_URI,
   },
 };

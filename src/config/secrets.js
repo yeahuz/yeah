@@ -38,4 +38,5 @@ export const {
   ORIGIN,
   ORIGIN_DEV,
   JWT_SECRET,
+  WS_URI,
 } = process.env;
