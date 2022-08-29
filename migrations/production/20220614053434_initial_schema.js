@@ -1,45 +1,150 @@
 export function up(knex) {
   return knex.schema
-    .createTable("accounts", (table) => {
+    .createTable("users", (table) => {
       table.increments("id");
-      table.string("phone", 15);
+      table.string("phone", 15).unique();
       table.string("name");
-      table.string("username");
+      table.string("username").unique();
       table.text("bio");
       table.string("website_url");
       table.string("profile_photo_url");
-      table.string("email");
-      table.unique(["username", "email"]);
+      table.string("email").unique();
+      table.string("password").notNullable();
+      table.string("hash_id").index();
       table.timestamp("last_activity_date").defaultTo(knex.fn.now());
       table.timestamps(false, true);
+    })
+    .createTable("otp_secrets", (table) => {
+      table.increments("id");
+      table.enu("method", ["email", "phone"]);
+      table.string("identifier");
+      table.string("secret");
+      table.unique(["method", "identifier"]);
+    })
+    .createTable("confirmation_codes", (table) => {
+      table.increments("id");
+      table.string("code");
+      table.string("identifier").unique();
+      table.timestamp("expires_at");
+      table.timestamps(false, true);
+    })
+    .createTable("auth_providers", (table) => {
+      table.increments("id");
+      table.string("name").unique();
+      table.string("logo_url");
+      table.boolean("active");
+      table.timestamps(false, true);
+    })
+    .createTable("accounts", (table) => {
+      table.increments("id");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .string("provider")
+        .index()
+        .notNullable()
+        .references("name")
+        .inTable("auth_providers")
+        .onDelete("CASCADE");
+      table.string("provider_account_id").index();
+      table.unique(["provider_account_id", "user_id"]);
+      table.timestamps(false, true);
+    })
+    .createTable("notifications", (table) => {
+      table.increments("id").primary();
+      table.integer("entity_id").index();
+      table.integer("entity_type_id");
+      table.integer("from").index().notNullable().references("id").inTable("users");
+      table.integer("to").index().notNullable().references("id").inTable("users");
+      table.string("hash_id");
+      table.boolean("status");
+      table.timestamps(false, true);
+    })
+    .createTable("user_cards", (table) => {
+      table.increments("id");
+      table.string("pan");
+      table.string("expiry");
+      table.boolean("default").defaultTo(false);
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("user_reviews", (table) => {
+      table.increments("id");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.text("comment");
+      table.smallint("rating");
+      table
+        .integer("from")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
     })
     .createTable("credentials", (table) => {
       table.increments("id");
       table.string("credential_id", 1024);
+      table.string("title").notNullable().unique();
       table.text("public_key");
       table.integer("counter");
       table.json("transports");
       table.timestamps(false, true);
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
     })
     .createTable("sessions", (table) => {
       table.increments("id");
       table.boolean("active").defaultTo(true);
-      table.string("user_agent");
+      table.string("ip");
+      table.timestamp("expires_at");
       table.timestamps(false, true);
       table
-        .integer("account_id")
+        .integer("user_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("accounts")
+        .inTable("users")
         .onDelete("CASCADE");
+    })
+    .createTable("user_agents", (table) => {
+      table.increments("id");
+      table.string("browser_name");
+      table.string("browser_version");
+      table.string("engine_name");
+      table.string("engine_version");
+      table.string("device_type");
+      table.string("device_model");
+      table.string("device_vendor");
+      table
+        .integer("session_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("sessions")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
     })
     .createTable("sessions_credentials", (table) => {
       table
@@ -63,8 +168,10 @@ export function up(knex) {
       table.string("name");
       table.timestamps(false, true);
     })
-    .createTable("postings_statuses", (table) => {
+    .createTable("posting_statuses", (table) => {
       table.increments("id");
+      table.boolean("active").defaultTo(false);
+      table.string("code").notNullable();
       table.timestamps(false, true);
     })
     .createTable("postings", (table) => {
@@ -76,20 +183,22 @@ export function up(knex) {
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings_statuses")
+        .inTable("posting_statuses")
         .onDelete("CASCADE");
       table.timestamps(false, true);
     })
-    .createTable("postings_statuses_translations", (table) => {
+    .createTable("posting_status_translations", (table) => {
       table.increments("id");
       table
         .integer("status_id")
+        .index()
         .notNullable()
         .references("id")
-        .inTable("postings_statuses")
+        .inTable("posting_statuses")
         .onDelete("CASCADE");
       table
         .string("language_code")
+        .index()
         .notNullable()
         .references("code")
         .inTable("languages")
@@ -97,17 +206,496 @@ export function up(knex) {
       table.string("name");
       table.unique(["status_id", "language_code"]);
       table.timestamps(false, true);
+    })
+    .createTable("roles", (table) => {
+      table.increments("id");
+      table.enu("code", ["admin", "moderator"]);
+      table.timestamps(false, true);
+    })
+    .createTable("role_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("role_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("roles")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("title");
+      table.unique(["language_code", "role_id"]);
+      table.timestamps(false, true);
+    })
+    .createTable("user_roles", (table) => {
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .integer("role_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("roles")
+        .onDelete("CASCADE");
+      table.unique(["user_id", "role_id"]);
+    })
+    .createTable("categories", (table) => {
+      table.increments("id");
+      table.integer("parent_id").index().references("id").inTable("categories").onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("category_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("title");
+      table.text("description");
+      table.timestamps(false, true);
+    })
+    .createTable("posting_bookmarks", (table) => {
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table.unique(["user_id", "posting_id"]);
+    })
+    .createTable("posting_categories", (table) => {
+      table
+        .integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE");
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table.unique(["category_id", "posting_id"]);
+    })
+    .createTable("category_fields", (table) => {
+      table.increments("id");
+      table.boolean("required").defaultTo(true);
+      table.boolean("read_only").defaultTo(false);
+      table.boolean("disabled").defaultTo(false);
+      table.boolean("multiple").defaultTo(false);
+      table.boolean("checked").defaultTo(false);
+      table.smallint("min").defaultTo(0);
+      table.smallint("max").defaultTo(0);
+      table.smallint("max_length").defaultTo(0);
+      table.smallint("min_length").defaultTo(0);
+      table.string("accept");
+      table.string("pattern");
+      table
+        .enu("type", [
+          "range",
+          "radio",
+          "text",
+          "checkbox",
+          "select",
+          "search",
+          "url",
+          "number",
+          "password",
+          "file",
+          "search",
+          "tel",
+        ])
+        .defaultTo("text");
+      table
+        .enu("input_mode", ["text", "decimal", "numeric", "tel", "search", "email", "url"])
+        .defaultTo("text");
+      table.string("name");
+      table
+        .integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("category_field_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("category_field_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("category_fields")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("label");
+      table.string("placeholder");
+      table.string("hint");
+      table.timestamps(false, true);
+    })
+    .createTable("category_field_values", (table) => {
+      table.increments("id");
+      table
+        .integer("category_field_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("category_fields")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("category_field_value_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("category_field_value_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("category_field_values")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("label");
+      table.timestamps(false, true);
+    })
+    .createTable("posting_attributes", (table) => {
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table
+        .integer("category_field_value_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("category_field_values")
+        .onDelete("CASCADE");
+      table.unique(["posting_id", "category_field_value_id"]);
+    })
+    .createTable("promotions", (table) => {
+      table.increments("id");
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table.smallint("boost_score");
+      table.timestamp("expiration_date");
+      table.enu("placement", ["SEARCH", "FRONT"]).defaultTo("SEARCH");
+      table.timestamps(false, true);
+    })
+    .createTable("attachments", (table) => {
+      table.uuid("id").defaultTo(knex.raw("gen_random_uuid()")).primary();
+      table.string("url", 512);
+      table.string("mimetype");
+      table.string("name");
+      table.string("s3_url", 512);
+      table.string("s3_key", 512);
+      table.string("caption");
+      table.timestamps(false, true);
+    })
+    .createTable("posting_attachments", (table) => {
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table
+        .uuid("attachment_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
+    })
+    .createTable("entity_attachments", (table) => {
+      table.integer("entity_id").notNullable().index();
+      table
+        .uuid("attachment_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
+    })
+    .createTable("transactions", (table) => {
+      table.increments("id");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.integer("amount");
+      table
+        .integer("card_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("user_cards")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("transaction_statuses", (table) => {
+      table.increments("id");
+      table.timestamps(false, true);
+    })
+    .createTable("transaction_status_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("status_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("transaction_statuses")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("name");
+      table.unique(["status_id", "language_code"]);
+      table.timestamps(false, true);
+    })
+    .createTable("conversations", (table) => {
+      table.increments("id");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("conversation_members", (table) => {
+      table
+        .integer("conversation_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("conversations")
+        .onDelete("CASCADE");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.unique(["conversation_id", "user_id"]);
+    })
+    .createTable("messages", (table) => {
+      table.increments("id");
+      table.text("content");
+      table.integer("reply_to").index().references("id").inTable("messages");
+      table
+        .integer("sender_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .integer("conversation_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("conversations")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("countries", (table) => {
+      table.string("code").primary();
+      table.timestamps(false, true);
+    })
+    .createTable("country_translations", (table) => {
+      table
+        .string("country_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("countries")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("name");
+      table.timestamps(false, true);
+    })
+    .createTable("regions", (table) => {
+      table.increments("id");
+      table
+        .string("country_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("countries")
+        .onDelete("CASCADE");
+      table.point("coords");
+      table.timestamps(false, true);
+    })
+    .createTable("region_translations", (table) => {
+      table
+        .integer("region_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("regions")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("short_name");
+      table.string("long_name");
+      table.timestamps(false, true);
+    })
+    .createTable("districts", (table) => {
+      table.increments("id");
+      table
+        .integer("region_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("regions")
+        .onDelete("CASCADE");
+      table.point("coords");
+      table.timestamps(false, true);
+    })
+    .createTable("district_translations", (table) => {
+      table
+        .integer("district_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("districts")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("short_name");
+      table.string("long_name");
+      table.timestamps(false, true);
     });
 }
 
 export function down(knex) {
   return knex.schema
-    .dropTable("accounts")
-    .dropTable("credentials")
-    .dropTable("sessions")
     .dropTable("sessions_credentials")
+    .dropTable("user_agents")
+    .dropTable("sessions")
+    .dropTable("credentials")
+    .dropTable("transaction_status_translations")
+    .dropTable("transaction_statuses")
+    .dropTable("transactions")
+    .dropTable("user_reviews")
+    .dropTable("user_cards")
+    .dropTable("user_roles")
+    .dropTable("role_translations")
+    .dropTable("roles")
+    .dropTable("posting_bookmarks")
+    .dropTable("conversation_members")
+    .dropTable("messages")
+    .dropTable("conversations")
+    .dropTable("notifications")
+    .dropTable("accounts")
+    .dropTable("users")
+    .dropTable("auth_providers")
+    .dropTable("posting_attachments")
+    .dropTable("posting_categories")
+    .dropTable("posting_attributes")
+    .dropTable("posting_status_translations")
+    .dropTable("district_translations")
+    .dropTable("districts")
+    .dropTable("region_translations")
+    .dropTable("regions")
+    .dropTable("country_translations")
+    .dropTable("countries")
+    .dropTable("promotions")
     .dropTable("postings")
-    .dropTable("postings_statuses")
+    .dropTable("posting_statuses")
+    .dropTable("category_translations")
+    .dropTable("category_field_translations")
+    .dropTable("category_field_value_translations")
     .dropTable("languages")
-    .dropTable("postings_statuses_translations");
+    .dropTable("category_field_values")
+    .dropTable("category_fields")
+    .dropTable("categories")
+    .dropTable("entity_attachments")
+    .dropTable("attachments")
+    .dropTable("otp_secrets")
+    .dropTable("confirmation_codes");
 }

@@ -32,6 +32,9 @@ import {
   ORIGIN_DEV,
   JWT_SECRET,
   WS_URI,
+  SMS_API_URI,
+  SMS_API_EMAIL,
+  SMS_API_PASSWORD,
 } from "./secrets.js";
 
 export const configs = {
@@ -61,6 +64,9 @@ export const configs = {
     origin: ORIGIN,
     jwt_secret: JWT_SECRET,
     ws_uri: WS_URI,
+    sms_api_uri: SMS_API_URI,
+    sms_api_email: SMS_API_EMAIL,
+    sms_api_password: SMS_API_PASSWORD,
   },
   development: {
     port: PORT_DEV,
@@ -88,5 +94,8 @@ export const configs = {
     origin: ORIGIN_DEV,
     jwt_secret: JWT_SECRET,
     ws_uri: WS_URI,
+    sms_api_uri: SMS_API_URI,
+    sms_api_email: SMS_API_EMAIL,
+    sms_api_password: SMS_API_PASSWORD,
   },
 };

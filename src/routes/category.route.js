@@ -1,4 +1,4 @@
-import * as CategoryController from "../controllers/category.controller.js"
+import * as CategoryController from "../controllers/category.controller.js";
 
 export const category = async (fastify) => {
   fastify.route({
@@ -10,5 +10,5 @@ export const category = async (fastify) => {
     method: "GET",
     url: "/:category_id",
     handler: CategoryController.get_many,
-  })
+  });
 };

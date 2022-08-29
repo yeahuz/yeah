@@ -1,5 +1,4 @@
-import * as GeoController from "../controllers/geo.controller.js"
-import { guest_user } from '../utils/roles.js'
+import * as GeoController from "../controllers/geo.controller.js";
 
 export const geo = async (fastify) => {
   fastify.route({
@@ -10,6 +9,6 @@ export const geo = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/geocode",
-    handler: GeoController.geocode
-  })
+    handler: GeoController.geocode,
+  });
 };

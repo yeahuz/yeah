@@ -1,6 +1,6 @@
 <header class="bg-white border-b border-b-gray-200 py-4 px-4 xl:px-0 sticky top-0 z-50 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <a href="/" class="font-semibold text-lg p-3 -m-3 text-primary-600 hidden md:inline-block" noprefetch>YeaH</a>
+    <a href="/" class="font-semibold text-lg p-3 -m-3 text-primary-600 hidden md:inline-block" noprefetch>YYYY</a>
     <%~ includeFile('./mobile-nav.html', it) %>
     <% if (it.user) { %>
       <a href="/settings/details" class="bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
@@ -13,8 +13,8 @@
             crossorigin
           />
         <% } else { %>
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10">
-            <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+            <path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         <% } %>
       </a>
@@ -51,7 +51,7 @@
           <ul>
             <li>
               <a
-                href="/<%= it.user.username %>?ps=active"
+                href="/me?ps=active"
                 class="flex items-center text-sm text-gray-700 py-2.5 px-4 hover:bg-gray-50 duration-200"
               >
                 <svg

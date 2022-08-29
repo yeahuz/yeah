@@ -1,5 +1,5 @@
 import * as SessionService from "../services/session.service.js";
-import * as CredentialService from '../services/credential.service.js'
+import * as CredentialService from "../services/credential.service.js";
 import { render_file } from "../utils/eta.js";
 import { create_date_formatter, parse_url } from "../utils/index.js";
 
@@ -15,7 +15,7 @@ export async function get_tab(req, reply) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "settings" }), lang: req.language },
       t,
-      user
+      user,
     });
     stream.push(top);
   }
@@ -59,7 +59,7 @@ export async function get_details(req, reply) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
       t,
-      user
+      user,
     });
     stream.push(top);
   }
@@ -98,7 +98,7 @@ export async function get_privacy(req, reply) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("tabs.privacy", { ns: "settings" }), lang: req.language },
       t,
-      user
+      user,
     });
     stream.push(top);
   }
@@ -109,8 +109,8 @@ export async function get_privacy(req, reply) {
   });
   stream.push(settings_top);
 
-  const sessions = await SessionService.get_many().for(user.id, current_sid)
-  const credentials = await CredentialService.get_many().for(user.id)
+  const sessions = await SessionService.get_many().for(user.id, current_sid);
+  const credentials = await CredentialService.get_many().for(user.id);
 
   const privacy = await render_file("/settings/privacy.html", {
     user,

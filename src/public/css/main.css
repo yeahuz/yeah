@@ -216,10 +216,6 @@ button:disabled {
   --font-size: 0.875rem;
 }
 
-.tgme_widget_login.large button.tgme_widget_login_button {
-  padding: var(--size);
-}
-
 .form-control {
   --placeholder-color: var(--gray-500);
   --text-color: var(--gray-900);

@@ -112,6 +112,11 @@ export function add_t(path) {
   return `${path}?t=${get_time()}`;
 }
 
+export function add_minutes_to_now(mins = 0) {
+  const now = new Date();
+  return new Date(now.getTime() + mins * 60000);
+}
+
 export function group_by(key, root_id = "0") {
   const result = {};
   return (arr) => {

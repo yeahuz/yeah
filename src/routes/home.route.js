@@ -1,5 +1,4 @@
 import * as HomeController from "../controllers/home.controller.js";
-import * as PostingController from "../controllers/posting.controller.js";
 
 export const home = async (fastify) => {
   fastify.route({
@@ -11,6 +10,16 @@ export const home = async (fastify) => {
     method: "GET",
     url: "/partials/:partial",
     handler: HomeController.get_partial,
+  });
+  fastify.route({
+    method: "GET",
+    url: "/me",
+    handler: HomeController.get_me,
+  });
+  fastify.route({
+    method: "GET",
+    url: "/avatars",
+    handler: HomeController.get_avatar,
   });
   fastify.route({
     method: "GET",

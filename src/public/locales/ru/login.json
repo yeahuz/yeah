@@ -1,14 +1,1 @@
-{
-	"title": "Войти",
-	"email": {
-		"label": "Email или номер телефона",
-		"placeholder": "juraev@gmail.com"
-	},
-	"password": {
-		"label": "Пароль",
-		"placeholder": "complicated-passphrase"
-	},
-	"with_google": "Продолжить c Google",
-	"with_telegram": "Продолжить с Telegram",
-	"no_account": "Нету аккаунта?"
-}
+{  "title": "Войти",  "email": {    "label": "Email",    "placeholder": "juraev@gmail.com"  },  "phone": {    "label": "Номер телефона",    "placeholder": "93 915 20 00"  },  "password": {    "label": "Пароль",    "placeholder": "complicated-passphrase"  },  "code": {    "label": "Код"  },  "with_google": "Продолжить c Google",  "with_telegram": "Продолжить с Telegram",  "no_account": "Нету аккаунта?",  "qr": {    "title": "Отсканируйте QR-код",    "description": "Наведите любой сканер QR-кода на изображение выше",    "login_device": "Вы хотите войти в систему на другом устройстве?",    "login_device_warning": "Сканируйте только QR-коды, полученные непосредственно из вашего браузера. Никогда не используйте код, отправленный вам другим пользователем.",    "yes_login": "Да, авторизовать"  }}

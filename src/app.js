@@ -13,11 +13,9 @@ import fastify_rate_limit from "@fastify/rate-limit";
 import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
-// import fastify_ws from "@fastify/websocket";
-// import WebSocket from "ws";
+import * as eta from "eta";
 import { elastic_client } from "./services/es.service.js";
 import { i18next } from "./utils/i18n.js";
-import * as eta from "eta";
 import { routes } from "./routes/index.js";
 import { is_xhr } from "./plugins/is-xhr.js";
 import { chunk_view } from "./plugins/chunk-view.js";
@@ -28,18 +26,13 @@ import { can } from "./plugins/can.js";
 import { ws } from "./plugins/ws.js";
 import { add_t } from "./utils/index.js";
 import { redis_client } from "./services/redis.service.js";
-import { PackBytes, string, array } from "packBytes";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
 export async function start() {
   const app = fastify({
     maxParamLength: 1000,
-    logger: {
-      transport: {
-        target: "pino-pretty",
-      },
-    },
+    logger: true,
     ignoreTrailingSlash: true,
     trustProxy: true,
     ajv: {
@@ -78,22 +71,6 @@ export async function start() {
     });
 
     app.register(fastify_flash);
-
-    // const ws = new WebSocket("ws://localhost:3020");
-
-    // const encoder = new PackBytes({
-    //   op: string,
-    //   payload: string,
-    // });
-
-    // ws.on("open", () => {
-    //   ws.send(encoder.encode({ op: "subscribe", payload: "channel-name" }));
-    // });
-
-    // ws.on("message", (message) => {
-    //   const decoded = encoder.decode(Buffer.from(message));
-    //   console.log(decoded);
-    // });
 
     app.register(ws);
 
@@ -163,10 +140,9 @@ export async function start() {
 
     app.register(attach_user);
     app.register(can);
-    const customResponseTypeStrategy = {
-      // strategy name for referencing in the route handler `constraints` options
+
+    const accept_strategy = {
       name: "accept",
-      // storage factory for storing routes in the find-my-way route tree
       storage: function () {
         let handlers = {};
         return {
@@ -178,15 +154,12 @@ export async function start() {
           },
         };
       },
-      // function to get the value of the constraint from each incoming request
       deriveConstraint: (req, ctx) => {
         return req.headers["accept"];
       },
-      // optional flag marking if handlers without constraints can match requests that have a value for this constraint
-      // mustMatchWhenDerived: true
     };
 
-    app.addConstraintStrategy(customResponseTypeStrategy);
+    app.addConstraintStrategy(accept_strategy);
     // app.get("/elastic/regions", async (req, reply) => {
     //   const { lang = "en" } = req.query;
     //   const regions = await RegionService.get_many({ lang });

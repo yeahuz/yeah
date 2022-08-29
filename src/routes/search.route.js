@@ -1,5 +1,4 @@
-import * as SearchController from "../controllers/search.controller.js"
-import { guest_user } from '../utils/roles.js'
+import * as SearchController from "../controllers/search.controller.js";
 
 export const search = async (fastify) => {
   fastify.route({

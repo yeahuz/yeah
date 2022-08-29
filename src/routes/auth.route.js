@@ -19,38 +19,43 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/signup",
     handler: AuthController.signup,
-    schema: {
-      body: auth_schema.common,
-    },
     onRequest: fastify.can(guest_user),
   });
-  // fastify.route({
-  //   method: "GET",
-  //   url: "/qr",
-  //   handler: AuthController.generate_qr,
-  // });
+  fastify.route({
+    method: "POST",
+    url: "/otp",
+    handler: AuthController.create_otp,
+    schema: auth_schema.create_otp,
+  });
+  fastify.route({
+    method: "POST",
+    url: "/otp/confirmation",
+    handler: AuthController.confirm_otp,
+    schema: auth_schema.confirm_otp,
+  });
   fastify.route({
     method: "GET",
     url: "/qr/:token",
     handler: AuthController.get_qr_login,
+    onRequest: fastify.can(authenticated_user),
   });
   fastify.route({
     method: "POST",
     url: "/qr/:token/confirmation",
     handler: AuthController.qr_login_confirm,
+    onRequest: fastify.can(authenticated_user),
   });
   fastify.route({
     method: "POST",
     url: "/qr",
     handler: AuthController.qr_login,
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "POST",
     url: "/login",
     handler: AuthController.login,
-    schema: {
-      body: auth_schema.common,
-    },
+    schema: auth_schema.login,
     onRequest: fastify.can(guest_user),
   });
   fastify.route({
@@ -69,9 +74,7 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/google",
     handler: AuthController.google_one_tap,
-    schema: {
-      body: auth_schema.google_one_tap,
-    },
+    schema: auth_schema.google_one_tap,
     onRequest: fastify.can(guest_user),
     constraints: { accept: "application/json" },
   });
@@ -79,10 +82,9 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/telegram",
     handler: AuthController.telegram_callback,
-    schema: {
-      body: auth_schema.telegram,
-    },
+    schema: auth_schema.telegram,
     onRequest: fastify.can(guest_user),
+    constraints: { accept: "application/json" },
   });
   fastify.route({
     method: "GET",

@@ -1,12 +1,10 @@
-import { option, request } from './utils.js';
-import { disable_form, replace_text } from './dom.js'
-import { decode, encode } from './base64-url.js';
-import { toast } from './toast.js'
+import { request } from "./utils.js";
+import { decode, encode } from "./base64-url.js";
 
 export function format_assertion_request(assertion) {
   assertion.allowCredentials = assertion.allowCredentials.map((credential) => ({
     ...credential,
-    id: decode(credential.id)
+    id: decode(credential.id),
   }));
   assertion.challenge = decode(assertion.challenge);
 
@@ -27,7 +25,7 @@ export async function verify_assertion(assertion) {
     encode(assertion.response.clientDataJSON),
     encode(assertion.response.signature),
     encode(assertion.response.userHandle),
-  ])
+  ]);
 
   return await request("/auth/assertions", {
     body: {
@@ -38,13 +36,12 @@ export async function verify_assertion(assertion) {
         client_data_json,
         signature,
         user_handle,
-      }
+      },
     },
     state: {
       replace: true,
-      reload: true,
-    }
-  })
+    },
+  });
 }
 
 export async function add_credential(credential) {
@@ -52,7 +49,7 @@ export async function add_credential(credential) {
     encode(credential.rawId),
     encode(credential.response.attestationObject),
     encode(credential.response.clientDataJSON),
-  ])
+  ]);
 
   return await request("/auth/credentials?return_to=/settings/privacy", {
     body: {
@@ -61,10 +58,10 @@ export async function add_credential(credential) {
       type: credential.type,
       response: {
         attestation_object,
-        client_data_json
+        client_data_json,
       },
       transports: credential.response.getTransports?.() || [],
-      title: credential.title
-    }
-  })
+      title: credential.title,
+    },
+  });
 }

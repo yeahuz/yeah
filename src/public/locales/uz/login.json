@@ -1,14 +1,28 @@
 {
-	"title": "Kirish",
-	"email": {
-		"label": "Email yoki telefon raqam",
-		"placeholder": "juraev@gmail.com"
-	},
-	"password": {
-		"label": "Parol",
-		"placeholder": "complicated-passphrase"
-	},
-	"with_google": "Google orqali kirish",
-	"with_telegram": "Telegram orqali kirish",
-	"no_account": "Akkaunt yoqmi?"
+  "title": "Kirish",
+  "email": {
+    "label": "Email",
+    "placeholder": "juraev@gmail.com"
+  },
+  "phone": {
+    "label": "Telefon raqam",
+    "placeholder": "93 915 20 00"
+  },
+  "password": {
+    "label": "Parol",
+    "placeholder": "complicated-passphrase"
+  },
+  "code": {
+    "label": "Kod"
+  },
+  "with_google": "Google orqali kirish",
+  "with_telegram": "Telegram orqali kirish",
+  "no_account": "Akkaunt yoqmi?",
+  "qr": {
+    "title": "QR-kodni skanerlang",
+    "description": "Istalgan QR-kod skanerini yuqoridagi rasmga qarating",
+    "login_device": "Boshqa qurilmada tizimga kirmoqchimisiz?",
+    "login_device_warning": "Brauzeringizdan to'g'ridan-to'g'ri olingan faqat QR kodlarini skanerlang. Hech qachon boshqa foydalanuvchi tomonidan yuborilgan koddan foydalanmang.",
+    "yes_login": "Ha, ruxsat berish"
+  }
 }

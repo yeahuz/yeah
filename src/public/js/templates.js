@@ -19,3 +19,17 @@ export function scan_profile_tmpl(profile) {
 
   return div;
 }
+
+export async function qr_code_tmpl(url) {
+  const { t } = await import("./i18n.js");
+  const fragment = new DocumentFragment();
+  const img = create_node("img", { src: url, class: "w-36 h-36 object-cover js-qr-code" });
+  const h2 = create_node("h2", { class: "text-gray-900 text-lg font-medium mt-2" });
+  const p = create_node("p", { class: "text-gray-700" });
+
+  h2.textContent = t("qr.title", { ns: "login" });
+  p.textContent = t("qr.description", { ns: "login" });
+  fragment.append(img, h2, p);
+
+  return fragment;
+}

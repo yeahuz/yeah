@@ -12,5 +12,7 @@
   "create": "Create",
   "liked": "Liked",
   "post": "Post",
-  "search": "Search"
+  "search": "Search",
+  "continue": "Continue",
+  "cancel": "Cancel"
 }

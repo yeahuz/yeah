@@ -16,3 +16,5 @@ export * from "./attachment.model.js";
 export * from "./posting.model.js";
 export * from "./region.model.js";
 export * from "./district.model.js";
+export * from "./otp-secret.model.js";
+export * from "./confirmation-code.model.js";

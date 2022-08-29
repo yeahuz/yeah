@@ -1,7 +1,7 @@
 import { BaseModel } from "./index.js";
-import { hashids } from '../utils/hashid.js'
+import { hashids } from "../utils/hashid.js";
 import * as argon2 from "argon2";
-import { createHash, randomBytes } from "crypto";
+import { createHash } from "crypto";
 
 export class User extends BaseModel {
   static get tableName() {
@@ -21,7 +21,6 @@ export class User extends BaseModel {
   async $beforeInsert() {
     await this.hash_password();
     this.set_avatar();
-    this.set_username();
   }
 
   async $afterInsert(ctx) {
@@ -39,8 +38,8 @@ export class User extends BaseModel {
 
   formatted_phone() {
     return this.phone?.replace(
-      /^(\+998)(\d{2})(\d{3})(\d{2})(\d{2})/,
-      "$2 $3 $4-$5"
+      /^(33|55|77|88|90|91|93|94|95|97|98|99)(\d{3})(\d{2})(\d{2})$/,
+      "$1 $2 $3 $4"
     );
   }
 
@@ -52,17 +51,6 @@ export class User extends BaseModel {
     const hash = await argon2.hash(this.password);
     this.password = hash;
     return hash;
-  }
-
-  set_username(){
-    const random_suffix = randomBytes(4).readUInt32LE();
-    if (this.name) {
-      this.username = this.name + random_suffix;
-    }
-
-    if (this.phone || this.email) {
-      this.username = Buffer.from(this.phone || this.email).toString('base64url') + random_suffix;
-    }
   }
 
   set_avatar() {

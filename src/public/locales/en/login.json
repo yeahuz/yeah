@@ -1,14 +1,28 @@
 {
   "title": "Log in",
   "email": {
-    "label": "Email or phone number",
+    "label": "Email",
     "placeholder": "juraev@gmail.com"
+  },
+  "phone": {
+    "label": "Phone",
+    "placeholder": "93 915 20 00"
   },
   "password": {
     "label": "Password",
     "placeholder": "complicated-passphrase"
   },
+  "code": {
+    "label": "Code"
+  },
   "with_google": "Continue with Google",
   "with_telegram": "Continue with Telegram",
-  "no_account": "Don't have an account?"
+  "no_account": "Don't have an account?",
+  "qr": {
+    "title": "Scan QR-code",
+    "description": "Point any QR-code scanner at the image above",
+    "login_device": "Do you want to sign in on another device?",
+    "login_device_warning": "Scan only QR codes received directly from your browser. Never use a code sent to you by another user.",
+    "yes_login": "Yes, log me in"
+  }
 }

@@ -4,13 +4,12 @@ const schema = schemas({
   auth_scan: {
     topic: string,
     name: string,
-    username: string,
     profile_photo_url: string,
   },
   subscribe: string,
   auth_init: string,
   auth_confirmed: { topic: string, token: string },
-  auth_denied: null,
+  auth_denied: string,
 });
 
 export const json_schema = JSON.stringify(schema);

@@ -2,43 +2,22 @@ import * as AuthService from "../services/auth.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
+import * as ConfirmationCodeService from "../services/confirmation-code.service.js";
 import config from "../config/index.js";
-import QRCode from "qrcode";
-import jwt from "jsonwebtoken";
+import * as jwt from "../utils/jwt.js";
 import { redis_client } from "../services/redis.service.js";
 import { render_file } from "../utils/eta.js";
 import { decrypt, encrypt, option, get_time, add_t, parse_url } from "../utils/index.js";
-import { AuthenticationError } from "../utils/errors.js";
+import { AuthenticationError, GoneError } from "../utils/errors.js";
 import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
-import { randomBytes, randomUUID } from "crypto";
-import { PassThrough } from "stream";
+import { randomBytes } from "crypto";
 import { encoder } from "../utils/byte-utils.js";
-import { promisify } from "util";
-
-const jwt_verify = promisify(jwt.verify);
-
-function generate_qr_login_url() {
-  const random_bullshit = randomBytes(16).toString("hex");
-  const token = jwt.sign({ data: random_bullshit }, config.jwt_secret, { expiresIn: 120 });
-  return `${config.origin}/auth/qr?token=${token}`;
-}
-
-export async function generate_qr(req, reply) {
-  const url = generate_qr_login_url();
-  const stream = new PassThrough();
-  QRCode.toFileStream(stream, url, {
-    margin: 0,
-    color: { dark: "#0070f3", ligth: "#fff" },
-  });
-  reply.send(stream);
-  return reply;
-}
 
 export async function get_qr_login(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { token } = req.params;
-  const { name, username, profile_photo_url } = req.user || {};
+  const { name, profile_photo_url } = req.user || {};
   const ws = req.server.ws;
   const stream = reply.init_stream();
   const t = req.i18n.t;
@@ -53,21 +32,18 @@ export async function get_qr_login(req, reply) {
     stream.push(top);
   }
 
-  const [decoded, err] = await option(jwt_verify(token, config.jwt_secret));
+  const [decoded, err] = await option(jwt.verify(token));
 
   if (err) {
-    stream.push("<h1>Some error<h1>");
+    stream.push(`<h1>${err.build(t).message}</h1>`);
   } else {
-    ws.send(
-      encoder.encode("auth_scan", { topic: decoded.data, name, username, profile_photo_url })
-    );
+    ws.send(encoder.encode("auth_scan", { topic: decoded.data, name, profile_photo_url }));
 
-    const qr_confirmation = await render_file("/auth/qr-login-confirmation.html", { token });
+    const qr_confirmation = await render_file("/auth/qr-login-confirmation.html", { token, t });
     stream.push(qr_confirmation);
   }
 
   stream.push(null);
-
   return reply;
 }
 
@@ -77,17 +53,24 @@ export async function qr_login_confirm(req, reply) {
   const { _action } = req.body;
   const user = req.user;
   const ws = req.server.ws;
+  const t = req.i18n.t;
+
+  const [decoded, err] = await option(jwt.verify(token));
+  if (err) {
+    req.flash("err", err.build(t));
+    reply.redirect(req.url);
+    return reply;
+  }
 
   switch (_action) {
     case "confirm": {
-      const decoded = jwt.verify(token, config.jwt_secret);
-      const auth_token = jwt.sign({ user_id: user.id }, config.jwt_secret, { expiresIn: 120 });
+      const auth_token = jwt.sign({ user_id: user.id }, { expiresIn: 120 });
       ws.send(encoder.encode("auth_confirmed", { topic: decoded.data, token: auth_token }));
       reply.redirect(return_to);
       return reply;
     }
     case "deny": {
-      ws.send(encoder.encode("auth_denied"));
+      ws.send(encoder.encode("auth_denied", decoded.data));
       reply.redirect(return_to);
       return reply;
     }
@@ -101,11 +84,8 @@ export async function qr_login(req, reply) {
   const ip = req.ip;
   const { token } = req.body;
 
-  const [decoded, decoding_err] = await option(jwt_verify(token, config.jwt_secret));
-
-  const [session, err] = await option(
-    SessionService.create_one({ user_id: decoded.user_id, user_agent, ip })
-  );
+  const decoded = await jwt.verify(token);
+  const session = await SessionService.create_one({ user_id: decoded.user_id, user_agent, ip });
 
   req.session.set("sid", session.id);
   reply.redirect("/");
@@ -113,7 +93,7 @@ export async function qr_login(req, reply) {
 }
 
 export async function get_login(req, reply) {
-  const { return_to = "/" } = req.query;
+  const { return_to = "/", method = "phone" } = req.query;
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
 
@@ -142,6 +122,7 @@ export async function get_login(req, reply) {
     google_oauth_client_id: config.google_oauth_client_id,
     oauth_state,
     nonce,
+    method,
   });
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);
@@ -160,11 +141,12 @@ export async function get_login(req, reply) {
 }
 
 export async function get_signup(req, reply) {
-  const { return_to = "/" } = req.query;
+  const { return_to = "/", method = "phone", step = "1" } = req.query;
   const flash = reply.flash();
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
 
   const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
+  const identifier = req.session.get("identifier");
   const oauth_state = encrypt(JSON.stringify({ came_from: req.url, return_to }));
 
   req.session.set("oauth_state", oauth_state);
@@ -183,14 +165,42 @@ export async function get_signup(req, reply) {
     stream.push(top);
   }
 
-  const signup = await render_file("/auth/signup.html", {
-    t,
-    flash,
-    google_oauth_client_id: config.google_oauth_client_id,
-    oauth_state,
-    nonce,
-  });
-  stream.push(signup);
+  let rendered_step;
+  switch (step) {
+    case "1": {
+      rendered_step = await render_file("/auth/signup/step-1.html", {
+        t,
+        flash,
+        google_oauth_client_id: config.google_oauth_client_id,
+        oauth_state,
+        nonce,
+        method,
+      });
+      break;
+    }
+    case "2": {
+      if (!identifier) {
+        rendered_step = await render_file("/partials/404.html", { t });
+        break;
+      }
+      rendered_step = await render_file("/auth/signup/step-2.html", { t, flash, nonce, method });
+      break;
+    }
+    case "3": {
+      rendered_step = await render_file("/auth/signup/step-3.html", {
+        t,
+        flash,
+        nonce,
+        method,
+        identifier,
+      });
+      break;
+    }
+    default:
+      break;
+  }
+
+  stream.push(rendered_step);
   redis_client.setex(nonce, 86400, 1);
 
   if (!is_navigation_preload) {
@@ -206,14 +216,69 @@ export async function get_signup(req, reply) {
   return reply;
 }
 
+export async function create_otp(req, reply) {
+  const { method } = req.query;
+  const { identifier } = req.body;
+  const t = req.i18n.t;
+
+  const [code, err] = await option(ConfirmationCodeService.generate_auth_code(identifier));
+
+  if (err) {
+    req.flash("err", err.build(t));
+    return reply.redirect(add_t(`/auth/signup?method=${method}`));
+  }
+  console.log({ code });
+
+  // TODO: send otp to user;
+
+  req.session.set("identifier", identifier);
+  reply.redirect(`/auth/signup?step=2&method=${method}`);
+  return reply;
+}
+
+export async function confirm_otp(req, reply) {
+  const { method = "phone" } = req.query;
+  const otp = Array.isArray(req.body.otp) ? req.body.otp.join("") : req.body.otp;
+  const t = req.i18n.t;
+  const identifier = req.session.get("identifier");
+
+  const is_valid = await ConfirmationCodeService.verify(identifier, otp);
+
+  if (!is_valid) {
+    req.flash("err", new GoneError({ key: "otp_expired" }).build(t));
+    return reply.redirect(add_t(`/auth/signup?step=2&method=${method}`));
+  }
+
+  const otp_token = jwt.sign({ otp }, { expiresIn: 1000 * 60 * 15 });
+  req.session.set("otp_token", otp_token);
+  reply.redirect(`/auth/signup?step=3&method=${method}`);
+  return reply;
+}
+
 export async function signup(req, reply) {
   const { return_to = "/" } = req.query;
-  const { email_phone, password } = req.body;
+  const { identifier, masked_identifier, password, name } = req.body;
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
   const t = req.i18n.t;
+  const otp_token = req.session.get("otp_token");
 
-  const [result, err] = await option(AuthService.signup({ email_phone, password, user_agent, ip }));
+  const [_, decoding_err] = await option(jwt.verify(otp_token));
+
+  if (decoding_err) {
+    req.flash("err", decoding_err.build(t));
+    return reply.redirect(add_t(req.url));
+  }
+
+  const [result, err] = await option(
+    AuthService.signup({
+      identifier: identifier || masked_identifier,
+      password,
+      user_agent,
+      ip,
+      name,
+    })
+  );
 
   if (err) {
     req.flash("err", err.build(t));
@@ -223,18 +288,46 @@ export async function signup(req, reply) {
   req.session.set("sid", result.session.id);
   req.session.set("oauth_state", null);
   req.session.set("nonce", null);
-  reply.redirect(`${return_to}?t=${get_time()}`);
+  req.session.set("otp_token", null);
+  reply.redirect(add_t(return_to));
+  return reply;
+}
+
+export async function login_xhr(req, reply) {
+  const { method = "phone" } = req.query;
+  const { email, phone, password } = req.body;
+  const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
+  const t = req.i18n.t;
+
+  const user = await AuthService.verify_password({ method, email, phone, password });
+  const has_credential = await CredentialService.exists_for(user.id);
+
+  if (has_credential) {
+    req.sesion.set("user_id", user.id);
+    reply.send({ user_id: user.id, has_credential });
+    return reply;
+  }
+
+  const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
+
+  req.session.set("sid", session.id);
+  req.session.set("oauth_state", null);
+  req.session.set("nonce", null);
+
+  reply.send({ sid: session.id });
   return reply;
 }
 
 export async function login(req, reply) {
   const { return_to = "/" } = req.query;
-  const { email_phone, password } = req.body;
+  const { identifier, password } = req.body;
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
   const t = req.i18n.t;
 
-  const [user, user_err] = await option(AuthService.verify_password({ email_phone, password }));
+  const [user, user_err] = await option(AuthService.verify_password({ identifier, password }));
+
   if (user_err) {
     if (req.xhr) {
       reply.code(user_err.status_code).send(user_err.build(t));
@@ -459,11 +552,11 @@ export async function verify_assertion(req, reply) {
   AssertionRequest.validate_client_data(assertion, challenge);
 
   const credential = await CredentialService.get_one(assertion.id);
-  const auth_data = await AssertionRequest.validate_response(assertion, credential);
+  const auth_data = AssertionRequest.validate_response(assertion, credential);
 
   await credential.$query().patch({ counter: auth_data.counter });
 
-  const [session, err] = await option(SessionService.create_one({ user_id, user_agent, ip }));
+  const session = await SessionService.create_one({ user_id, user_agent, ip });
 
   req.session.set("sid", session.id);
   req.session.set("nonce", null);
@@ -491,7 +584,6 @@ export async function update_credential(req, reply) {
 
 export async function delete_credential(req, reply) {
   const { id } = req.params;
-  const { return_to = "/" } = req.query;
 
   const [result, err] = await option(CredentialService.delete_one(id));
 
@@ -543,7 +635,6 @@ export async function get_webauthn(req, reply) {
   if (!is_navigation_preload) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
-      user,
       url: parse_url(req.url),
     });
     stream.push(bottom);

@@ -1,6 +1,20 @@
 <div class="flex space-x-8 max-w-7xl mx-auto my-20">
   <div class="bg-white shadow-sm rounded-lg p-5 flex flex-col max-w-xs w-full">
-    <img src="<%= it.profile.profile_photo_url %>" alt="" class="w-36 h-36 rounded-full overflow-hidden object-cover">
+    <% if (it.profile.profile_photo_url) { %>
+      <img
+        referrerpolicy="no-referrer"
+        src="<%= it.profile.profile_photo_url %>"
+        alt=""
+        class="w-36 h-36 rounded-full overflow-hidden object-cover"
+        crossorigin
+      />
+    <% } else { %>
+    <div class="w-36 h-36 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-16 h-16">
+        <path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <% } %>
     <% if (it.profile.name) { %>
       <div class="flex items-center space-x-3 mt-4">
         <span class="text-gray-900 font-semibold text-lg"><%= it.profile.name %></span>
@@ -17,7 +31,9 @@
         </svg>
       </div>
     <% } %>
-    <span class="text-gray-500 text-sm"><%= it.profile.username %></span>
+    <% if (it.profile.username) {%>
+      <span class="text-gray-500 text-sm"><%= it.profile.username %></span>
+    <% } %>
     <a href="/settings/details" class="btn btn-secondary-color mt-6">Изменить профиль</a>
   </div>
   <div class="w-full">
@@ -25,14 +41,14 @@
       <li class="flex-1">
         <a
           class="btn btn-md <%= it.ps === 'active' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%> w-full"
-          href="/<%= it.profile.username %>?ps=active">
+          href="/me?ps=active">
           Активные</a
         >
       </li>
       <li class="flex-1">
         <a
           class="btn btn-md <%= it.ps === 'archived' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-          href="/<%= it.profile.username %>?ps=archived"
+          href="/me?ps=archived"
           >Архивирован</a
         >
       </li>
@@ -40,5 +56,5 @@
   </div>
 </div>
 <script>
- document.title = "<%= it.profile.name %> | YeaH"
+ document.title = "<%= it.profile.name || it.t("profile", { ns: "common" }) %> | YeaH"
 </script>

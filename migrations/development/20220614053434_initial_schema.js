@@ -10,8 +10,22 @@ export function up(knex) {
       table.string("profile_photo_url");
       table.string("email").unique();
       table.string("password").notNullable();
-      table.string("hash_id");
+      table.string("hash_id").index();
       table.timestamp("last_activity_date").defaultTo(knex.fn.now());
+      table.timestamps(false, true);
+    })
+    .createTable("otp_secrets", (table) => {
+      table.increments("id");
+      table.enu("method", ["email", "phone"]);
+      table.string("identifier");
+      table.string("secret");
+      table.unique(["method", "identifier"]);
+    })
+    .createTable("confirmation_codes", (table) => {
+      table.increments("id");
+      table.string("code");
+      table.string("identifier").unique();
+      table.timestamp("expires_at");
       table.timestamps(false, true);
     })
     .createTable("auth_providers", (table) => {
@@ -45,18 +59,8 @@ export function up(knex) {
       table.increments("id").primary();
       table.integer("entity_id").index();
       table.integer("entity_type_id");
-      table
-        .integer("from")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("users");
-      table
-        .integer("to")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("users");
+      table.integer("from").index().notNullable().references("id").inTable("users");
+      table.integer("to").index().notNullable().references("id").inTable("users");
       table.string("hash_id");
       table.boolean("status");
       table.timestamps(false, true);
@@ -114,6 +118,7 @@ export function up(knex) {
       table.increments("id");
       table.boolean("active").defaultTo(true);
       table.string("ip");
+      table.timestamp("expires_at");
       table.timestamps(false, true);
       table
         .integer("user_id")
@@ -246,12 +251,7 @@ export function up(knex) {
     })
     .createTable("categories", (table) => {
       table.increments("id");
-      table
-        .integer("parent_id")
-        .index()
-        .references("id")
-        .inTable("categories")
-        .onDelete("CASCADE");
+      table.integer("parent_id").index().references("id").inTable("categories").onDelete("CASCADE");
       table.timestamps(false, true);
     })
     .createTable("category_translations", (table) => {
@@ -334,19 +334,11 @@ export function up(knex) {
           "password",
           "file",
           "search",
-          "tel"
+          "tel",
         ])
         .defaultTo("text");
       table
-        .enu("input_mode", [
-          "text",
-          "decimal",
-          "numeric",
-          "tel",
-          "search",
-          "email",
-          "url",
-        ])
+        .enu("input_mode", ["text", "decimal", "numeric", "tel", "search", "email", "url"])
         .defaultTo("text");
       table.string("name");
       table
@@ -585,7 +577,7 @@ export function up(knex) {
         .notNullable()
         .references("code")
         .inTable("countries")
-        .onDelete("CASCADE")
+        .onDelete("CASCADE");
       table
         .string("language_code")
         .index()
@@ -604,8 +596,8 @@ export function up(knex) {
         .notNullable()
         .references("code")
         .inTable("countries")
-        .onDelete("CASCADE")
-      table.point("coords")
+        .onDelete("CASCADE");
+      table.point("coords");
       table.timestamps(false, true);
     })
     .createTable("region_translations", (table) => {
@@ -615,7 +607,7 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("regions")
-        .onDelete("CASCADE")
+        .onDelete("CASCADE");
       table
         .string("language_code")
         .index()
@@ -635,8 +627,8 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("regions")
-        .onDelete("CASCADE")
-      table.point("coords")
+        .onDelete("CASCADE");
+      table.point("coords");
       table.timestamps(false, true);
     })
     .createTable("district_translations", (table) => {
@@ -646,7 +638,7 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("districts")
-        .onDelete("CASCADE")
+        .onDelete("CASCADE");
       table
         .string("language_code")
         .index()
@@ -703,5 +695,7 @@ export function down(knex) {
     .dropTable("category_fields")
     .dropTable("categories")
     .dropTable("entity_attachments")
-    .dropTable("attachments");
+    .dropTable("attachments")
+    .dropTable("otp_secrets")
+    .dropTable("confirmation_codes");
 }

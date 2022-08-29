@@ -1,14 +1,25 @@
 {
-	"title": "Create account",
-	"email": {
-		"label": "Email or phone number",
-		"placeholder": "juraev@gmail.com"
-	},
-	"password": {
-		"label": "Password",
-		"placeholder": "complicated-passphrase"
-	},
-	"with_google": "Continue with Google",
-	"with_telegram": "Continue with Telegram",
-	"have_account": "Already have an account?"
+  "title": "Create account",
+  "email": {
+    "label": "Email",
+    "placeholder": "juraev@gmail.com"
+  },
+  "phone": {
+    "label": "Phone",
+    "placeholder": "93 915 20 00"
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "complicated-passphrase"
+  },
+  "code": {
+    "label": "Code"
+  },
+  "name": {
+    "label": "Name",
+    "placeholder": "Kristina"
+  },
+  "with_google": "Continue with Google",
+  "with_telegram": "Continue with Telegram",
+  "have_account": "Already have an account?"
 }

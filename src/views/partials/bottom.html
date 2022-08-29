@@ -6,7 +6,7 @@
 	<% }) %>
 <% } %>
 <script defer async type="module" src="/public/js/init-sw.js"></script>
-<script defer async type="module" src="/public/js/auth.js"></script>
+<script defer async type="module" src="/public/js/main.js"></script>
 <script defer async type="module" src="/public/js/ripple.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.min.js" integrity="sha512-XmXJdyJwwkMu/jMgwXUwIXx0VzBdvjW48UTLxodSOz3GuGtpDjAQ1+E4eROpoxPpvM279i5JjpGCMbTaNZjLmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
@@ -24,6 +24,9 @@
     .js-enabled {
       pointer-events: none;
       opacity: 0.7;
+    }
+    .nojs-hidden {
+      display: none;
     }
   </style>
 </noscript>

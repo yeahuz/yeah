@@ -1,11 +1,59 @@
 import { option, request, message_sw } from "./utils.js";
-import { add_listeners, disable_form } from "./dom.js";
+import { disable_form } from "./dom.js";
 import { toast } from "./toast.js";
 
-const login_form = document.querySelector(".js-login-form");
-const logout_form = document.querySelectorAll(".js-logout-form");
+const BOT_ID = 5544485948;
 
-async function on_login(e) {
+export function on_telegram_login(e) {
+  const form = e.target.closest("form");
+  return new Promise((resolve) => {
+    window.Telegram.Login.auth(
+      {
+        bot_id: BOT_ID,
+        request_access: true,
+      },
+      async (user) => {
+        if (!user) {
+          toast("Telegram login failed", "err");
+          return resolve();
+        }
+        const enable_form = disable_form(form);
+        const [_, err] = await option(request("/auth/telegram", { body: { user } }));
+        if (err) {
+          enable_form(err);
+          toast(err.message, "err");
+          return resolve();
+        }
+        const params = new window.URLSearchParams(window.location.search);
+        const return_to = params.get("retutrn_to") || "/";
+        await message_sw({ type: "expire_partials" });
+        window.location.href = return_to;
+        return resolve();
+      }
+    );
+  });
+}
+
+export async function on_signup(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+  const enable_form = disable_form(form);
+
+  const [_, err] = await option(
+    request(form.action, { body: data, method: form.method, state: { replace: true } })
+  );
+
+  if (!err) {
+    await message_sw({ type: "expire_partials" });
+    window.location.reload();
+  }
+
+  toast(err.message, "err");
+  enable_form(err);
+}
+
+export async function on_login(e) {
   e.preventDefault();
   const form = e.target;
   const data = Object.fromEntries(new FormData(form));
@@ -21,10 +69,10 @@ async function on_login(e) {
   }
 
   toast(err.message, "err");
-  enable_form();
+  enable_form(err);
 }
 
-async function on_logout(e) {
+export async function on_logout(e) {
   e.preventDefault();
   const form = e.target;
   const [_, err] = await option(
@@ -39,13 +87,5 @@ async function on_logout(e) {
   }
 
   toast(err.message, "err");
-  enable_form();
+  enable_form(err);
 }
-
-add_listeners(login_form, {
-  submit: on_login,
-});
-
-add_listeners(logout_form, {
-  submit: on_logout,
-});

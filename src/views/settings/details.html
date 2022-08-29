@@ -19,10 +19,12 @@
         </label>
       </div>
       <div class="flex space-x-6 mb-6">
-        <label class="text-sm font-medium text-gray-700 w-full">
-          <%= it.t("personal.phone.label", { ns: "settings-details" }) %> 
-          <input type="text" inputmode="tel" class="form-control mt-2"
-                                             placeholder="<%= it.t("personal.phone.placeholder", { ns: "settings-details" }) %>" name="phone" value="<%= it.user.phone ?? "" %>" />
+        <label class="w-full mb-6">
+          <span class="text-sm font-medium text-gray-700"><%= it.t("personal.phone.label", { ns: "settings-details" }) %></span>
+          <div class="flex mt-2">
+            <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">+998</span>
+            <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("personal.phone.placeholder", { ns: "settings-details" }) %>" name="phone" value="<%= it.user.phone ?? "" %>">
+          </div>
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
         </label>
       </div>

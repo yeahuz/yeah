@@ -92,3 +92,9 @@ export class BadGatewayError extends DomainError {
     super({ key, status_code: 502 });
   }
 }
+
+export class GoneError extends DomainError {
+  constructor({ key = "genereic_gone" } = {}) {
+    super({ key, status_code: 410 });
+  }
+}

@@ -1,14 +1,25 @@
 {
-	"title": "Akkaunt yaratish",
-	"email": {
-		"label": "Email yoki telefon raqam",
-		"placeholder": "juraev@gmail.com"
-	},
-	"password": {
-		"label": "Parol",
-		"placeholder": "complicated-passphrase"
-	},
-	"with_google": "Google orqali kirish",
-	"with_telegram": "Telegram orqali kirish",
-	"have_account": "Akkaunt bormi?"
+  "title": "Akkaunt yaratish",
+  "email": {
+    "label": "Email",
+    "placeholder": "juraev@gmail.com"
+  },
+  "phone": {
+    "label": "Telefon raqam",
+    "placeholder": "93 915 20 00"
+  },
+  "password": {
+    "label": "Parol",
+    "placeholder": "complicated-passphrase"
+  },
+  "code": {
+    "label": "Kod"
+  },
+  "name": {
+    "label": "Ism",
+    "placeholder": "Kristina"
+  },
+  "with_google": "Google orqali kirish",
+  "with_telegram": "Telegram orqali kirish",
+  "have_account": "Akkaunt bormi?"
 }

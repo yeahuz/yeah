@@ -1,0 +1,23 @@
+<div class="max-w-sm mx-auto space-y-8 mt-20 px-4 sm:px-0">
+  <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "signup"}) %></h1>
+  <%~ includeFile('../../partials/flash.html', it) %>
+  <form action="/auth/signup?method=<%= it.method %>" method="post" class="js-signup-form">
+    <input type="hidden" name="nonce" value="<%= it.nonce %>" />
+    <input type="hidden" name="identifier" value="<%= it.identifier %>" />
+    <label class="text-sm font-medium text-gray-700 mt-5 block">
+      <%= it.t("name.label", { ns: "signup" }) %>
+      <input type="text" class="form-control mt-2" name="name" placeholder="<%= it.t("name.placeholder", { ns: "signup" }) %>" required />
+    </label>
+    <label class="text-sm font-medium text-gray-700 mt-5 block">
+      <%= it.t("password.label", { ns: "signup" }) %>
+      <input type="password" class="form-control mt-2" name="password" placeholder="<%= it.t("password.placeholder", { ns: "signup" }) %>" required minlength="6" />
+    </label>
+    <button class="btn btn-primary btn-lg w-full mt-6">
+      <%= it.t("create_account", { ns: "common" }) %>
+    </button>
+  </form>
+</div>
+<script>
+ document.title = "<%= it.t("title", { ns: "signup" })%> | YeaH"
+</script>
+<script type="module" src="/public/js/signup.js" defer async></script>

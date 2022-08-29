@@ -1,0 +1,81 @@
+<div class="max-w-sm mx-auto space-y-8 mt-20 px-4 sm:px-0">
+  <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "signup"}) %></h1>
+  <%~ includeFile('../../partials/flash.html', it) %>
+  <form action="/auth/otp?method=<%= it.method %>" method="post">
+    <input type="hidden" name="nonce" value="<%= it.nonce %>" />
+    <div class="flex flex-col relative">
+      <% if (it.method === "email") { %>
+        <label class="text-sm font-medium text-gray-700">
+          <%= it.t("email.label", { ns: "signup"}) %> <input type="email" autocomplete="email" class="form-control mt-2"
+          placeholder="<%= it.t("email.placeholder", { ns: "login" }) %>" name="identifier" required />
+        </label>
+        <a href="/auth/signup?method=phone" class="inline-block mt-1.5 self-end btn btn-enabled btn-md btn-tertiary-color">Phone-ID</a>
+      <% } %>
+      <% if (it.method === "phone") { %>
+        <label class="text-sm font-medium text-gray-700">
+          <%= it.t("phone.label", { ns: "signup"}) %>
+          <div class="flex mt-2 relative">
+            <input type="hidden" name="identifier" class="js-unmasked-value" />
+            <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal">+998</span>
+            <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" inputmode="numeric" name="masked_identifier"
+              placeholder="<%= it.t("phone.placeholder", { ns: "signup" }) %>"
+              data-mask="## ### ## ##"
+              data-unmask="#########"
+              pattern="^(33|55|77|88|90|91|93|94|95|97|98|99)\s?(\d{3})\s?(\d{2})\s?(\d{2})$" required
+            />
+          </div>
+        </label>
+        <a href="/auth/signup?method=email" class="self-end btn btn-enabled btn-md btn-tertiary-color mt-1.5">Email-ID</a>
+      <% } %>
+    </div>
+    <button class="btn btn-primary btn-lg w-full mt-6 mb-4">
+      <%= it.t("continue", { ns: "common" }) %>
+    </button>
+    <a
+      class="btn btn-secondary btn-lg btn-enabled w-full"
+      href="//accounts.google.com/o/oauth2/auth?client_id=<%= it.google_oauth_client_id %>&state=<%= it.oauth_state %>&scope=email profile&response_type=code&redirect_uri=http://localhost:3000/auth/google"
+    >
+      <svg class="w-6 h-6 mr-2" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M30.0014 16.3109C30.0014 15.1598 29.9061 14.3198 29.6998 13.4487H16.2871V18.6442H24.1601C24.0014 19.9354 23.1442 21.8798 21.2394 23.1864L21.2127 23.3604L25.4536 26.58L25.7474 26.6087C28.4458 24.1665 30.0014 20.5731 30.0014 16.3109Z" fill="#4285F4"/>
+        <path d="M16.2853 30C20.1424 30 23.3804 28.7555 25.7456 26.6089L21.2377 23.1865C20.0313 24.011 18.4123 24.5866 16.2853 24.5866C12.5076 24.5866 9.30128 22.1444 8.15832 18.7688L7.99078 18.7827L3.58111 22.1272L3.52344 22.2843C5.87261 26.8577 10.698 30 16.2853 30Z" fill="#34A853"/>
+        <path d="M8.16061 18.7688C7.85903 17.8977 7.6845 16.9643 7.6845 15.9999C7.6845 15.0354 7.85903 14.1021 8.14475 13.231L8.13676 13.0455L3.67181 9.64734L3.52572 9.71544C2.55751 11.6132 2.00195 13.7444 2.00195 15.9999C2.00195 18.2555 2.55751 20.3865 3.52572 22.2843L8.16061 18.7688Z" fill="#FBBC05"/>
+        <path d="M16.2854 7.4133C18.9679 7.4133 20.7774 8.54885 21.8092 9.4978L25.8409 5.64C23.3648 3.38445 20.1425 2 16.2854 2C10.698 2 5.87262 5.1422 3.52344 9.71549L8.14247 13.2311C9.30131 9.85555 12.5076 7.4133 16.2854 7.4133Z" fill="#EB4335"/>
+      </svg>
+      <%= it.t("with_google", { ns: "login"}) %>
+    </a>
+    <button class="btn btn-secondary btn-lg btn-enabled w-full mt-2 js-telegram-login" type="button">
+      <svg class="w-6 h-6 mr-2" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="14" fill="url(#paint0_linear_1334_735)"/>
+        <path d="M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z" fill="white"/>
+        <defs>
+        <linearGradient id="paint0_linear_1334_735" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#37BBFE"/>
+        <stop offset="1" stop-color="#007DBB"/>
+        </linearGradient>
+        </defs>
+      </svg>
+        <%= it.t("with_telegram", { ns: "login"}) %>
+    </button>
+  </form>
+  <p class="text-center font-medium text-gray-500">
+    <%= it.t("have_account", { ns: "signup"}) %>
+    <a href="/auth/login" class="text-primary-600"><%= it.t("login", { ns: "common" }) %></a>
+  </p>
+</div>
+<script>
+ document.title = "<%= it.t("title", { ns: "signup" })%> | YeaH"
+</script>
+<script type="module">
+  const masked_input = document.querySelector(".js-masked-input");
+  const masked_value = document.querySelector(".js-unmasked-value");
+  import { maskit } from "/public/js/mask.js"
+
+  masked_input.addEventListener("input", (e) => {
+    const mask = e.target.dataset.mask;
+    const unmask = e.target.dataset.unmask;
+    masked_value.value = maskit(e.target.value, unmask);
+    e.target.value = maskit(e.target.value, mask);
+  });
+</script>
+<script async src="https://telegram.org/js/telegram-widget.js?19"></script>
+<script type="module" src="/public/js/signup.js" defer async></script>

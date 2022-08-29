@@ -1,11 +1,11 @@
-import { request, option } from "./utils.js";
+import { request, option, message_sw } from "./utils.js";
 import { format_assertion_request, verify_assertion } from "./webauthn.js";
-import { disable_form, replace_text } from "./dom.js";
+import { add_listeners, disable_form, replace_text } from "./dom.js";
 import { toast } from "./toast.js";
 
 const assertion_request_form = document.querySelector(".js-assertion-request-form");
 
-assertion_request_form.addEventListener("submit", async (e) => {
+async function on_assertion_request(e) {
   e.preventDefault();
 
   const form = e.target;
@@ -42,5 +42,15 @@ assertion_request_form.addEventListener("submit", async (e) => {
   restore_text();
 
   const [_, verification_err] = await option(verify_assertion(assertion));
+
+  if (!verification_err) {
+    await message_sw({ type: "expire_partials" });
+    window.location.reload();
+  }
+
   toast(verification_err.message, "err");
+}
+
+add_listeners(assertion_request_form, {
+  submit: on_assertion_request,
 });

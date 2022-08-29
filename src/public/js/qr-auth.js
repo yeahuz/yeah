@@ -1,6 +1,6 @@
 import { toDataURL } from "/node_modules/qrcode/build/qrcode.esm.js";
-import { create_node, add_listeners } from "./dom.js";
-import { scan_profile_tmpl } from "./templates.js";
+import { add_listeners } from "./dom.js";
+import { qr_code_tmpl, scan_profile_tmpl } from "./templates.js";
 import { encoder } from "./byte-utils.js";
 import { option, request, wait, message_sw } from "./utils.js";
 import { toast } from "./toast.js";
@@ -39,12 +39,13 @@ function connect({ retries }) {
 }
 
 async function on_auth_init(url) {
+  qr_container.innerHTML = "";
   const qr_url = await toDataURL(url, {
     margin: 0,
     color: { dark: "#101828", light: "#fff" },
   });
-
-  qr_code_img.src = qr_url;
+  const qr_code = await qr_code_tmpl(qr_url);
+  qr_container.append(qr_code);
 }
 
 function on_auth_scan(data) {
@@ -74,9 +75,14 @@ function on_visibility_change() {
   if (is_tab_in_focus() && ws && ws.readState === 3) connect({ retries: MAX_RETRIES });
 }
 
+function on_auth_denied() {
+  if (ws) ws.close();
+}
+
 on("auth_init", on_auth_init);
 on("auth_scan", on_auth_scan);
 on("auth_confirmed", on_auth_confirm);
+on("auth_denied", on_auth_denied);
 
 add_listeners(document, {
   visibilitychange: on_visibility_change,
