@@ -10,6 +10,7 @@ export async function get_tab(req, reply) {
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
+  const { mobile } = req.query;
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
@@ -20,8 +21,17 @@ export async function get_tab(req, reply) {
     stream.push(top);
   }
 
-  const settings_top = await render_file("/settings/top.html", { tab, t });
+  const settings_top = await render_file("/settings/top.html", { t });
   stream.push(settings_top);
+
+  if (!mobile) {
+    const settings_tabs = await render_file("/partials/settings-tabs.html", {
+      tab,
+      t,
+      mobile,
+    });
+    stream.push(settings_tabs);
+  }
 
   const selected_tab = await render_file(`/settings/${tab}`, {
     user,
@@ -54,6 +64,7 @@ export async function get_details(req, reply) {
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
+  const { mobile } = req.query;
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
@@ -64,11 +75,17 @@ export async function get_details(req, reply) {
     stream.push(top);
   }
 
-  const settings_top = await render_file("/settings/top.html", {
-    tab: "details",
-    t,
-  });
+  const settings_top = await render_file("/settings/top.html", { t });
   stream.push(settings_top);
+
+  if (!mobile) {
+    const settings_tabs = await render_file("/partials/settings-tabs.html", {
+      tab: "details",
+      t,
+      mobile,
+    });
+    stream.push(settings_tabs);
+  }
 
   const details = await render_file("/settings/details.html", {
     user,
@@ -93,6 +110,7 @@ export async function get_privacy(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
   const current_sid = req.session.get("sid");
+  const { mobile } = req.query;
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
@@ -103,11 +121,17 @@ export async function get_privacy(req, reply) {
     stream.push(top);
   }
 
-  const settings_top = await render_file("/settings/top.html", {
-    tab: "privacy",
-    t,
-  });
+  const settings_top = await render_file("/settings/top.html", { t });
   stream.push(settings_top);
+
+  if (!mobile) {
+    const settings_tabs = await render_file("/partials/settings-tabs.html", {
+      tab: "privacy",
+      t,
+      mobile,
+    });
+    stream.push(settings_tabs);
+  }
 
   const sessions = await SessionService.get_many().for(user.id, current_sid);
   const credentials = await CredentialService.get_many().for(user.id);
@@ -137,6 +161,7 @@ export async function get_settings(req, reply) {
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
+  const { mobile } = req.query;
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
@@ -147,11 +172,16 @@ export async function get_settings(req, reply) {
     stream.push(top);
   }
 
-  const settings_top = await render_file("/settings/top.html", {
-    t,
-  });
-
+  const settings_top = await render_file("/settings/top.html", { t });
   stream.push(settings_top);
+
+  if (mobile) {
+    const settings_tabs = await render_file("/partials/settings-tabs.html", {
+      t,
+      mobile,
+    });
+    stream.push(settings_tabs);
+  }
 
   if (!is_navigation_preload) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });

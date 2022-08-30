@@ -1,30 +1,35 @@
-<ul class="flex flex-col space-y-2 max-w-[14rem] w-full">
+<ul class="flex flex-col space-y-2 lg:max-w-[14rem] w-full">
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'details' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/details"
+      href="/settings/details<%= it.mobile ? "?mobile=true" : ""%>"
       ><%= it.t("tabs.details", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'privacy' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/privacy"
+      href="/settings/privacy<%= it.mobile ? "?mobile=true" : ""%>"
       ><%= it.t("tabs.privacy", { ns: "settings" })%></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'billing' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/billing"
+      href="/settings/billing<%= it.mobile ? "?mobile=true" : ""%>"
       ><%= it.t("tabs.billing", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'notifications' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/notifications"
+      href="/settings/notifications<%= it.mobile ? "?mobile=true" : ""%>"
       ><%= it.t("tabs.notifications", { ns: "settings" })%></a
     >
   </li>
 </ul>
+<% if (it.mobile) { %>
+</div>
+</div>
+</main>
+<% } %>

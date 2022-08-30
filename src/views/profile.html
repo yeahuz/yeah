@@ -34,7 +34,8 @@
     <% if (it.profile.username) {%>
       <span class="text-gray-500 text-sm"><%= it.profile.username %></span>
     <% } %>
-    <a href="/settings/details" class="btn btn-secondary-color mt-6 w-full"><%= it.t("edit_profile", { ns: "profile" }) %></a>
+    <a href="/settings/details" class="btn btn-secondary-color mt-6 w-full !hidden lg:!flex"><%= it.t("edit_profile", { ns: "profile" }) %></a>
+    <a href="/settings?mobile=true" class="btn btn-secondary-color mt-6 w-full lg:!hidden"><%= it.t("edit_profile", { ns: "profile" }) %></a>
   </div>
   <div class="w-full">
     <ul class="flex gap-2">
