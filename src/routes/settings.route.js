@@ -4,6 +4,12 @@ import { authenticated_user } from "../utils/roles.js";
 export const settings = async (fastify) => {
   fastify.route({
     method: "GET",
+    url: "/",
+    handler: SettingsController.get_settings,
+    onRequest: fastify.can(authenticated_user),
+  });
+  fastify.route({
+    method: "GET",
     url: "/details",
     handler: SettingsController.get_details,
     onRequest: fastify.can(authenticated_user),

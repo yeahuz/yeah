@@ -3,7 +3,7 @@
     <a href="/" class="font-semibold text-lg p-3 -m-3 text-primary-600 hidden md:inline-block" noprefetch>YYYY</a>
     <%~ includeFile('./mobile-nav.html', it) %>
     <% if (it.user) { %>
-      <a href="/settings/details" class="bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
+      <a href="/me?ps=active" class="bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
         <% if (it.user.profile_photo_url) { %>
           <img
             referrerpolicy="no-referrer"

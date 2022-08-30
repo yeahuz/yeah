@@ -17,13 +17,13 @@ i18next
       "settings-privacy",
       "2fa",
       "new-posting",
-      "offline"
+      "offline",
+      "profile",
     ],
     fallbackLng: "ru",
     backend: {
       loadPath: process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.json",
-      addPath:
-        process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.missing.json",
+      addPath: process.cwd() + "/src/public/locales/{{lng}}/{{ns}}.missing.json",
     },
     saveMissing: true,
     cleanCode: true,

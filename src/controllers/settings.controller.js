@@ -130,3 +130,34 @@ export async function get_privacy(req, reply) {
   stream.push(null);
   return reply;
 }
+
+export async function get_settings(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+  const flash = reply.flash();
+  const stream = reply.init_stream();
+  const user = req.user;
+  const t = req.i18n.t;
+
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("tabs.privacy", { ns: "settings" }), lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  const settings_top = await render_file("/settings/top.html", {
+    t,
+  });
+
+  stream.push(settings_top);
+
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
