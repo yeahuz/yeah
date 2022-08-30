@@ -6,11 +6,10 @@
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
     <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
-      <div class="flex space-x-6 mb-6">
+      <div class="flex flex-col space-y-6 mb-6 sm:flex-row sm:space-y-0 sm:space-x-6">
         <label class="text-sm font-medium text-gray-700 w-full"> <%= it.t("personal.name.label", { ns: "settings-details" }) %>
-            <input type="text" class="form-control mt-2"
-            placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>"/>
-          </label>
+          <input type="text" class="form-control mt-2" placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
+        </label>
         <label class="text-sm font-medium text-gray-700 w-full">
           <%= it.t("personal.email.label", { ns: "settings-details" }) %>
           <input type="text" inputmode="email" class="form-control mt-2"
@@ -18,8 +17,8 @@
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
         </label>
       </div>
-      <div class="flex space-x-6 mb-6">
-        <label class="w-full mb-6">
+      <div class="flex space-x-6">
+        <label class="w-full">
           <span class="text-sm font-medium text-gray-700"><%= it.t("personal.phone.label", { ns: "settings-details" }) %></span>
           <div class="flex mt-2">
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">+998</span>
