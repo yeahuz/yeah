@@ -1,7 +1,10 @@
 <header class="bg-white border-b border-b-gray-200 py-4 px-4 xl:px-0 sticky top-0 z-50 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <a href="/" class="font-semibold text-lg p-3 -m-3 text-primary-600 hidden md:inline-block" noprefetch>YYYY</a>
-    <%~ includeFile('./mobile-nav.html', it) %>
+    <div class="flex items-center">
+      <a href="/" class="font-semibold text-lg p-3 -m-3 text-primary-600 hidden md:inline-block" noprefetch>YYYY</a>
+      <%~ includeFile('./mobile-nav.html', it) %>
+      <button class="btn btn-md btn-secondary-color ml-6 duration-200 scale-0 js-install-btn md:hidden"><%= it.t("install", { ns: "common" }) %></button>
+    </div>
     <% if (it.user) { %>
       <a href="/me?ps=active" class="bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
         <% if (it.user.profile_photo_url) { %>

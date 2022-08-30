@@ -2,7 +2,7 @@
   <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "login"}) %></h1>
   <%~ includeFile('../partials/flash.html', it) %>
   <div class="flex">
-    <form action="/auth/login" method="post" class="js-login-form max-w-sm w-full">
+    <form action="/auth/login" method="post" class="js-login-form w-full md:max-w-sm">
       <input type="hidden" name="nonce" value="<%= it.nonce %>" />
       <div class="flex flex-col relative">
         <% if (it.method === "email") { %>
@@ -18,7 +18,7 @@
             <div class="flex mt-2 relative">
               <input type="hidden" name="identifier" class="js-unmasked-value" />
               <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal">+998</span>
-              <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" name="masked_identifier"
+              <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" inputmode="numeric" name="masked_identifier"
                 placeholder="<%= it.t("phone.placeholder", { ns: "login" }) %>"
                 data-mask="## ### ## ##"
                 data-unmask="#########"
@@ -68,7 +68,7 @@
         >
       </p>
     </form>
-    <div class="ml-12 flex flex-col max-w-xs js-qr-container">
+    <div class="hidden md:block ml-12 flex flex-col max-w-xs js-qr-container">
     </div>
   </div>
 </div>
