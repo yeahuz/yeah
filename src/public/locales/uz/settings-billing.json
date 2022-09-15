@@ -1,0 +1,15 @@
+{
+  "title": "Hisob-kitob",
+  "description": "Karta va hisob-kitob sozlamalari",
+  "your_balance": "Balansingiz",
+  "top_up": "To'ldirish",
+  "cards": {
+    "title": "Kartalar"
+  },
+  "billing": {
+    "title": "To'lovlar tarixi",
+    "description": "Tavsif",
+    "date": "Sana",
+    "amount": "Miqdori"
+  }
+}

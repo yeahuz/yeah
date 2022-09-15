@@ -1,8 +1,10 @@
 import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
+import * as PostingService from "../services/posting.service.js";
+import path from "path";
 import { render_file } from "../utils/eta.js";
 import { parse_url, array_to_tree } from "../utils/index.js";
-import path from "path";
+import { create_relative_formatter } from "../utils/date.js";
 import { registerFont, createCanvas } from "canvas";
 
 registerFont(path.join(process.cwd(), "src/public/fonts/Inter-Regular.ttf"), { family: "Inter" });
@@ -11,10 +13,12 @@ export async function get_partial(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
   const { partial } = req.params;
+  const theme = req.session.get("theme");
   const html = await render_file(`/partials/${partial}`, {
     meta: { title: t("home", { ns: "common" }), lang: req.language, t },
     t,
     user,
+    theme,
   });
 
   reply.header("Content-Type", "text/html").send(html);
@@ -64,7 +68,17 @@ export async function get_index(req, reply) {
   }
 
   const categories = await CategoryService.get_many({ lang: req.language });
-  const home = await render_file("/home.html", { t, categories: array_to_tree(categories) });
+  const postings = await PostingService.get_many();
+  const posting = postings[0];
+  console.log(posting);
+
+  const home = await render_file("/home.html", {
+    t,
+    categories: array_to_tree(categories),
+    postings,
+    lang: req.language,
+    format_relative: create_relative_formatter(req.language),
+  });
   stream.push(home);
 
   if (!is_navigation_preload) {

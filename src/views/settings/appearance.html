@@ -1,0 +1,41 @@
+<section class="max-w-2xl w-full">
+  <header>
+    <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("title", { ns: "settings-appearance" }) %></h2>
+    <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("description", { ns: "settings-appearance" }) %></p>
+  </header>
+  <%~ includeFile('../partials/flash.html', it) %>
+  <form method="post" class="mt-6" action="/settings/appearance?return_to=/settings/appearance">
+    <div class="flex flex-col sm:flex-row gap-4">
+      <div class="">
+        <input type="radio" name="theme" value="system" id="theme-system" class="absolute w-0 opacity-0 peer js-theme-input" <%= it.theme === 'system' || !it.theme ? "checked" : "" %> />
+        <label for="theme-system" class="flex flex-col bg-gray-100 dark:bg-zinc-900 block border dark:border-zinc-800 shadow-xs peer-checked:bg-transparent peer-checked:border-primary-600 dark:peer-checked:bg-zinc-800 rounded-lg overflow-hidden">
+          <img src="/public/images/system-theme-preview.png" alt="" class="w-auto object-cover" />
+          <span class="text-gray-700 dark:text-gray-200 block p-2 bg-gray-100 dark:bg-zinc-900"><%= it.t("themes.system", { ns: "settings-appearance" }) %></span>
+        </label>
+      </div>
+      <div class="">
+        <input type="radio" name="theme" value="dark" id="theme-dark" class="absolute w-0 opacity-0 peer js-theme-input" <%= it.theme === 'dark' ? "checked" : "" %> />
+        <label for="theme-dark" class="flex flex-col bg-gray-100 dark:bg-zinc-900 block border dark:border-zinc-800 shadow-xs peer-checked:bg-transparent peer-checked:border-primary-600 dark:peer-checked:bg-zinc-800 rounded-lg overflow-hidden">
+          <img src="/public/images/dark-theme-preview.png" alt="" class="w-auto object-cover" />
+          <span class="text-gray-700 dark:text-gray-200 block p-2 bg-gray-100 dark:bg-zinc-900"><%= it.t("themes.dark", { ns: "settings-appearance" }) %></span>
+        </label>
+      </div>
+      <div class="">
+        <input type="radio" name="theme" value="light" id="theme-light" class="absolute w-0 opacity-0 peer js-theme-input" <%= it.theme === 'light' ? "checked" : "" %> />
+        <label for="theme-light" class="flex flex-col bg-gray-100 dark:bg-zinc-900 block border dark:border-zinc-800 shadow-xs peer-checked:bg-transparent peer-checked:border-primary-600 dark:peer-checked:bg-zinc-800 rounded-lg overflow-hidden">
+          <img src="/public/images/light-theme-preview.png" alt="" class="w-auto object-cover" />
+          <p class="text-gray-700 dark:text-gray-200 block p-2 bg-gray-100 dark:bg-zinc-900"><%= it.t("themes.light", { ns: "settings-appearance" }) %></p>
+        </label>
+      </div>
+    </div>
+    <noscript>
+      <button class="btn btn-md btn-primary mt-6"> <%= it.t("save_changes", { ns: "common" })%> </button>
+    </noscript>
+  </form>
+</section>
+</div>
+</main>
+<script>
+ document.title = "<%= it.t("tabs.appearance", { ns: "settings" })%> | Needs"
+</script>
+<script src="/public/js/appearance.js" type="module" async defer></script>

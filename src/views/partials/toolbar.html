@@ -1,10 +1,10 @@
-<ul class="flex justify-between bg-white fixed w-full z-10 bottom-0 shadow-[0px_-12px_16px_-4px_rgba(0,0,0,0.04)] md:hidden">
+<ul class="flex justify-between bg-white fixed w-full z-10 bottom-0 shadow-[0px_-12px_16px_-4px_rgba(0,0,0,0.04)] md:hidden dark:bg-zinc-800">
   <li>
     <a noprefetch href="/" class="p-6 sm:p-4 text-sm flex flex-col items-center toolbar-font-size js-toolbar-link">
       <svg class="w-5 h-5 <%= it.url?.pathname === "/" ? "text-primary-600" : "text-gray-400" %>" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M12.5227 1.33636C12.1804 1.24368 11.8196 1.24368 11.4773 1.33636C11.0799 1.44395 10.7454 1.7066 10.4784 1.91623L10.4037 1.97465L3.54373 7.31012C3.1671 7.6024 2.83529 7.85991 2.58803 8.19421C2.37104 8.48759 2.20939 8.8181 2.11103 9.1695C1.99895 9.56992 1.9994 9.98993 1.99992 10.4667L1.99999 17.8385C1.99997 18.3657 1.99995 18.8204 2.03056 19.195C2.06286 19.5904 2.13417 19.9836 2.32697 20.362C2.61459 20.9264 3.07353 21.3854 3.63802 21.673C4.0164 21.8658 4.40961 21.9371 4.80496 21.9694C5.17953 22 5.63428 22 6.16142 22H17.8386C18.3657 22 18.8204 22 19.195 21.9694C19.5904 21.9371 19.9836 21.8658 20.362 21.673C20.9264 21.3854 21.3854 20.9264 21.673 20.362C21.8658 19.9836 21.9371 19.5904 21.9694 19.195C22 18.8204 22 18.3657 22 17.8386L22.0001 10.4667C22.0006 9.98993 22.001 9.56992 21.8889 9.1695C21.7906 8.8181 21.6289 8.48759 21.4119 8.19421C21.1647 7.8599 20.8329 7.6024 20.4562 7.31011L13.5962 1.97465L13.5216 1.91623C13.2546 1.7066 12.92 1.44395 12.5227 1.33636ZM15 13C15 14.6569 13.6569 16 12 16C10.3431 16 9 14.6569 9 13C9 11.3431 10.3431 10 12 10C13.6569 10 15 11.3431 15 13Z" fill="currentColor"/>
       </svg>
-      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/" ? "text-primary-600" : "text-gray-700" %>">
+      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/" ? "text-primary-600" : "text-gray-700 dark:text-gray-400" %>">
         <%= it.t("home", { ns: "common" })%>
       </span>
     </a>
@@ -14,17 +14,17 @@
       <svg class="w-5 h-5 <%= it.url?.pathname === "/search" ? "text-primary-600" : "text-gray-400" %>" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C13.125 20 15.078 19.2635 16.6177 18.0319L20.2929 21.7071C20.6834 22.0976 21.3166 22.0976 21.7071 21.7071C22.0976 21.3166 22.0976 20.6834 21.7071 20.2929L18.0319 16.6177C19.2635 15.078 20 13.125 20 11C20 6.02944 15.9706 2 11 2ZM4 11C4 7.13401 7.13401 4 11 4C14.866 4 18 7.13401 18 11C18 14.866 14.866 18 11 18C7.13401 18 4 14.866 4 11Z" fill="currentColor"/>
       </svg>
-      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/search" ? "text-primary-600" : "text-gray-700" %>">
+      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/search" ? "text-primary-600" : "text-gray-700 dark:text-gray-400" %>">
         <%= it.t("search", { ns: "common" }) %>
       </span>
     </a>
   </li>
   <li>
-    <a noprefetch href="/postings/new" class="p-4 -mt-6 sm:mt-0 bg-white shadow-xl sm:shadow-none border border-gray-100 sm:border-none rounded-full sm:p-4 text-sm flex flex-col items-center toolbar-font-size">
+    <a noprefetch href="/postings/new" class="p-4 -mt-6 sm:mt-0 bg-white dark:bg-zinc-800 shadow-xl sm:shadow-none border border-gray-100 dark:border-zinc-700 sm:border-none rounded-full sm:p-4 text-sm flex flex-col items-center toolbar-font-size">
       <svg class="w-5 h-5 text-primary-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5V11H5C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13H11V19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19V13H19C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11H13V5Z" fill="currentColor"/>
       </svg>
-      <span class="mt-0.5 hidden sm:block <%= new RegExp('/postings/wizard/.*').test(it.url?.pathname) ? "text-primary-600" : "text-gray-700" %>">
+      <span class="mt-0.5 hidden sm:block <%= new RegExp('/postings/wizard/.*').test(it.url?.pathname) ? "text-primary-600" : "text-gray-700 dark:text-gray-400" %>">
         <%= it.t("post", { ns: "common" }) %>
       </span>
     </a>
@@ -35,7 +35,7 @@
         <path d="M2.13352 8.18144C1.83359 7.9672 1.68363 7.86008 1.55288 7.84617C1.35735 7.82537 1.16139 7.92622 1.06467 8.09741C0.999992 8.21189 0.999995 8.39416 1 8.75869V15.2413C0.999988 16.0463 0.999978 16.7106 1.04419 17.2518C1.09012 17.8139 1.18868 18.3306 1.43598 18.816C1.81947 19.5686 2.43139 20.1805 3.18404 20.564C3.66937 20.8113 4.18608 20.9099 4.74818 20.9558C5.28937 21 5.95372 21 6.75868 21H17.2413C18.0463 21 18.7106 21 19.2518 20.9558C19.8139 20.9099 20.3306 20.8113 20.816 20.564C21.5686 20.1805 22.1805 19.5686 22.564 18.816C22.8113 18.3306 22.9099 17.8139 22.9558 17.2518C23 16.7106 23 16.0463 23 15.2413V8.75868C23 8.58001 23 8.49068 22.9836 8.42829C22.9096 8.14627 22.603 7.98561 22.329 8.08531C22.2684 8.10737 22.1941 8.15886 22.0453 8.26184L14.3032 13.6219C13.7542 14.0032 13.2722 14.3379 12.7247 14.4706C12.2458 14.5867 11.7456 14.583 11.2685 14.4599C10.7229 14.3191 10.2459 13.9774 9.70265 13.5881L2.13352 8.18144Z" fill="currentColor"/>
         <path d="M22.1328 5.76872C22.3174 5.64092 22.4097 5.57702 22.4664 5.47424C22.5104 5.39443 22.5356 5.26804 22.5255 5.17745C22.5125 5.06079 22.463 4.98377 22.3638 4.82973C21.9839 4.23964 21.4373 3.75256 20.816 3.43598C20.3306 3.18868 19.8139 3.09012 19.2518 3.04419C18.7106 2.99998 18.0463 2.99999 17.2413 3H6.7587C5.95374 2.99999 5.28937 2.99998 4.74818 3.04419C4.18608 3.09012 3.66937 3.18868 3.18404 3.43598C2.62501 3.72082 2.1418 4.1326 1.77436 4.63335C1.65877 4.79089 1.60097 4.86966 1.58192 4.98921C1.56703 5.08269 1.58783 5.21257 1.63116 5.29674C1.68657 5.40436 1.78269 5.47302 1.97493 5.61033L10.75 11.8783C11.4773 12.3977 11.6316 12.4881 11.7681 12.5233C11.9272 12.5644 12.0939 12.5656 12.2535 12.5269C12.3906 12.4937 12.5463 12.4056 13.281 11.8969L22.1328 5.76872Z" fill="currentColor"/>
       </svg>
-      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/messages" ? "text-primary-600" : "text-gray-700" %>">
+      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/messages" ? "text-primary-600" : "text-gray-700 dark:text-gray-400" %>">
         Сообщения
       </span>
     </a>
@@ -45,7 +45,7 @@
       <svg class="w-5 h-5 <%= it.url?.pathname === "/liked" ? "text-primary-600" : "text-gray-400" %>" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M1 9.48C1 5.97111 3.65774 2 7.88889 2C9.71593 2 11.0661 2.7105 12 3.51082C12.9339 2.7105 14.2841 2 16.1111 2C20.3423 2 23 5.97111 23 9.48C23 11.3254 22.2854 13.0297 21.293 14.5091C20.2998 15.9897 18.9924 17.2999 17.7111 18.3798C16.4261 19.4629 15.1397 20.3372 14.1636 20.9411C13.6749 21.2435 13.2596 21.4807 12.9558 21.6447C12.8047 21.7263 12.6762 21.7924 12.5771 21.8404C12.5289 21.8637 12.4787 21.8871 12.4319 21.9068C12.4098 21.9161 12.3759 21.9299 12.3368 21.9431C12.3177 21.9496 12.2854 21.9601 12.2456 21.9699C12.2202 21.9762 12.1237 22 12 22C11.8763 22 11.7805 21.9763 11.7551 21.9701C11.7153 21.9602 11.6823 21.9496 11.6632 21.9431C11.6241 21.9299 11.5902 21.9161 11.5681 21.9068C11.5213 21.8871 11.4711 21.8637 11.4229 21.8404C11.3238 21.7924 11.1953 21.7263 11.0442 21.6447C10.7404 21.4807 10.3251 21.2435 9.83637 20.9411C8.86027 20.3372 7.57395 19.4629 6.28889 18.3798C5.00758 17.2999 3.70022 15.9897 2.70703 14.5091C1.71464 13.0297 1 11.3254 1 9.48Z" fill="currentColor"/>
       </svg>
-      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/liked" ? "text-primary-600" : "text-gray-700" %>">
+      <span class="mt-0.5 hidden sm:block <%= it.url?.pathname === "/liked" ? "text-primary-600" : "text-gray-700 dark:text-gray-400" %>">
         <%= it.t("liked", { ns: "common" }) %>
       </span>
     </a>
@@ -83,11 +83,11 @@
      svg.classList.add("text-primary-600");
      span.classList.add("text-primary-600");
      svg.classList.remove("text-gray-400");
-     span.classList.remove("text-gray-700");
+     span.classList.remove("text-gray-700", "dark:text-gray-400");
    } else {
-     span.classList.remove("text-primary-600");
+     span.classList.remove("!text-primary-600");
      svg.classList.add("text-gray-400");
-     span.classList.add("text-gray-700");
+     span.classList.add("text-gray-700", "dark:text-gray-400");
    }
  }
 </script>

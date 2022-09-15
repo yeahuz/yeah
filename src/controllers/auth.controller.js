@@ -3,6 +3,7 @@ import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
 import * as ConfirmationCodeService from "../services/confirmation-code.service.js";
+import * as EmailService from "../services/email.service.js";
 import config from "../config/index.js";
 import * as jwt from "../utils/jwt.js";
 import { redis_client } from "../services/redis.service.js";
@@ -13,6 +14,7 @@ import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
 import { randomBytes } from "crypto";
 import { encoder } from "../utils/byte-utils.js";
+import { events } from "../utils/events.js";
 
 export async function get_qr_login(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
@@ -227,9 +229,9 @@ export async function create_otp(req, reply) {
     req.flash("err", err.build(t));
     return reply.redirect(add_t(`/auth/signup?method=${method}`));
   }
-  console.log({ code });
 
-  // TODO: send otp to user;
+  console.log({ code });
+  events.emit("create_otp", { tmpl_name: "verify", method, vars: { code, t }, to: identifier });
 
   req.session.set("identifier", identifier);
   reply.redirect(`/auth/signup?step=2&method=${method}`);
@@ -384,13 +386,14 @@ export async function google_callback(req, reply) {
   const { state, code } = req.query;
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
-  const originalState = req.session.get("oauth_state");
+  const original_state = req.session.get("oauth_state");
   const decrypted = JSON.parse(decrypt(state));
   const t = req.i18n.t;
 
-  if (state !== originalState) {
+  if (state !== original_state) {
     req.flash("err", new AuthenticationError({ key: "!oauth_state_match" }).build(t));
-    return reply.redirect(decrypted.came_from);
+    reply.redirect(decrypted.came_from);
+    return reply;
   }
 
   const data = await google_oauth_client.getToken(code);

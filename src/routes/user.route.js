@@ -16,7 +16,7 @@ export const user = async (fastify) => {
           },
           phone: {
             type: "string",
-            pattern: "^\\+998[0-9]{9}",
+            pattern: "^(33|55|77|88|90|91|93|94|95|97|98|99)(\\d{7})$",
             errorMessage: { pattern: "!phone_number", type: "!phone_number" },
           },
         },

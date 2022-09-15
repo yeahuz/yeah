@@ -1,4 +1,4 @@
-import { BaseModel } from "./index.js";
+import { BaseModel, BillingAccount, UserPrefence, UserNotification } from "./index.js";
 import { hashids } from "../utils/hashid.js";
 import * as argon2 from "argon2";
 import { createHash } from "crypto";
@@ -10,6 +10,39 @@ export class User extends BaseModel {
 
   static get virtualAttributes() {
     return ["formatted_phone"];
+  }
+
+  static get relationMappings() {
+    return {
+      billing_account: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: BillingAccount,
+        join: {
+          from: "users.id",
+          to: "billing_accounts.user_id",
+        },
+      },
+      preferences: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: UserPrefence,
+        join: {
+          from: "users.id",
+          to: "user_preferences.user_id",
+        },
+      },
+      notifications: {
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: UserNotification,
+        join: {
+          from: "users.id",
+          through: {
+            from: "user_notifications.user_id",
+            to: "user_notifications.notification_id",
+          },
+          to: "notifications.id",
+        },
+      },
+    };
   }
 
   $formatJson(json) {

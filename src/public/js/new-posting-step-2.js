@@ -1,10 +1,11 @@
-import { add_listeners, remove_node } from "./dom.js";
-import { request, option } from "./utils.js";
+import { add_listeners, remove_node, create_node } from "./dom.js";
+import { request, option, upload_request, async_pool } from "./utils.js";
 import { close_icon } from "./icons.js";
 
 const photos_area = document.querySelector(".js-photos-area");
 const photos_input = document.querySelector(".js-photos-input");
 const preview_delete_forms = document.querySelectorAll(".js-preview-delete-form");
+const attachment_sync_form = document.querySelector(".js-attachment-sync-form");
 
 function on_drag_over(e) {
   e.stopPropagation();
@@ -27,24 +28,6 @@ function get_file_id(file) {
   return `${file.name}${file.lastModified}${file.size}`;
 }
 
-function remove_file(file_to_remove) {
-  const dt = new DataTransfer();
-  const files = photos_input.files;
-  const container = get_photos_preview(photos_area);
-
-  for (const file of files) {
-    if (get_file_id(file) !== get_file_id(file_to_remove)) {
-      dt.items.add(file);
-    }
-  }
-
-  if (!dt.files.length && !container.children.length) {
-    container.remove();
-  }
-
-  photos_input.files = dt.files;
-}
-
 async function generate_previews(files = []) {
   const { t } = await import("./i18n.js");
   const container = get_photos_preview(photos_area);
@@ -53,11 +36,16 @@ async function generate_previews(files = []) {
     const i_children = i + children_length;
     const file = files[i];
     const url = URL.createObjectURL(file);
-    const li = create_node("li", { class: "relative group rounded-lg" });
+    const li = create_node("li", {
+      class: "relative group rounded-lg",
+      "data-file_id": get_file_id(file),
+    });
+
     const img = create_node("img", {
       src: url,
-      class: "min-h-[128px] object-fit rounded-lg aspect-video",
+      class: "rounded-lg h-36 object-cover w-full",
     });
+
     const close_btn = create_node("button", {
       type: "button",
       tabindex: "0",
@@ -74,6 +62,7 @@ async function generate_previews(files = []) {
       class: "absolute opacity-0 w-0 -z-10 peer",
       ...(i_children === 0 && { checked: true }),
     });
+
     const main_label = create_node("label", {
       for: `cover-${i_children}`,
       "data-choose_cover_text": t("form.photos.choose_as_cover", { ns: "new-posting" }),
@@ -90,18 +79,6 @@ async function generate_previews(files = []) {
     close_btn.innerHTML = close_icon({ size: 20 });
 
     add_listeners(img, { load: () => URL.revokeObjectURL(url) });
-    add_listeners(close_btn, {
-      click: () => {
-        li.remove();
-        remove_file(file);
-        if (radio_input.checked) {
-          const first_radio_input = container.querySelector("input[type=radio]");
-          if (first_radio_input) {
-            first_radio_input.checked = true;
-          }
-        }
-      },
-    });
 
     li.append(img, close_btn, radio_input, main_label);
     container.append(li);
@@ -133,10 +110,100 @@ function on_drag_leave(e) {
   }
 }
 
+function on_progress(item) {
+  item.classList.add("pointer-events-none");
+  const span = create_node("span", {
+    class:
+      "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
+  });
+  span.textContent = "0";
+  item.append(span);
+  return (progress) => {
+    span.textContent = `${Math.floor(progress.percent)}%`;
+  };
+}
+
+function on_done(item) {
+  return () => {
+    item.classList.remove("pointer-events-none");
+    const upload_progress = item.querySelector(".upload-progress");
+    if (upload_progress) upload_progress.remove();
+  };
+}
+
+function upload_to(urls) {
+  const container = get_photos_preview(photos_area);
+  return async function upload(file) {
+    const item = container.querySelector(`[data-file_id="${get_file_id(file)}"]`);
+    const url = urls.shift();
+    const fd = new FormData();
+    fd.append("file", file);
+    console.log({ url });
+    const [result, err] = await option(
+      upload_request(url.uploadURL, {
+        data: fd,
+        on_progress: on_progress(item),
+        on_done: on_done(item),
+      })
+    );
+
+    if (result) {
+      const close_btn = item.querySelector("button");
+      add_listeners(close_btn, {
+        click: async () => {
+          const li = item;
+          const radio_input = li.querySelector("input[type=radio]");
+
+          const restore_li = remove_node(li);
+
+          const container = get_photos_preview(photos_area);
+          if (radio_input.checked) {
+            const first_radio_input = container.querySelector("input[type=radio]");
+            if (first_radio_input) first_radio_input.checked = true;
+          }
+
+          const [_, err] = await option(
+            request(new URL(window.location.href).pathname + "/attachments/" + result.result.id, {
+              method: "DELETE",
+            })
+          );
+
+          if (err) {
+            restore_li();
+            return;
+          }
+
+          if (!container.children.length) container.remove();
+        },
+      });
+    }
+    return result;
+  };
+}
+
+async function upload_files(files = []) {
+  const [urls, err] = await option(
+    request(`/cloudflare/images/direct_upload?count=${files.length}`)
+  );
+
+  for await (const result of async_pool(10, files, upload_to(urls))) {
+    const [_, err] = await option(
+      request(attachment_sync_form.action, {
+        method: "PATCH",
+        body: { attachments: [{ id: result.result.id, name: result.result.filename }] },
+      })
+    );
+    if (err) {
+      toast(err.message, "err");
+    }
+  }
+}
+
 async function on_photos_change(e) {
   const files = e.target.files;
   if (!files.length) return;
   await generate_previews(files);
+  await upload_files(files);
 }
 
 async function on_existing_delete(e) {

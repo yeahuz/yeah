@@ -7,7 +7,6 @@ import { toast } from "./toast.js";
 
 const MAX_RETRIES = 5;
 const qr_container = document.querySelector(".js-qr-container");
-const qr_code_img = document.querySelector(".js-qr-code");
 
 const listeners = {};
 
@@ -54,7 +53,7 @@ function on_auth_scan(data) {
 }
 
 async function on_auth_confirm(data) {
-  const [result, err] = await option(
+  const [_, err] = await option(
     request("/auth/qr", { method: "POST", body: { token: data.token }, state: { replace: true } })
   );
 

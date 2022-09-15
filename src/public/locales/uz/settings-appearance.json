@@ -1,0 +1,9 @@
+{
+  "title": "Ko'rinish sozlamalari",
+  "description": "Veb-sayt sizga qanday ko'rinishini tanlang",
+  "themes": {
+    "dark": "Tun",
+    "light": "Kun",
+    "system": "Tizim"
+  }
+}

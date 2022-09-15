@@ -6,22 +6,20 @@ export const can = fp(function can(fastify, opts = {}, done) {
   done();
 });
 
-async function asyncSome(arr, ...params) {
+async function async_some(arr, ...params) {
   for (const item of arr) {
     if (await item(...params)) return true;
     return false;
   }
 }
 
-function can_impl(...validationFns) {
+function can_impl(...validation_fns) {
   return async (req, reply) => {
     const user = req.user;
-    const can_access = await asyncSome(validationFns, user, req.params);
+    const can_access = await async_some(validation_fns, user, req.params);
     if (!can_access) {
       if (req.xhr) {
-        const err = new AuthorizationError();
-        reply.code(err.status_code).send(err);
-        return reply;
+        throw new AuthorizationError();
       }
       const referer = req.headers["referer"];
       reply.code(404).render("404.html", { referer });

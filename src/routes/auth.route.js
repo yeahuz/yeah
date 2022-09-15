@@ -1,6 +1,6 @@
 import * as AuthController from "../controllers/auth.controller.js";
 import { auth_schema } from "../schemas/auth.schema.js";
-import { authenticated_user, guest_user } from "../utils/roles.js";
+import { authenticated_user, guest_user, own_credential, own_session } from "../utils/roles.js";
 
 export const auth = async (fastify) => {
   fastify.route({
@@ -115,13 +115,13 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/credentials/:id",
     handler: AuthController.update_credential,
-    onRequest: fastify.can(authenticated_user),
+    onRequest: fastify.can(authenticated_user, own_credential),
   });
   fastify.route({
     method: "DELETE",
     url: "/credentials/:id",
     handler: AuthController.delete_credential,
-    onRequest: fastify.can(authenticated_user),
+    onRequest: fastify.can(authenticated_user, own_credential),
     constraints: { accept: "application/json" },
   });
   fastify.route({
@@ -140,6 +140,6 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/sessions/:id",
     handler: AuthController.update_session,
-    onRequest: fastify.can(authenticated_user),
+    onRequest: fastify.can(authenticated_user, own_session),
   });
 };

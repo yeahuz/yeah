@@ -1,19 +1,70 @@
-<form method="post" class="max-w-4xl space-y-5 js-posting-step-3 mx-auto shadow-lg p-6 rounded-lg">
-  <h1 class="text-gray-900 text-xl font-semibold"><%= it.posting_data?.title %></h1>
+<form method="post" class="max-w-4xl js-posting-step-3 mx-auto shadow-lg rounded-lg">
+  <h1 class="text-gray-900 text-xl font-semibold dark:text-white"><%= it.posting_data?.title %></h1>
+  <% if (it.posting_data?.attachments?.length) { %>
+    <div class="js-carousel my-5">
+      <div class="relative">
+        <div class="justify-between items-center absolute top-1/2 -translate-y-1/2 w-full hidden lg:flex">
+          <button class="flex items-center justify-center rounded-full p-2 text-zinc-400 -ml-14 hover:bg-zinc-800 duration-200 js-carousel-prev" type="button">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="flex items-center justify-center rounded-full p-2 text-zinc-400 -mr-14 hover:bg-zinc-800 duration-200 js-carousel-next" type="button">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="js-carousel-scroller hide-scroll" style="overscroll-behavior-x: contain; scroll-snap-type: x mandatory; display:grid; grid-column: 1/-1; grid-row: 1; grid-auto-columns: 100%; grid-auto-flow: column; align-items:center; overflow-x: auto;">
+          <% it.posting_data?.attachments?.forEach(function (photo, i) { %>
+            <div class="js-carousel-snap" style="scroll-snap-align: center;">
+              <img
+                <%= i > 0  ? 'loading="lazy"' : "" %>
+                width="896"
+                height="896"
+                srcset="<%= it.generate_srcset(photo.url, "fit=scale-down") %>"
+                sizes="(min-width: 896px) 896px, 100vw"
+                src="<%= photo.url %>/thumbnail"
+                class="animate-visibility h-72 md:h-[600px] object-cover rounded-lg overflow-hidden" alt="<%= photo.name %>"
+                crossorigin />
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="flex space-x-4 mt-4 js-carousel-pagination">
+        <% it.posting_data?.attachments?.forEach(function (photo, i) { %>
+          <button type="button">
+            <img
+              src="<%= photo.url %>/width=160"
+              srcset="<%= it.generate_srcset(photo.url, "fit=scale-down", 2) %>"
+              sizes="(min-width: 640px) 80px, 64px"
+              loading="lazy"
+              class="w-16 sm:w-20 object-cover aspect-square rounded-lg pointer-events-none"
+              crossorigin />
+          </button>
+        <% })%>
+      </div>
+    </div>
+  <% } %>
   <ul class="flex flex-col w-full space-y-5">
-    <li class="flex w-full text-left">
-      <span class="basis-1/3 text-gray-500"><%= it.t("form.location.label", { ns: "new-posting" }) %></span>
-      <a href="geo:<%= it.posting_data?.lat%>,<%= it.posting_data?.lon %>" class="text-primary-600 cursor-pointer underline basis-2/3">
+    <li class="flex w-full text-left flex-col bg-zinc-800 rounded-lg md:bg-transparent md:flex-row">
+      <span class="basis-1/3 text-gray-500 dark:text-gray-300 hidden md:inline"><%= it.t("form.location.label", { ns: "new-posting" }) %></span>
+      <a href="geo:<%= it.posting_data?.lat%>,<%= it.posting_data?.lon %>" class="p-3 md:p-0 text-primary-600 cursor-pointer underline basis-2/3 dark:text-primary-400">
         <%= it.posting_data?.formatted_address %>
       </a>
     </li>
-    <li class="flex w-full text-left">
-      <span class="basis-1/3 text-gray-500"> <%= it.t("form.description.label", { ns: "new-posting" }) %> </span>
-      <p class="text-gray-900 basis-2/3 whitespace-pre-wrap"><%= it.posting_data?.description %></p>
+    <li class="flex w-full text-left flex-col md:flex-row">
+      <span class="basis-1/3 text-gray-500 dark:text-gray-300 hidden md:inline"> <%= it.t("form.description.label", { ns: "new-posting" }) %> </span>
+      <p class="text-gray-900 basis-2/3 whitespace-pre-wrap dark:text-white"><%= it.posting_data?.description %></p>
     </li>
+    <% it.paramaters?.forEach(function (param) { %>
+      <li class="flex w-full text-left flex-col md:flex-row">
+        <span class="basis-1/3 text-gray-500 dark:text-gray-300 hidden md:inline"> <%= param.label %> </span>
+        <p class="text-gray-900 basis-2/3 whitespace-pre-wrap dark:text-white"><%= param.values.map((value) => value.label).join(', ') %></p>
+      </li>
+    <% }) %>
   </ul>
-  <a href="yeah://postings/wizard/rldfabi5jjg/3">Link here</a>
-  <button class="btn btn-lg btn-primary mt-6">Создать</button>
+  <button class="btn btn-lg btn-primary mt-8"><%= it.t("create", { ns: "common" })%></button>
 </form>
 </main>
 <script type="module">
@@ -21,5 +72,6 @@
  adjust_geo_links();
 </script>
 <script>
- document.title = "<%= it.t("title", { ns: "new-posting" })%> | YeaH"
+ document.title = "<%= it.t("title", { ns: "new-posting" })%> | Needs"
 </script>
+<script src="/public/js/carousel.js" type="module" async defer></script>

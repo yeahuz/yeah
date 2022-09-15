@@ -11,15 +11,21 @@ export function up(knex) {
       table.string("email").unique();
       table.string("password").notNullable();
       table.string("hash_id").index();
+      table.boolean("verified").defaultTo(false);
       table.timestamp("last_activity_date").defaultTo(knex.fn.now());
       table.timestamps(false, true);
     })
-    .createTable("otp_secrets", (table) => {
+    .createTable("user_preferences", (table) => {
       table.increments("id");
-      table.enu("method", ["email", "phone"]);
-      table.string("identifier");
-      table.string("secret");
-      table.unique(["method", "identifier"]);
+      table.string("name");
+      table.string("value");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
     })
     .createTable("confirmation_codes", (table) => {
       table.increments("id");
@@ -55,15 +61,96 @@ export function up(knex) {
       table.unique(["provider_account_id", "user_id"]);
       table.timestamps(false, true);
     })
+    .createTable("products", (table) => {
+      table.increments("id");
+      table.string("title");
+      table.string("description");
+      table.integer("unit_price");
+      table.timestamps(false, true);
+    })
+    .createTable("billing_accounts", (table) => {
+      table.increments("id");
+      table.integer("balance").defaultTo(0);
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("payments", (table) => {
+      table.increments("id");
+      table.integer("amount");
+      table.enu("type", ["DEPOSIT", "WITHDRAWAL"]).index();
+      table
+        .integer("billing_account_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("billing_accounts")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("invoices", (table) => {
+      table.increments("id");
+      table
+        .integer("payment_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("payments")
+        .onDelete("CASCADE");
+      table
+        .integer("billing_account_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("billing_accounts")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("invoice_lines", (table) => {
+      table.increments("id");
+      table.smallint("quantity").defaultTo(1);
+      table
+        .integer("product_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("products")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("notification_types", (table) => {
+      table.string("name").primary();
+      table.string("description");
+      table.timestamps(false, true);
+    })
     .createTable("notifications", (table) => {
       table.increments("id").primary();
-      table.integer("entity_id").index();
-      table.integer("entity_type_id");
-      table.integer("from").index().notNullable().references("id").inTable("users");
-      table.integer("to").index().notNullable().references("id").inTable("users");
+      table.integer("sender_id").index().notNullable().references("id").inTable("users");
+      table.string("type").index().notNullable().references("name").inTable("notification_types");
       table.string("hash_id");
-      table.boolean("status");
       table.timestamps(false, true);
+    })
+    .createTable("user_notifications", (table) => {
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
+        .integer("notification_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("notifications")
+        .onDelete("CASCADE");
+      table.boolean("read").defaultTo(false);
     })
     .createTable("user_cards", (table) => {
       table.increments("id");
@@ -178,6 +265,7 @@ export function up(knex) {
       table.increments("id");
       table.string("title");
       table.text("description");
+      table.string("cover_url", 512);
       table
         .integer("status_id")
         .index()
@@ -290,6 +378,51 @@ export function up(knex) {
         .inTable("postings")
         .onDelete("CASCADE");
       table.unique(["user_id", "posting_id"]);
+    })
+    .createTable("currencies", (table) => {
+      table.increments("id");
+      table.string("code").unique();
+      table.timestamps(false, true);
+    })
+    .createTable("exchange_rates", (table) => {
+      table.increments("id");
+      table
+        .string("from_currency")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      table
+        .string("to_currency")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      table.decimal("rate", 19, 9).defaultTo(1.0);
+      table.unique(["from_currency", "to_currency"]);
+      table.timestamps(false, true);
+    })
+    .createTable("posting_prices", (table) => {
+      table.increments("id");
+      table
+        .string("currency_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table.integer("price");
+      table.unique(["posting_id", "currency_code"]);
+      table.timestamps(false, true);
     })
     .createTable("posting_categories", (table) => {
       table
@@ -432,6 +565,14 @@ export function up(knex) {
       table.enu("placement", ["SEARCH", "FRONT"]).defaultTo("SEARCH");
       table.timestamps(false, true);
     })
+    .createTable("attachments_v2", (table) => {
+      table.increments("id");
+      table.string("resource_id").index();
+      table.string("name");
+      table.string("caption");
+      table.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
+      table.timestamps(false, true);
+    })
     .createTable("attachments", (table) => {
       table.uuid("id").defaultTo(knex.raw("gen_random_uuid()")).primary();
       table.string("url", 512);
@@ -451,11 +592,11 @@ export function up(knex) {
         .inTable("postings")
         .onDelete("CASCADE");
       table
-        .uuid("attachment_id")
+        .integer("attachment_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("attachments")
+        .inTable("attachments_v2")
         .onDelete("CASCADE");
     })
     .createTable("entity_attachments", (table) => {
@@ -597,6 +738,8 @@ export function up(knex) {
         .references("code")
         .inTable("countries")
         .onDelete("CASCADE");
+      table.integer("soato");
+      table.smallint("code");
       table.point("coords");
       table.timestamps(false, true);
     })
@@ -628,6 +771,8 @@ export function up(knex) {
         .references("id")
         .inTable("regions")
         .onDelete("CASCADE");
+      table.integer("soato");
+      table.smallint("code");
       table.point("coords");
       table.timestamps(false, true);
     })
@@ -649,6 +794,54 @@ export function up(knex) {
       table.string("short_name");
       table.string("long_name");
       table.timestamps(false, true);
+    })
+    .createTable("posting_location", (table) => {
+      table.increments("id");
+      table.string("formatted_address");
+      table.point("coords");
+      table
+        .integer("posting_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("postings")
+        .onDelete("CASCADE");
+      table
+        .integer("district_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("districts")
+        .onDelete("CASCADE");
+      table
+        .integer("region_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("regions")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("notification_type_translations", (table) => {
+      table.increments("id");
+      table
+        .string("notification_type_name")
+        .index()
+        .notNullable()
+        .references("name")
+        .inTable("notification_types")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("title");
+      table.text("content");
+      table.unique(["notification_type_name", "language_code"]);
+      table.timestamps(false, true);
     });
 }
 
@@ -667,13 +860,26 @@ export function down(knex) {
     .dropTable("role_translations")
     .dropTable("roles")
     .dropTable("posting_bookmarks")
+    .dropTable("posting_location")
     .dropTable("conversation_members")
     .dropTable("messages")
     .dropTable("conversations")
+    .dropTable("user_notifications")
     .dropTable("notifications")
+    .dropTable("notification_type_translations")
+    .dropTable("notification_types")
     .dropTable("accounts")
+    .dropTable("invoice_lines")
+    .dropTable("invoices")
+    .dropTable("products")
+    .dropTable("payments")
+    .dropTable("billing_accounts")
+    .dropTable("user_preferences")
     .dropTable("users")
     .dropTable("auth_providers")
+    .dropTable("posting_prices")
+    .dropTable("exchange_rates")
+    .dropTable("currencies")
     .dropTable("posting_attachments")
     .dropTable("posting_categories")
     .dropTable("posting_attributes")
@@ -696,6 +902,6 @@ export function down(knex) {
     .dropTable("categories")
     .dropTable("entity_attachments")
     .dropTable("attachments")
-    .dropTable("otp_secrets")
+    .dropTable("attachments_v2")
     .dropTable("confirmation_codes");
 }

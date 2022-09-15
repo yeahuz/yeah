@@ -1,7 +1,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js");
 
 workbox.setConfig({
-  debug: false,
+  debug: true,
 });
 
 const { cacheNames } = workbox.core;
@@ -38,7 +38,7 @@ const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   google_fonts_webfonts: "google-fonts-webfonts",
 });
 
-self.__WB_DISABLE_DEV_LOGS = true;
+self.__WB_DISABLE_DEV_LOGS = false;
 
 const image_expiration_plugin = new ExpirationPlugin({
   maxEntries: 60,
@@ -109,16 +109,7 @@ const swr_content_strategy = new StaleWhileRevalidate({
   cacheName: CACHE_NAMES.swr_content,
   plugins: [
     {
-      requestWillFetch: ({ request }) => {
-        const headers = new Headers();
-        headers.append("X-Content-Mode", "partial");
-        return new Request(request.url, {
-          method: "GET",
-          headers,
-          redirect: "follow",
-        });
-      },
-      handlerDidError: ({ request }) => {
+      handlerDidError: () => {
         return matchPrecache("/partials/offline.html");
       },
     },
@@ -138,36 +129,74 @@ precacheAndRoute([
 ]);
 
 const swr_content_handler = compose_strategies([
-  ({ event }) =>
-    partial_strategy.handle({
+  async ({ event }) => {
+    const url = new URL(event.request.url);
+    if (url.searchParams.get("t")) {
+      await partial_expiration_plugin.deleteCacheAndMetadata();
+    }
+    return partial_strategy.handle({
       event,
       request: new Request("/partials/top.html"),
-    }),
-  ({ event }) => swr_content_strategy.handle(event),
-  ({ event }) =>
-    partial_strategy.handle({
+    });
+  },
+  async ({ event }) => {
+    const url = new URL(event.request.url);
+    if (url.searchParams.get("t")) {
+      const cache = await caches.open(CACHE_NAMES.swr_content);
+      await cache.delete(url.pathname);
+    }
+    return swr_content_strategy.handle(event);
+  },
+  async ({ event }) => {
+    const url = new URL(event.request.url);
+    if (url.searchParams.get("t")) {
+      await partial_expiration_plugin.deleteCacheAndMetadata();
+    }
+    return partial_strategy.handle({
       event,
       request: new Request("/partials/bottom.html"),
-    }),
+    });
+  },
 ]);
 
 const nf_content_handler = compose_strategies([
-  ({ event }) =>
-    partial_strategy.handle({
+  async ({ event }) => {
+    const url = new URL(event.request.url);
+    if (url.searchParams.get("t")) {
+      await partial_expiration_plugin.deleteCacheAndMetadata();
+    }
+    return partial_strategy.handle({
       event,
       request: new Request("/partials/top.html"),
-    }),
-  ({ event }) => new NetworkFirst({ cacheName: CACHE_NAMES.nf_content }).handle(event),
+    });
+  },
   ({ event }) =>
-    partial_strategy.handle({
+    new NetworkFirst({
+      cacheName: CACHE_NAMES.nf_content,
+      plugins: [
+        {
+          handlerDidError: () => {
+            return matchPrecache("/partials/offline.html");
+          },
+        },
+      ],
+    }).handle(event),
+  async ({ event }) => {
+    const url = new URL(event.request.url);
+    if (url.searchParams.get("t")) {
+      await partial_expiration_plugin.deleteCacheAndMetadata();
+    }
+    return partial_strategy.handle({
       event,
       request: new Request("/partials/bottom.html"),
-    }),
+    });
+  },
 ]);
 
 const swr_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
-  if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
+  else if (url.pathname === "/auth/google") return;
+  else if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
 }, swr_content_handler);
 
@@ -175,12 +204,6 @@ const nf_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   return request.mode === "navigate" && POSTING_WIZARD_REGEX.test(url.pathname);
 }, nf_content_handler);
-
-setCatchHandler(async ({ request }) => {
-  if (request.destination === "document") {
-    return matchPrecache("/partials/offline.html");
-  }
-});
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -192,6 +215,9 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+enable_navigation_preload();
+google_fonts_cache();
+cleanup_outdated_caches();
 registerRoute(swr_content_route);
 registerRoute(nf_content_route);
 registerRoute(image_route);
@@ -200,16 +226,18 @@ warm_strategy_cache({
   urls: ["/partials/top.html", "/partials/bottom.html"],
   strategy: partial_strategy,
 });
-enable_navigation_preload();
-google_fonts_cache();
-cleanup_outdated_caches();
+
+setCatchHandler(({ request }) => {
+  if (request.destination === "document") {
+    return matchPrecache("/partials/offline.html");
+  }
+});
 
 self.addEventListener("message", async (event) => {
   const port = event.ports[0];
   const { type, payload } = event.data;
   switch (type) {
     case "expire_partials":
-      console.log("Here");
       await partial_expiration_plugin.deleteCacheAndMetadata();
       port.postMessage({ type, acknowledged: true });
       break;

@@ -47,7 +47,11 @@
     },
     "phone": {
       "label": "Номер телефона",
-      "placeholder": "+998939152000"
+      "placeholder": "93 915 20 00"
+    },
+    "price": {
+      "label": "Цена",
+      "placeholder": 100
     }
   }
 }

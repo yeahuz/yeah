@@ -4,7 +4,8 @@
   "tabs": {
     "details": "Mening ma'lumotlarim",
     "privacy": "Maxfiylik",
-    "billing": "Hisob-kitob",
-    "notifications": "Xabarnomalar"
+    "billing": "To'lovlar",
+    "notifications": "Xabarnomalar",
+    "appearance": "Tashqi ko'rinish"
   }
 }

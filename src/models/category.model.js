@@ -12,17 +12,17 @@ export class Category extends BaseModel {
         modelClass: Category,
         join: {
           from: "categories.id",
-          to: "categories.parent_id"
-        }
+          to: "categories.parent_id",
+        },
       },
       translation: {
         relation: BaseModel.HasOneRelation,
         modelClass: CategoryTranslation,
         join: {
           from: "categories.id",
-          to: "category_translations.category_id"
+          to: "category_translations.category_id",
         },
-      }
-    }
+      },
+    };
   }
 }

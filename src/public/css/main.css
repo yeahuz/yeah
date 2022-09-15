@@ -2,10 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+html {
   /* Base */
   --white: 255, 255, 255;
   --black: 0, 0, 0;
+
+  /* Zinc */
+  --zinc-50: 250, 250, 250;
+  --zinc-100: 244, 244, 245;
+  --zinc-200: 228, 228, 231;
+  --zinc-300: 212, 212, 216;
+  --zinc-400: 161, 161, 170;
+  --zinc-500: 113, 113, 122;
+  --zinc-600: 82, 82, 91;
+  --zinc-700: 63, 63, 70;
+  --zinc-800: 39, 39, 42;
+  --zinc-900: 24, 24, 27;
 
   /* Gray */
   --gray-25: 252, 252, 253;
@@ -46,11 +58,11 @@
   --error-800: 144, 32, 24;
 
   /* Green */
-  --success-700: 2, 122, 72;
   --success-25: 246, 254, 249;
   --success-50: 236, 253, 243;
   --success-300: 108, 233, 166;
   --success-600: 3, 152, 85;
+  --success-700: 2, 122, 72;
 
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(var(--gray-900), 0.05);
@@ -64,6 +76,215 @@
     0 8px 8px -4px rgba(var(--gray-900), 0.03);
   --shadow-2xl: 0 24px 48px -12px rgba(var(--gray-900), 0.18);
   --shadow-3xl: 0 32px 64px -12px rgba(var(--gray-900), 0.14);
+
+
+  /* Default button */
+  --color-btn-bg: var(--white);
+  --color-btn-text: var(--gray-500);
+  --color-btn-border: transparent;
+  --color-btn-hover: var(--gray-50);
+  --color-btn-text-hover: var(--gray-600);
+  --color-btn-ring: transparent;
+  --color-btn-ripple-bg: var(--gray-400);
+  --shadow-btn: var(--shadow-xs);
+
+  /* Primary button */
+  --color-primary-btn-bg: var(--primary-600);
+  --color-primary-btn-text: var(--white);
+  --color-primary-btn-hover: var(--primary-700);
+  --color-primary-btn-text-hover: var(--white);
+  --color-primary-btn-ripple-bg: var(--white);
+  --color-primary-btn-ring: var(--primary-100);
+  --shadow-primary-btn: var(--shadow-xs);
+
+  /* Secondary button */
+  --color-secondary-btn-bg: var(--white);
+  --color-secondary-btn-text: var(--gray-700);
+  --color-secondary-btn-border: var(--gray-300);
+  --color-secondary-btn-text-hover: var(--gray-800);
+  --color-secondary-btn-ring: var(--gray-100);
+  --color-secondary-btn-ripple-bg: var(--gray-400);
+  --shadow-secondary-btn: var(--shadow-xs);
+
+  /* Tertiary button color */
+  --color-tertiary-cr-btn-bg: transparent;
+  --color-tertiary-cr-btn-text: var(--gray-500);
+  --color-tertiary-cr-btn-text-hover: var(--primary-700);
+  --color-tertiary-cr-btn-hover: var(--primary-50);
+  --color-tertiary-cr-btn-ring: var(--primary-100);
+  --color-tertiary-cr-btn-ripple-bg: var(--primary-400);
+  --shadow-tertiary-cr-btn: transparent;
+
+  /* Tertiary button danger */
+  --color-tertiary-danger-btn-bg: transparent;
+  --color-tertiary-danger-btn-text: var(--error-700);
+  --color-tertiary-danger-btn-hover: var(--error-50);
+  --color-tertiary-danger-btn-text-hover: var(--error-800);
+  --color-tertiary-danger-btn-ring: var(--error-50);
+  --color-tertiary-danger-btn-ripple-bg: var(--error-400);
+  --shadow-tertiary-danger-btn: transparent;
+
+  /* Secondary button color */
+  --color-secondary-cr-btn-bg: var(--primary-50);
+  --color-secondary-cr-btn-text: var(--primary-700);
+  --color-secondary-cr-btn-border: transparent;
+  --color-secondary-cr-btn-hover: var(--primary-100);
+  --color-secondary-cr-btn-text-hover: var(--primary-700);
+  --color-secondary-cr-btn-ring: var(--primary-100);
+  --color-secondary-cr-btn-ripple-bg: var(--primary-400);
+  --shadow-secondary-cr-btn: var(shadow-xs);
+
+  /* Form control */
+  --color-form-control-placeholder: var(--gray-500);
+  --color-form-control-text: var(--gray-900);
+  --color-form-control-border: var(--gray-300);
+  --color-form-control-bg: var(--white);
+  --color-form-control-ring: var(--primary-100);
+  --color-form-control-bg-disabled: var(--gray-50);
+  --color-form-control-text-disabled: var(--gray-500);
+  --color-form-control-border-focused: var(--primary-300);
+  --shadow-form-control-focused: 0 0 0 4px rgb(var(--color-form-control-ring));
+  --shadow-form-control: var(--shadow-xs);
+
+  /* Badge */
+  --color-badge-text: var(--gray-700);
+  --color-badge-bg: var(--gray-100);
+
+  /* Badge success */
+  --color-success-badge-bg: var(--success-50);
+  --color-success-badge-text: var(--success-700);
+}
+
+
+html.light {
+  color-scheme: light;
+
+ /* Default button */
+  --color-btn-bg: var(--white);
+  --color-btn-text: var(--gray-500);
+  --color-btn-border: transparent;
+  --color-btn-hover: var(--gray-50);
+  --color-btn-text-hover: var(--gray-600);
+  --color-btn-ring: transparent;
+  --color-btn-ripple-bg: var(--gray-400);
+  --shadow-btn: var(--shadow-xs);
+
+  /* Primary button */
+  --color-primary-btn-bg: var(--primary-600);
+  --color-primary-btn-text: var(--white);
+  --color-primary-btn-hover: var(--primary-700);
+  --color-primary-btn-text-hover: var(--white);
+  --color-primary-btn-ripple-bg: var(--white);
+  --color-primary-btn-ring: var(--primary-100);
+  --shadow-primary-btn: var(--shadow-xs);
+
+  /* Secondary button */
+  --color-secondary-btn-bg: var(--white);
+  --color-secondary-btn-text: var(--gray-700);
+  --color-secondary-btn-border: var(--gray-300);
+  --color-secondary-btn-text-hover: var(--gray-800);
+  --color-secondary-btn-ring: var(--gray-100);
+  --color-secondary-btn-ripple-bg: var(--gray-400);
+  --shadow-secondary-btn: var(--shadow-xs);
+
+  /* Tertiary button color */
+  --color-tertiary-cr-btn-bg: transparent;
+  --color-tertiary-cr-btn-text: var(--gray-500);
+  --color-tertiary-cr-btn-text-hover: var(--primary-700);
+  --color-tertiary-cr-btn-hover: var(--primary-50);
+  --color-tertiary-cr-btn-ring: var(--primary-100);
+  --color-tertiary-cr-btn-ripple-bg: var(--primary-400);
+  --shadow-tertiary-cr-btn: transparent;
+
+  /* Tertiary button danger */
+  --color-tertiary-danger-btn-bg: transparent;
+  --color-tertiary-danger-btn-text: var(--error-700);
+  --color-tertiary-danger-btn-hover: var(--error-50);
+  --color-tertiary-danger-btn-text-hover: var(--error-800);
+  --color-tertiary-danger-btn-ring: var(--error-50);
+  --color-tertiary-danger-btn-ripple-bg: var(--error-400);
+  --shadow-tertiary-danger-btn: transparent;
+
+  /* Secondary button color */
+  --color-secondary-cr-btn-bg: var(--primary-50);
+  --color-secondary-cr-btn-text: var(--primary-700);
+  --color-secondary-cr-btn-border: transparent;
+  --color-secondary-cr-btn-hover: var(--primary-100);
+  --color-secondary-cr-btn-text-hover: var(--primary-700);
+  --color-secondary-cr-btn-ring: var(--primary-100);
+  --color-secondary-cr-btn-ripple-bg: var(--primary-400);
+  --shadow-secondary-cr-btn: var(shadow-xs);
+
+  /* Form control */
+  --color-form-control-placeholder: var(--gray-500);
+  --color-form-control-text: var(--gray-900);
+  --color-form-control-border: var(--gray-300);
+  --color-form-control-bg: var(--white);
+  --color-form-control-ring: var(--primary-100);
+  --color-form-control-bg-disabled: var(--gray-50);
+  --color-form-control-text-disabled: var(--gray-500);
+  --color-form-control-border-focused: var(--primary-300);
+  --shadow-form-control-focused: 0 0 0 4px rgb(var(--color-form-control-ring));
+  --shadow-form-control: var(--shadow-xs);
+
+  /* Badge */
+  --color-badge-text: var(--gray-700);
+  --color-badge-bg: var(--gray-100);
+
+  /* Badge success */
+  --color-success-badge-bg: var(--success-50);
+  --color-success-badge-text: var(--success-700);
+}
+
+html.dark {
+  color-scheme: dark;
+
+  /* Primary button */
+  --color-primary-btn-ring: var(--primary-400);
+
+  /* Secondary button */
+  --color-secondary-btn-bg: transparent;
+  --color-secondary-btn-border: var(--zinc-700);
+  --color-secondary-btn-text: var(--gray-300);
+  --color-secondary-btn-hover: var(--zinc-800);
+  --color-secondary-btn-text-hover: var(--white);
+  --color-secondary-btn-ring: var(--zinc-800);
+  --color-secondary-btn-ripple-bg: var(--zinc-400);
+
+
+  /* Tertiary button color */
+  --color-tertiary-cr-btn-text: var(--gray-300);
+  --color-tertiary-cr-btn-hover: var(--zinc-800);
+  --color-tertiary-cr-btn-ring: var(--zinc-800);
+  --color-tertiary-cr-btn-ripple-bg: var(--zinc-600);
+
+  /* Secondary button color */
+  --color-secondary-cr-btn-bg: var(--zinc-800);
+  --color-secondary-cr-btn-hover: var(--zinc-700);
+  --color-secondary-cr-btn-ring: var(--zinc-800);
+  --color-secondary-cr-btn-ripple-bg: var(--zinc-600);
+
+  /* Tertiary button danger */
+  --color-tertiary-danger-btn-hover: var(--zinc-800);
+  --color-tertiary-danger-btn-text-hover: var(--error-600);
+  --color-tertiary-danger-btn-ring: var(--zinc-800);
+
+  /* Form control */
+  --color-form-control-placeholder: var(--gray-400);
+  --color-form-control-text: var(--white);
+  --color-form-control-border: var(--zinc-800);
+  --color-form-control-bg: var(--zinc-900);
+  --color-form-control-ring: var(--zinc-800);
+  --color-form-control-bg-disabled: var(--zinc-700);
+  --color-form-control-border-focused: var(--zinc-600);
+
+  /* Badge */
+  --color-badge-text: var(--gray-300);
+  --color-badge-bg: var(--zinc-800);
+
+  /* Badge success */
+  --color-success-badge-bg: var(--zinc-800);
+  --color-success-badge-text: var(--success-600);
 }
 
 details > summary {
@@ -76,6 +297,16 @@ details summary::-webkit-details-marker {
 
 details summary::marker {
   display: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
 }
 
 form:invalid .btn:not(.btn-enabled) {
@@ -94,20 +325,20 @@ details[open] summary::before {
 }
 
 .btn {
-  --text-color: var(--gray-500);
-  --bg-color: var(--white);
+  --text-color: var(--color-btn-text);
+  --bg-color: var(--color-btn-bg);
   --size: 0.75rem 1.25rem;
-  --border-color: transparent;
-  --shadow: var(--shadow-xs);
-  --bg-hover: var(--gray-50);
-  --text-hover: var(--gray-600);
-  --ring-color: transparent;
+  --border-color: var(--color-btn-border);
+  --shadow: var(--shadow-btn);
+  --bg-hover: var(--color-btn-hover);
+  --text-hover: var(--color-btn-text-hover);
+  --ring-color: var(--color-btn-ring);
+  --ripple-bg: var(--color-btn-ripple-bg);
   --events: all;
   --opacity: 1;
   --font-size: 1rem;
   --align: center;
   --justify: center;
-  --ripple-bg: var(--gray-400);
   background: rgb(var(--bg-color));
   color: rgb(var(--text-color));
   padding: var(--size);
@@ -145,7 +376,7 @@ button:disabled {
   --text-color: var(--text-hover);
 }
 
-.btn:focus {
+.btn:focus-visible {
   --shadow: 0 0 0 4px rgb(var(--ring-color));
 }
 
@@ -154,53 +385,55 @@ button:disabled {
 }
 
 .btn-primary {
-  --text-color: var(--white);
-  --bg-color: var(--primary-600);
-  --shadow: var(--shadow-xs);
-  --bg-hover: var(--primary-700);
-  --text-hover: var(--white);
-  --ring-color: var(--primary-100);
-  --ripple-bg: var(--white);
+  --text-color: var(--color-primary-btn-text);
+  --bg-color: var(--color-primary-btn-bg);
+  --shadow: var(--shadow-primary-btn);
+  --bg-hover: var(--color-primary-btn-hover);
+  --text-hover: var(--color-primary-btn-text-hover);
+  --ring-color: var(--color-primary-btn-ring);
+  --ripple-bg: var(--color-primary-btn-ripple-bg);
 }
 
 .btn-secondary {
-  --text-color: var(--gray-700);
-  --bg-color: var(--white);
-  --border-color: var(--gray-300);
-  --shadow: var(--shadow-xs);
-  --text-hover: var(--gray-800);
-  --ring-color: var(--gray-100);
+  --text-color: var(--color-secondary-btn-text);
+  --bg-color: var(--color-secondary-btn-bg);
+  --border-color: var(--color-secondary-btn-border);
+  --shadow: var(--shadow-secondary-btn);
+  --text-hover: var(--color-secondary-btn-text-hover);
+  --ring-color: var(--color-secondary-btn-ring);
+  --ripple-bg: var(--color-secondary-btn-ripple-bg);
+  --bg-hover: var(--color-secondary-btn-hover);
 }
 
 .btn-tertiary-color {
-  --text-color: var(--gray-500);
-  --bg-color: transparent;
-  --text-hover: var(--primary-700);
-  --bg-hover: var(--primary-50);
-  --ring-color: var(--primary-100);
-  --shadow: transparent;
-  --ripple-bg: var(--primary-400);
+  --text-color: var(--color-tertiary-cr-btn-text);
+  --bg-color: var(--color-tertiary-cr-btn-bg);
+  --text-hover: var(--color-tertiary-cr-btn-text-hover);
+  --bg-hover: var(--color-tertiary-cr-btn-hover);
+  --ring-color: var(--color-tertiary-cr-btn-ring);
+  --shadow: var(--shadow-tertiary-cr-btn);
+  --ripple-bg: var(--color-tertiary-cr-btn-ripple-bg);
 }
 
 .btn-tertiary-danger {
-  --text-color: var(--error-700);
-  --bg-color: transparent;
-  --bg-hover: var(--error-50);
-  --text-hover: var(--error-800);
-  --ring-color: var(--error-50);
-  --shadow: transparent;
-  --ripple-bg: var(--error-400);
+  --text-color: var(--color-tertiary-danger-btn-text);
+  --bg-color: var(--color-tertiary-danger-btn-bg);
+  --bg-hover: var(--color-tertiary-danger-btn-hover);
+  --text-hover: var(--color-tertiary-danger-btn-text-hover);
+  --ring-color: var(--color-tertiary-danger-btn-ring);
+  --shadow: var(--shadow-tertiary-danger-btn);
+  --ripple-bg: var(--color-tertiary-danger-btn-ripple-bg);
 }
 
 .btn-secondary-color {
-  --text-color: var(--primary-700);
-  --bg-color: var(--primary-50);
-  --border-color: transparent;
-  --shadow: var(--shadow-xs);
-  --bg-hover: var(--primary-100);
-  --text-hover: var(--primary-700);
-  --ring-color: var(--primary-100);
-  --ripple-bg: var(--primary-400);
+  --text-color: var(--color-secondary-cr-btn-text);
+  --bg-color: var(--color-secondary-cr-btn-bg);
+  --border-color: var(--color-secondary-cr-btn-border);
+  --shadow: var(--shadow-secondary-cr-btn);
+  --bg-hover: var(--color-secondary-cr-btn-hover);
+  --text-hover: var(--color-secondary-cr-btn-text-hover);
+  --ring-color: var(--color-secondary-cr-btn-ring);
+  --ripple-bg: var(--color-secondary-cr-btn-ripple-bg);
 }
 
 .btn-xl {
@@ -217,13 +450,13 @@ button:disabled {
 }
 
 .form-control {
-  --placeholder-color: var(--gray-500);
-  --text-color: var(--gray-900);
-  --border-color: var(--gray-300);
+  --placeholder-color: var(--color-form-control-placeholder);
+  --text-color: var(--color-form-control-text);
+  --border-color: var(--color-form-control-border);
   --size: 0.625rem 0.875rem;
-  --bg-color: var(--white);
-  --ring-color: var(--primary-100);
-  --shadow: var(--shadow-xs);
+  --bg-color: var(--color-form-control-bg);
+  --ring-color: var(--color-form-control-ring);
+  --shadow: var(--shadow-form-control);
   background: rgb(var(--bg-color));
   border-radius: 0.5rem;
   padding: var(--size);
@@ -239,13 +472,13 @@ button:disabled {
 }
 
 .form-control:focus {
-  --shadow: 0 0 0 4px rgb(var(--ring-color));
-  --border-color: var(--primary-300);
+  --shadow: var(--shadow-form-control-focused);
+  --border-color: var(--color-form-control-border-focused);
 }
 
 .form-control:disabled {
-  --bg-color: var(--gray-50);
-  --text-color: var(--gray-500);
+  --bg-color: var(--color-form-control-bg-disabled);
+  --text-color: var(--color-form-control-text-disabled);
 }
 
 .form-control::placeholder {
@@ -281,8 +514,8 @@ button:disabled {
 
 .badge {
   --font-size: 0.75rem;
-  --color: var(--gray-700);
-  --bg-color: var(--gray-100);
+  --color: var(--color-badge-text);
+  --bg-color: var(--color-badge-bg);
   --size: 0.125rem 0.5rem;
   font-weight: 500;
   color: rgb(var(--color));
@@ -305,8 +538,8 @@ button:disabled {
 }
 
 .badge-success {
-  --bg-color: var(--success-50);
-  --color: var(--success-700);
+  --bg-color: var(--color-success-badge-bg);
+  --color: var(--color-success-badge-text);
 }
 
 .toast-group {
@@ -376,10 +609,6 @@ checkbox-control {
   stroke-dashoffset: 0;
   transition: all 200ms linear;
   transition-delay: 100ms;
-}
-
-.checkbox-input:checked ~ .checkbox-label {
-  color: rgb(var(--gray-900))
 }
 
 .ripple {
@@ -552,3 +781,112 @@ checkbox-control {
 .toolbar-font-size {
   font-size: clamp(0.75rem, 2.5vw, 0.875rem);
 }
+
+/*
+   @media (prefers-color-scheme: dark) {
+   .btn-secondary {
+   --bg-color: transparent;
+   --border-color: var(--zinc-700);
+   --text-color: var(--gray-300);
+   --bg-hover: var(--zinc-800);
+   --text-hover: var(--white);
+   --ring-color: var(--zinc-800);
+   }
+
+   .btn-primary {
+   --ring-color: var(--primary-400);
+   }
+
+   .btn-tertiary-color {
+   --text-color: var(--gray-300);
+   --bg-hover: var(--zinc-800);
+   --ring-color: var(--zinc-800);
+   --ripple-bg: var(--zinc-600);
+   }
+
+   .btn-secondary-color {
+   --bg-color: var(--zinc-800);
+   --bg-hover: var(--zinc-700);
+   --ring-color: var(--zinc-800);
+   --ripple-bg: var(--zinc-600);
+   }
+
+   .btn-tertiary-danger-btn {
+   --bg-hover: var(--zinc-800);
+   --text-hover: var(--error-600);
+   --ring-color: var(--zinc-800);
+   }
+
+   .form-control {
+   --bg-color: var(--bg-zinc-900);
+   --text-color: var(--white);
+   --placeholder-color: var(--gray-400);
+   --border-color: var(--zinc-800);
+   --ring-color: var(--zinc-800);
+   }
+
+   .badge {
+   --bg-color: var(--zinc-800);
+   --color: var(--gray-300);
+   }
+   .badge-success {
+   --bg-color: var(--zinc-800);
+   --color: var(--success-600);
+   }
+
+   .form-control:focus {
+   --border-color: var(--zinc-600);
+   }
+
+   .form-control:disabled {
+   --bg-color: var(--zinc-700);
+   }
+
+   .toast-item-err {
+   --bg-color: var(--zinc-900);
+   --border-color: var(--error-700);
+   --color: var(--error-600);
+   }
+
+   .toast-item-success {
+   --bg-color: var(--zinc-900);
+   --border-color: var(--success-700);
+   --color: var(--success-600);
+   }
+   } */
+
+
+
+.hide-scroll {
+  scrollbar-width: none;
+}
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.animate-visibility {
+  transition: transform .3s ease-in-out;
+  will-change: transform;
+}
+
+.js-carousel-snap:not(.in-view) .animate-visibility {
+  transform: scale(0.9);
+}
+
+/* .in-view {
+   animation: carousel-snap-fade-in forwards;
+   animation-duration: 2s;
+   }
+
+   .js-carousel-snap:not(.in-view) {
+   transform: scale(0.9);
+   }
+
+   @keyframes carousel-snap-fade-in {
+   from {
+   transform: scale(0.9);
+   }
+   to {
+   transfor: scale(1);
+   }
+   } */

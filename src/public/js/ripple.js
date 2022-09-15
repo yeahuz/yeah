@@ -1,6 +1,6 @@
 import { create_node, add_listeners } from "./dom.js";
 
-const ripple_elements = document.querySelectorAll(".js-ripple");
+const ripple_elements = document.querySelectorAll(".btn");
 
 function create_ripple(e) {
   const button = e.currentTarget;

@@ -1,4 +1,4 @@
-import { request, option, message_sw } from "./utils.js";
+import { request, option } from "./utils.js";
 import { format_assertion_request, verify_assertion } from "./webauthn.js";
 import { add_listeners, disable_form, replace_text } from "./dom.js";
 import { toast } from "./toast.js";
@@ -42,12 +42,6 @@ async function on_assertion_request(e) {
   restore_text();
 
   const [_, verification_err] = await option(verify_assertion(assertion));
-
-  if (!verification_err) {
-    await message_sw({ type: "expire_partials" });
-    window.location.reload();
-  }
-
   toast(verification_err.message, "err");
 }
 

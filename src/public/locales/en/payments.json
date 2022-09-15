@@ -1,0 +1,17 @@
+{
+  "deposit": {
+    "title": "Top up",
+    "form": {
+      "provider": {
+        "label": "Choose payment method"
+      },
+      "amount": {
+        "label": "Amount",
+        "placeholder": 5000,
+        "hint": "Minimum amount: 5000 UZS",
+        "prefix": "UZS"
+      }
+    },
+    "pay": "Pay"
+  }
+}

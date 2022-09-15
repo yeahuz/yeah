@@ -64,6 +64,10 @@ export async function delete_many_for(user_id, exceptions = []) {
   );
 }
 
+export async function belongs_to(user_id, id) {
+  return await Session.query().findOne({ user_id, id });
+}
+
 export const create_one = create_one_impl();
 
 export const create_one_trx = (trx) => create_one_impl(trx);

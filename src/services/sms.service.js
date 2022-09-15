@@ -1,5 +1,11 @@
 import config from "../config/index.js";
 
+const TEMPLATES = {
+  verify: {
+    message: (vars) => `Some message`,
+  },
+};
+
 export class SMSService {
   constructor(token) {
     this.refresh_token_promise = null;
@@ -62,11 +68,12 @@ export class SMSService {
     return json;
   }
 
-  async send(phone, message) {
+  async send({ to, tmpl_name, vars }) {
+    const template = TEMPLATES[tmpl_name];
     const fd = new FormData();
     fd.append("from", "4546");
-    fd.append("message", message);
-    fd.append("mobile_phone", phone);
+    fd.append("message", template.message(vars));
+    fd.append("mobile_phone", to);
     return await this.request("/message/sms/send", { data: fd });
   }
 }

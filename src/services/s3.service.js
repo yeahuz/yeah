@@ -1,21 +1,20 @@
-import config from '../config/index.js';
-import { PassThrough } from 'stream';
-import { Upload } from '@aws-sdk/lib-storage';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { randomUUID } from 'crypto';
-import { async_pool } from '../utils/async-pool.js'
+import config from "../config/index.js";
+import { Upload } from "@aws-sdk/lib-storage";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { randomUUID } from "crypto";
+import { async_pool } from "../utils/async-pool.js";
 
 const s3 = new S3Client({
   region: config.aws_s3_region,
   credentials: {
     accessKeyId: config.aws_access_key,
-    secretAccessKey: config.aws_secret_key
+    secretAccessKey: config.aws_secret_key,
   },
 });
 
 function get_key(file_name) {
   if (!file_name) return randomUUID();
-  return `${randomUUID()}-${file_name}`
+  return `${randomUUID()}-${file_name}`;
 }
 
 function get_s3_url(key) {
@@ -23,7 +22,7 @@ function get_s3_url(key) {
 }
 
 function get_url(key) {
-  return `https://${config.s3_origin}/${key}`
+  return `https://${config.s3_origin}/${key}`;
 }
 
 export async function delete_one(s3_key) {
@@ -54,8 +53,8 @@ export async function upload_url(url) {
     url: get_url(key),
     s3_key: key,
     name: key,
-    mimetype: content_type
-  }
+    mimetype: content_type,
+  };
 }
 
 export async function upload(data) {
@@ -85,12 +84,12 @@ export async function upload(data) {
         s3_key: key,
         name: data.filename,
         mimetype: data.mimetype,
-      }
-    }
+      },
+    };
   }
 
-  await data.toBuffer()
-  return { fields: data.fields }
+  await data.toBuffer();
+  return { fields: data.fields };
 }
 
 export async function* upload_multiple(files) {

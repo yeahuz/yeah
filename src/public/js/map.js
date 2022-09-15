@@ -1,5 +1,5 @@
-import { add_listeners, create_node, disable_element } from './dom.js';
-import { request, option, debounce } from './utils.js';
+import { add_listeners, create_node, disable_element } from "./dom.js";
+import { request, option, debounce } from "./utils.js";
 
 const geo_trigger = document.querySelector(".js-geo-trigger");
 const geo_input = document.querySelector(".js-geo-input");
@@ -19,16 +19,15 @@ let map = null;
 let marker = null;
 
 async function init_map({ lat, lng }) {
-  const  { Loader } = await import("/node_modules/@googlemaps/js-api-loader/dist/index.esm.js");
+  const { Loader } = await import("/node_modules/@googlemaps/js-api-loader/dist/index.esm.js");
   const loader = new Loader({
     apiKey: "AIzaSyCOBscE5wKHhTlQBx20mKN5-abTzLzn3P4",
     version: "weekly",
-    libraries: ["places"],
-    region: "uz"
+    region: "uz",
   });
 
   const google = await loader.load();
-  const pos = new google.maps.LatLng(lat, lng)
+  const pos = new google.maps.LatLng(lat, lng);
 
   map = new google.maps.Map(get_map_container(), {
     center: pos,
@@ -36,6 +35,7 @@ async function init_map({ lat, lng }) {
     mapTypeId: "roadmap",
     disableDefaultUI: true,
     zoomControl: true,
+    mapId: "a245b8cd3728c3c7",
   });
 
   marker = new google.maps.Marker({
@@ -55,7 +55,7 @@ async function init_map({ lat, lng }) {
     map.setCenter(pos);
     geo_input.value = result.formatted_address;
     location_input.value = `${result.formatted_address}|${lat}|${lng}|${result.district_id}|${result.region_id}`;
-  })
+  });
 
   return map;
 }
@@ -71,24 +71,27 @@ function on_geo_trigger(e) {
       const enable = disable_element(e.target);
       await init_map({ lat: coords.latitude, lng: coords.longitude }).catch(() => enable());
       enable();
-    }
-    else {
+    } else {
       const pos = { lat: coords.latitude, lng: coords.longitude };
       marker.setPosition(pos);
       map.panTo(pos);
       map.setCenter(pos);
     }
-    const [result, err] = await option(request(`/geo/geocode?lat=${coords.latitude}&lon=${coords.longitude}`));
+    const [result, err] = await option(
+      request(`/geo/geocode?lat=${coords.latitude}&lon=${coords.longitude}`)
+    );
     if (err) return;
     geo_input.value = result.formatted_address;
     location_input.value = `${result.formatted_address}|${coords.latitude}|${coords.longitude}|${result.district_id}|${result.region_id}`;
   }
 
-  window.navigator.geolocation.getCurrentPosition(on_success, console.error, { enableHighAccuracy: true });
+  window.navigator.geolocation.getCurrentPosition(on_success, console.error, {
+    enableHighAccuracy: true,
+  });
 }
 
 async function on_geo_input_change(e) {
-  if (!(e.target.checkValidity())) return;
+  if (!e.target.checkValidity()) return;
   const form = e.target.form;
   const resource = new URL(form.action);
   resource.search = new URLSearchParams(new FormData(form));
@@ -98,8 +101,18 @@ async function on_geo_input_change(e) {
   predictions.classList.add("!opacity-100", "!translate-y-0", "!z-10");
   for (const result of results) {
     const li = create_node("li");
-    const input = create_node("input", { type: "radio", name: "loc", id: `location-${result.district_id}`, value: `${result.district_id},${result.region_id}`, class: "absolute opacity-0 w-0 -z-10 peer" });
-    const label = create_node("label", { for: `location-${result.district_id}`, class: "block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50" });
+    const input = create_node("input", {
+      type: "radio",
+      name: "loc",
+      id: `location-${result.district_id}`,
+      value: `${result.district_id},${result.region_id}`,
+      class: "absolute opacity-0 w-0 -z-10 peer",
+    });
+    const label = create_node("label", {
+      for: `location-${result.district_id}`,
+      class:
+        "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 dark:text-gray-200 hover:bg-zinc-800",
+    });
     label.textContent = result.formatted_address;
 
     input.addEventListener("change", async () => {
@@ -114,7 +127,7 @@ async function on_geo_input_change(e) {
       }
 
       location_input.value = `${result.formatted_address}|${result.coords.lat}|${result.coords.lon}|${result.district_id}|${result.region_id}`;
-    })
+    });
     li.append(input, label);
 
     predictions.append(li);
@@ -129,11 +142,10 @@ add_listeners(geo_trigger, {
   click: on_geo_trigger,
 });
 
-
 window.addEventListener("load", async () => {
   const location = location_input.value;
   if (location) {
     const [formatted_address, lat, lng] = location.split("|");
     await init_map({ lat, lng });
   }
-})
+});

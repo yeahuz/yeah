@@ -1,0 +1,9 @@
+{
+  "verify": {
+    "title": "Elektron pochta manzilingizni tasdiqlang",
+    "description": "Roʻyxatdan oʻtishni davom ettirish uchun quyidagi kodni kiriting.",
+    "hint": "Kod faqat bir soat davomida amal qiladi.",
+    "verification_code": "Kod - {{code}}"
+  },
+  "regards": "Rahmat!"
+}

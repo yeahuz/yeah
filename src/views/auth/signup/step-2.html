@@ -1,9 +1,9 @@
 <div class="max-w-sm mx-auto space-y-8 mt-20 px-4 sm:px-0">
-  <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "signup"}) %></h1>
+  <h1 class="font-semibold text-4xl text-gray-900 dark:text-white"><%= it.t("title", { ns: "signup"}) %></h1>
   <%~ includeFile('../../partials/flash.html', it) %>
   <form action="/auth/otp/confirmation?method=<%= it.method %>" method="post">
     <input type="hidden" name="nonce" value="<%= it.nonce %>" />
-    <label class="text-sm font-medium text-gray-700 mt-5 block">
+    <label class="text-sm font-medium text-gray-700 mt-5 block dark:text-gray-200">
       <%= it.t("code.label", { ns: "signup" }) %>
       <div class="mt-2 grid grid-cols-6 gap-2">
           <input type="text" inputmode="number" class="js-otp-input form-control text-center" name="otp" maxlength="1" required />
@@ -20,6 +20,6 @@
   </form>
 </div>
 <script>
- document.title = "<%= it.t("title", { ns: "signup" })%> | YeaH"
+ document.title = "<%= it.t("title", { ns: "signup" })%> | Needs"
 </script>
 <script type="module" src="/public/js/signup.js" defer async></script>

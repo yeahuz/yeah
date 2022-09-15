@@ -1,27 +1,26 @@
 {
-  "name": "YeaH",
-  "short_name": "YeaH",
+  "name": "needs",
+  "short_name": "needs",
   "display": "standalone",
   "start_url": "/",
   "icons": [
     {
-      "src": "/public/images/yeah-logo-512-bg.png",
+      "src": "/public/images/needs-logo-512-bg.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "/public/images/yeah-logo-1024-bg.png",
+      "src": "/public/images/needs-logo-1024-bg.png",
       "type": "image/png",
       "sizes": "1024x1024"
     },
     {
-      "src": "/public/images/yeah-logo-512-bg.png",
+      "src": "/public/images/needs-logo-512-bg.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#0070f3",
   "background_color": "#0070f3",
   "lang": "en",
   "orientation": "any",

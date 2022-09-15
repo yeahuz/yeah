@@ -35,7 +35,7 @@ export async function verify(identifier, code) {
     .select("id", "code", raw("case when now() > expires_at then 1 else 0 end as expired"))
     .findOne({ identifier });
 
-  if (confirmation_code.expired) await confirmation_code.$query().delete();
+  if (confirmation_code?.expired) await confirmation_code.$query().delete();
 
-  return !confirmation_code.expired && confirmation_code.verify_code(code);
+  return !confirmation_code?.expired && confirmation_code?.verify_code(code);
 }

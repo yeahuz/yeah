@@ -1,7 +1,9 @@
 import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
+import * as BillingService from "../services/billing.service.js";
 import { render_file } from "../utils/eta.js";
-import { create_date_formatter, parse_url } from "../utils/index.js";
+import { parse_url, add_t } from "../utils/index.js";
+import { create_date_formatter } from "../utils/date.js";
 
 export async function get_tab(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
@@ -155,6 +157,108 @@ export async function get_privacy(req, reply) {
   return reply;
 }
 
+export async function get_billing(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+  const flash = reply.flash();
+  const stream = reply.init_stream();
+  const user = req.user;
+  const t = req.i18n.t;
+  const { mobile } = req.query;
+
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("tabs.billing", { ns: "settings" }), lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  const settings_top = await render_file("/settings/top.html", { t });
+  stream.push(settings_top);
+
+  if (!mobile) {
+    const settings_tabs = await render_file("/partials/settings-tabs.html", {
+      tab: "billing",
+      t,
+      mobile,
+    });
+    stream.push(settings_tabs);
+  }
+
+  const billing_account = await BillingService.get_by_user_id(user.id);
+  const billing = await render_file("/settings/billing.html", {
+    user,
+    flash,
+    t,
+    billing_account,
+  });
+  stream.push(billing);
+
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
+
+export async function get_appearance(req, reply) {
+  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+  const flash = reply.flash();
+  const stream = reply.init_stream();
+  const user = req.user;
+  const t = req.i18n.t;
+  const theme = req.session.get("theme");
+  const { mobile } = req.query;
+
+  if (!is_navigation_preload) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("tabs.appearance", { ns: "settings" }), lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  const settings_top = await render_file("/settings/top.html", { t });
+  stream.push(settings_top);
+
+  if (!mobile) {
+    const settings_tabs = await render_file("/partials/settings-tabs.html", {
+      tab: "appearance",
+      t,
+      mobile,
+    });
+    stream.push(settings_tabs);
+  }
+
+  const appearance = await render_file("/settings/appearance.html", {
+    user,
+    flash,
+    t,
+    theme,
+  });
+  stream.push(appearance);
+
+  if (!is_navigation_preload) {
+    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
+
+export async function update_appearance(req, reply) {
+  const { return_to = "/" } = req.query;
+  const { theme } = req.body;
+  req.session.set("theme", theme);
+  reply.redirect(add_t(return_to));
+  return reply;
+}
+
 export async function get_settings(req, reply) {
   const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
@@ -165,7 +269,7 @@ export async function get_settings(req, reply) {
 
   if (!is_navigation_preload) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: t("tabs.privacy", { ns: "settings" }), lang: req.language },
+      meta: { title: t("title", { ns: "settings" }), lang: req.language },
       t,
       user,
     });

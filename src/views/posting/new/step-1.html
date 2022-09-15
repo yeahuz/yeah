@@ -1,12 +1,12 @@
 <form method="post" class="max-w-md">
   <input type="hidden" name="step" value="1" />
-  <label class="text-sm font-medium text-gray-700 block">
+  <label class="text-sm font-medium text-gray-700 block dark:text-gray-200">
     <%= it.t("form.title.label", { ns: "new-posting" }) %>
     <input type="text" value="<%= it.posting_data?.title ?? "" %>" autocomplete="off" class="form-control mt-2" placeholder="<%= it.t("form.title.placeholder", { ns: "new-posting" }) %>" name="title" />
     <small class="text-error-500 mt-1 text-sm block"><%= it.flash?.validation_errors?.[0]?.title ?? "" %></small>
   </label>
-  <span class="font-normal text-gray-500 text-sm block mt-1.5"><%= it.t("form.title.hint", { ns: "new-posting"}) %></span>
-  <label class="text-sm font-medium text-gray-700 block mt-5">
+  <span class="font-normal text-gray-500 text-sm block mt-1.5 dark:text-gray-400"><%= it.t("form.title.hint", { ns: "new-posting"}) %></span>
+  <label class="text-sm font-medium text-gray-700 block mt-5 dark:text-gray-200">
     <%= it.t("form.category.label", { ns: "new-posting" }) %>
     <div class="relative mt-2">
     <select name="category_id" class="form-control" required>
@@ -40,9 +40,9 @@
     </svg>
     </div>
   </label>
-  <button class="btn btn-lg btn-primary mt-6">Далее</button>
+  <button class="btn btn-lg btn-primary mt-8">Далее</button>
 </form>
 </main>
 <script>
- document.title = "<%= it.t("title", { ns: "new-posting" })%> | YeaH"
+ document.title = "<%= it.t("title", { ns: "new-posting" })%> | Needs"
 </script>

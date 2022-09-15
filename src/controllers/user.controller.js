@@ -1,4 +1,4 @@
-import { get_time, option, add_t } from "../utils/index.js";
+import { option, add_t } from "../utils/index.js";
 import * as UserService from "../services/user.service.js";
 
 export async function update_one(req, reply) {
@@ -19,8 +19,8 @@ export async function update_one(req, reply) {
 
   if (err) {
     if (req.xhr) {
-      reply.code(err.status_code).send(err.build(t))
-      return reply
+      reply.code(err.status_code).send(err.build(t));
+      return reply;
     }
     req.flash("err", err.build(t));
     return reply.redirect(return_to);

@@ -59,8 +59,8 @@ export class ConflictError extends DomainError {
 }
 
 export class BadRequestError extends DomainError {
-  constructor({ key = "generic_bad_request" } = {}) {
-    super({ key, status_code: 400 });
+  constructor({ key = "generic_bad_request", params } = {}) {
+    super({ key, status_code: 400, params });
   }
 }
 

@@ -1,0 +1,9 @@
+{
+  "verify": {
+    "title": "Confirm your email address",
+    "description": "Please enter code below to continue your registration.",
+    "hint": "Code is only valid for an hour.",
+    "verification_code": "Verification code - {{code}}"
+  },
+  "regards": "Thank you!"
+}

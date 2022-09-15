@@ -1,66 +1,70 @@
 <div class="max-w-2xl w-full">
   <section id="personal-details">
     <header>
-      <h2 class="text-gray-900 text-lg font-medium"><%= it.t("personal.title", { ns: "settings-details" }) %></h2>
-      <p class="text-gray-500 mt-1"><%= it.t("personal.description", { ns: "settings-details" }) %></p>
+      <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("personal.title", { ns: "settings-details" }) %></h2>
+      <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("personal.description", { ns: "settings-details" }) %></p>
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
-      <div class="flex flex-col space-y-6 mb-6 sm:flex-row sm:space-y-0 sm:space-x-6">
-        <label class="text-sm font-medium text-gray-700 w-full"> <%= it.t("personal.name.label", { ns: "settings-details" }) %>
-          <input type="text" class="form-control mt-2" placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
-        </label>
-        <label class="text-sm font-medium text-gray-700 w-full">
-          <%= it.t("personal.email.label", { ns: "settings-details" }) %>
-          <input type="text" inputmode="email" class="form-control mt-2"
-          placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
-          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
-        </label>
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
+      <div class="p-6">
+        <div class="flex flex-col space-y-6 mb-6 sm:flex-row sm:space-y-0 sm:space-x-6">
+          <label class="text-sm font-medium text-gray-700 w-full dark:text-gray-200"> <%= it.t("personal.name.label", { ns: "settings-details" }) %>
+            <input type="text" class="form-control mt-2" placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
+          </label>
+          <label class="text-sm font-medium text-gray-700 w-full dark:text-gray-200">
+            <%= it.t("personal.email.label", { ns: "settings-details" }) %>
+            <input type="text" inputmode="email" class="form-control mt-2"
+            placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
+            <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
+          </label>
+        </div>
+        <div class="flex space-x-6">
+          <label class="w-full">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("personal.phone.label", { ns: "settings-details" }) %></span>
+            <div class="flex mt-2">
+              <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">+998</span>
+              <input type="text" class="form-control !rounded-l-none" inputmode="numeric" placeholder="<%= it.t("personal.phone.placeholder", { ns: "settings-details" }) %>" name="phone" value="<%= it.user.phone ?? "" %>">
+            </div>
+            <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
+          </label>
+        </div>
       </div>
-      <div class="flex space-x-6">
-        <label class="w-full">
-          <span class="text-sm font-medium text-gray-700"><%= it.t("personal.phone.label", { ns: "settings-details" }) %></span>
-          <div class="flex mt-2">
-            <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">+998</span>
-            <input type="text" class="form-control !rounded-l-none" inputmode="numeric" placeholder="<%= it.t("personal.phone.placeholder", { ns: "settings-details" }) %>" name="phone" value="<%= it.user.phone ?? "" %>">
-          </div>
-          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
-        </label>
-      </div>
-      <hr class="bg-gray-200 w-full mt-6" />
-      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>
+      <hr class="bg-gray-200 w-full border-none h-px dark:bg-zinc-800" />
+      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto my-4 mr-6"><%= it.t("save_changes", { ns: "common" }) %></button>
     </form>
   </section>
   <section id="general-details">
     <header>
-      <h2 class="text-gray-900 text-lg font-medium"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
-      <p class="text-gray-500 mt-1"><%= it.t("general.description", { ns: "settings-details" }) %></p>
+      <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
+      <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("general.description", { ns: "settings-details" }) %></p>
     </header>
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full p-6 mt-6 mb-8 flex flex-col js-details-form">
-      <label class="w-full mb-6">
-        <span class="text-sm font-medium text-gray-700"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>
-        <div class="flex mt-2">
-          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">yeah.uz/</span>
-          <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.username.placeholder", { ns: "settings-details" }) %>" name="username" value="<%= it.user.username ?? "" %>">
-        </div>
-        <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.username ?? ""%></small>
-      </label>
-      <label class="w-full">
-        <span class="text-sm font-medium text-gray-700"><%= it.t("general.website.label", { ns: "settings-details" }) %></span>
-        <div class="flex mt-2">
-          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg">https://</span>
-          <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.website.placeholder", { ns: "settings-details" }) %>" name="website_url" value="<%= it.user.website_url ?? "" %>">
-        </div>
-        <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.website_url ?? ""%></small>
-      </label>
-      <hr class="bg-gray-200 w-full mt-6" />
-      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto mt-4"><%= it.t("save_changes", { ns: "common" }) %></button>
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
+      <div class="p-6">
+        <label class="w-full mb-6">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>
+          <div class="flex mt-2">
+            <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">needs.uz/</span>
+            <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.username.placeholder", { ns: "settings-details" }) %>" name="username" value="<%= it.user.username ?? "" %>">
+          </div>
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.username ?? ""%></small>
+        </label>
+        <label class="w-full">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.website.label", { ns: "settings-details" }) %></span>
+          <div class="flex mt-2">
+            <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">https://</span>
+            <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.website.placeholder", { ns: "settings-details" }) %>" name="website_url" value="<%= it.user.website_url ?? "" %>">
+          </div>
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.website_url ?? ""%></small>
+        </label>
+      </div>
+      <hr class="bg-gray-200 w-full border-none h-px dark:bg-zinc-800" />
+      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto my-4 mr-6"><%= it.t("save_changes", { ns: "common" }) %></button>
     </form>
   </section>
 </div>
 </div>
 </main>
 <script>
- document.title = "<%= it.t("tabs.details", { ns: "settings" })%> | YeaH"
+ document.title = "<%= it.t("tabs.details", { ns: "settings" })%> | Needs"
 </script>
 <script src="/public/js/details.js" type="module" defer async> </script>

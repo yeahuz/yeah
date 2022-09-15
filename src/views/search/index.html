@@ -1,17 +1,10 @@
-<main class="my-2">
-  <div class="flex items-center space-x-2">
-    <a href="/" class="p-3 text-gray-700">
-      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
-    <input type="text" name="q" value="<%= it.q ?? ""%>" class="form-control" placeholder="Search postings"/>
-  </div>
+<main class="px-4 xl:px-0">
+  <input type="text" name="q" value="<%= it.q ?? ""%>" class="form-control" placeholder="Search postings"/>
   <% if (it.categories.length) { %>
     <ul>
       <% it.categories.forEach(function (category) { %>
         <li>
-          <a href="/c/<%= category.id %>" class="flex items-center w-full px-4 py-3">
+          <a href="/c/<%= category.id %>" class="flex items-center w-full py-3">
             <%= category.title %>
             <% if (category.has_children) { %>
               <svg class="w-5 h-5 ml-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

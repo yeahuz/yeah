@@ -17,6 +17,7 @@
   },
   "with_google": "Google orqali kirish",
   "with_telegram": "Telegram orqali kirish",
+  "noscript_telegram_login": "JavaScript yoqilmagan holda Telegram orqali tizimga kira olmaysiz",
   "no_account": "Akkaunt yoqmi?",
   "qr": {
     "title": "QR-kodni skanerlang",

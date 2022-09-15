@@ -1,4 +1,4 @@
-<div class="flex items-center p-3 space-x-3 border-b border-gray-200">
+<div class="flex items-center p-3 space-x-3 border-b border-b-gray-200 dark:border-b-zinc-800">
   <div class="relative flex-shrink-0 text-gray-500">
     <% if (it.user.profile_photo_url) { %>
       <img
@@ -17,9 +17,9 @@
   </div>
   <div class="flex flex-col truncate">
     <% if (it.user.name) { %>
-      <span class="text-gray-700 text-sm font-medium"><%= it.user.name %></span>
+      <span class="text-gray-700 text-sm font-medium dark:text-gray-200"><%= it.user.name %></span>
     <%} %> <% if (it.user.phone || it.user.email) {%>
-      <span class="text-sm text-gray-500 truncate"><%= it.user.formatted_phone || it.user.email %></span>
+      <span class="text-sm text-gray-500 truncate dark:text-gray-300"><%= it.user.formatted_phone || it.user.email %></span>
     <% } %>
   </div>
 </div>

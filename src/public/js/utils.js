@@ -1,3 +1,31 @@
+const noop = () => {};
+
+export function upload_request(url, { data, method, on_progress = noop, on_done = noop } = {}) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "json";
+    xhr.addEventListener("loadend", () => {
+      if (xhr.readyState === 4) {
+        if (xhr.status >= 400) reject(xhr.response);
+        else resolve(xhr.response);
+      }
+    });
+
+    xhr.addEventListener("error", reject);
+    xhr.upload.addEventListener("error", reject);
+    xhr.upload.addEventListener("load", on_done);
+    xhr.upload.addEventListener("loadstart", (e) => {
+      on_progress({ value: 0, max: e.total, percent: 0 });
+    });
+    xhr.upload.addEventListener("progress", (e) => {
+      on_progress({ value: e.loaded, max: e.total, percent: (e.loaded / e.total) * 100 });
+    });
+
+    xhr.open(method || "POST", url, true);
+    xhr.send(data);
+  });
+}
+
 export async function request(
   url,
   { body, query, method, timeout = 60000, state = {}, ...custom_config } = {}
@@ -105,4 +133,28 @@ export function is_apple_device() {
 
 export function wait(ms = 0) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function* async_pool(concurrency, iterable, iteratorFn) {
+  const executing = new Set();
+  for await (const item of iterable) {
+    const promise = Promise.resolve().then(() => iteratorFn(item, iterable));
+    executing.add(promise);
+    const clean = () => executing.delete(promise);
+    promise.then(clean).catch(clean);
+    if (executing.size >= concurrency) {
+      yield await Promise.race(executing);
+    }
+  }
+  while (executing.size) {
+    yield await Promise.race(executing);
+  }
+}
+
+export async function async_pool_all(...args) {
+  const results = [];
+  for await (const result of async_pool(...args)) {
+    results.push(result);
+  }
+  return results;
 }

@@ -1,23 +1,23 @@
 <div class="max-w-3xl mx-auto space-y-8 mt-20 px-4">
-  <h1 class="font-semibold text-4xl text-gray-900"><%= it.t("title", { ns: "login"}) %></h1>
+  <h1 class="font-semibold text-4xl text-gray-900 dark:text-white"><%= it.t("title", { ns: "login"}) %></h1>
   <%~ includeFile('../partials/flash.html', it) %>
   <div class="flex">
     <form action="/auth/login" method="post" class="js-login-form w-full md:max-w-sm">
       <input type="hidden" name="nonce" value="<%= it.nonce %>" />
       <div class="flex flex-col relative">
         <% if (it.method === "email") { %>
-          <label class="text-sm font-medium text-gray-700">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
             <%= it.t("email.label", { ns: "login"}) %> <input type="email" autocomplete="email" class="form-control mt-2"
             placeholder="<%= it.t("email.placeholder", { ns: "login" }) %>" name="identifier" required />
           </label>
           <a href="/auth/login?method=phone" class="inline-block mt-1.5 self-end btn btn-enabled btn-md btn-tertiary-color">Phone-ID</a>
         <% } %>
         <% if (it.method === "phone") { %>
-          <label class="text-sm font-medium text-gray-700">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
             <%= it.t("phone.label", { ns: "login"}) %>
             <div class="flex mt-2 relative">
               <input type="hidden" name="identifier" class="js-unmasked-value" />
-              <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal">+998</span>
+              <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal dark:border-zinc-800 dark:text-gray-400">+998</span>
               <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" inputmode="numeric" name="masked_identifier"
                 placeholder="<%= it.t("phone.placeholder", { ns: "login" }) %>"
                 data-mask="## ### ## ##"
@@ -29,7 +29,7 @@
           <a href="/auth/login?method=email" class="self-end btn btn-enabled btn-md btn-tertiary-color mt-1.5">Email-ID</a>
         <% } %>
       </div>
-      <label class="text-sm font-medium text-gray-700 mt-5 block">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-200 mt-5 block">
         <%= it.t("password.label", { ns: "login" }) %>
         <input type="password" class="form-control mt-2" name="password" placeholder="<%= it.t("password.placeholder", { ns: "login" }) %>" required minlength="6" />
       </label>
@@ -48,7 +48,7 @@
         </svg>
         <%= it.t("with_google", { ns: "login"}) %>
       </a>
-      <button class="btn btn-secondary btn-lg btn-enabled w-full mt-2 js-telegram-login" type="button">
+      <button class="btn btn-secondary btn-lg btn-enabled w-full mt-2 js-telegram-login js-enabled" type="button">
         <svg class="w-6 h-6 mr-2" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="16" cy="16" r="14" fill="url(#paint0_linear_1334_735)"/>
           <path d="M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z" fill="white"/>
@@ -61,7 +61,10 @@
         </svg>
           <%= it.t("with_telegram", { ns: "login"}) %>
       </button>
-      <p class="text-center font-medium text-gray-500 mt-8">
+      <noscript>
+        <span class="text-sm text-amber-600 inline-block mt-2"><%= it.t("noscript_telegram_login", { ns: "login" }) %></span>
+      </noscript>
+      <p class="text-center font-medium text-gray-500 mt-8 dark:text-gray-400">
         <%= it.t("no_account", { ns: "login"}) %>
         <a href="/auth/signup" class="text-primary-600"
           ><%= it.t("create_account", { ns: "common" }) %></a
@@ -73,7 +76,7 @@
   </div>
 </div>
 <script>
- document.title = "<%= it.t("title", { ns: "login" })%> | YeaH"
+ document.title = "<%= it.t("title", { ns: "login" })%> | Needs"
 </script>
 <% if (it.method === "phone") { %>
   <script type="module">

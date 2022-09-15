@@ -40,6 +40,7 @@ export async function verify_assertion(assertion) {
     },
     state: {
       replace: true,
+      reload: true,
     },
   });
 }
@@ -62,6 +63,10 @@ export async function add_credential(credential) {
       },
       transports: credential.response.getTransports?.() || [],
       title: credential.title,
+    },
+    state: {
+      replace: true,
+      reload: true,
     },
   });
 }

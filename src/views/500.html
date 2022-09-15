@@ -1,0 +1,35 @@
+<% if (!it.is_navigation_preload) { %>
+  <% layout('./layout.html', { meta: { title: "Internal server error", lang: "en" }} ) %>
+<% } %>
+<noscript>
+  <style>
+    .js-enabled {
+      display: none;
+    }
+  </style>
+</noscript>
+<div class="flex flex-col-reverse flex-col md:flex-row items-center justify-center mx-auto w-full max-w-7xl px-4 xl:px-0 mb-24">
+  <div class="md:max-w-lg">
+    <h1 class="text-gray-900 font-semibold dark:text-white text-3xl md:text-6xl">Internal Server Error</h1>
+    <p class="text-xl text-gray-500 mt-6 max-w-lg dark:text-gray-300">
+      Something went wrong on our side, please try again.
+    </p>
+    <div class="flex mt-12">
+      <noscript>
+        <% if (it.referer) {%>
+          <a href="<%= it.referer %>" class="btn btn-secondary btn-lg mr-3">Go back</a>
+        <% } %>
+      </noscript>
+      <button class="btn btn-secondary btn-lg js-enabled mr-3" onclick="history.go(-1)">
+        Go back
+      </button>
+      <a href="/" class="btn btn-primary btn-lg">Take me home</a>
+    </div>
+  </div>
+  <div>
+    <img src="/public/images/500-error.png" alt="" width="720" />
+  </div>
+</div>
+<script>
+  document.title = "<%= it.t("page_not_found", { ns: "common" }) %> | Needs"
+</script>

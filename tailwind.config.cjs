@@ -1,13 +1,16 @@
 const plugin = require("tailwindcss/plugin");
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: ["./src/**/*.{html,js}"],
+  darkMode: ["class"],
   theme: {
+    screens: {
+      xs: "360px",
+      ...defaultTheme.screens,
+    },
     groups: ["nested"],
     extend: {
-      screens: {
-        xs: "360px",
-      },
       fontFamily: {
         sans: ["Inter"],
       },
@@ -71,10 +74,7 @@ module.exports = {
       const groups = theme("groups") || [];
 
       groups.forEach((group) => {
-        addVariant(
-          `group-${group}-hover`,
-          () => `:merge(.group-${group}):hover &`
-        );
+        addVariant(`group-${group}-hover`, () => `:merge(.group-${group}):hover &`);
       });
     }),
   ],

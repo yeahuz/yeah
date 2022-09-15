@@ -26,6 +26,8 @@ import { can } from "./plugins/can.js";
 import { ws } from "./plugins/ws.js";
 import { add_t } from "./utils/index.js";
 import { redis_client } from "./services/redis.service.js";
+import { render_file } from "./utils/eta.js";
+import fs from "fs";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
@@ -103,9 +105,12 @@ export async function start() {
 
     app.setErrorHandler((err, req, reply) => {
       console.log({ err });
-      const t = i18next.getFixedT(
-        (req.language instanceof Function ? req.language() : req.language) || "en"
-      );
+      const accept_lang = [
+        req.language instanceof Function ? req.language() : req.language,
+        "en",
+      ].flat();
+
+      const t = i18next.getFixedT(accept_lang);
       const { return_to } = req.query;
 
       if (err.validation) {
@@ -130,9 +135,24 @@ export async function start() {
       return reply;
     });
 
-    app.setNotFoundHandler((req, res) => {
+    app.setNotFoundHandler(async (req, reply) => {
+      const accept_lang = [
+        req.language instanceof Function ? req.language() : req.language,
+        "en",
+      ].flat();
+      const t = i18next.getFixedT(accept_lang);
       const referer = req.headers["referer"];
-      res.code(404).render("404.html", { referer });
+      const theme = req.session.get("theme");
+      const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+      const html = await render_file("/404.html", {
+        meta: { lang: req.language },
+        referer,
+        theme,
+        is_navigation_preload,
+        t,
+      });
+      reply.code(404).type("text/html").send(html);
+      return reply;
     });
 
     app.register(fastify_accepts);
@@ -264,6 +284,82 @@ export async function start() {
 
       console.log(response);
       return response.body.hits.hits;
+    });
+
+    app.get("/yerelektron", async (req, reply) => {
+      const response = await fetch("https://api-admin.yerelektron.uz/v1/city");
+      const data = await response.json().catch(() => {});
+      for (let i = 0; i < data.cities.length; i++) {
+        const city = data.cities[i];
+        const response = await fetch(`https://api-admin.yerelektron.uz/v1/regions/${city.id}`);
+        const { regions: districts } = await response.json().catch(() => {});
+        data.cities[i].districts = districts.map(({ city, ...district }) => district);
+      }
+
+      fs.writeFileSync("src/data/soato.json", JSON.stringify(data));
+      return data;
+    });
+
+    app.get("/parse-soato", async (req, reply) => {
+      const COUNTRY_LENGTH = 2;
+      const REGION_LENGTH = 4;
+      const DISTRICT_LENGTH = 7;
+      const CITY_LENGTH = 10;
+      let data = JSON.parse(fs.readFileSync(process.cwd() + "/src/raw-soato.json", "utf-8"));
+      data.shift();
+      data.shift();
+      data.shift();
+
+      const parent_child = () => {
+        for (const item of data) {
+          const id = item.field1;
+          item.soato_id = id;
+          if (id.length === COUNTRY_LENGTH) {
+            item.parent_id = null;
+            item.id = id;
+          }
+          if (id.length === REGION_LENGTH) {
+            item.parent_id = id.slice(0, COUNTRY_LENGTH - REGION_LENGTH);
+            item.id = id.slice(0, REGION_LENGTH);
+          }
+
+          if (id.length === DISTRICT_LENGTH) {
+            if (id.endsWith("200")) {
+              item.skip = true;
+            }
+            item.parent_id = id.slice(0, REGION_LENGTH);
+            item.id = id.slice(0, DISTRICT_LENGTH);
+          }
+          if (id.length === CITY_LENGTH) {
+            item.parent_id = id.slice(0, DISTRICT_LENGTH);
+            item.id = id.slice(0, CITY_LENGTH);
+          }
+        }
+      };
+
+      parent_child();
+
+      function array_to_tree(arr, parent_id = null) {
+        return arr
+          .filter((item) => !item.skip && item.parent_id === parent_id)
+          .map((child) => ({
+            name: child.field2,
+            id: child.soato_id,
+            children: array_to_tree(arr, child.id),
+          }));
+      }
+
+      reply.send(array_to_tree(data));
+      return reply;
+
+      // for (let i = 3; i < data.length; i++) {
+      //   const item = data[i];
+      //   const id = item.field1;
+      //   const name = item.field2;
+      // }
+
+      // reply.send({ status: "oke" });
+      // return reply;
     });
 
     app.register(routes);

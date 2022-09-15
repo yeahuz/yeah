@@ -17,6 +17,7 @@
   },
   "with_google": "Continue with Google",
   "with_telegram": "Continue with Telegram",
+  "noscript_telegram_login": "You cannot login with Telegram without JavaScript enabled",
   "no_account": "Don't have an account?",
   "qr": {
     "title": "Scan QR-code",

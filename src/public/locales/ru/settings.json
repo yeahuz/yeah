@@ -4,7 +4,8 @@
   "tabs": {
     "details": "Мои детали",
     "privacy": "Конфиденциальность",
-    "billing": "Биллинг",
-    "notifications": "Уведомления"
+    "billing": "Платежи",
+    "notifications": "Уведомления",
+    "appearance": "Внешний вид"
   }
 }

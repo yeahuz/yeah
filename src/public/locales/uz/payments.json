@@ -1,0 +1,17 @@
+{
+  "deposit": {
+    "title": "To'ldirish",
+    "form": {
+      "provider": {
+        "label": "To'lov usulini tanlang"
+      },
+      "amount": {
+        "label": "Miqdor"
+        "placeholder": 5000,
+        "hint": "Miniman miqdor: 5000 UZS",
+        "prefix": "UZS"
+      }
+    },
+    "pay": "To'lash"
+  }
+}

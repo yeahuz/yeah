@@ -5,3 +5,9 @@ export class Attachment extends BaseModel {
     return "attachments";
   }
 }
+
+export class Attachment_v2 extends BaseModel {
+  static get tableName() {
+    return "attachments_v2";
+  }
+}

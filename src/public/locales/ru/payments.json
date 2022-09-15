@@ -1,0 +1,17 @@
+{
+  "deposit": {
+    "title": "Пополнение",
+    "form": {
+      "provider": {
+        "label": "Выберите способ оплаты"
+      },
+      "amount": {
+        "label": "Сумма",
+        "placeholder": 5000,
+        "hint": "Минимальная сумма: 5000 UZS",
+        "prefix": "UZS"
+      }
+    },
+    "pay": "Оплатить"
+  }
+}

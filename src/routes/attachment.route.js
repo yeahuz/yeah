@@ -1,5 +1,5 @@
-import * as AttachmentController from "../controllers/attachment.controller.js"
-import { guest_user } from '../utils/roles.js'
+import * as AttachmentController from "../controllers/attachment.controller.js";
+import { guest_user } from "../utils/roles.js";
 
 export const attachment = async (fastify) => {
   fastify.route({

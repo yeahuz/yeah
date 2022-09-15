@@ -1,0 +1,15 @@
+{
+  "title": "Billing",
+  "description": "Card and billing settings",
+  "your_balance": "Your balance",
+  "top_up": "Top up",
+  "cards": {
+    "title": "Cards"
+  },
+  "billing": {
+    "title": "Billing history",
+    "description": "Description",
+    "date": "Date",
+    "amount": "Amount"
+  }
+}

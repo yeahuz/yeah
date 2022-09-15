@@ -11,6 +11,15 @@ export const posting = async (fastify) => {
     method: "GET",
     url: "/wizard/:id/:step",
     handler: PostingController.get_step,
+    schema: {
+      params: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          step: { type: "number" },
+        },
+      },
+    },
   });
   fastify.route({
     method: "POST",
@@ -24,9 +33,6 @@ export const posting = async (fastify) => {
     method: "POST",
     url: "/wizard/:id/2",
     handler: PostingController.submit_second_step,
-    // schema: {
-    //   body: new_posting_schema.general
-    // }
   });
   fastify.route({
     method: "POST",
@@ -35,8 +41,23 @@ export const posting = async (fastify) => {
   });
   fastify.route({
     method: "POST",
+    url: "/wizard/:id/4",
+    handler: PostingController.submit_fourth_step,
+  });
+  fastify.route({
+    method: "POST",
     url: "/wizard/:id/2/attachments/:attachment_id",
     handler: PostingController.update_attachment,
+  });
+  fastify.route({
+    method: "POST",
+    url: "/wizard/:id/2/attachments",
+    handler: PostingController.upload_attachments,
+  });
+  fastify.route({
+    method: "PATCH",
+    url: "/wizard/:id/2/attachments",
+    handler: PostingController.sync_attachments,
   });
   fastify.route({
     method: "DELETE",

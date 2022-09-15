@@ -185,3 +185,12 @@ export function create_tree2(array, rootNodes, customID, childrenProperty) {
 export function parse_url(url) {
   return new URL(url, config.origin);
 }
+
+export function generate_srcset(url, options, count = 20) {
+  let srcset = "";
+  for (let i = 1; i <= count; i++) {
+    let w = i * 100;
+    srcset += `${url}/width=${w},${options} ${w}w, `;
+  }
+  return srcset;
+}

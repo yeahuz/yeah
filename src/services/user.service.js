@@ -1,9 +1,10 @@
+import * as BillingService from "./billing.service.js";
 import { User } from "../models/index.js";
-import { ConflictError, InternalError, ValidationError } from "../utils/errors.js";
-import { parse_unique_error } from "../utils/index.js";
+import { InternalError, ValidationError } from "../utils/errors.js";
 import crypto from "crypto";
 
 import pkg from "objection";
+import { format_relations } from "../utils/index.js";
 const { UniqueViolationError } = pkg;
 
 const email_regex =
@@ -21,13 +22,9 @@ function create_one_impl(trx) {
     name,
     profile_photo_url,
   }) => {
-    return await User.query(trx).insert({
-      email,
-      phone,
-      password,
-      name,
-      profile_photo_url,
-    });
+    const user = await User.query(trx).insert({ email, phone, password, name, profile_photo_url });
+    await BillingService.create_one_trx(trx)(user.id);
+    return user;
   };
 }
 
@@ -45,24 +42,31 @@ export async function update_one(id, update) {
   }
 }
 
-export async function get_by_email_phone(identifier) {
+export async function get_by_email_phone(identifier, relations = []) {
   const field_name = email_regex.test(identifier) ? "email" : "phone";
-  return await User.query().findOne({ [field_name]: identifier });
+  return await User.query()
+    .findOne({ [field_name]: identifier })
+    .withGraphFetched(format_relations(relations));
 }
 
-export async function get_one(id) {
+export async function get_one(id, relations = []) {
   if (!id) return;
-  return await User.query().findById(id);
+  return await User.query().findById(id).withGraphFetched(format_relations(relations));
 }
 
-export async function get_by_username(username) {
+export async function get_by_username(username, relations = []) {
   if (!username) return;
-  return await User.query().findOne({ username });
+  return await User.query().findOne({ username }).withGraphFetched(format_relations(relations));
 }
 
-export async function get_by_hashid(hash_id) {
+export async function get_by_hashid(hash_id, relations = []) {
   if (hash_id) return;
-  return await User.query().findOne({ hash_id });
+  return await User.query().findOne({ hash_id }).withGraphFetched(format_relations(relations));
+}
+
+export async function get_preferences(id) {
+  const user = await get_one(id);
+  return await user?.$relatedQuery("preferences");
 }
 
 export const create_one = create_one_impl();

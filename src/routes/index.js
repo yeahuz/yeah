@@ -7,6 +7,8 @@ import { attachment } from "./attachment.route.js";
 import { geo } from "./geo.route.js";
 import { search } from "./search.route.js";
 import { category } from "./category.route.js";
+import { payment } from "./payment.route.js";
+import { cfimg } from "./cfimg.route.js";
 
 export const routes = async (fastify) => {
   fastify.register(home);
@@ -19,4 +21,6 @@ export const routes = async (fastify) => {
   fastify.register(search, { prefix: "/search" });
   fastify.register(category, { prefix: "/categories" });
   fastify.register(category, { prefix: "/c" });
+  fastify.register(payment, { prefix: "/payments" });
+  fastify.register(cfimg, { prefix: "/cloudflare/images" });
 };

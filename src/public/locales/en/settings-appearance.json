@@ -1,0 +1,9 @@
+{
+  "title": "Theme preferences",
+  "description": "Choose how website looks for you",
+  "themes": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
+  }
+}

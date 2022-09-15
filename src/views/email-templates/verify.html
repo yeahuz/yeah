@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= it.t("verify.title", { ns: "email-templates" }) %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      height: 100%;
+    }
+    body {
+      min-height: 100%;
+      padding: 24px;
+    }
+    .body {
+      height: 100%;
+      width: 100%;
+      background-color: rgb(249, 250, 251);
+      padding: 24px;
+    }
+    .container {
+      background-color: rgb(255, 255, 255);
+      max-width: 448px;
+      margin: auto;
+      padding: 24px;
+      color: rgb(16, 24, 40);
+      width: 100%;
+      border-radius: 8px;
+    }
+    .container__description {
+      margin-top: 16px;
+      margin-bottom: 20px;
+      font-size: 17px;
+    }
+    .container__code {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .container__hint {
+      color: rgb(63, 63, 70);
+      font-size: 16px;
+    }
+    .container__regards {
+      margin-top: 24px;
+      font-size: 16px;
+      color: rgb(63, 63, 70);
+    }
+    .container__logo {
+      max-width: 64px;
+      margin-bottom: 24px;
+    }
+    .logo-container {
+      max-width: 448px;
+      margin: auto;
+      width: 100%;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .logo-container__logo {
+      max-width: 64px;
+    }
+  </style>
+</head>
+<body>
+  <div class="body">
+    <a class="logo-container" href="https://needs.uz">
+      <img src="https://s3.yeah.uz/needs-logo.png" alt="needs.uz logo" class="logo-container__logo"/>
+    </a>
+    <div class="container">
+      <h1 class="container__heading"><%= it.t("verify.title", { ns: "email-templates" }) %></h1>
+      <p class="container__description"><%= it.t("verify.description", { ns: "email-templates" }) %></p>
+      <span class="container__code">
+        <%= it.code %>
+      </span>
+      <p class="container__hint"><%= it.t("verify.hint", { ns: "email-templates" }) %></p>
+      <p class="container__regards"><%= it.t("regards", { ns: "email-templates" }) %></p>
+    </div>
+  </div>
+</body>
+</html>
