@@ -266,6 +266,8 @@ export function up(knex) {
       table.string("title");
       table.text("description");
       table.string("cover_url", 512);
+      table.string("hash_id").index();
+      table.string("url", 512);
       table
         .integer("status_id")
         .index()
@@ -513,6 +515,7 @@ export function up(knex) {
         .references("id")
         .inTable("category_fields")
         .onDelete("CASCADE");
+      table.string("name");
       table.timestamps(false, true);
     })
     .createTable("category_field_value_translations", (table) => {

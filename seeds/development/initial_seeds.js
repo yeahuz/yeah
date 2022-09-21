@@ -19,6 +19,7 @@ export async function seed(knex) {
   await knex("posting_status_translations").del();
   await knex("exchange_rates").del();
   await knex("currencies").del();
+  await knex("notifications").del();
   await knex("notification_types").del();
   await knex("notification_type_translations").del();
 
@@ -29,14 +30,18 @@ export async function seed(knex) {
 
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i];
-      const [ru_first] = region.ru_name.split(" ");
+      const [ru_first, ru_second] = region.ru_name.split(" ");
       const [uz_first] = region.name.split(" ");
+      const [en_first, en_second] = region.en_name.split(" ");
 
-      const [inserted_region] = await knex("regions").returning("id").insert({
-        country_code: "uz",
-        soato: region.soato,
-        code: region.code,
-      });
+      const [inserted_region] = await knex("regions")
+        .returning("id")
+        .insert({
+          country_code: "uz",
+          soato: region.soato,
+          code: region.code,
+          ...(region.lat && { coords: knex.raw(`point(${region.lat}, ${region.lon})`) }),
+        });
 
       await knex("region_translations").insert([
         {
@@ -47,8 +52,14 @@ export async function seed(knex) {
         },
         {
           language_code: "ru",
-          short_name: ru_first.substring(0, ru_first.length - 4),
+          short_name: ru_second ? ru_first.substring(0, ru_first.length - 4) : ru_first,
           long_name: region.ru_name,
+          region_id: inserted_region.id,
+        },
+        {
+          language_code: "en",
+          short_name: en_second ? en_first.substring(0, ru_first.length - 4) : en_first,
+          long_name: region.en_name,
           region_id: inserted_region.id,
         },
       ]);
@@ -57,12 +68,16 @@ export async function seed(knex) {
         const district = region.districts[j];
         const [ru_first] = district.ru_name.split(" ");
         const [uz_first] = district.name.split(" ");
+        const [en_first] = district.en_name.split(" ");
 
-        const [inserted] = await knex("districts").returning("id").insert({
-          region_id: inserted_region.id,
-          soato: district.soato,
-          code: district.code,
-        });
+        const [inserted] = await knex("districts")
+          .returning("id")
+          .insert({
+            region_id: inserted_region.id,
+            soato: district.soato,
+            code: district.code,
+            ...(district.lat && { coords: knex.raw(`point(${district.lat}, ${district.lon})`) }),
+          });
 
         await knex("district_translations").insert([
           {
@@ -75,6 +90,12 @@ export async function seed(knex) {
             language_code: "ru",
             short_name: ru_first,
             long_name: district.ru_name,
+            district_id: inserted.id,
+          },
+          {
+            language_code: "en",
+            short_name: en_first,
+            long_name: district.en_name,
             district_id: inserted.id,
           },
         ]);
@@ -145,6 +166,11 @@ export async function seed(knex) {
       active: true,
       code: "in_moderation",
     },
+    {
+      id: 4,
+      active: true,
+      code: "indexing",
+    },
   ]);
 
   await knex("posting_status_translations").insert([
@@ -193,6 +219,21 @@ export async function seed(knex) {
       language_code: "uz",
       name: "Tekshiruvda",
     },
+    {
+      status_id: 4,
+      language_code: "ru",
+      name: "Индексирование",
+    },
+    {
+      status_id: 4,
+      language_code: "uz",
+      name: "Indekslanmoqda",
+    },
+    {
+      status_id: 4,
+      language_code: "en",
+      name: "Indexing",
+    },
   ]);
 
   await knex("auth_providers").insert([
@@ -222,13 +263,13 @@ export async function seed(knex) {
     {
       id: 1,
       type: "radio",
-      name: "repair",
+      name: "apartment_repair",
       category_id: 2,
     },
     {
       id: 2,
       type: "checkbox",
-      name: "exists",
+      name: "apartment_has",
       category_id: 2,
     },
   ]);

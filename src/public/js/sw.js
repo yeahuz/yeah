@@ -1,7 +1,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js");
 
 workbox.setConfig({
-  debug: true,
+  debug: false,
 });
 
 const { cacheNames } = workbox.core;
@@ -25,6 +25,7 @@ const { BackgroundSyncPlugin } = workbox.backgroundSync;
 const GOOGLE_GSTATIC_REGEX = new RegExp("https://maps\\.gstatic\\.com.*");
 const GOOGLE_APIS_REGEX = new RegExp("https://maps\\.googleapis\\.com.*");
 const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
+const SEARCH_ROUTE_REGEX = new RegExp("/search/?.*");
 const GLOBAL_VERSION = 2;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
@@ -38,7 +39,7 @@ const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   google_fonts_webfonts: "google-fonts-webfonts",
 });
 
-self.__WB_DISABLE_DEV_LOGS = false;
+self.__WB_DISABLE_DEV_LOGS = true;
 
 const image_expiration_plugin = new ExpirationPlugin({
   maxEntries: 60,
@@ -197,6 +198,7 @@ const swr_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   else if (url.pathname === "/auth/google") return;
   else if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
+  else if (SEARCH_ROUTE_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
 }, swr_content_handler);
 

@@ -1,6 +1,7 @@
 import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
 import * as PostingService from "../services/posting.service.js";
+import * as RegionService from "../services/region.service.js";
 import path from "path";
 import { render_file } from "../utils/eta.js";
 import { parse_url, array_to_tree } from "../utils/index.js";
@@ -68,9 +69,8 @@ export async function get_index(req, reply) {
   }
 
   const categories = await CategoryService.get_many({ lang: req.language });
-  const postings = await PostingService.get_many();
-  const posting = postings[0];
-  console.log(posting);
+  const postings = await PostingService.get_many({ status_id: 1 });
+  const regions = await RegionService.get_regions({ lang: req.language });
 
   const home = await render_file("/home.html", {
     t,
@@ -78,6 +78,7 @@ export async function get_index(req, reply) {
     postings,
     lang: req.language,
     format_relative: create_relative_formatter(req.language),
+    regions,
   });
   stream.push(home);
 

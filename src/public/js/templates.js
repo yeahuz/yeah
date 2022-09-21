@@ -35,3 +35,27 @@ export async function qr_code_tmpl(url) {
 
   return fragment;
 }
+
+export function search_suggestion_tmpl(suggestion, query) {
+  const li = create_node("li");
+  const link = create_node("a", {
+    class:
+      "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 hover: dark:text-gray-200 dark:hover:bg-zinc-800",
+    href: `/search?q=${query}${suggestion}`,
+  });
+  const span = create_node("span", { class: "font-semibold" });
+  span.textContent = suggestion;
+
+  link.textContent = query;
+  link.append(span);
+  li.append(link);
+  return link;
+}
+
+export function search_suggestions_tmpl(suggestions, query) {
+  const fragment = new DocumentFragment();
+  for (const suggestion of suggestions) {
+    fragment.append(search_suggestion_tmpl(suggestion, query));
+  }
+  return fragment;
+}

@@ -6,6 +6,8 @@ import {
   PostingLocation,
   PostingPrice,
 } from "./index.js";
+import { hashids } from "../utils/hashid.js";
+import config from "../config/index.js";
 
 export class Posting extends BaseModel {
   static get tableName() {
@@ -69,5 +71,12 @@ export class Posting extends BaseModel {
         },
       },
     };
+  }
+
+  async $afterInsert(ctx) {
+    await super.$afterInsert(ctx);
+    const hash_id = hashids.encode(this.id);
+    const url = `${config.origin}/postings/${hash_id}`;
+    await this.$query(ctx.transaction).patch({ hash_id: hashids.encode(this.id), url });
   }
 }

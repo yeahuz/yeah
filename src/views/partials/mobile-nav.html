@@ -5,7 +5,7 @@
 </label>
 <input type="checkbox" id="mobile-nav" class="peer hidden" />
 <label for="mobile-nav" class="fixed left-0 top-0 w-full h-full bg-black/10 hidden peer-checked:block backdrop-blur-[0.5px]"></label>
-<div class="fixed left-0 top-0 bg-white dark:bg-zinc-800 w-72 h-full z-20 -translate-x-2/3 invisible opacity-0 will-change-transform duration-300 peer-checked:visible peer-checked:translate-x-0 peer-checked:opacity-100 shadow-[0px_0px_0px_1px_rgba(255,255,255,1)] dark:shadow-[0px_0px_0px_1px_rgba(39,39,42,1)]">
+<div class="fixed -left-12 top-0 bg-white dark:bg-zinc-800 w-72 h-full z-20 invisible opacity-0 duration-300 peer-checked:visible peer-checked:left-0 peer-checked:opacity-100 shadow-[0px_0px_0px_1px_rgba(255,255,255,1)] dark:shadow-[0px_0px_0px_1px_rgba(39,39,42,1)]">
   <% if (it.user) { %>
     <%~ includeFile('./mini-profile-info.html', it) %>
   <% } else { %>

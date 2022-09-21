@@ -111,7 +111,7 @@ async function on_geo_input_change(e) {
     const label = create_node("label", {
       for: `location-${result.district_id}`,
       class:
-        "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 dark:text-gray-200 hover:bg-zinc-800",
+        "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 dark:text-gray-200 dark:hover:bg-zinc-800",
     });
     label.textContent = result.formatted_address;
 

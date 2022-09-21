@@ -30,7 +30,16 @@ function on_scroll() {
   };
 }
 
-window.addEventListener("scroll", on_scroll(), false);
+function on_scroll_shadow() {
+  const current_scroll = window.pageYOffset || document.documentElement.scrollTop;
+  if (current_scroll > 80) {
+    header?.classList.add("shadow-lg");
+  } else {
+    header?.classList.remove("shadow-lg");
+  }
+}
+
+window.addEventListener("scroll", on_scroll_shadow, false);
 
 add_listeners(logout_form, {
   submit: on_logout,

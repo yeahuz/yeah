@@ -61,8 +61,8 @@ export async function create_posting(payload) {
     await posting.$relatedQuery("location", trx).insert({
       formatted_address,
       coords: raw(`point(${lat}, ${lon})`),
-      district_id: 467,
-      region_id: 29,
+      district_id,
+      region_id,
     });
 
     await posting.$relatedQuery("attributes", trx).relate(attributes);
@@ -75,7 +75,7 @@ export async function create_posting(payload) {
   }
 }
 
-export async function get_many({ currency = "USD" } = {}) {
+export async function get_many({ currency = "USD", status_id = 1 } = {}) {
   return await Posting.query()
     .select(
       "title",
@@ -87,6 +87,7 @@ export async function get_many({ currency = "USD" } = {}) {
       "postings.id as id",
       raw("round(price * rate) as price")
     )
+    .where({ status_id })
     .join("posting_prices as pp", "postings.id", "pp.posting_id")
     .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
     .where("exchange_rates.to_currency", "=", currency)

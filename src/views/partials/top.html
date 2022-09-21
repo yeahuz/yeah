@@ -46,4 +46,6 @@
         }
       }
     </script>
-    <%~ includeFile("./header.html", it) %>
+    <% if (!it.header_hidden) { %>
+      <%~ includeFile("./header.html", it) %>
+    <% } %>

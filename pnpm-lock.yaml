@@ -40,6 +40,7 @@ specifiers:
   jsonwebtoken: ^8.5.1
   knex: 2.2.0
   negotiator: ^0.6.3
+  node-cron: ^3.0.2
   node-telegram-bot-api: ^0.58.0
   nodemon: ^2.0.19
   objection: ^3.0.1
@@ -78,7 +79,7 @@ dependencies:
   cbor: 8.1.0
   dotenv: 16.0.1
   eta: 1.12.3
-  fastify: github.com/fastify/fastify/8971520989d771deebe5ee4e5c8a65adcdd66288
+  fastify: github.com/fastify/fastify/21eb6cf9f5d49236e88161ef71ece7a7d5926e31
   fastify-plugin: 4.2.0
   google-auth-library: 8.3.0
   hashids: 2.2.10
@@ -90,6 +91,7 @@ dependencies:
   jsonwebtoken: 8.5.1
   knex: 2.2.0_pg@8.7.3
   negotiator: 0.6.3
+  node-cron: 3.0.2
   node-telegram-bot-api: 0.58.0
   objection: 3.0.1_knex@2.2.0
   otplib: 12.0.1
@@ -1543,8 +1545,8 @@ packages:
       fastify-plugin: 3.0.1
     dev: false
 
-  /@fastify/ajv-compiler/3.1.2:
-    resolution: {integrity: sha512-m2nzzQJeuVmeGOB9rnII9sZiY8AZ02a9WMQfMBfK1jxdFnxm3FPYKGbYpPjODj4halNogwpolyugbTNpnDCi0A==}
+  /@fastify/ajv-compiler/3.3.1:
+    resolution: {integrity: sha512-IRnids8lblQ8e1i8h4JLyfJmebXE+ohcj8x8X/+Ew6ZB4H0Ui05z5YL6q5FOcl0zItVpu4adRzeyVNNUwmduIg==}
     dependencies:
       ajv: 8.11.0
       ajv-formats: 2.1.1
@@ -1579,8 +1581,8 @@ packages:
       fastify-plugin: 3.0.1
     dev: false
 
-  /@fastify/fast-json-stringify-compiler/4.0.0:
-    resolution: {integrity: sha512-9pCi6c6tmGt/qfuf2koZQuSIG6ckP9q3mz+JoMmAq9eQ4EtA92sWoK7E0LJUn2FFTS/hp5kag+4+dWsV5ZfcXg==}
+  /@fastify/fast-json-stringify-compiler/4.1.0:
+    resolution: {integrity: sha512-cTKBV2J9+u6VaKDhX7HepSfPSzw+F+TSd+k0wzifj4rG+4E5PjSFJCk19P8R6tr/72cuzgGd+mbB3jFT6lvAgw==}
     dependencies:
       fast-json-stringify: 5.1.0
     dev: false
@@ -2776,6 +2778,10 @@ packages:
     resolution: {integrity: sha512-LDzYKNTHhD+XOp8wGMuCkY4eTxFZOOycmpwLBiuF3r3OjOmZnURRD8t2dUAbmKuXGbo/MGggwbSjcBdp8QT0+g==}
     dev: true
 
+  /fast-decode-uri-component/1.0.1:
+    resolution: {integrity: sha512-WKgKWg5eUxvRZGwW8FvfbaH7AXSh2cL+3j5fMGzUMCxWBJ3dV3a7Wz8y2f/uQ0e3B6WmodD3oS54jTQ9HVTIIg==}
+    dev: false
+
   /fast-deep-equal/3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: false
@@ -2803,6 +2809,12 @@ packages:
       ajv-formats: 2.1.1
       fast-uri: 2.1.0
       rfdc: 1.3.0
+    dev: false
+
+  /fast-querystring/1.0.0:
+    resolution: {integrity: sha512-3LQi62IhQoDlmt4ULCYmh17vRO2EtS7hTSsG4WwoKWgV7GLMKBOecEh+aiavASnLx8I2y89OD33AGLo0ccRhzA==}
+    dependencies:
+      fast-decode-uri-component: 1.0.1
     dev: false
 
   /fast-redact/3.1.1:
@@ -2872,11 +2884,12 @@ packages:
       - supports-color
     dev: true
 
-  /find-my-way/7.0.1:
-    resolution: {integrity: sha512-w05SaOPg54KqBof/RDA+75n1R48V7ZZNPL3nR17jJJs5dgZpR3ivfrMWOyx7BVFQgCLhYRG05hfgFCohYvSUXA==}
+  /find-my-way/7.2.0:
+    resolution: {integrity: sha512-27SFA5sSYDYFZCQ/7SSJB0yhStTP/qxKP1OEC8feZvkHFRuD3fGcQ97Y+0w8HpKTDfMYWXGU3h2ETRGt5zPWyA==}
     engines: {node: '>=14'}
     dependencies:
       fast-deep-equal: 3.1.3
+      fast-querystring: 1.0.0
       safe-regex2: 2.0.0
     dev: false
 
@@ -3626,8 +3639,8 @@ packages:
       - supports-color
     dev: false
 
-  /light-my-request/5.5.1:
-    resolution: {integrity: sha512-Zd4oZjF7axSyc5rYQsbB0qsgY4LFFviZSbEywxf7Vi5UE3y3c7tYF/GeheQjBNYY+pQ55BF8UGGJTjneoxOS1w==}
+  /light-my-request/5.6.1:
+    resolution: {integrity: sha512-sbJnC1UBRivi9L1kICr3CESb82pNiPNB3TvtdIrZZqW0Qh8uDXvoywMmWKZlihDcmw952CMICCzM+54LDf+E+g==}
     dependencies:
       cookie: 0.5.0
       process-warning: 2.0.0
@@ -3824,6 +3837,13 @@ packages:
 
   /node-addon-api/5.0.0:
     resolution: {integrity: sha512-CvkDw2OEnme7ybCykJpVcKH+uAOLV2qLqiyla128dN9TkEWfrYmxG6C2boDe5KcNQqZF3orkqzGgOMvZ/JNekA==}
+    dev: false
+
+  /node-cron/3.0.2:
+    resolution: {integrity: sha512-iP8l0yGlNpE0e6q1o185yOApANRe47UPbLf4YxfbiNHt/RU5eBcGB/e0oudruheSf+LQeDMezqC5BVAb5wwRcQ==}
+    engines: {node: '>=6.0.0'}
+    dependencies:
+      uuid: 8.3.2
     dev: false
 
   /node-fetch/2.6.7:
@@ -4159,8 +4179,8 @@ packages:
     resolution: {integrity: sha512-mMMOwSKrmyl+Y12Ri2xhH1lbzQxwwpuru9VjyJpgFIH4asSj88F2csdMwN6+M5g1Ll4rmsYghHLQJw81tgZ7LQ==}
     dev: false
 
-  /pino/8.4.2:
-    resolution: {integrity: sha512-PlXDeGhJZfAuVay+wtlS02s5j8uisQveZExYdAm9MwwxUQSz9R7Q78XtjM2tTa4sa5KJmygimZjZxXXuHgV6ew==}
+  /pino/8.6.0:
+    resolution: {integrity: sha512-gCEOs6XpgiM8mSFjiLXQejDJ1PZww8AUmHowQ16QpqpXQDIm3mFwn/29+Y6CJxd6i+x3uXduuerjq+IqWoABbA==}
     hasBin: true
     dependencies:
       atomic-sleep: 1.0.0
@@ -5371,19 +5391,19 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  github.com/fastify/fastify/8971520989d771deebe5ee4e5c8a65adcdd66288:
-    resolution: {tarball: https://codeload.github.com/fastify/fastify/tar.gz/8971520989d771deebe5ee4e5c8a65adcdd66288}
+  github.com/fastify/fastify/21eb6cf9f5d49236e88161ef71ece7a7d5926e31:
+    resolution: {tarball: https://codeload.github.com/fastify/fastify/tar.gz/21eb6cf9f5d49236e88161ef71ece7a7d5926e31}
     name: fastify
-    version: 4.5.3
+    version: 4.6.0
     dependencies:
-      '@fastify/ajv-compiler': 3.1.2
+      '@fastify/ajv-compiler': 3.3.1
       '@fastify/error': 3.0.0
-      '@fastify/fast-json-stringify-compiler': 4.0.0
+      '@fastify/fast-json-stringify-compiler': 4.1.0
       abstract-logging: 2.0.1
       avvio: 8.2.0
-      find-my-way: 7.0.1
-      light-my-request: 5.5.1
-      pino: 8.4.2
+      find-my-way: 7.2.0
+      light-my-request: 5.6.1
+      pino: 8.6.0
       process-warning: 2.0.0
       proxy-addr: 2.0.7
       rfdc: 1.3.0

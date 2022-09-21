@@ -6,4 +6,9 @@ export const search = async (fastify) => {
     url: "/",
     handler: SearchController.get_search,
   });
+  fastify.route({
+    method: "GET",
+    url: "/completions",
+    handler: SearchController.get_completions,
+  });
 };

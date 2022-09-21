@@ -1,7 +1,6 @@
-<main class="px-4 xl:px-0">
-  <input type="text" name="q" value="<%= it.q ?? ""%>" class="form-control" placeholder="Search postings"/>
+<main class="px-4 xl:px-0 max-w-7xl mx-auto">
   <% if (it.categories.length) { %>
-    <ul>
+    <ul class="md:hidden">
       <% it.categories.forEach(function (category) { %>
         <li>
           <a href="/c/<%= category.id %>" class="flex items-center w-full py-3">
@@ -15,5 +14,9 @@
         </li>
       <% }) %>
     </ul>
+  <% } %>
+  <%~ includeFile('../partials/search-bar.html', it) %>
+  <% if (it.q) {%>
+    <h1 class="font-semibold text-xl mt-16 hidden md:block">Объявления по запросу &laquo;<%= it.q %>&raquo;</h1>
   <% } %>
 </main>

@@ -17,6 +17,7 @@ const render_file = async (templatePath, ...props) => {
     const exists = await file_exists(path.join(process.cwd(), `src/views/${templatePath}`));
     if (exists) return await eta.renderFile(templatePath, ...props);
   } catch (err) {
+    console.log(err);
     return await eta.renderFile("/500.html", ...props);
   }
 };
