@@ -1,4 +1,4 @@
-import { PackBytes, string, array, bits, schemas } from "packBytes";
+import { PackBytes, string, array, bits, schemas } from "packbytes";
 
 const schema = schemas({
   auth_scan: {
