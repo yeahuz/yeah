@@ -1,0 +1,92 @@
+<aside class="max-w-xs w-full">
+  <form>
+    <input type="hidden" name="q" value="<%= it.q ?? "" %>" />
+    <input type="hidden" name="region_id" value="<%= it.region_id ?? "" %>" />
+    <label class="w-full">
+      <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Цена</span>
+      <div class="flex">
+        <div class="flex mt-2">
+          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">От</span>
+          <input value="<%= it.min_amount ?? ""%>" type="text" class="form-control !rounded-l-none !border-l-0 !rounded-r-none" placeholder="мин" name="min_amount">
+        </div>
+        <div class="flex mt-2">
+          <span class="border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 dark:border-zinc-800 dark:text-gray-400">До</span>
+          <input  value="<%= it.max_amount ?? ""%>" type="text" class="form-control !rounded-l-none !border-l-0" placeholder="макс" name="max_amount">
+        </div>
+      </div>
+    </label>
+    <% it.filters.checkbox_facets.facet_id.buckets.forEach(function (bucket) { %>
+      <% const label = bucket.facet_name.buckets[0].key %>
+      <div class="space-y-2 mt-5">
+        <div class="text-sm block">
+          <span class="font-medium text-gray-700 dark:text-gray-200">
+            <%= label %>
+          </span>
+        </div>
+        <% bucket.facet_value_id.buckets.forEach(function (value_bucket) { %>
+          <% const value_label = value_bucket.facet_value_name.buckets[0].key %>
+          <div class="flex items-center">
+            <input  <%= (it.facets?.[bucket.key]?.includes(String(value_bucket.key)) || it.facets?.[bucket.key] === String(value_bucket.key)) ? "checked" : "" %> type="checkbox" name="<%= bucket.key %>" id="<%= bucket.key %>-<%= value_bucket.key %>" class="checkbox-input appearance-none peer" value="<%= value_bucket.key %>"/>
+            <label for="<%= bucket.key %>-<%= value_bucket.key %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+                <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </label>
+            <% if (value_label) { %>
+              <label for="<%= bucket.key %>-<%= value_bucket.key %>" class="checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
+                <% const href = it.facets?.[bucket.key]?.includes(String(value_bucket.key)) || it.facets?.[bucket.key] === String(value_bucket.key) ? it.remove_query_value(it.url, bucket.key, value_bucket.key) : it.append_query_value(it.url, bucket.key, value_bucket.key) %>
+                <a href="<%= href %>">
+                  <%= value_label %>
+                </a>
+              </label>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% }) %>
+    <% it.filters.radio_facets.facet_id.buckets.forEach(function (bucket) { %>
+      <% const label = bucket.facet_name.buckets[0].key %>
+      <div class="space-y-2 mt-5">
+        <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
+          <%= label %>
+        </span>
+        <% bucket.facet_value_id.buckets.forEach(function (value_bucket) { %>
+          <% const value_label = value_bucket.facet_value_name.buckets[0].key %>
+          <div class="flex items-center">
+            <input  <%= it.facets?.[bucket.key] === String(value_bucket.key) ? "checked" : ""%> type="radio" name="<%= bucket.key %>" value="<%= value_bucket.key %>" id="<%= bucket.key %>-<%= value_bucket.key %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+                        bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
+                        font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
+                        relative checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
+            <label for="<%= bucket.key %>-<%= value_bucket.key %>" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white">
+              <%= value_label %>
+            </label>
+          </div>
+        <% }) %>
+      </div>
+    <% }) %>
+    <div class="space-y-2 mt-5">
+      <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
+        Срок размещения
+      </span>
+      <div class="flex items-center">
+        <input  type="radio" <%= it.placement === "1d" ? "checked" : "" %> name="placement" id="placement-1d" value="1d" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+                    bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
+                    font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
+                    relative checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
+        <label for="placement-1d" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white">
+          За 24 часа
+        </label>
+      </div>
+      <div class="flex items-center">
+        <input  type="radio" <%= it.placement === "1w" ? "checked" : "" %> name="placement" id="placement-1w" value="1w" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+                    bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
+                    font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
+                    relative checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
+        <label for="placement-1w" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white">
+          За неделю
+        </label>
+      </div>
+    </div>
+    <button  class="btn btn-primary btn-md mt-5">Применить</button>
+  </form>
+</aside>
