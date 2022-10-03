@@ -18,6 +18,7 @@ import { elastic_client } from "./services/es.service.js";
 import { i18next } from "./utils/i18n.js";
 import { routes } from "./routes/index.js";
 import { is_xhr } from "./plugins/is-xhr.js";
+import { is_partial } from "./plugins/is-partial.js";
 import { chunk_view } from "./plugins/chunk-view.js";
 import { init_stream } from "./plugins/init-stream.js";
 import { DomainError, InternalError, ValidationError } from "./utils/errors.js";
@@ -47,6 +48,7 @@ export async function start() {
 
   try {
     app.register(is_xhr);
+    app.register(is_partial);
     app.register(chunk_view);
     app.register(init_stream);
     app.register(form_body);
@@ -146,11 +148,13 @@ export async function start() {
       const referer = req.headers["referer"];
       const theme = req.session.get("theme");
       const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+      const is_partial_content = req.headers["x-content-mode"] === "partial";
+      const partial = is_navigation_preload || is_partial_content;
       const html = await render_file("/404.html", {
         meta: { lang: req.language },
         referer,
         theme,
-        is_navigation_preload,
+        partial,
         t,
       });
       reply.code(404).type("text/html").send(html);

@@ -1,4 +1,4 @@
-<% if (!it.is_navigation_preload) { %>
+<% if (!it.partial) { %>
   <% layout('./layout.html', { meta: { title: it.t("page_not_found", { ns: "common" }), lang: "en" }} ) %>
 <% } %>
 <noscript>

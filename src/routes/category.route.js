@@ -8,7 +8,7 @@ export const category = async (fastify) => {
   });
   fastify.route({
     method: "GET",
-    url: "/:category_id",
+    url: "/*",
     handler: CategoryController.get_many,
   });
 };

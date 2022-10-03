@@ -23,6 +23,7 @@ i18next
       "profile",
       "payments",
       "email-templates",
+      "sms",
     ],
     fallbackLng: "ru",
     backend: {

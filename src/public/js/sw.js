@@ -5,8 +5,7 @@ workbox.setConfig({
 });
 
 const { cacheNames } = workbox.core;
-const { registerRoute, Route, NavigationRoute, setCatchHandler, setDefaultHandler } =
-  workbox.routing;
+const { registerRoute, Route, setCatchHandler, setDefaultHandler } = workbox.routing;
 const { enable: enable_navigation_preload } = workbox.navigationPreload;
 const { CacheFirst, StaleWhileRevalidate, NetworkFirst, Strategy } = workbox.strategies;
 const { ExpirationPlugin } = workbox.expiration;
@@ -110,7 +109,15 @@ const swr_content_strategy = new StaleWhileRevalidate({
   cacheName: CACHE_NAMES.swr_content,
   plugins: [
     {
-      handlerDidError: () => {
+      requestWillFetch: ({ request }) => {
+        const headers = new Headers();
+        headers.append("X-Content-Mode", "partial");
+        return new Request(request.url, {
+          method: "GET",
+          headers,
+        });
+      },
+      handlerDidError: (err) => {
         return matchPrecache("/partials/offline.html");
       },
     },
@@ -122,11 +129,38 @@ const swr_content_strategy = new StaleWhileRevalidate({
   ],
 });
 
+const nf_content_strategy = new NetworkFirst({
+  cacheName: CACHE_NAMES.nf_content,
+  plugins: [
+    {
+      requestWillFetch: ({ request }) => {
+        const headers = new Headers();
+        headers.append("X-Content-Mode", "partial");
+        return new Request(request.url, {
+          method: "GET",
+          headers,
+        });
+      },
+      handlerDidError: () => {
+        return matchPrecache("/partials/offline.html");
+      },
+    },
+  ],
+});
+
 precacheAndRoute([
   {
     url: "/partials/offline.html",
     revision: GLOBAL_VERSION + 1,
   },
+  // {
+  //   url: "/partials/top.html",
+  //   revision: GLOBAL_VERSION + 1,
+  // },
+  // {
+  //   url: "/partials/bottom.html",
+  //   revision: GLOBAL_VERSION + 1,
+  // },
 ]);
 
 const swr_content_handler = compose_strategies([
@@ -135,6 +169,7 @@ const swr_content_handler = compose_strategies([
     if (url.searchParams.get("t")) {
       await partial_expiration_plugin.deleteCacheAndMetadata();
     }
+
     return partial_strategy.handle({
       event,
       request: new Request("/partials/top.html"),
@@ -171,17 +206,7 @@ const nf_content_handler = compose_strategies([
       request: new Request("/partials/top.html"),
     });
   },
-  ({ event }) =>
-    new NetworkFirst({
-      cacheName: CACHE_NAMES.nf_content,
-      plugins: [
-        {
-          handlerDidError: () => {
-            return matchPrecache("/partials/offline.html");
-          },
-        },
-      ],
-    }).handle(event),
+  ({ event }) => nf_content_strategy.handle(event),
   async ({ event }) => {
     const url = new URL(event.request.url);
     if (url.searchParams.get("t")) {
@@ -197,6 +222,8 @@ const nf_content_handler = compose_strategies([
 const swr_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   else if (url.pathname === "/auth/google") return;
+  else if (url.pathname === "/auth/signup") return;
+  else if (url.pathname === "/auth/login") return;
   else if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
   else if (SEARCH_ROUTE_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
@@ -207,17 +234,7 @@ const nf_content_route = new Route(({ request, url }) => {
   return request.mode === "navigate" && POSTING_WIZARD_REGEX.test(url.pathname);
 }, nf_content_handler);
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cache_keys) => {
-      const valid_caches = new Set(Object.values(CACHE_NAMES));
-      const to_delete = cache_keys.filter((key) => !valid_caches.has(key));
-      return Promise.all(to_delete.map((name) => caches.delete(name)));
-    })
-  );
-});
-
-enable_navigation_preload();
+// enable_navigation_preload();
 google_fonts_cache();
 cleanup_outdated_caches();
 registerRoute(swr_content_route);
@@ -233,6 +250,16 @@ setCatchHandler(({ request }) => {
   if (request.destination === "document") {
     return matchPrecache("/partials/offline.html");
   }
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cache_keys) => {
+      const valid_caches = new Set(Object.values(CACHE_NAMES));
+      const to_delete = cache_keys.filter((key) => !valid_caches.has(key));
+      return Promise.all(to_delete.map((name) => caches.delete(name)));
+    })
+  );
 });
 
 self.addEventListener("message", async (event) => {

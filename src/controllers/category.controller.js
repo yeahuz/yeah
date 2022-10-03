@@ -3,13 +3,12 @@ import { render_file } from "../utils/eta.js";
 import * as CategoryService from "../services/category.service.js";
 
 export async function get_many(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
   const { category_id } = req.params;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
@@ -25,7 +24,7 @@ export async function get_many(req, reply) {
   const list = await render_file("/category/list", { categories });
   stream.push(list);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       user,
       t,

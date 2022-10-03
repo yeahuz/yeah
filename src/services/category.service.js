@@ -26,9 +26,9 @@ export async function get_by_parent({ lang = "en", parent_id = null } = {}) {
     .where({ language_code: lang.substring(0, 2) });
 }
 
-export async function get_parents(category_id) {
+export async function get_parents(category_id, include_itself = true) {
   const knex = Category.knex();
-  return await knex
+  const cte_query = knex
     .withRecursive("category_parents", (qb) => {
       qb.select("parent_id", "id")
         .from("categories")
@@ -41,6 +41,12 @@ export async function get_parents(category_id) {
     })
     .select("id")
     .from("category_parents");
+
+  if (!include_itself) {
+    cte_query.whereNot({ id: category_id });
+  }
+
+  return await cte_query;
 }
 
 export async function get_fields({ category_id, lang = "en" }) {

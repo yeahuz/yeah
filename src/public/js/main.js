@@ -1,8 +1,4 @@
-import { add_listeners } from "./dom.js";
-import { on_logout } from "./auth.js";
-
 const header = document.querySelector(".js-header");
-const logout_form = document.querySelectorAll(".js-logout-form");
 
 function on_scroll() {
   let last_scroll = 0;
@@ -40,7 +36,3 @@ function on_scroll_shadow() {
 }
 
 window.addEventListener("scroll", on_scroll_shadow, false);
-
-add_listeners(logout_form, {
-  submit: on_logout,
-});

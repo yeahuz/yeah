@@ -14,6 +14,9 @@ export async function seed(knex) {
   await knex("regions").del();
   await knex("region_translations").del();
   await knex("districts").del();
+  await knex("payment_providers").del();
+  await knex("payment_statuses").del();
+  await knex("payment_status_translations").del();
   await knex("district_translations").del();
   await knex("posting_statuses").del();
   await knex("posting_status_translations").del();
@@ -272,6 +275,13 @@ export async function seed(knex) {
       name: "apartment_has",
       category_id: 2,
     },
+    // {
+    //   id: 3,
+    //   type: "number",
+    //   name: "price",
+    //   category_id: 2,
+    //   input_mode: "numeric",
+    // },
   ]);
 
   await knex("category_field_values").insert([
@@ -463,6 +473,24 @@ export async function seed(knex) {
       language_code: "uz",
       label: "Kvartirada bor",
     },
+    // {
+    //   category_field_id: 3,
+    //   language_code: "ru",
+    //   label: "Цена",
+    //   placeholder: "0",
+    // },
+    // {
+    //   category_field_id: 3,
+    //   language_code: "en",
+    //   label: "Price",
+    //   placeholder: "0",
+    // },
+    // {
+    //   category_field_id: 3,
+    //   language_code: "uz",
+    //   label: "Narxi",
+    //   placeholder: "0",
+    // },
   ]);
 
   await knex("category_translations").insert([
@@ -563,6 +591,87 @@ export async function seed(knex) {
       title: "Ура, новое обновление!",
       content:
         "Привет, %s. У нас есть новые обновления для вас. Узнайте больше <a href='https://needs.uz/updates'>здесь</a>",
+    },
+  ]);
+
+  await knex("payment_providers").insert([
+    {
+      name: "payme",
+      title: "Payme",
+      light_logo_url: "http://localhost:3000/public/images/payme-logo-light.png",
+      dark_logo_url: "http://localhost:3000/public/images/payme-logo-dark.png",
+    },
+    {
+      name: "click",
+      title: "Click Evolution",
+      light_logo_url: "http://localhost:3000/public/images/click-logo-light.png",
+      dark_logo_url: "http://localhost:3000/public/images/click-logo-dark.png",
+    },
+    {
+      name: "octo",
+      title: "Octo",
+      light_logo_url: "http://localhost:3000/public/images/octo-logo-light.png",
+      dark_logo_url: "http://localhost:3000/public/images/octo-logo-dark.png",
+    },
+  ]);
+
+  await knex("payment_statuses").insert([
+    {
+      code: "PENDING",
+    },
+    {
+      code: "FAILED",
+    },
+    {
+      code: "SUCCESS",
+    },
+  ]);
+
+  await knex("payment_status_translations").insert([
+    {
+      status_code: "PENDING",
+      language_code: "ru",
+      name: "В обработке",
+    },
+    {
+      status_code: "PENDING",
+      language_code: "en",
+      name: "Pending",
+    },
+    {
+      status_code: "PENDING",
+      language_code: "uz",
+      name: "Kutilmoqda",
+    },
+    {
+      status_code: "FAILED",
+      language_code: "ru",
+      name: "Ошибка",
+    },
+    {
+      status_code: "FAILED",
+      language_code: "en",
+      name: "Failed",
+    },
+    {
+      status_code: "FAILED",
+      language_code: "uz",
+      name: "Muvaffaqiyatsiz",
+    },
+    {
+      status_code: "SUCCESS",
+      language_code: "ru",
+      name: "Успешно",
+    },
+    {
+      status_code: "SUCCESS",
+      language_code: "en",
+      name: "Success",
+    },
+    {
+      status_code: "SUCCESS",
+      language_code: "uz",
+      name: "Muvaffaqiyatli",
     },
   ]);
 

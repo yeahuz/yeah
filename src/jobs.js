@@ -1,19 +1,66 @@
 import { Posting } from "./models/index.js";
-import objection from "objection";
-import cron from "node-cron";
 import { elastic_client } from "./services/es.service.js";
+import cron from "node-cron";
+import objection from "objection";
 
-const { ref } = objection;
+const { ref, raw } = objection;
 
-export const pg_to_es = cron.schedule("* * * * *", pg_to_es_impl);
+export const pg_to_es = cron.schedule("*/5 * * * * *", pg_to_es_impl);
+
+let called = 0;
+
+function boosted_description(title, facets) {
+  let description = title;
+  for (const prop in facets) {
+    if (prop === "checkbox_facets") {
+      const checkbox_facets = facets[prop];
+      description += ` с ${checkbox_facets.map((facet) => facet.facet_value_name).join(", ")}.`;
+    }
+
+    if (prop === "radio_facets") {
+      const radio_facets = facets[prop];
+      description += radio_facets
+        .map((facet) => ` ${facet.facet_name} - ${facet.facet_value_name}`)
+        .join(", ");
+    }
+  }
+
+  return description;
+}
 
 async function pg_to_es_impl() {
+  console.log({ called: ++called });
   const postings = await Posting.query()
+    .alias("p")
+    .select(
+      "p.id as id",
+      "p.title",
+      "p.description",
+      "p.cover_url",
+      "p.url",
+      "p.created_at as created_at",
+      "pl.district_id",
+      "pl.region_id",
+      "pl.formatted_address",
+      "d.coords as district_coords",
+      "r.coords as region_coords",
+      "exchange_rates.to_currency as currency",
+      raw("cast(round(price * rate) as int)").as("price")
+    )
     .where({ status_id: 4 })
     .withGraphFetched("[attributes.[field.[translation], translation], categories.[translation]]")
+    .join("posting_location as pl", "p.id", "pl.posting_id")
+    .join("districts as d", "pl.district_id", "d.id")
+    .join("regions as r", "pl.region_id", "r.id")
+    .join("posting_prices as pp", "p.id", "pp.posting_id")
+    .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
+    .where("exchange_rates.to_currency", "=", "USD")
     .modifyGraph("categories.translation", (builder) =>
       builder.select("title").where({ language_code: "ru" })
     )
+    .modifyGraph("location.district", (builder) => {
+      builder.select("ditrict.coords");
+    })
     .modifyGraph("attributes.translation", (builder) =>
       builder.select("label").where({ language_code: "ru" })
     )
@@ -25,15 +72,37 @@ async function pg_to_es_impl() {
   for (const posting of postings) {
     const checkbox_facets = [];
     const radio_facets = [];
+    const number_facets = [];
     for (const attribute of posting.attributes) {
       if (attribute.field.type === "checkbox") {
         checkbox_facets.push({
-          facet_name: attribute.category_field_id,
-          facet_value: attribute.id,
+          facet_id: attribute.category_field_id,
+          facet_name: attribute.field.translation.label,
+          // facet_name: `${attribute.category_field_id}|${attribute.field.translation.label}`,
+          // facet_value: `${attribute.id}|${attribute.translation.label}`,
+          facet_value_id: attribute.id,
+          facet_value_name: attribute.translation.label,
         });
       }
       if (attribute.field.type === "radio") {
-        radio_facets.push({ facet_name: attribute.category_field_id, facet_value: attribute.id });
+        radio_facets.push({
+          facet_id: attribute.category_field_id,
+          facet_name: attribute.field.translation.label,
+          // facet_name: `${attribute.category_field_id}|${attribute.field.translation.label}`,
+          // facet_value: `${attribute.id}|${attribute.translation.label}`,
+          facet_value_id: attribute.id,
+          facet_value_name: attribute.translation.label,
+        });
+      }
+      if (attribute.field.type === "number") {
+        number_facets.push({
+          facet_id: attribute.category_field_id,
+          facet_name: attribute.field.translation.label,
+          // facet_name: `${attribute.category_field_id}|${attribute.field.translation.label}`,
+          // facet_value: `${attribute.id}|${attribute.translation.label}`,
+          facet_value_id: attribute.id,
+          facet_value_name: attribute.translation.label,
+        });
       }
     }
 
@@ -44,12 +113,29 @@ async function pg_to_es_impl() {
           title: posting.title,
           cover_url: posting.cover_url,
           url: posting.url,
+          location: {
+            formatted_address: posting.formatted_address,
+          },
+          description: posting.description,
+          created_at: posting.created_at,
+          price: posting.price,
+          currency: posting.currency,
         },
         search_data: {
           checkbox_facets,
           radio_facets,
-          categories: posting.categories.map((c) => c.id),
+          number_facets,
+          categories: posting.categories.map((c) => c.translation.title),
+          category_id: posting.categories.find((c) => c.relation === "DIRECT")?.id,
           title: posting.title,
+          full_text: posting.title + posting.description,
+          full_text_boosted: boosted_description(posting.title, { checkbox_facets, radio_facets }),
+          district_id: posting.district_id,
+          region_id: posting.region_id,
+          coords: { lat: posting.district_coords.x, lon: posting.district_coords.y },
+          price: posting.price,
+          created_at: posting.created_at,
+          indexed_at: new Date(),
         },
       },
     });

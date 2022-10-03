@@ -1,3 +1,22 @@
+const ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
+  CREATE OR REPLACE FUNCTION on_payment_status_update() RETURNS trigger AS $$
+  BEGIN
+    UPDATE billing_accounts
+    SET balance = balance + (NEW.debit_amount - NEW.credit_amount)
+    WHERE id = NEW.billing_account_id;
+    RETURN NEW;
+  END;
+  $$ language 'plpgsql';
+
+  CREATE TRIGGER tr_payment_status_update
+  AFTER UPDATE ON payments
+  FOR EACH ROW
+  WHEN (NEW.status = 'SUCCESS')
+  EXECUTE FUNCTION on_payment_status_update();
+`;
+
+const DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION = `DROP FUNCTION on_payment_status_update`;
+
 export function up(knex) {
   return knex.schema
     .createTable("users", (table) => {
@@ -80,10 +99,36 @@ export function up(knex) {
         .onDelete("CASCADE");
       table.timestamps(false, true);
     })
+    .createTable("payment_providers", (table) => {
+      table.string("name").primary();
+      table.string("title");
+      table.string("light_logo_url");
+      table.string("dark_logo_url");
+      table.boolean("active").defaultTo(true);
+      table.timestamps(false, true);
+    })
+    .createTable("payment_statuses", (table) => {
+      table.string("code").primary();
+      table.timestamps(false, true);
+    })
     .createTable("payments", (table) => {
       table.increments("id");
-      table.integer("amount");
-      table.enu("type", ["DEPOSIT", "WITHDRAWAL"]).index();
+      table.integer("debit_amount").defaultTo(0);
+      table.integer("credit_amount").defaultTo(0);
+      table
+        .string("status")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("payment_statuses")
+        .onDelete("CASCADE");
+      table
+        .string("provider")
+        .index()
+        .notNullable()
+        .references("name")
+        .inTable("payment_providers")
+        .onDelete("CASCADE");
       table
         .integer("billing_account_id")
         .index()
@@ -204,7 +249,7 @@ export function up(knex) {
     .createTable("sessions", (table) => {
       table.increments("id");
       table.boolean("active").defaultTo(true);
-      table.string("ip");
+      table.specificType("ip", "INET");
       table.timestamp("expires_at");
       table.timestamps(false, true);
       table
@@ -214,6 +259,21 @@ export function up(knex) {
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
+    })
+    .createTable("user_location", (table) => {
+      table.increments("id");
+      table.point("coords");
+      table.string("city");
+      table.string("region");
+      table.string("country");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.timestamps(false, true);
     })
     .createTable("user_agents", (table) => {
       table.increments("id");
@@ -275,6 +335,26 @@ export function up(knex) {
         .references("id")
         .inTable("posting_statuses")
         .onDelete("CASCADE");
+      table.timestamps(false, true);
+    })
+    .createTable("payment_status_translations", (table) => {
+      table.increments("id");
+      table
+        .string("status_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("payment_statuses")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("name");
+      table.unique(["status_code", "language_code"]);
       table.timestamps(false, true);
     })
     .createTable("posting_status_translations", (table) => {
@@ -441,6 +521,7 @@ export function up(knex) {
         .references("id")
         .inTable("postings")
         .onDelete("CASCADE");
+      table.enu("relation", ["DIRECT", "PARENT"]);
       table.unique(["category_id", "posting_id"]);
     })
     .createTable("category_fields", (table) => {
@@ -472,6 +553,7 @@ export function up(knex) {
           "tel",
         ])
         .defaultTo("text");
+      table.enu("facet_type", ["checkbox", "radio", "number", "select", "range"]);
       table
         .enu("input_mode", ["text", "decimal", "numeric", "tel", "search", "email", "url"])
         .defaultTo("text");
@@ -845,13 +927,15 @@ export function up(knex) {
       table.text("content");
       table.unique(["notification_type_name", "language_code"]);
       table.timestamps(false, true);
-    });
+    })
+    .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION));
 }
 
 export function down(knex) {
   return knex.schema
     .dropTable("sessions_credentials")
     .dropTable("user_agents")
+    .dropTable("user_location")
     .dropTable("sessions")
     .dropTable("credentials")
     .dropTable("transaction_status_translations")
@@ -876,6 +960,9 @@ export function down(knex) {
     .dropTable("invoices")
     .dropTable("products")
     .dropTable("payments")
+    .dropTable("payment_status_translations")
+    .dropTable("payment_statuses")
+    .dropTable("payment_providers")
     .dropTable("billing_accounts")
     .dropTable("user_preferences")
     .dropTable("users")
@@ -906,5 +993,6 @@ export function down(knex) {
     .dropTable("entity_attachments")
     .dropTable("attachments")
     .dropTable("attachments_v2")
-    .dropTable("confirmation_codes");
+    .dropTable("confirmation_codes")
+    .then(() => knex.raw(DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION));
 }

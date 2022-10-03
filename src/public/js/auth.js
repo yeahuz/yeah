@@ -18,17 +18,18 @@ export function on_telegram_login(e) {
           return resolve();
         }
         const enable_form = disable_form(form);
-        const [_, err] = await option(request("/auth/telegram", { body: { user } }));
+        const [_, err] = await option(
+          request(`/auth/telegram${window.location.search}`, {
+            body: { user },
+            state: { reload: true, replace: true },
+          })
+        );
+
         if (err) {
           enable_form(err);
           toast(err.message, "err");
-          return resolve();
+          resolve();
         }
-        const params = new window.URLSearchParams(window.location.search);
-        const return_to = params.get("retutrn_to") || "/";
-        await message_sw({ type: "expire_partials" });
-        window.location.href = return_to;
-        return resolve();
       }
     );
   });

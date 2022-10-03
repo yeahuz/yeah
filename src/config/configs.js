@@ -43,6 +43,11 @@ import {
   CF_API_URI,
   CF_IMAGES_ACCOUNT_ID,
   CF_IMAGES_ACCOUNT_HASH,
+  IP_INFO_API_TOKEN,
+  OCTO_API_KEY,
+  OCTO_API_URI,
+  OCTO_MERCHANT_ID,
+  SMS_API_TOKEN,
 } from "./secrets.js";
 
 export const configs = {
@@ -75,6 +80,7 @@ export const configs = {
     sms_api_uri: SMS_API_URI,
     sms_api_email: SMS_API_EMAIL,
     sms_api_password: SMS_API_PASSWORD,
+    sms_api_token: SMS_API_TOKEN,
     payme_merchant_id: PAYME_MERCHANT_ID,
     click_merchant_id: CLICK_MERCHANT_ID,
     payme_checkout_uri: PAYME_CHECKOUT_URI,
@@ -84,6 +90,10 @@ export const configs = {
     cf_images_api_uri: `${CF_API_URI}/${CF_IMAGES_ACCOUNT_ID}/images`,
     cf_images_account_id: CF_IMAGES_ACCOUNT_ID,
     cf_images_account_hash: CF_IMAGES_ACCOUNT_HASH,
+    ip_info_api_token: IP_INFO_API_TOKEN,
+    octo_api_key: OCTO_API_KEY,
+    octo_api_uri: OCTO_API_URI,
+    octo_merchant_id: OCTO_MERCHANT_ID,
   },
   development: {
     port: PORT_DEV,
@@ -114,6 +124,7 @@ export const configs = {
     sms_api_uri: SMS_API_URI,
     sms_api_email: SMS_API_EMAIL,
     sms_api_password: SMS_API_PASSWORD,
+    sms_api_token: SMS_API_TOKEN,
     payme_merchant_id: PAYME_MERCHANT_ID,
     click_merchant_id: CLICK_MERCHANT_ID,
     payme_checkout_uri: PAYME_CHECKOUT_URI,
@@ -123,5 +134,9 @@ export const configs = {
     cf_images_api_uri: `${CF_API_URI}/${CF_IMAGES_ACCOUNT_ID}/images`,
     cf_images_account_id: CF_IMAGES_ACCOUNT_ID,
     cf_images_account_hash: CF_IMAGES_ACCOUNT_HASH,
+    ip_info_api_token: IP_INFO_API_TOKEN,
+    octo_api_key: OCTO_API_KEY,
+    octo_api_uri: OCTO_API_URI,
+    octo_merchant_id: OCTO_MERCHANT_ID,
   },
 };

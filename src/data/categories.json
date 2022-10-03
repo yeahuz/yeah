@@ -1,10 +1,202 @@
 {
   "ru": [
     {
-      "title": "Недвижимость"
+      "title": "Недвижимость",
       "children": [
         {
-          "title": "Продажа квартиры"
+          "title": "Продажа квартиры",
+          "filters": [
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Комнат в квартире",
+              "values": [
+                {
+                  "label": "1 комната"
+                },
+                {
+                  "label": "2 комнаты"
+                },
+                {
+                  "label": "3 комнаты"
+                },
+                {
+                  "label": "4 комнаты"
+                },
+                {
+                  "label": "5 и более комнат"
+                },
+                {
+                  "label": "Апартаменты"
+                },
+                {
+                  "label": "Свободная планировка"
+                },
+                {
+                  "label": "Студия"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Общая площадь",
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Этаж",
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Балкон",
+              "values": [
+                {
+                  "label": "Нет"
+                },
+                {
+                  "label": "Есть"
+                },
+                {
+                  "label": "Лоджия"
+                },
+                {
+                  "label": "Несколько балконов"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Этажность дома"
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "До метро",
+              "values": [
+                {
+                  "label": "До 5 мин. пешком"
+                },
+                {
+                  "label": "5-15 мин. пешком"
+                },
+                {
+                  "label": "Более 15 мин. пешком"
+                },
+                {
+                  "label": "На транспорте"
+                },
+                {
+                  "label": "Метро планируется"
+                },
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Тип дома",
+              "values": [
+                {
+                  "label": "Панельный"
+                },
+                {
+                  "label": "Кирпичный"
+                },
+                {
+                  "label": "Монолит"
+                },
+                {
+                  "label": "Кирпично-монолитный"
+                },
+                {
+                  "label": "Блочный"
+                },
+                {
+                  "label": "Деревянный"
+                },
+              ]
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Год постройки"
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Лифт"
+              "values": [
+                {
+                  "label": "Нет"
+                },
+                {
+                  "label": "Легковой"
+                },
+                {
+                  "label": "Легковой и грузовой"
+                },
+                {
+                  "label": "3 и более лифтов"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Ремонт"
+              "values": [
+                {
+                  "label": "Требуется ремонт"
+                },
+                {
+                  "label": "Не требуется"
+                },
+                {
+                  "label": "Косметический"
+                },
+                {
+                  "label": "Евроремонт"
+                },
+                {
+                  "label": "Дизайнерский"
+                },
+                {
+                  "label": "Капитальный ремонт"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Санузлы"
+              "values": [
+                {
+                  "label": "Совмещенный"
+                },
+                {
+                  "label": "Раздельный"
+                },
+                {
+                  "label": "2 и более"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Кто разместил"
+              "values": [
+                {
+                  "label": "Собственник"
+                },
+                {
+                  "label": "Агент"
+                }
+              ]
+            },
+          ]
         },
         {
           "title": "Продажа комнаты"
@@ -16,7 +208,259 @@
           "title": "Продажа участка"
         },
         {
-          "title": "Аренда квартиры длительно"
+          "title": "Аренда квартиры длительно",
+          "filters": [
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Комнат в квартире",
+              "values": [
+                {
+                  "label": "1 комната"
+                },
+                {
+                  "label": "2 комнаты"
+                },
+                {
+                  "label": "3 комнаты"
+                },
+                {
+                  "label": "4 комнаты"
+                },
+                {
+                  "label": "5 и более комнат"
+                },
+                {
+                  "label": "Апартаменты"
+                },
+                {
+                  "label": "Свободная планировка"
+                },
+                {
+                  "label": "Студия"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Общая площадь",
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Этаж",
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Балкон",
+              "values": [
+                {
+                  "label": "Нет"
+                },
+                {
+                  "label": "Есть"
+                },
+                {
+                  "label": "Лоджия"
+                },
+                {
+                  "label": "Несколько балконов"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Этажность дома"
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "До метро",
+              "values": [
+                {
+                  "label": "До 5 мин. пешком"
+                },
+                {
+                  "label": "5-15 мин. пешком"
+                },
+                {
+                  "label": "Более 15 мин. пешком"
+                },
+                {
+                  "label": "На транспорте"
+                },
+                {
+                  "label": "Метро планируется"
+                },
+              ]
+            },
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Тип дома",
+              "values": [
+                {
+                  "label": "Панельный"
+                },
+                {
+                  "label": "Кирпичный"
+                },
+                {
+                  "label": "Монолит"
+                },
+                {
+                  "label": "Кирпично-монолитный"
+                },
+                {
+                  "label": "Блочный"
+                },
+                {
+                  "label": "Деревянный"
+                },
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Комиссия"
+              "values": [
+                {
+                  "label": "Нет"
+                },
+                {
+                  "label": "30%"
+                },
+                {
+                  "label": "50%"
+                },
+                {
+                  "label": "100%"
+                },
+                {
+                  "label": "Другая"
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "facet_type": "checkbox",
+              "label": "В квартире есть"
+              "values": [
+                {
+                  "label": "Интернет"
+                },
+                {
+                  "label": "Телефон"
+                },
+                {
+                  "label": "Холодильник"
+                },
+                {
+                  "label": "Стиральная машина"
+                },
+                {
+                  "label": "Телевизор"
+                },
+                {
+                  "label": "Посудамоечная машина"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "facet_type": "range",
+              "label": "Год постройки"
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Лифт"
+              "values": [
+                {
+                  "label": "Нет"
+                },
+                {
+                  "label": "Легковой"
+                },
+                {
+                  "label": "Легковой и грузовой"
+                },
+                {
+                  "label": "3 и более лифтов"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Ремонт"
+              "values": [
+                {
+                  "label": "Требуется ремонт"
+                },
+                {
+                  "label": "Не требуется"
+                },
+                {
+                  "label": "Косметический"
+                },
+                {
+                  "label": "Евроремонт"
+                },
+                {
+                  "label": "Дизайнерский"
+                },
+                {
+                  "label": "Капитальный ремонт"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Санузлы"
+              "values": [
+                {
+                  "label": "Совмещенный"
+                },
+                {
+                  "label": "Раздельный"
+                },
+                {
+                  "label": "2 и более"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Коммунальные услуги",
+              "values": [
+                {
+                  "label": "Включены"
+                },
+                {
+                  "label": "Не включены"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Кто разместил"
+              "values": [
+                {
+                  "label": "Собственник"
+                },
+                {
+                  "label": "Агент"
+                }
+              ]
+            }
+          ]
         },
         {
           "title": "Аренда комнаты длительно"
@@ -42,16 +486,376 @@
       ]
     },
     {
-      "title": "Компьютерная техника"
+      "title": "Компьютерная техника",
       "children": [
         {
-          "title": "Ноутбуки"
+          "title": "Ноутбуки",
+          "filters": [
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Тип",
+              "values": [
+                {
+                  "label": "Нетбуки"
+                },
+                {
+                  "label": "Ноутбуки"
+                },
+                {
+                  "label": "Трансформеры"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Марка",
+              "values": [
+                {
+                  "label": "Acer"
+                },
+                {
+                  "label": "ASUS"
+                },
+                {
+                  "label": "Alienware"
+                },
+                {
+                  "label": "Apple"
+                },
+                {
+                  "label": "Dell"
+                },
+                {
+                  "label": "HP"
+                },
+                {
+                  "label": "Lenovo"
+                },
+                {
+                  "label": "Huawei"
+                },
+                {
+                  "label": "MSI"
+                },
+                {
+                  "label": "Samsung"
+                },
+                {
+                  "label": "Sony"
+                },
+                {
+                  "label": "Toshiba"
+                },
+                {
+                  "label": "Panasonic"
+                },
+                {
+                  "label": "Fujitsu"
+                },
+                {
+                  "label": "Packard Bell"
+                },
+                {
+                  "label": "Prestigio"
+                },
+                {
+                  "label": "Haier"
+                },
+                {
+                  "label": "DNS"
+                },
+                {
+                  "label": "Dexp"
+                },
+                {
+                  "label": "Razer"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "input_mode": "decimal",
+              "facet_type": "checkbox",
+              "label": "Диагональ экрана",
+              "values": [
+                {
+                  "label": "12.5\" и менее"
+                },
+                {
+                  "label": "от 13\" до 14.6\""
+                },
+                {
+                  "label": "от 15\" до 16.4\""
+                },
+                {
+                  "label": "16.4\" и более"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Срок использования",
+              "values": [
+                {
+                  "label": "Новый"
+                },
+                {
+                  "label": "До 6 месяцев"
+                },
+                {
+                  "label": "1 год"
+                },
+
+                {
+                  "label": "2 года"
+                }
+                {
+                  "label": "3 года"
+                }
+                {
+                  "label": "4 года и более"
+                }
+              ]
+            }
+          ]
         },
         {
-          "title": "Компьютеры"
+          "title": "Компьютеры",
+          "filters": [
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Тип",
+              "values": [
+                {
+                  "label": "Настольные, системные блоки"
+                },
+                {
+                  "label": "Моноблоки"
+                },
+                {
+                  "label": "Мини ПК, неттопы"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Оперативная память",
+              "values": [
+                {
+                  "label": "До 1 ГБ"
+                },
+                {
+                  "label": "1 ГБ"
+                },
+                {
+                  "label": "2 ГБ"
+                },
+                {
+                  "label": "3 ГБ"
+                },
+                {
+                  "label": "4 ГБ"
+                },
+                {
+                  "label": "6 ГБ"
+                },
+                {
+                  "label": "8 ГБ"
+                },
+                {
+                  "label": "12 ГБ"
+                },
+                {
+                  "label": "16 ГБ"
+                },
+                {
+                  "label": "32 ГБ"
+                },
+                {
+                  "label": "64 ГБ"
+                },
+                {
+                  "label": "Более 64 ГБ"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Тип видеокарты",
+              "values": [
+                {
+                  "label": "Встроенная"
+                },
+                {
+                  "label": "Дискретная"
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "facet_type": "checkbox",
+              "label": "Игровой",
+              "values": [
+                {
+                  "label": "Да"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Срок использования",
+              "values": [
+                {
+                  "label": "Новый"
+                },
+                {
+                  "label": "До 6 месяцев"
+                },
+                {
+                  "label": "1 год"
+                },
+                {
+                  "label": "2 года"
+                },
+                {
+                  "label": "3 года"
+                },
+                {
+                  "label": "4 года и более"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "radio",
+              "label": "Тип оптического привода",
+              "values": [
+                {
+                  "label": "Blu-ray"
+                },
+                {
+                  "label": "DVD"
+                },
+                {
+                  "label": "DVD-RW"
+                },
+                {
+                  "label": "DVD/CD-RW"
+                },
+                {
+                  "label": "Отсутствует"
+                }
+              ]
+            }
+          ]
         },
         {
-          "title": "Мониторы"
+          "title": "Мониторы",
+          "filters": [
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Тип",
+              "values": [
+                {
+                  "label": "Для дома и офиса"
+                },
+                {
+                  "label": "Игровой"
+                },
+                {
+                  "label": "Профессиональный"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "facet_type": "checkbox",
+              "label": "Марка",
+              "values": [
+                {
+                  "label": "Acer"
+                },
+                {
+                  "label": "AOC"
+                },
+                {
+                  "label": "Apple"
+                },
+                {
+                  "label": "ASUS"
+                },
+                {
+                  "label": "ASUS"
+                },
+                {
+                  "label": "BenQ"
+                },
+                {
+                  "label": "Dell"
+                },
+                {
+                  "label": "HP"
+                },
+                {
+                  "label": "Liyama"
+                },
+                {
+                  "label": "Lenovo"
+                },
+                {
+                  "label": "LG"
+                },
+                {
+                  "label": "NEC"
+                },
+                {
+                  "label": "Packard Bell"
+                },
+                {
+                  "label": "Philips"
+                },
+                {
+                  "label": "Samsung"
+                },
+                {
+                  "label": "Toshiba"
+                },
+                {
+                  "label": "Viewsonic"
+                }
+              ]
+            },
+            {
+              "type": "radio",
+              "facet_type": "checkbox",
+              "label": "Диагональ экрана",
+              "values": [
+                {
+                  "label": "Менее 14\""
+                },
+                {
+                  "label": "от 14\" до 14.9\""
+                },
+                {
+                  "label": "от 15\" до 15.9\""
+                },
+                {
+                  "label": "от 15\" до 15.9\""
+                },
+                {
+                  "label": "16.4\" и более"
+                }
+              ]
+            },
+          ]
         },
         {
           "title": "Клавиатуры и мыши"
@@ -250,7 +1054,46 @@
       "title": "Бытовая техника",
       "children": [
         {
-          "title": ""
+          "title": "Весы"
+        },
+        {
+          "title": "Вытяжки"
+        },
+        {
+          "title": "Измельчение и смешивание"
+        },
+        {
+          "title": "Климатическая техника"
+        },
+        {
+          "title": "Кулеры и фильтры для воды"
+        },
+        {
+          "title": "Плиты и духовые шкафы"
+        },
+        {
+          "title": "Посудомоечные машины"
+        },
+        {
+          "title": "Приготовление еды"
+        },
+        {
+          "title": "Приготовление напитков"
+        },
+        {
+          "title": "Пылесосы и пароочистители"
+        },
+        {
+          "title": "Стиральные машины"
+        },
+        {
+          "title": "Утюги и уход за одеждой"
+        },
+        {
+          "title": "Холодильники"
+        },
+        {
+          "title": "Швейное оборудование"
         }
       ]
     }

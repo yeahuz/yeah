@@ -2,7 +2,7 @@ import { add_listeners } from "./dom.js";
 import { debounce, option, request } from "./utils.js";
 import { search_suggestions_tmpl } from "./templates.js";
 
-const search_input = document.querySelector(".js-search-input");
+const search_inputs = document.querySelectorAll(".js-search-input");
 const suggestions = document.querySelector(".js-search-suggestions");
 
 async function on_input(e) {
@@ -19,6 +19,6 @@ async function on_input(e) {
   suggestions.append(search_suggestions_tmpl(results, data.get("q")));
 }
 
-add_listeners(search_input, {
+add_listeners(search_inputs, {
   input: debounce(on_input),
 });

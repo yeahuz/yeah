@@ -57,7 +57,12 @@ export async function create_posting(payload) {
     const att = await AttachmentService.createt_one_trx_v2(trx)(attachments_to_insert);
     const categories = await CategoryService.get_parents(category_id);
     await posting.$relatedQuery("attachments", trx).relate(att);
-    await posting.$relatedQuery("categories", trx).relate(categories);
+    await posting.$relatedQuery("categories", trx).relate(
+      categories.map((c) => ({
+        ...c,
+        relation: c.id === Number(category_id) ? "DIRECT" : "PARENT",
+      }))
+    );
     await posting.$relatedQuery("location", trx).insert({
       formatted_address,
       coords: raw(`point(${lat}, ${lon})`),
@@ -82,6 +87,7 @@ export async function get_many({ currency = "USD", status_id = 1 } = {}) {
       "description",
       "postings.id",
       "cover_url",
+      "url",
       "exchange_rates.to_currency as currency",
       "postings.created_at as created_at",
       "postings.id as id",

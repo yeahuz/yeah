@@ -1,29 +1,22 @@
 <main class="max-w-7xl mx-auto my-20 px-4 xl:px-0">
   <h1 class="font-medium text-3xl text-gray-900 dark:text-white"><%= it.t("deposit.title", { ns: "payments" })%></h1>
-  <form class="max-w-md my-12" method="post">
+  <form class="max-w-2xl my-12" method="post">
     <div class="space-y-2">
       <span class="text-sm font-medium text-gray-700 block dark:text-gray-200">
         <%= it.t("deposit.form.provider.label", { ns: "payments" }) %>
       </span>
-      <div class="flex grid gap-4 grid-cols-10">
-        <div class="col-span-5">
-          <input type="radio" name="provider" value="payme" id="provider-payme" class="absolute w-0 opacity-0 peer" checked />
-          <label for="provider-payme" class="bg-gray-100 dark:bg-zinc-900 block h-32 flex items-center justify-center border dark:border-zinc-800 shadow-xs peer-checked:bg-transparent peer-checked:border-primary-600 dark:peer-checked:bg-zinc-800 rounded-lg">
-            <picture class="w-32">
-              <source srcset="/public/images/payme-logo-dark.png" media="(prefers-color-scheme: dark)">
-              <img src="/public/images/payme-logo-light.png" alt="payme logo light" />
-            </picture>
-          </label>
-        </div>
-        <div class="col-span-5">
-          <input type="radio" name="provider" value="click" id="provider-click" class="absolute w-0 opacity-0 peer" />
-          <label for="provider-click" class="bg-gray-100 dark:bg-zinc-900 block h-32 flex items-center justify-center border dark:border-zinc-800 shadow-xs peer-checked:bg-transparent peer-checked:border-primary-600 dark:peer-checked:bg-zinc-800 rounded-lg">
-            <picture class="w-32">
-              <source srcset="/public/images/click-logo-dark.png" media="(prefers-color-scheme: dark)">
-              <img src="/public/images/click-logo-light.png" alt="payme logo light" />
-            </picture>
-          </label>
-        </div>
+      <div class="flex grid gap-4 grid-cols-12">
+        <% it.providers.forEach(function (provider, index) { %>
+          <div class="col-span-4">
+            <input type="radio" name="provider_name" value="<%= provider.name %>" id="<%= provider.name %>" class="absolute w-0 opacity-0 peer" <%= index === 0 ? "checked" : ""%> />
+            <label for="<%= provider.name %>" class="bg-gray-100 dark:bg-zinc-900 block h-32 flex items-center justify-center border dark:border-zinc-800 shadow-xs peer-checked:bg-transparent peer-checked:border-primary-600 dark:peer-checked:bg-zinc-800 rounded-lg">
+              <picture class="w-32">
+                <source srcset="<%= provider.dark_logo_url %>" media="(prefers-color-scheme: dark)">
+                <img src="<%= provider.light_logo_url %>" alt="<%= provider.title %> logo" />
+              </picture>
+            </label>
+          </div>
+        <% }) %>
       </div>
     </div>
     <label class="w-full block mt-5">
@@ -31,7 +24,7 @@
         <%= it.t("deposit.form.amount.label", { ns: "payments" }) %>
       </span>
       <div class="flex mt-2">
-        <input type="number" min="5000" class="form-control !rounded-r-none" name="amount" autocomplete="off" autofocus  placeholder="<%= it.t("deposit.form.amount.placeholder", { ns: "payments" }) %>" required />
+        <input type="number" min="5000" class="form-control !rounded-r-none" name="debit_amount" autocomplete="off" autofocus  placeholder="<%= it.t("deposit.form.amount.placeholder", { ns: "payments" }) %>" required />
         <span class="border-r border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-r-lg dark:border-zinc-800 dark:text-gray-400"><%= it.t("deposit.form.amount.prefix", { ns: "payments" }) %></span>
       </div>
       <span class="font-normal text-gray-500 text-sm block mt-1.5 dark:text-gray-400"><%= it.t("deposit.form.amount.hint", { ns: "payments"}) %></span>

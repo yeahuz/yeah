@@ -1,15 +1,15 @@
-import { render_file } from "../utils/eta.js";
-import { parse_url } from "../utils/index.js";
 import * as PaymentService from "../services/payment.service.js";
+import * as BillingService from "../services/billing.service.js";
+import { render_file } from "../utils/eta.js";
+import { parse_url, option } from "../utils/index.js";
 
 export async function get_new(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "new-posting" }), lang: req.language },
       t,
@@ -18,10 +18,11 @@ export async function get_new(req, reply) {
     stream.push(top);
   }
 
-  const new_payment = await render_file("/payments/new.html", { t, flash });
+  const providers = await PaymentService.get_providers();
+  const new_payment = await render_file("/payments/new.html", { t, flash, providers });
   stream.push(new_payment);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
       url: parse_url(req.url),
@@ -36,9 +37,24 @@ export async function get_new(req, reply) {
 
 export async function create_new_payment(req, reply) {
   const user = req.user;
-  const { provider = "payme", amount = 0 } = req.body;
-  const generate_url = PaymentService.pay_with(provider);
-  const url = generate_url({ amount, user, order_id: 90 });
-  reply.redirect(url);
+  const t = req.i18n.t;
+  const billing_account = await BillingService.get_by_user_id(user.id);
+  const { provider_name = "payme", debit_amount = 0 } = req.body;
+  const [result, err] = await option(
+    PaymentService.create_payment({
+      debit_amount,
+      provider_name,
+      status: "PENDING",
+      billing_account_id: billing_account.id,
+    })
+  );
+
+  if (err) {
+    req.flash("err", err.build(t));
+    reply.redirect(req.url);
+    return reply;
+  }
+
+  reply.redirect(result.url);
   return reply;
 }

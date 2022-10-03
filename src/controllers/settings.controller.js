@@ -14,7 +14,7 @@ export async function get_tab(req, reply) {
   const t = req.i18n.t;
   const { mobile } = req.query;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "settings" }), lang: req.language },
       t,
@@ -51,7 +51,7 @@ export async function get_tab(req, reply) {
   const settings_bottom = await render_file("/settings/bottom.html");
   stream.push(settings_bottom);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -68,7 +68,7 @@ export async function get_details(req, reply) {
   const t = req.i18n.t;
   const { mobile } = req.query;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
       t,
@@ -96,7 +96,7 @@ export async function get_details(req, reply) {
   });
   stream.push(details);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -114,7 +114,7 @@ export async function get_privacy(req, reply) {
   const current_sid = req.session.get("sid");
   const { mobile } = req.query;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("tabs.privacy", { ns: "settings" }), lang: req.language },
       t,
@@ -148,7 +148,7 @@ export async function get_privacy(req, reply) {
   });
   stream.push(privacy);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -165,7 +165,7 @@ export async function get_billing(req, reply) {
   const t = req.i18n.t;
   const { mobile } = req.query;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("tabs.billing", { ns: "settings" }), lang: req.language },
       t,
@@ -195,7 +195,7 @@ export async function get_billing(req, reply) {
   });
   stream.push(billing);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -213,7 +213,7 @@ export async function get_appearance(req, reply) {
   const theme = req.session.get("theme");
   const { mobile } = req.query;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("tabs.appearance", { ns: "settings" }), lang: req.language },
       t,
@@ -242,7 +242,7 @@ export async function get_appearance(req, reply) {
   });
   stream.push(appearance);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -267,7 +267,7 @@ export async function get_settings(req, reply) {
   const t = req.i18n.t;
   const { mobile } = req.query;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "settings" }), lang: req.language },
       t,
@@ -287,7 +287,7 @@ export async function get_settings(req, reply) {
     stream.push(settings_tabs);
   }
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }

@@ -169,14 +169,13 @@ export async function submit_fourth_step(req, reply) {
 }
 
 export async function get_step(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
   const { id, step } = req.params;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "new-posting" }), lang: req.language },
       t,
@@ -274,7 +273,7 @@ export async function get_step(req, reply) {
   }
   stream.push(rendered_step);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
       url: parse_url(req.url),

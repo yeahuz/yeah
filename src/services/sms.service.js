@@ -1,23 +1,25 @@
-import config from "../config/index.js";
+import config, { update_env } from "../config/index.js";
 
 const TEMPLATES = {
   verify: {
-    message: (vars) => `Some message`,
+    message: ({ t, ...vars }) => t("verify", { ns: "sms", ...vars }),
   },
 };
 
-export class SMSService {
+export class SMSClient {
   constructor(token) {
     this.refresh_token_promise = null;
     this.token = token;
   }
 
   static async build() {
-    const token = await SMSService.get_token();
-    return new SMSService(token);
+    const token = await SMSClient.get_token();
+    return new SMSClient(token);
   }
 
   static async get_token() {
+    if (config.sms_api_token) return config.sms_api_token;
+
     const fd = new FormData();
     fd.append("email", config.sms_api_email);
     fd.append("password", config.sms_api_password);
@@ -31,12 +33,14 @@ export class SMSService {
       return Promise.reject(json);
     }
 
+    await update_env({ SMS_API_TOKEN: json.data.token });
     return json.data.token;
   }
 
   async get_refresh_token() {
     const json = await this.request("/auth/refresh", { method: "PATCH" });
     this.token = json.data.token;
+    await update_env({ SMS_API_TOKEN: this.token });
     return this.token;
   }
 
@@ -77,3 +81,5 @@ export class SMSService {
     return await this.request("/message/sms/send", { data: fd });
   }
 }
+
+export const SMSService = await SMSClient.build();

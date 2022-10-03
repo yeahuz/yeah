@@ -186,6 +186,13 @@ export function parse_url(url) {
   return new URL(url, config.origin);
 }
 
+export function cleanup_object(obj) {
+  for (const prop in obj) {
+    if (!obj[prop]) delete obj[prop];
+  }
+  return obj;
+}
+
 export function generate_srcset(url, options, count = 20) {
   let srcset = "";
   for (let i = 1; i <= count; i++) {
@@ -193,4 +200,26 @@ export function generate_srcset(url, options, count = 20) {
     srcset += `${url}/width=${w},${options} ${w}w, `;
   }
   return srcset;
+}
+
+export function remove_query_value(current, key, value_to_remove) {
+  const query_params = new URLSearchParams(current);
+  const values = query_params.getAll(key);
+
+  if (values.length) {
+    query_params.delete(key);
+    for (const value of values) {
+      if (value !== value_to_remove) {
+        query_params.append(key, value);
+      }
+    }
+  }
+
+  return decodeURIComponent(query_params.toString());
+}
+
+export function append_query_value(current, key, value) {
+  const params = new URLSearchParams(current);
+  params.append(key, value);
+  return decodeURIComponent(params.toString());
 }

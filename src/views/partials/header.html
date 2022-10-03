@@ -1,8 +1,10 @@
 <header class="bg-white border-b border-b-gray-200 py-4 px-4 xl:px-0 sticky duration-300 top-0 z-30 js-header dark:bg-zinc-900 dark:border-b-zinc-800">
   <% if (it.mobile_search) { %>
     <div class="max-w-7xl mx-auto flex items-center justify-between md:hidden">
-      <form method="get" action="/search" class="md:hidden w-full">
-        <input autofocus type="text" name="q" value="<%= it.q ?? "" %>" class="outline-none py-2.5 px-3.5 w-full bg-zinc-800 rounded-lg text-base" placeholder="Search postings"/>
+      <form method="get" action="/search" class="md:hidden w-full relative">
+        <input autofocus type="text" name="q" autocomplete="off" minlength="3" value="<%= it.q ?? "" %>" class="outline-none py-2.5 px-3.5 w-full bg-zinc-800 rounded-lg text-base js-search-input" placeholder="Search postings"/>
+        <ul class="absolute bg-white shadow-lg w-full rounded-lg border border-gray-100 mt-1 overflow-hidden max-h-60 overflow-y-auto -z-10 opacity-0 translate-y-2 duration-200 dark:bg-zinc-900 dark:border-zinc-700 js-search-suggestions">
+        </ul>
       </form>
     </div>
   <% } %>
@@ -33,7 +35,7 @@
         <% } %>
       </a>
     <% } else { %>
-      <a href="/auth/login" class="p-3 -m-3 md:hidden">
+      <a href="/auth/login" noprefetch class="p-3 -m-3 md:hidden">
         <svg class="w-6 h-6 text-primary-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 15C8.8299 15 6.01077 16.5306 4.21597 18.906C3.82968 19.4172 3.63653 19.6728 3.64285 20.0183C3.64773 20.2852 3.81533 20.6219 4.02534 20.7867C4.29716 21 4.67384 21 5.4272 21H18.5727C19.3261 21 19.7028 21 19.9746 20.7867C20.1846 20.6219 20.3522 20.2852 20.3571 20.0183C20.3634 19.6728 20.1703 19.4172 19.784 18.906C17.9892 16.5306 15.17 15 12 15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M12 12C14.4853 12 16.5 9.98528 16.5 7.5C16.5 5.01472 14.4853 3 12 3C9.51469 3 7.49997 5.01472 7.49997 7.5C7.49997 9.98528 9.51469 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,6 +44,22 @@
     <% } %>
     <div class="space-x-5 ml-auto items-center hidden md:flex">
       <% if (it.user) { %>
+      <details class="relative">
+        <summary class="cursor-pointer">
+          <svg class="w-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </summary>
+        <div class="absolute right-0 bg-white w-96 shadow-lg border border-gray-100 mt-2 rounded-lg z-50 dark:bg-zinc-900 dark:border-zinc-800">
+          <div class="p-3">
+            <h3 class="text-lg font-medium">Notifications</h3>
+          </div>
+          <ul>
+            <li>
+            </li>
+          </ul>
+        </div>
+      </details>
       <details class="relative">
         <summary class="bg-gray-300 w-12 h-12 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500">
           <% if (it.user.profile_photo_url) { %>
@@ -66,7 +84,7 @@
             <li>
               <a
                 href="/me?ps=active"
-                class="flex items-center text-sm text-gray-700 py-2.5 px-4 hover:bg-gray-50 duration-200 dark:text-gray-200 dark:hover:bg-zinc-800"
+                class="flex items-center text-sm text-gray-700 py-2.5 px-3 hover:bg-gray-50 duration-200 dark:text-gray-200 dark:hover:bg-zinc-800"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -88,7 +106,7 @@
             <li>
               <a
                 href="/settings/details"
-                class="flex items-center text-sm text-gray-700 py-2.5 px-4 hover:bg-gray-50 duration-200 dark:text-gray-200 dark:hover:bg-zinc-800"
+                class="flex items-center text-sm text-gray-700 py-2.5 px-3 hover:bg-gray-50 duration-200 dark:text-gray-200 dark:hover:bg-zinc-800"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -117,7 +135,7 @@
             <li>
               <form action="/auth/logout" method="post" class="w-full js-logout-form">
                 <button
-                  class="flex items-center text-sm text-gray-700 py-2.5 px-4 hover:bg-gray-50 hover:rounded-b-lg duration-200 overflow-hidden border-t border-t-gray-200 w-full dark:text-gray-200 dark:hover:bg-zinc-800 dark:border-t-zinc-800"
+                  class="flex items-center text-sm text-gray-700 py-2.5 px-3 hover:bg-gray-50 hover:rounded-b-lg duration-200 overflow-hidden border-t border-t-gray-200 w-full dark:text-gray-200 dark:hover:bg-zinc-800 dark:border-t-zinc-800"
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -141,7 +159,7 @@
         </div>
       </details>
       <% } else { %>
-        <a class="btn btn-secondary js-ripple" href="/auth/login"><%= it.t("login", { ns: "common" }) %></a>
+        <a class="btn btn-secondary js-ripple" href="/auth/login" noprefetch><%= it.t("login", { ns: "common" }) %></a>
       <% } %>
       <a class="btn btn-primary js-ripple" href="/postings/new" noprefetch><%= it.t("create_poster", { ns: "common" }) %></a>
     </div>

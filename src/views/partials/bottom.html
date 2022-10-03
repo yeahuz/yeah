@@ -11,14 +11,14 @@
 <script defer async type="module" src="/public/js/pwa-install.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.min.js" integrity="sha512-XmXJdyJwwkMu/jMgwXUwIXx0VzBdvjW48UTLxodSOz3GuGtpDjAQ1+E4eROpoxPpvM279i5JjpGCMbTaNZjLmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
- window.addEventListener('load', () =>{
-	 quicklink.listen({
-		 ignores: [
-			 uri => window.location.pathname === new URL(uri).pathname,
-			 (uri, elem) => elem.hasAttribute('noprefetch')
-		 ]
-	 });
- });
+    window.addEventListener('load', () => {
+        quicklink.listen({
+            ignores: [
+                uri => window.location.pathname === new URL(uri).pathname,
+                (uri, elem) => elem.hasAttribute('noprefetch')
+            ]
+        });
+    });
 </script>
 <noscript>
   <style>

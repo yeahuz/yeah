@@ -36,6 +36,7 @@ export class Posting extends BaseModel {
           through: {
             from: "posting_categories.posting_id",
             to: "posting_categories.category_id",
+            extra: ["relation"],
           },
           to: "categories.id",
         },

@@ -41,6 +41,7 @@ specifiers:
   knex: 2.2.0
   negotiator: ^0.6.3
   node-cron: ^3.0.2
+  node-ipinfo: ^3.1.1
   node-telegram-bot-api: ^0.58.0
   nodemon: ^2.0.19
   objection: ^3.0.1
@@ -79,7 +80,7 @@ dependencies:
   cbor: 8.1.0
   dotenv: 16.0.1
   eta: 1.12.3
-  fastify: github.com/fastify/fastify/21eb6cf9f5d49236e88161ef71ece7a7d5926e31
+  fastify: github.com/fastify/fastify/c849d6ccbae313a4a9f4ca007b7f4154473a7b1a
   fastify-plugin: 4.2.0
   google-auth-library: 8.3.0
   hashids: 2.2.10
@@ -92,6 +93,7 @@ dependencies:
   knex: 2.2.0_pg@8.7.3
   negotiator: 0.6.3
   node-cron: 3.0.2
+  node-ipinfo: 3.1.1
   node-telegram-bot-api: 0.58.0
   objection: 3.0.1_knex@2.2.0
   otplib: 12.0.1
@@ -1786,6 +1788,10 @@ packages:
   /@types/cors/2.8.12:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
     dev: true
+
+  /@types/lru-cache/5.1.1:
+    resolution: {integrity: sha512-ssE3Vlrys7sdIzs5LOxCzTVMsU7i9oa/IaW92wF32JFb3CVczqOkru2xspuKczHEbG3nvmPY7IFqVmGGHdNbYw==}
+    dev: false
 
   /@types/node/18.7.9:
     resolution: {integrity: sha512-0N5Y1XAdcl865nDdjbO0m3T6FdmQ4ijE89/urOHLREyTXbpMWbSafx9y7XIsgWGtwUP2iYTinLyyW3FatAxBLQ==}
@@ -3868,6 +3874,14 @@ packages:
     hasBin: true
     dev: false
 
+  /node-ipinfo/3.1.1:
+    resolution: {integrity: sha512-zXOIG/nD3hVIIE+7ACAfWpeOlFLBFo94wGc6sF4I68QIRoqQr3WAvXgvnObtogewhNXD7w6JTMzua0tq6bguAg==}
+    engines: {node: '>=10'}
+    dependencies:
+      '@types/lru-cache': 5.1.1
+      lru-cache: 6.0.0
+    dev: false
+
   /node-telegram-bot-api/0.58.0:
     resolution: {integrity: sha512-DmP5wBON9stOiunvUw/NvTb1clMYvj+c3NnSqbPZdVd6hNkNRnM97eqPZIH4UsBJ+4n+XFGpU33dCzjqD1sv3A==}
     engines: {node: '>=0.12'}
@@ -5391,8 +5405,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  github.com/fastify/fastify/21eb6cf9f5d49236e88161ef71ece7a7d5926e31:
-    resolution: {tarball: https://codeload.github.com/fastify/fastify/tar.gz/21eb6cf9f5d49236e88161ef71ece7a7d5926e31}
+  github.com/fastify/fastify/c849d6ccbae313a4a9f4ca007b7f4154473a7b1a:
+    resolution: {tarball: https://codeload.github.com/fastify/fastify/tar.gz/c849d6ccbae313a4a9f4ca007b7f4154473a7b1a}
     name: fastify
     version: 4.6.0
     dependencies:

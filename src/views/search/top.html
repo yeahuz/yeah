@@ -1,5 +1,22 @@
-<header class="bg-white border-b border-b-gray-200 py-4 px-4 xl:px-0 duration-300 dark:bg-zinc-900 dark:border-b-zinc-800 max-w-7xl mx-auto">
-  <form method="get" action="/search">
-    <input autofocus type="text" name="q" value="<%= it.q ?? "" %>" class="outline-none py-2.5 px-3.5 w-full bg-zinc-800 rounded-lg text-base" placeholder="Search postings"/>
-  </form>
-</header>
+<main class="px-4 xl:px-0 max-w-7xl mx-auto">
+  <% if (it.categories.length) { %>
+    <ul class="md:hidden">
+      <% it.categories.forEach(function (category) { %>
+        <li>
+          <a href="/c/<%= category.id %>" class="flex items-center w-full py-3">
+            <%= category.title %>
+            <% if (category.has_children) { %>
+              <svg class="w-5 h-5 ml-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            <% } %>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+  <%~ includeFile('../partials/search-bar.html', it) %>
+  <% if (it.q) {%>
+    <h1 class="font-semibold text-xl mt-16 hidden md:block">Объявления по запросу &laquo;<%= it.q %>&raquo;</h1>
+  <% } %>
+  <div class="flex flex-col space-y-12 lg:space-y-0 lg:flex-row lg:space-x-6 mt-5">

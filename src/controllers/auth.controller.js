@@ -3,7 +3,6 @@ import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
 import * as ConfirmationCodeService from "../services/confirmation-code.service.js";
-import * as EmailService from "../services/email.service.js";
 import config from "../config/index.js";
 import * as jwt from "../utils/jwt.js";
 import { redis_client } from "../services/redis.service.js";
@@ -17,7 +16,6 @@ import { encoder } from "../utils/byte-utils.js";
 import { events } from "../utils/events.js";
 
 export async function get_qr_login(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { token } = req.params;
   const { name, profile_photo_url } = req.user || {};
   const ws = req.server.ws;
@@ -25,7 +23,7 @@ export async function get_qr_login(req, reply) {
   const t = req.i18n.t;
   const user = req.user;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: "Confirm qr code", lang: req.language },
       t,
@@ -96,12 +94,12 @@ export async function qr_login(req, reply) {
 
 export async function get_login(req, reply) {
   const { return_to = "/", method = "phone" } = req.query;
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
 
   const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
   const oauth_state = encrypt(JSON.stringify({ came_from: req.url, return_to }));
 
+  console.log("setting oauth state", oauth_state);
   req.session.set("oauth_state", oauth_state);
   req.session.set("nonce", nonce);
 
@@ -109,7 +107,7 @@ export async function get_login(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "login" }), lang: req.language },
       t,
@@ -129,7 +127,7 @@ export async function get_login(req, reply) {
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
       user,
@@ -145,7 +143,6 @@ export async function get_login(req, reply) {
 export async function get_signup(req, reply) {
   const { return_to = "/", method = "phone", step = "1" } = req.query;
   const flash = reply.flash();
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
 
   const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
   const identifier = req.session.get("identifier");
@@ -158,7 +155,7 @@ export async function get_signup(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "signup" }), lang: req.language },
       t,
@@ -205,7 +202,7 @@ export async function get_signup(req, reply) {
   stream.push(rendered_step);
   redis_client.setex(nonce, 86400, 1);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
       user,
@@ -220,7 +217,7 @@ export async function get_signup(req, reply) {
 
 export async function create_otp(req, reply) {
   const { method } = req.query;
-  const { identifier } = req.body;
+  const { identifier, country_code } = req.body;
   const t = req.i18n.t;
 
   const [code, err] = await option(ConfirmationCodeService.generate_auth_code(identifier));
@@ -230,8 +227,13 @@ export async function create_otp(req, reply) {
     return reply.redirect(add_t(`/auth/signup?method=${method}`));
   }
 
-  console.log({ code });
-  events.emit("create_otp", { tmpl_name: "verify", method, vars: { code, t }, to: identifier });
+  events.emit("create_otp", {
+    tmpl_name: "verify",
+    method,
+    vars: { code, t },
+    to: identifier,
+    country_code,
+  });
 
   req.session.set("identifier", identifier);
   reply.redirect(`/auth/signup?step=2&method=${method}`);
@@ -390,6 +392,8 @@ export async function google_callback(req, reply) {
   const decrypted = JSON.parse(decrypt(state));
   const t = req.i18n.t;
 
+  console.log({ original_state, state }); // TODO: fix this problem (original state and state don't match);
+
   if (state !== original_state) {
     req.flash("err", new AuthenticationError({ key: "!oauth_state_match" }).build(t));
     reply.redirect(decrypted.came_from);
@@ -399,11 +403,13 @@ export async function google_callback(req, reply) {
   const data = await google_oauth_client.getToken(code);
   google_oauth_client.setCredentials(data.tokens);
 
-  const userInfo = await google_oauth_client.request({
+  const user_info = await google_oauth_client.request({
     url: "https://www.googleapis.com/oauth2/v3/userinfo",
   });
 
-  const [result, err] = await option(AuthService.google_auth({ ...userInfo.data, user_agent, ip }));
+  const [result, err] = await option(
+    AuthService.google_auth({ ...user_info.data, user_agent, ip })
+  );
 
   if (err) {
     req.flash("err", err.build(t));
@@ -413,7 +419,7 @@ export async function google_callback(req, reply) {
   req.session.set("sid", result.session.id);
   req.session.set("oauth_state", null);
   req.session.set("nonce", null);
-  reply.redirect(`${decrypted.return_to}?t=${get_time()}`);
+  reply.redirect(add_t(decrypted.return_to));
 }
 
 export async function google_one_tap(req, reply) {
@@ -443,6 +449,7 @@ export async function google_one_tap(req, reply) {
 export async function telegram_callback(req, reply) {
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
+  const { return_to = "/" } = req.query;
   const { user } = req.body;
 
   const { session } = await AuthService.telegram_auth({
@@ -454,7 +461,9 @@ export async function telegram_callback(req, reply) {
   req.session.set("sid", session.id);
   req.session.set("oauth_state", null);
   req.session.set("nonce", null);
-  return { status: "oke" };
+
+  reply.redirect(add_t(return_to));
+  return reply;
 }
 
 export async function update_sessions(req, reply) {
@@ -613,7 +622,6 @@ export async function delete_credentials(req, reply) {
 
 export async function get_webauthn(req, reply) {
   const user_id = req.session.get("user_id");
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { return_to = "/" } = req.query;
 
   if (!user_id) {
@@ -624,7 +632,7 @@ export async function get_webauthn(req, reply) {
   const stream = reply.init_stream();
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "2fa" }), lang: req.language },
       t,
@@ -635,7 +643,7 @@ export async function get_webauthn(req, reply) {
   const webauthn = await render_file("/auth/webauthn.html", { t });
   stream.push(webauthn);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
       url: parse_url(req.url),

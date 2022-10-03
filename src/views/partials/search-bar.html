@@ -2,7 +2,7 @@
   <header>
     <h1 class="font-semibold text-2xl text-gray-900 dark:text-white">Поиск по объявлениям</h1>
   </header>
-  <form class="flex space-x-4 mt-6 relative" action="/search">
+  <form class="flex space-x-4 mt-6 relative" action="/search" id="search-form">
       <div class="relative max-w-xs w-full">
       <select name="category_id" class="form-control">
         <option disabled selected value="">Все категории</option>
@@ -40,10 +40,10 @@
       </ul>
     </div>
     <div class="relative max-w-xs w-full">
-      <select name="region" id="" class="form-control" name="region">
+      <select name="region_id" id="" class="form-control" name="region">
         <option disabled selected>Весь Узбекистан</option>
         <% it.regions?.forEach(function (region) { %>
-          <option value="<%= region.id %>" <%= it.region === String(region.id) ? "selected" : "" %>><%= region.long_name %></option>
+          <option <%= it.region_id === String(region.id) ? "selected" : "" %> value="<%= region.id %>" <%= it.region === String(region.id) ? "selected" : "" %>><%= region.long_name %></option>
         <% }) %>
       </select>
       <svg

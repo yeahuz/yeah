@@ -2,6 +2,7 @@ import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
 import * as PostingService from "../services/posting.service.js";
 import * as RegionService from "../services/region.service.js";
+import * as NotificationService from "../services/notification.service.js";
 import path from "path";
 import { render_file } from "../utils/eta.js";
 import { parse_url, array_to_tree } from "../utils/index.js";
@@ -54,12 +55,11 @@ export async function get_avatar(req, reply) {
 }
 
 export async function get_index(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
@@ -82,7 +82,7 @@ export async function get_index(req, reply) {
   });
   stream.push(home);
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -92,13 +92,12 @@ export async function get_index(req, reply) {
 }
 
 export async function get_me(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { ps } = req.query;
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: "Home", lang: req.language },
       t,
@@ -119,7 +118,7 @@ export async function get_me(req, reply) {
     stream.push(profile_html);
   }
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }
@@ -129,14 +128,13 @@ export async function get_me(req, reply) {
 }
 
 export async function get_profile(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { username } = req.params;
   const { ps } = req.query;
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: "Home", lang: req.language },
       t,
@@ -159,7 +157,7 @@ export async function get_profile(req, reply) {
     stream.push(profile_html);
   }
 
-  if (!is_navigation_preload) {
+  if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
     stream.push(bottom);
   }

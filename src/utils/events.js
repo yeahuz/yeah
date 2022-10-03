@@ -15,8 +15,12 @@ events.on("send_phone_otp", async (data) => {
 });
 
 events.on("create_otp", async (data) => {
-  const { method, tmpl_name, vars, to } = data;
+  const { method, tmpl_name, vars, to, country_code } = data;
   if (method === "email") {
     await EmailService.send_email({ tmpl_name, vars, to });
+  }
+
+  if (method === "phone") {
+    await SMSService.send({ to: country_code + to, vars, tmpl_name });
   }
 });
