@@ -10,10 +10,11 @@
     "tailwind": "tailwindcss -c tailwind.config.cjs -i ./src/public/css/main.css -o ./src/public/css/main.min.css --watch",
     "nodemon": "nodemon ./src/index.js",
     "dev": "concurrently \"pnpm tailwind\" \"pnpm nodemon\"",
-    "migrate": "NODE_ENV=production knex:migrate --env production",
+    "migrate": "NODE_ENV=production knex migrate:latest --env production",
     "migrate:dev": "knex migrate:latest",
     "seed": "NODE_ENV=production knex seed:run --env production",
     "rollback:dev": "knex migrate:rollback",
+    "rollback": "NODE_ENV=production knex migrate:rollback --env production",
     "seed:dev": "knex seed:run"
   },
   "repository": {
