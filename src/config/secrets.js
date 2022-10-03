@@ -39,6 +39,7 @@ export const {
   ORIGIN_DEV,
   JWT_SECRET,
   WS_URI,
+  WS_URI_DEV,
   SMS_API_URI,
   SMS_API_EMAIL,
   SMS_API_PASSWORD,
