@@ -66,6 +66,7 @@
     "negotiator": "^0.6.3",
     "node-cron": "^3.0.2",
     "node-ipinfo": "^3.1.1",
+    "qrcode": "github:jcbbb/node-qrcode",
     "node-telegram-bot-api": "^0.58.0",
     "objection": "^3.0.1",
     "otplib": "^12.0.1",
