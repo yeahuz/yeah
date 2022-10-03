@@ -25,7 +25,6 @@ export const {
   RP_ID,
   RP_ID_DEV,
   RP_NAME,
-  RP_NAME_DEV,
   AWS_ACCESS_KEY,
   AWS_SECRET_KEY,
   AWS_S3_REGION,
