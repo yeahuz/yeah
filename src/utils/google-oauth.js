@@ -4,5 +4,5 @@ import config from "../config/index.js";
 export const google_oauth_client = new OAuth2Client({
   clientId: config.google_oauth_client_id,
   clientSecret: config.google_oauth_client_secret,
-  redirectUri: "http://localhost:3000/auth/google",
+  redirectUri: config.google_oauth_redirect_uri,
 });
