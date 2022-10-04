@@ -59,3 +59,9 @@ export async function upload(data) {
 export async function delete_one(id) {
   return await client.request(`/v1/${id}`, { method: "DELETE" });
 }
+
+export async function upload_url(url) {
+  const fd = new FormData();
+  fd.append("url", url);
+  return await client.request("/v1", { data: fd });
+}

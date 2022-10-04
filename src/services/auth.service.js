@@ -2,6 +2,7 @@ import * as SessionService from "../services/session.service.js";
 import * as AccountService from "../services/account.service.js";
 import * as UserService from "../services/user.service.js";
 import * as S3Service from "../services/s3.service.js";
+import * as CFImageService from "../services/cfimg.service.js";
 import {
   InternalError,
   ConflictError,
@@ -167,10 +168,13 @@ export async function telegram_auth(payload) {
   const trx = await UserService.start_transaction();
 
   try {
-    const { url } = await S3Service.upload_url(tg_user.photo_url);
+    const { url } = CFImageService.get_cf_image_url(
+      await CFImageService.upload_url(tg_user.photo_url)
+    );
+
     const user = await UserService.create_one_trx(trx)({
       name: tg_user.first_name || tg_user.username,
-      profile_photo_url: url,
+      profile_photo_url: `${url}/public`,
     });
 
     const session = await SessionService.create_one_trx(trx)({
