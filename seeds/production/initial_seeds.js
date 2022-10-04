@@ -598,20 +598,20 @@ export async function seed(knex) {
     {
       name: "payme",
       title: "Payme",
-      light_logo_url: "http://localhost:3000/public/images/payme-logo-light.png",
-      dark_logo_url: "http://localhost:3000/public/images/payme-logo-dark.png",
+      light_logo_url: "/public/images/payme-logo-light.png",
+      dark_logo_url: "/public/images/payme-logo-dark.png",
     },
     {
       name: "click",
       title: "Click Evolution",
-      light_logo_url: "http://localhost:3000/public/images/click-logo-light.png",
-      dark_logo_url: "http://localhost:3000/public/images/click-logo-dark.png",
+      light_logo_url: "/public/images/click-logo-light.png",
+      dark_logo_url: "/public/images/click-logo-dark.png",
     },
     {
       name: "octo",
       title: "Octo",
-      light_logo_url: "http://localhost:3000/public/images/octo-logo-light.png",
-      dark_logo_url: "http://localhost:3000/public/images/octo-logo-dark.png",
+      light_logo_url: "/public/images/octo-logo-light.png",
+      dark_logo_url: "/public/images/octo-logo-dark.png",
     },
   ]);
 
