@@ -5,5 +5,10 @@
     "hint": "Code is only valid for an hour.",
     "verification_code": "Verification code - {{code}}"
   },
+  "update_email": {
+    "title": "Confirm your email address",
+    "description": "To secure your account, we just need to verify your email address: {{email}}",
+    "verify_btn": "Verify email address"
+  },
   "regards": "Thank you!"
 }

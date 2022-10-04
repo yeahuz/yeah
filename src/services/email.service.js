@@ -16,7 +16,7 @@ const TEMPLATES = {
     subject: (vars) => {
       return vars.t("verify.verification_code", { ns: "email-templates", code: vars.code });
     },
-    source: () => `Needs Identity <verify@identity.yeah.uz>`,
+    source: () => `Needs <noreply@needs.uz>`,
   },
 };
 

@@ -5,5 +5,10 @@
     "hint": "Kod faqat bir soat davomida amal qiladi.",
     "verification_code": "Kod - {{code}}"
   },
+  "update_email": {
+    "title": "Elektron pochta manzilingizni tasdiqlang",
+    "description": "Akkauntingizni himoyalash uchun elektron pochta manzilingizni tasdiqlashimiz kifoya: {{email}}",
+    "verify_btn": "Tasdiqlash"
+  },
   "regards": "Rahmat!"
 }
