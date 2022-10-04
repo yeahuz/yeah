@@ -120,6 +120,7 @@ export async function get_login(req, reply) {
     t,
     flash,
     google_oauth_client_id: config.google_oauth_client_id,
+    google_oauth_redirect_uri: config.google_oauth_redirect_uri,
     oauth_state,
     nonce,
     method,
@@ -171,6 +172,7 @@ export async function get_signup(req, reply) {
         t,
         flash,
         google_oauth_client_id: config.google_oauth_client_id,
+        google_oauth_redirect_uri: config.google_oauth_redirect_uri,
         oauth_state,
         nonce,
         method,
@@ -391,8 +393,6 @@ export async function google_callback(req, reply) {
   const original_state = req.session.get("oauth_state");
   const decrypted = JSON.parse(decrypt(state));
   const t = req.i18n.t;
-
-  console.log({ original_state, state }); // TODO: fix this problem (original state and state don't match);
 
   if (state !== original_state) {
     req.flash("err", new AuthenticationError({ key: "!oauth_state_match" }).build(t));
