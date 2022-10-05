@@ -6,6 +6,7 @@ const photos_area = document.querySelector(".js-photos-area");
 const photos_input = document.querySelector(".js-photos-input");
 const preview_delete_forms = document.querySelectorAll(".js-preview-delete-form");
 const attachment_sync_form = document.querySelector(".js-attachment-sync-form");
+const posting_form = document.querySelector(".js-posting-form");
 
 function on_drag_over(e) {
   e.stopPropagation();
@@ -138,7 +139,6 @@ function upload_to(urls) {
     const url = urls.shift();
     const fd = new FormData();
     fd.append("file", file);
-    console.log({ url });
     const [result, err] = await option(
       upload_request(url.uploadURL, {
         data: fd,
@@ -153,8 +153,10 @@ function upload_to(urls) {
         click: async () => {
           const li = item;
           const radio_input = li.querySelector("input[type=radio]");
+          const photo_input = posting_form.querySelector(`#photos-${result.result.id}`);
 
           const restore_li = remove_node(li);
+          const restore_photo_input = remove_node(photo_input);
 
           const container = get_photos_preview(photos_area);
           if (radio_input.checked) {
@@ -170,9 +172,9 @@ function upload_to(urls) {
 
           if (err) {
             restore_li();
+            restore_photo_input();
             return;
           }
-
           if (!container.children.length) container.remove();
         },
       });
@@ -187,12 +189,22 @@ async function upload_files(files = []) {
   );
 
   for await (const result of async_pool(10, files, upload_to(urls))) {
+    const photo_input = create_node("input", {
+      type: "hidden",
+      name: "photos",
+      value: result.result.id,
+      id: `photos-${result.result.id}`,
+    });
+
+    posting_form.prepend(photo_input);
+
     const [_, err] = await option(
       request(attachment_sync_form.action, {
         method: "PATCH",
         body: { attachments: [{ id: result.result.id, name: result.result.filename }] },
       })
     );
+
     if (err) {
       toast(err.message, "err");
     }
@@ -209,9 +221,12 @@ async function on_photos_change(e) {
 async function on_existing_delete(e) {
   e.preventDefault();
   const form = e.target;
+  const data = new FormData(form);
   const li = e.submitter.closest("li");
   const radio_input = li.querySelector("input[type=radio]");
+  const photo_input = posting_form.querySelector(`#photos-${data.get("photo_id")}`);
 
+  const restore_photo_input = remove_node(photo_input);
   const restore_li = remove_node(li);
 
   const container = get_photos_preview(photos_area);
@@ -224,6 +239,7 @@ async function on_existing_delete(e) {
 
   if (err) {
     restore_li();
+    restore_photo_input();
     return;
   }
 

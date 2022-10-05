@@ -198,7 +198,7 @@ export async function get_step(req, reply) {
     }
     case 2: {
       const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
-      const valid = req.validateInput(posting_data, new_posting_schema.essential);
+      const valid = req.validateInput(posting_data, new_posting_schema.essential.body);
       if (!valid) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;
@@ -220,7 +220,7 @@ export async function get_step(req, reply) {
     }
     case 3: {
       const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
-      const valid = req.validateInput(posting_data, new_posting_schema.general);
+      const valid = req.validateInput(posting_data, new_posting_schema.general.body);
       if (!valid) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;
@@ -234,7 +234,7 @@ export async function get_step(req, reply) {
     }
     case 4: {
       const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
-      const valid = req.validateInput(posting_data, new_posting_schema.contact);
+      const valid = req.validateInput(posting_data, new_posting_schema.contact.body);
       if (!valid) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;

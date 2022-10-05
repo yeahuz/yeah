@@ -25,19 +25,19 @@ export const posting = async (fastify) => {
     method: "POST",
     url: "/wizard/:id/1",
     handler: PostingController.submit_first_step,
-    schema: {
-      body: new_posting_schema.essential,
-    },
+    schema: new_posting_schema.essential,
   });
   fastify.route({
     method: "POST",
     url: "/wizard/:id/2",
     handler: PostingController.submit_second_step,
+    schema: new_posting_schema.general,
   });
   fastify.route({
     method: "POST",
     url: "/wizard/:id/3",
     handler: PostingController.submit_third_step,
+    schema: new_posting_schema.contact,
   });
   fastify.route({
     method: "POST",

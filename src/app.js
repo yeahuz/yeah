@@ -123,6 +123,9 @@ export async function start() {
           return reply;
         }
 
+        console.log(
+          new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
+        );
         req.flash(
           "validation_errors",
           new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
