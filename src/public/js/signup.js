@@ -30,26 +30,25 @@ window.addEventListener("load", () => {
   }
 });
 
-if ("OTPCredential" in window) {
-  window.addEventListener("DOMContentLoaded", async () => {
-    if (!otp_inputs) return;
-    const first_input = otp_inputs[0];
-    const form = first_input.closest("form");
-    const ac = new AbortController();
+window.addEventListener("DOMContentLoaded", async () => {
+  console.log("DOMContentLoaded");
+  if (!otp_inputs) return;
+  const first_input = otp_inputs[0];
+  const form = first_input.closest("form");
+  const ac = new AbortController();
 
-    if (form) {
-      form.addEventListener("submit", () => ac.abort());
-    }
+  if (form) {
+    form.addEventListener("submit", () => ac.abort());
+  }
 
-    const [otp, err] = await option(
-      navigator.credentials.get({
-        otp: { transport: ["sms"] },
-        signal: ac.signal,
-      })
-    );
+  const [otp, err] = await option(
+    navigator.credentials.get({
+      otp: { transport: ["sms"] },
+      signal: ac.signal,
+    })
+  );
 
-    if (otp) {
-      otp_inputs.forEach((input, i) => (input.value = otp[i]));
-    } else console.error(err);
-  });
-}
+  if (otp) {
+    otp_inputs.forEach((input, i) => (input.value = otp.code[i]));
+  } else console.error(err);
+});
