@@ -23,15 +23,12 @@ function on_masked_input(e) {
   e.target.value = maskit(maskit(e.target.value, unmask), mask);
 }
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   if (masked_input) {
     add_listeners(masked_input, { input: on_masked_input });
     masked_input.value = maskit(masked_input.value, masked_input.dataset.mask);
   }
-});
 
-window.addEventListener("DOMContentLoaded", async () => {
-  console.log("DOMContentLoaded");
   if (!otp_inputs) return;
   const first_input = otp_inputs[0];
   const form = first_input.closest("form");
