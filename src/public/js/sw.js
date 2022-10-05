@@ -25,6 +25,7 @@ const GOOGLE_GSTATIC_REGEX = new RegExp("https://maps\\.gstatic\\.com.*");
 const GOOGLE_APIS_REGEX = new RegExp("https://maps\\.googleapis\\.com.*");
 const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
 const SEARCH_ROUTE_REGEX = new RegExp("/search/?.*");
+const AUTH_ROUTE_REGEX = new RegExp("/auth/(signup|login)");
 const GLOBAL_VERSION = 4;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
@@ -222,8 +223,7 @@ const nf_content_handler = compose_strategies([
 const swr_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   else if (url.pathname === "/auth/google") return;
-  else if (url.pathname === "/auth/signup") return;
-  else if (url.pathname === "/auth/login") return;
+  else if (AUTH_ROUTE_REGEX.test(url.pathname)) return;
   else if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
   else if (SEARCH_ROUTE_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
@@ -231,7 +231,9 @@ const swr_content_route = new Route(({ request, url }) => {
 
 const nf_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
-  return request.mode === "navigate" && POSTING_WIZARD_REGEX.test(url.pathname);
+  if (request.mode === "navigate") {
+    return POSTING_WIZARD_REGEX.test(url.pathname) || AUTH_ROUTE_REGEX.test(url.pathname);
+  }
 }, nf_content_handler);
 
 // enable_navigation_preload();
@@ -247,6 +249,7 @@ warm_strategy_cache({
 });
 
 setCatchHandler(({ request }) => {
+  console.log("here");
   if (request.destination === "document") {
     return matchPrecache("/partials/offline.html");
   }
