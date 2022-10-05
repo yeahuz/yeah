@@ -1,5 +1,5 @@
 {
-  "name": "s.uz",
+  "name": "needs.uz",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
@@ -19,14 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jcbbb/s.uz.git"
+    "url": "git+https://github.com/yeahuz/yeah.git"
   },
   "author": "juraev00",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jcbbb/s.uz/issues"
+    "url": "https://github.com/yeahuz/yeah/issues"
   },
-  "homepage": "https://github.com/jcbbb/s.uz#readme",
+  "homepage": "https://github.com/yeahuz/yeah#readme",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.135.0",
     "@aws-sdk/client-ses": "^3.163.0",
