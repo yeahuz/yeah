@@ -30,6 +30,7 @@ window.addEventListener("load", async () => {
   }
 
   if (!otp_inputs) return;
+
   const first_input = otp_inputs[0];
   const form = first_input.closest("form");
   const ac = new AbortController();
@@ -47,5 +48,6 @@ window.addEventListener("load", async () => {
 
   if (otp) {
     otp_inputs.forEach((input, i) => (input.value = otp.code[i]));
+    if (form) form.submit();
   } else console.error(err);
 });

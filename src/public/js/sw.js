@@ -29,7 +29,7 @@ const AUTH_ROUTE_REGEX = new RegExp("/auth/(signup|login)");
 const GLOBAL_VERSION = 5;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
-  static_assets: `static_assets-${GLOBAL_VERSION}.3`,
+  static_assets: `static_assets-${GLOBAL_VERSION}.4`,
   swr_content: `swr_content-${GLOBAL_VERSION}.1`,
   nf_content: `nf_content-${GLOBAL_VERSION}.1`,
   partials: `partials-${GLOBAL_VERSION}.1`,
