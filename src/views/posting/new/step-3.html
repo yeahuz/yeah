@@ -22,7 +22,7 @@
   <label class="text-sm font-medium text-gray-700 inline-block max-w-md w-full dark:text-gray-200 mt-5">
     <%= it.t("form.phone.label", { ns: "new-posting" }) %>
     <div class="flex mt-2 relative">
-    <!-- <input type="hidden" name="phone" class="js-unmasked-value" /> -->
+      <input type="hidden" name="country_code" value="998" />
       <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal dark:border-zinc-800 dark:text-gray-400">+998</span>
       <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" value="<%= it.posting_data?.phone ?? "" %>" inputmode="numeric" name="phone"
         placeholder="<%= it.t("form.phone.placeholder", { ns: "new-posting" }) %>"

@@ -1,6 +1,5 @@
 import * as CategoryService from "../services/category.service.js";
 import * as RegionService from "../services/region.service.js";
-import * as IPInfoService from "../services/ip-info.service.js";
 import {
   cleanup_object,
   parse_url,
@@ -15,8 +14,6 @@ export async function get_search(req, reply) {
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
-  // const ip = req.ip;
-  const ip = "84.54.74.91";
 
   const { q, min_amount, max_amount, placement, region_id, ...facets } = cleanup_object(req.query);
 
@@ -26,7 +23,7 @@ export async function get_search(req, reply) {
       user,
       t,
       mobile_search: true,
-      q,
+      q: q.trim(),
     });
     stream.push(top);
   }
@@ -34,7 +31,7 @@ export async function get_search(req, reply) {
   const categories = !q ? await CategoryService.get_by_parent({ lang: req.language }) : [];
   const regions = await RegionService.get_regions({ lang: req.language });
   const search_top = await render_file("/search/top.html", {
-    q,
+    q: q.trim(),
     t,
     user,
     categories,
@@ -43,7 +40,6 @@ export async function get_search(req, reply) {
   });
   stream.push(search_top);
 
-  // const geo = await IPInfoService.lookup(ip);
   const result = await ESService.general_search("needs_ru", {
     region_id,
     facets,
@@ -51,7 +47,6 @@ export async function get_search(req, reply) {
     max_amount,
     q,
     placement,
-    // geo,
   });
 
   const filters = await render_file("/search/filters.html", {
@@ -61,7 +56,7 @@ export async function get_search(req, reply) {
     facets,
     placement,
     region_id,
-    q,
+    q: q.trim(),
     url: req.url,
     remove_query_value,
     append_query_value,

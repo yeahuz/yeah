@@ -16,9 +16,8 @@
         <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
           <%= it.t("phone.label", { ns: "signup"}) %>
           <div class="flex mt-2 relative">
-            <input type="hidden" name="identifier" class="js-unmasked-value" />
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal dark:border-zinc-800 dark:text-gray-400">+998</span>
-            <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" inputmode="numeric" name="masked_identifier"
+            <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" inputmode="numeric" name="identifier"
               placeholder="<%= it.t("phone.placeholder", { ns: "signup" }) %>"
               data-mask="## ### ## ##"
               data-unmask="#########"
@@ -66,19 +65,5 @@
 <script>
  document.title = "<%= it.t("title", { ns: "signup" })%> | Needs"
 </script>
-<% if (it.method === "phone") { %>
-  <script type="module">
-    const masked_input = document.querySelector(".js-masked-input");
-    const masked_value = document.querySelector(".js-unmasked-value");
-    import { maskit } from "/public/js/mask.js"
-
-    masked_input.addEventListener("input", (e) => {
-      const mask = e.target.dataset.mask;
-      const unmask = e.target.dataset.unmask;
-      masked_value.value = maskit(e.target.value, unmask);
-      e.target.value = maskit(e.target.value, mask);
-    });
-  </script>
-<% } %>
 <script async src="https://telegram.org/js/telegram-widget.js?19"></script>
 <script type="module" src="/public/js/signup.js" defer async></script>

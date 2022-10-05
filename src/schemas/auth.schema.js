@@ -13,15 +13,11 @@ export const auth_schema = {
             },
             {
               type: "string",
-              pattern: "^(33|55|77|88|90|91|93|94|95|97|98|99)(\\d{7})$",
+              pattern:
+                "^(33|55|77|88|90|91|93|94|95|97|98|99)\\s?(\\d{3})\\s?(\\d{2})\\s?(\\d{2})$",
               errorMessage: { pattern: "!phone_number", type: "!phone_number" },
             },
           ],
-        },
-        masked_identifier: {
-          description: "Masked phone of an account",
-          type: "string",
-          pattern: "^(33|55|77|88|90|91|93|94|95|97|98|99)\\s?(\\d{3})\\s?(\\d{2})\\s?(\\d{2})$",
         },
         password: {
           description: "Password of an account",
@@ -58,7 +54,8 @@ export const auth_schema = {
             },
             {
               type: "string",
-              pattern: "^(33|55|77|88|90|91|93|94|95|97|98|99)(\\d{7})$",
+              pattern:
+                "^(33|55|77|88|90|91|93|94|95|97|98|99)\\s?(\\d{3})\\s?(\\d{2})\\s?(\\d{2})$",
               errorMessage: { pattern: "!phone_number", type: "!phone_number" },
             },
           ],

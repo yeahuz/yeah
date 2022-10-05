@@ -1,6 +1,8 @@
 import { add_listeners, create_node, disable_element } from "./dom.js";
 import { request, option, debounce } from "./utils.js";
+import { maskit } from "./mask.js";
 
+const masked_input = document.querySelector(".js-masked-input");
 const geo_trigger = document.querySelector(".js-geo-trigger");
 const geo_input = document.querySelector(".js-geo-input");
 const predictions = document.querySelector(".js-suggestions");
@@ -134,6 +136,12 @@ async function on_geo_input_change(e) {
   }
 }
 
+function on_masked_input(e) {
+  const mask = e.target.dataset.mask;
+  const unmask = e.target.dataset.unmask;
+  e.target.value = maskit(maskit(e.target.value, unmask), mask);
+}
+
 add_listeners(geo_input, {
   input: debounce(on_geo_input_change),
 });
@@ -142,8 +150,15 @@ add_listeners(geo_trigger, {
   click: on_geo_trigger,
 });
 
+add_listeners(masked_input, {
+  input: on_masked_input,
+});
+
 window.addEventListener("load", async () => {
   const location = location_input.value;
+  if (masked_input) {
+    masked_input.value = maskit(masked_input.value, masked_input.dataset.mask);
+  }
   if (location) {
     const [formatted_address, lat, lng] = location.split("|");
     await init_map({ lat, lng });

@@ -193,6 +193,13 @@ export function cleanup_object(obj) {
   return obj;
 }
 
+export function transform_object(obj, transformations) {
+  for (const prop in transformations) {
+    if (obj[prop]) obj[prop] = transformations[prop](obj[prop]);
+  }
+  return obj;
+}
+
 export function generate_srcset(url, options, count = 20) {
   let srcset = "";
   for (let i = 1; i <= count; i++) {

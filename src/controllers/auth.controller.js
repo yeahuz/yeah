@@ -7,7 +7,15 @@ import config from "../config/index.js";
 import * as jwt from "../utils/jwt.js";
 import { redis_client } from "../services/redis.service.js";
 import { render_file } from "../utils/eta.js";
-import { decrypt, encrypt, option, get_time, add_t, parse_url } from "../utils/index.js";
+import {
+  decrypt,
+  encrypt,
+  option,
+  get_time,
+  add_t,
+  parse_url,
+  transform_object,
+} from "../utils/index.js";
 import { AuthenticationError, GoneError } from "../utils/errors.js";
 import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
@@ -99,7 +107,6 @@ export async function get_login(req, reply) {
   const nonce = req.session.get("nonce") || randomBytes(4).readUInt32LE();
   const oauth_state = encrypt(JSON.stringify({ came_from: req.url, return_to }));
 
-  console.log("setting oauth state", oauth_state);
   req.session.set("oauth_state", oauth_state);
   req.session.set("nonce", nonce);
 
@@ -219,9 +226,11 @@ export async function get_signup(req, reply) {
 
 export async function create_otp(req, reply) {
   const { method } = req.query;
-  const { identifier, country_code } = req.body;
-  const t = req.i18n.t;
+  const { identifier, country_code } = transform_object(req.body, {
+    identifier: (v) => v.replace(/\s/g, ""),
+  });
 
+  const t = req.i18n.t;
   const [code, err] = await option(ConfirmationCodeService.generate_auth_code(identifier));
 
   if (err) {
@@ -244,7 +253,9 @@ export async function create_otp(req, reply) {
 
 export async function confirm_otp(req, reply) {
   const { method = "phone" } = req.query;
-  const otp = Array.isArray(req.body.otp) ? req.body.otp.join("") : req.body.otp;
+  const { otp } = transform_object(req.body, {
+    otp: (v) => (Array.isArray(v) ? v.join("") : v),
+  });
   const t = req.i18n.t;
   const identifier = req.session.get("identifier");
 
@@ -263,7 +274,10 @@ export async function confirm_otp(req, reply) {
 
 export async function signup(req, reply) {
   const { return_to = "/" } = req.query;
-  const { identifier, masked_identifier, password, name } = req.body;
+  const { identifier, password, name } = transform_object(req.body, {
+    identifier: (v) => v.replace(/\s/g, ""),
+  });
+
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
   const t = req.i18n.t;
@@ -278,7 +292,7 @@ export async function signup(req, reply) {
 
   const [result, err] = await option(
     AuthService.signup({
-      identifier: identifier || masked_identifier,
+      identifier,
       password,
       user_agent,
       ip,
@@ -296,32 +310,6 @@ export async function signup(req, reply) {
   req.session.set("nonce", null);
   req.session.set("otp_token", null);
   reply.redirect(add_t(return_to));
-  return reply;
-}
-
-export async function login_xhr(req, reply) {
-  const { method = "phone" } = req.query;
-  const { email, phone, password } = req.body;
-  const user_agent = req.headers["user-agent"];
-  const ip = req.ip;
-  const t = req.i18n.t;
-
-  const user = await AuthService.verify_password({ method, email, phone, password });
-  const has_credential = await CredentialService.exists_for(user.id);
-
-  if (has_credential) {
-    req.sesion.set("user_id", user.id);
-    reply.send({ user_id: user.id, has_credential });
-    return reply;
-  }
-
-  const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
-
-  req.session.set("sid", session.id);
-  req.session.set("oauth_state", null);
-  req.session.set("nonce", null);
-
-  reply.send({ sid: session.id });
   return reply;
 }
 

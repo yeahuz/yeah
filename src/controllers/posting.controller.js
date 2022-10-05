@@ -157,15 +157,6 @@ export async function submit_fourth_step(req, reply) {
   await PostingService.create_posting(posting_data);
   reply.redirect(req.url);
   return reply;
-  // const {
-  //   title,
-  //   description,
-  //   attachments,
-  //   district_id,
-  //   region_id,
-  //   formatted_address,
-  //   category_id,
-  // } = posting_data;
 }
 
 export async function get_step(req, reply) {
@@ -229,6 +220,11 @@ export async function get_step(req, reply) {
     }
     case 3: {
       const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
+      const valid = req.validateInput(posting_data, new_posting_schema.general);
+      if (!valid) {
+        rendered_step = await render_file("/partials/404.html", { t });
+        break;
+      }
       rendered_step = await render_file(`/posting/new/step-${step}`, {
         flash,
         t,
@@ -238,6 +234,11 @@ export async function get_step(req, reply) {
     }
     case 4: {
       const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
+      const valid = req.validateInput(posting_data, new_posting_schema.contact);
+      if (!valid) {
+        rendered_step = await render_file("/partials/404.html", { t });
+        break;
+      }
       const fields = await CategoryService.get_fields({
         category_id: posting_data.category_id,
         lang: req.language,

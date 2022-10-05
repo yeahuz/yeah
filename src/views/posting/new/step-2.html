@@ -146,15 +146,31 @@
     <% } %>
   <% }) %>
   <label class="w-full block mt-5 max-w-md">
-    <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+    <span class="text-sm font-medium text-gray-700 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
       <%= it.t("form.price.label", { ns: "new-posting" }) %>
     </span>
     <div class="flex mt-2">
       <input type="number" value="<%= it.posting_data?.price ?? "" %>" class="form-control !rounded-r-none" name="price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-posting" }) %>" required />
-      <select name="currency_code" class="form-control !rounded-l-none max-w-max">
-        <option value="USD" <%= it.posting_data?.currency_code === "USD" || !it.posting_data?.currency_code ? "selected" : "" %>>USD</option>
-        <option value="UZS" <%= it.posting_data?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
-      </select>
+      <div class="relative min-w-fit">
+        <select name="currency_code" class="form-control !rounded-l-none mr-6">
+          <option value="USD" <%= it.posting_data?.currency_code === "USD" || !it.posting_data?.currency_code ? "selected" : "" %>>USD</option>
+          <option value="UZS" <%= it.posting_data?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
+        </select>
+        <svg
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
     </div>
   </label>
   <button class="btn btn-lg btn-primary mt-8">Далее</button>

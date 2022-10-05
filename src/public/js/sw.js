@@ -154,14 +154,6 @@ precacheAndRoute([
     url: "/partials/offline.html",
     revision: GLOBAL_VERSION + 1,
   },
-  // {
-  //   url: "/partials/top.html",
-  //   revision: GLOBAL_VERSION + 1,
-  // },
-  // {
-  //   url: "/partials/bottom.html",
-  //   revision: GLOBAL_VERSION + 1,
-  // },
 ]);
 
 const swr_content_handler = compose_strategies([
