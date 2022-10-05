@@ -1,16 +1,25 @@
-export async function* async_pool(concurrency, iterable, iteratorFn) {
+// https://github.com/rxaviers/async-pool/blob/master/lib/es9.js
+export async function* async_pool(concurrency, iterable, iterator_fn) {
   const executing = new Set();
-  for await (const item of iterable) {
-    const promise = Promise.resolve().then(() => iteratorFn(item, iterable));
+  async function consume() {
+    const [promise, value] = await Promise.race(executing);
+    executing.delete(promise);
+    return value;
+  }
+
+  for (const item of iterable) {
+    const promise = (async () => await iterator_fn(item, iterable))().then((value) => [
+      promise,
+      value,
+    ]);
     executing.add(promise);
-    const clean = () => executing.delete(promise);
-    promise.then(clean).catch(clean);
     if (executing.size >= concurrency) {
-      yield await Promise.race(executing);
+      yield await consume();
     }
   }
+
   while (executing.size) {
-    yield await Promise.race(executing);
+    yield await consume();
   }
 }
 
