@@ -20,6 +20,7 @@
   "!posting_description_minlength": "Tavsif juda qisqa yoki boʻsh",
   "posting_min_photos": "Kamida bitta fotosurat kerak",
   "posting_max_photos": "Siz maksimal surat chegarasidan oshib ketdingiz (50). Iltimos, ulardan ba'zilarini o'chirib tashlang",
+  "credential_not_found": "Kalit topilmadi",
   "otp_expired": "Kod muddati tugagan yoki yaratilmagan. Iltimos, yana bir bor urinib ko'ring",
   "token_expired": "Token muddati tugagan",
   "token_malformed": "Token noto‘g‘ri tuzilgan",

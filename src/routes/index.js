@@ -1,3 +1,5 @@
+import fastify_etag from "@fastify/etag";
+import fastify_accepts from "@fastify/accepts";
 import { home } from "./home.route.js";
 import { auth } from "./auth.route.js";
 import { settings } from "./settings.route.js";
@@ -11,7 +13,26 @@ import { payment } from "./payment.route.js";
 import { billing } from "./billing.route.js";
 import { cfimg } from "./cfimg.route.js";
 
+// API routes
+import { auth_api } from "./auth-api.route.js";
+
+import { attach_user } from "../plugins/attach-user.js";
+import { is_xhr } from "../plugins/is-xhr.js";
+import { is_partial } from "../plugins/is-partial.js";
+import { chunk_view } from "../plugins/chunk-view.js";
+import { init_stream } from "../plugins/init-stream.js";
+
 export const routes = async (fastify) => {
+  // Plugins
+  fastify.register(fastify_accepts);
+  fastify.register(fastify_etag);
+  fastify.register(is_xhr);
+  fastify.register(is_partial);
+  fastify.register(chunk_view);
+  fastify.register(init_stream);
+  fastify.register(attach_user);
+
+  // Routes
   fastify.register(home);
   fastify.register(auth, { prefix: "/auth" });
   fastify.register(settings, { prefix: "/settings" });
@@ -25,4 +46,8 @@ export const routes = async (fastify) => {
   fastify.register(payment, { prefix: "/payments" });
   fastify.register(cfimg, { prefix: "/cloudflare/images" });
   fastify.register(billing, { prefix: "/billing" });
+};
+
+export const api_routes = async (fastify) => {
+  fastify.register(auth_api, { prefix: "/auth" });
 };

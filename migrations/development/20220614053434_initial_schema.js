@@ -247,7 +247,7 @@ export function up(knex) {
         .onDelete("CASCADE");
     })
     .createTable("sessions", (table) => {
-      table.increments("id");
+      table.uuid("id").defaultTo(knex.raw("gen_random_uuid()")).primary();
       table.boolean("active").defaultTo(true);
       table.specificType("ip", "INET");
       table.timestamp("expires_at");
@@ -285,7 +285,7 @@ export function up(knex) {
       table.string("device_model");
       table.string("device_vendor");
       table
-        .integer("session_id")
+        .uuid("session_id")
         .index()
         .notNullable()
         .references("id")
@@ -295,7 +295,7 @@ export function up(knex) {
     })
     .createTable("sessions_credentials", (table) => {
       table
-        .integer("session_id")
+        .uuid("session_id")
         .index()
         .notNullable()
         .references("id")
@@ -927,6 +927,12 @@ export function up(knex) {
       table.text("content");
       table.unique(["notification_type_name", "language_code"]);
       table.timestamps(false, true);
+    })
+    .createTable("external_clients", (table) => {
+      table.increments("id");
+      table.string("title");
+      table.string("token").index();
+      table.boolean("active").defaultTo(true);
     })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION));
 }
