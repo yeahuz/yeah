@@ -197,6 +197,7 @@ export function transform_object(obj, transformations) {
   for (const prop in transformations) {
     if (obj[prop]) obj[prop] = transformations[prop](obj[prop]);
   }
+
   return obj;
 }
 

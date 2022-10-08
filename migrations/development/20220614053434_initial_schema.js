@@ -1000,5 +1000,6 @@ export function down(knex) {
     .dropTable("attachments")
     .dropTable("attachments_v2")
     .dropTable("confirmation_codes")
+    .dropTable("external_clients")
     .then(() => knex.raw(DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION));
 }

@@ -4,7 +4,6 @@ import * as UserService from "../services/user.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as jwt from "../utils/jwt.js";
 import { ResourceNotFoundError } from "../utils/errors.js";
-import { option } from "../utils/index.js";
 import { AssertionRequest, CredentialRequest } from "../utils/webauthn.js";
 
 export async function login(req, reply) {
@@ -64,5 +63,13 @@ export async function generate_request(req, reply) {
   }
 
   reply.send(request);
+  return reply;
+}
+
+export async function get_session(req, reply) {
+  const { id } = req.params;
+  console.log({ id });
+  const session = await SessionService.get_one(id);
+  reply.send(session);
   return reply;
 }

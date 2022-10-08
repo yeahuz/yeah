@@ -675,7 +675,7 @@ export async function seed(knex) {
     },
   ]);
 
-  await knex("external_services").insert([
+  await knex("external_clients").insert([
     {
       title: "Needs Admin",
       token: "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15",

@@ -26,7 +26,6 @@ function create_one_impl(trx) {
 
 export async function get_one(id) {
   if (!id) return;
-
   return await Session.query()
     .select("*")
     .select(raw("case when now() > expires_at then 1 else 0 end as expired"))

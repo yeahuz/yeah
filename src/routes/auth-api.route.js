@@ -22,4 +22,9 @@ export const auth_api = async (fastify) => {
     url: "/assertions",
     handler: AuthApiController.verify_assertion,
   });
+  fastify.route({
+    method: "GET",
+    url: "/sessions/:id",
+    handler: AuthApiController.get_session,
+  });
 };

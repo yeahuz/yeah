@@ -15,7 +15,9 @@ import { cfimg } from "./cfimg.route.js";
 
 // API routes
 import { auth_api } from "./auth-api.route.js";
+import { user_api } from "./user-api.route.js";
 
+// Plugins
 import { attach_user } from "../plugins/attach-user.js";
 import { is_xhr } from "../plugins/is-xhr.js";
 import { is_partial } from "../plugins/is-partial.js";
@@ -50,4 +52,5 @@ export const routes = async (fastify) => {
 
 export const api_routes = async (fastify) => {
   fastify.register(auth_api, { prefix: "/auth" });
+  fastify.register(user_api, { prefix: "/users" });
 };

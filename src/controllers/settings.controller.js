@@ -6,7 +6,6 @@ import { parse_url, add_t } from "../utils/index.js";
 import { create_date_formatter } from "../utils/date.js";
 
 export async function get_tab(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const { tab } = req.params;
   const flash = reply.flash();
   const stream = reply.init_stream();
