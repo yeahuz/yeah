@@ -6,4 +6,9 @@ export const user_api = async (fastify) => {
     url: "/:id",
     handler: UserApiController.get_one,
   });
+  fastify.route({
+    method: "GET",
+    url: "/",
+    handler: UserApiController.get_many,
+  });
 };

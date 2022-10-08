@@ -54,6 +54,26 @@ export async function get_one(id, relations = []) {
   return await User.query().findById(id).withGraphFetched(format_relations(relations));
 }
 
+export async function get_many({ prev, next, id, username } = {}) {
+  const query = User.query();
+
+  if (id) {
+    query.where({ id });
+  }
+
+  if (username) {
+    query.where({ username });
+  }
+
+  if (prev) {
+    query.where("id", "<", prev);
+  } else if (next) {
+    query.where("id", ">", next);
+  }
+
+  return await query;
+}
+
 export async function get_by_username(username, relations = []) {
   if (!username) return;
   return await User.query().findOne({ username }).withGraphFetched(format_relations(relations));
