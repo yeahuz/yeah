@@ -1,5 +1,4 @@
 import * as AuthApiController from "../controllers/auth-api.controller.js";
-import { guest_user } from "../utils/roles.js";
 import { auth_api_schema } from "../schemas/auth-api.schema.js";
 
 export const auth_api = async (fastify) => {
@@ -8,7 +7,6 @@ export const auth_api = async (fastify) => {
     url: "/login",
     handler: AuthApiController.login,
     schema: auth_api_schema.login,
-    onRequest: fastify.can(guest_user),
   });
 
   fastify.route({

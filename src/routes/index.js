@@ -1,5 +1,6 @@
 import fastify_etag from "@fastify/etag";
 import fastify_accepts from "@fastify/accepts";
+import { i18next } from "../utils/i18n.js";
 import { home } from "./home.route.js";
 import { auth } from "./auth.route.js";
 import { settings } from "./settings.route.js";
@@ -23,6 +24,8 @@ import { is_xhr } from "../plugins/is-xhr.js";
 import { is_partial } from "../plugins/is-partial.js";
 import { chunk_view } from "../plugins/chunk-view.js";
 import { init_stream } from "../plugins/init-stream.js";
+import { external_client } from "../plugins/external-client.js";
+import { DomainError, ValidationError, InternalError } from "../utils/errors.js";
 
 export const routes = async (fastify) => {
   // Plugins
@@ -51,6 +54,23 @@ export const routes = async (fastify) => {
 };
 
 export const api_routes = async (fastify) => {
+  fastify.register(external_client);
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
+  fastify.setErrorHandler((err, req, reply) => {
+    const lang = req.language;
+    const t = i18next.getFixedT(lang);
+    if (err.validation) {
+      reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
+      return reply;
+    }
+
+    if (err instanceof DomainError) {
+      reply.code(err.status_code).send(err.build(t));
+      return reply;
+    }
+
+    reply.code(500).send(new InternalError().build(t));
+    return reply;
+  });
 };

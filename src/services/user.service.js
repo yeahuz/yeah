@@ -54,8 +54,8 @@ export async function get_one(id, relations = []) {
   return await User.query().findById(id).withGraphFetched(format_relations(relations));
 }
 
-export async function get_many({ prev, next, id, username } = {}) {
-  const query = User.query();
+export async function get_many({ prev, next, id, username, limit } = {}) {
+  const query = User.query().orderBy("id", "desc").limit(limit);
 
   if (id) {
     query.where({ id });
@@ -87,6 +87,10 @@ export async function get_by_hashid(hash_id, relations = []) {
 export async function get_preferences(id) {
   const user = await get_one(id);
   return await user?.$relatedQuery("preferences");
+}
+
+export async function delete_one(id) {
+  return await User.query().deleteById(id);
 }
 
 export const create_one = create_one_impl();

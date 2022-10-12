@@ -9,13 +9,13 @@ export const external_client = fp(function external_client(fastify, opts = {}, d
 });
 
 function get_bearer_token(auth_header) {
-  const [type, credential] = auth_header.trim().split(" ");
+  const [type, credential] = auth_header?.trim()?.split(" ");
   if (type === "Bearer") return credential;
 }
 
 async function external_client_impl(req, reply) {
-  const token = get_bearer_token(req.headers["Authorization"]);
-  if (token) {
+  const token = get_bearer_token(req.headers["authorization"]);
+  if (!token) {
     throw new AuthenticationError();
   }
 

@@ -99,10 +99,9 @@ export async function start() {
 
     app.setErrorHandler((err, req, reply) => {
       console.log({ err });
-      const accept_lang = [
-        req.language instanceof Function ? req.language() : req.language,
-        "en",
-      ].flat();
+      const accept_lang = [req.language instanceof Function ? req.language() : req.language, "en"]
+        .filter(Boolean)
+        .flat();
 
       const t = i18next.getFixedT(accept_lang);
       const { return_to } = req.query;
@@ -112,10 +111,6 @@ export async function start() {
           reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
           return reply;
         }
-
-        console.log(
-          new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
-        );
         req.flash(
           "validation_errors",
           new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors

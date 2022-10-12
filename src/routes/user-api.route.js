@@ -11,4 +11,9 @@ export const user_api = async (fastify) => {
     url: "/",
     handler: UserApiController.get_many,
   });
+  fastify.route({
+    method: "DELETE",
+    url: "/:id",
+    handler: UserApiController.delete_one,
+  });
 };
