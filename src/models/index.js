@@ -31,3 +31,4 @@ export * from "./user-notification.model.js";
 export * from "./payment-provider.model.js";
 export * from "./payment.model.js";
 export * from "./external-client.model.js";
+export * from "./posting-status.model.js";

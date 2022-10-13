@@ -1,7 +1,7 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import objection from "objection";
-import { Posting } from "../models/index.js";
+import { Posting, PostingStatus } from "../models/index.js";
 import { InternalError } from "../utils/errors.js";
 
 const { raw } = objection;
@@ -80,8 +80,18 @@ export async function create_posting(payload) {
   }
 }
 
-export async function get_many({ currency = "USD", status_id = 1 } = {}) {
-  return await Posting.query()
+async function cursor_paginate(model, list = [], excludes = []) {
+  const first = list[0];
+  const last = list[list.length - 1];
+
+  const has_next = !!(await model.query().findOne("id", "<", last.id).whereNotIn("id", excludes));
+  const has_prev = !!(await model.query().findOne("id", ">", first.id).whereNotIn("id", excludes));
+
+  return { list, has_next, has_prev };
+}
+
+export async function get_many({ currency = "USD", status_id = 1, limit, after, before } = {}) {
+  const list = await Posting.query()
     .select(
       "title",
       "description",
@@ -105,5 +115,15 @@ export async function get_many({ currency = "USD", status_id = 1 } = {}) {
       "postings.id",
       "pp.price"
     )
-    .withGraphFetched("location");
+    .withGraphFetched("location")
+    .limit(limit);
+
+  return await cursor_paginate(Posting, list);
+}
+
+export async function get_statuses({ lang = "en" }) {
+  return await PostingStatus.query()
+    .select("pst.name as name", "posting_statuses.id", "posting_statuses.code")
+    .join("posting_status_translations as pst", "pst.status_id", "posting_statuses.id")
+    .where({ language_code: lang.substring(0, 2) });
 }

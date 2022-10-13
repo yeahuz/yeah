@@ -68,7 +68,6 @@ export async function generate_request(req, reply) {
 
 export async function get_session(req, reply) {
   const { id } = req.params;
-  console.log({ id });
   const session = await SessionService.get_one(id);
   reply.send(session);
   return reply;

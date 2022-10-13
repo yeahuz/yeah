@@ -8,8 +8,17 @@ export async function get_one(req, reply) {
 }
 
 export async function get_many(req, reply) {
-  const { next, prev, id, username, limit = 15 } = req.query;
-  const users = await UserService.get_many({ next, prev, id, username, limit });
+  const { id, username, limit = 15, excludes, after, before, email, phone } = req.query;
+  const users = await UserService.get_many({
+    id,
+    username,
+    limit,
+    excludes,
+    after,
+    before,
+    email,
+    phone,
+  });
   reply.send(users);
   return reply;
 }

@@ -54,24 +54,65 @@ export async function get_one(id, relations = []) {
   return await User.query().findById(id).withGraphFetched(format_relations(relations));
 }
 
-export async function get_many({ prev, next, id, username, limit } = {}) {
+async function cursor_paginate(model, list = [], excludes) {
+  const first = list[0];
+  const last = list[list.length - 1];
+
+  const has_next = !!(await model.query().findOne("id", "<", last.id).whereNotIn("id", excludes));
+  const has_prev = !!(await model.query().findOne("id", ">", first.id).whereNotIn("id", excludes));
+
+  return { list, has_next, has_prev };
+}
+
+export async function get_many({
+  before,
+  after,
+  id,
+  username,
+  email,
+  phone,
+  limit,
+  excludes,
+} = {}) {
   const query = User.query().orderBy("id", "desc").limit(limit);
 
+  const excluded_ids = [excludes].flat().filter(Boolean);
+
+  if (excludes) {
+    query.whereNotIn("id", excluded_ids);
+  }
+
   if (id) {
-    query.where({ id });
+    const list = await query.where({ id });
+    return { list, has_next: false, has_prev: false };
   }
 
   if (username) {
-    query.where({ username });
+    const list = await query.where({ username });
+    return { list, has_next: false, has_prev: false };
   }
 
-  if (prev) {
-    query.where("id", "<", prev);
-  } else if (next) {
-    query.where("id", ">", next);
+  if (phone) {
+    const list = await query.where({ phone });
+    return { list, has_next: false, has_prev: false };
   }
 
-  return await query;
+  if (email) {
+    const list = await query.where({ email });
+    return { list, has_next: false, has_prev: false };
+  }
+
+  if (after) {
+    query.where("id", "<", after);
+  }
+
+  if (before) {
+    query.where("id", ">", before);
+  }
+
+  const list = await query;
+
+  return await cursor_paginate(User, list, excluded_ids);
 }
 
 export async function get_by_username(username, relations = []) {
