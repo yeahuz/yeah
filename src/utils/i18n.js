@@ -24,6 +24,7 @@ i18next
       "payments",
       "email-templates",
       "sms",
+      "chats",
     ],
     fallbackLng: "ru",
     backend: {

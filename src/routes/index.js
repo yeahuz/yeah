@@ -13,6 +13,7 @@ import { category } from "./category.route.js";
 import { payment } from "./payment.route.js";
 import { billing } from "./billing.route.js";
 import { cfimg } from "./cfimg.route.js";
+import { chat } from "./chat.route.js";
 
 // API routes
 import { auth_api } from "./auth-api.route.js";
@@ -52,6 +53,7 @@ export const routes = async (fastify) => {
   fastify.register(payment, { prefix: "/payments" });
   fastify.register(cfimg, { prefix: "/cloudflare/images" });
   fastify.register(billing, { prefix: "/billing" });
+  fastify.register(chat, { prefix: "/chats" });
 };
 
 export const api_routes = async (fastify) => {

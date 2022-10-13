@@ -737,10 +737,10 @@ export function up(knex) {
       table.unique(["status_id", "language_code"]);
       table.timestamps(false, true);
     })
-    .createTable("conversations", (table) => {
+    .createTable("chats", (table) => {
       table.increments("id");
       table
-        .integer("user_id")
+        .integer("created_by")
         .index()
         .notNullable()
         .references("id")
@@ -753,15 +753,17 @@ export function up(knex) {
         .references("id")
         .inTable("postings")
         .onDelete("CASCADE");
+      table.string("hash_id").index();
+      table.string("url", 512);
       table.timestamps(false, true);
     })
-    .createTable("conversation_members", (table) => {
+    .createTable("chat_members", (table) => {
       table
-        .integer("conversation_id")
+        .integer("chat_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("conversations")
+        .inTable("chats")
         .onDelete("CASCADE");
       table
         .integer("user_id")
@@ -770,7 +772,7 @@ export function up(knex) {
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      table.unique(["conversation_id", "user_id"]);
+      table.unique(["chat_id", "user_id"]);
     })
     .createTable("messages", (table) => {
       table.increments("id");
@@ -784,11 +786,11 @@ export function up(knex) {
         .inTable("users")
         .onDelete("CASCADE");
       table
-        .integer("conversation_id")
+        .integer("chat_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("conversations")
+        .inTable("chats")
         .onDelete("CASCADE");
       table.timestamps(false, true);
     })
@@ -954,9 +956,9 @@ export function down(knex) {
     .dropTable("roles")
     .dropTable("posting_bookmarks")
     .dropTable("posting_location")
-    .dropTable("conversation_members")
+    .dropTable("chat_members")
     .dropTable("messages")
-    .dropTable("conversations")
+    .dropTable("chats")
     .dropTable("user_notifications")
     .dropTable("notifications")
     .dropTable("notification_type_translations")

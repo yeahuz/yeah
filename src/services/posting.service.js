@@ -84,13 +84,21 @@ async function cursor_paginate(model, list = [], excludes = []) {
   const first = list[0];
   const last = list[list.length - 1];
 
-  const has_next = !!(await model.query().findOne("id", "<", last.id).whereNotIn("id", excludes));
-  const has_prev = !!(await model.query().findOne("id", ">", first.id).whereNotIn("id", excludes));
+  const has_next =
+    last && !!(await model.query().findOne("id", "<", last.id).whereNotIn("id", excludes));
+  const has_prev =
+    first && !!(await model.query().findOne("id", ">", first.id).whereNotIn("id", excludes));
 
   return { list, has_next, has_prev };
 }
 
-export async function get_many({ currency = "USD", status_id = 1, limit, after, before } = {}) {
+export async function get_many({
+  currency = "USD",
+  status_id = 1,
+  limit = 15,
+  after,
+  before,
+} = {}) {
   const list = await Posting.query()
     .select(
       "title",

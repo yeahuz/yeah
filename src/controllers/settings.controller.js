@@ -60,7 +60,6 @@ export async function get_tab(req, reply) {
 }
 
 export async function get_details(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
@@ -105,7 +104,6 @@ export async function get_details(req, reply) {
 }
 
 export async function get_privacy(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
@@ -157,7 +155,6 @@ export async function get_privacy(req, reply) {
 }
 
 export async function get_billing(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
@@ -204,7 +201,6 @@ export async function get_billing(req, reply) {
 }
 
 export async function get_appearance(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
@@ -259,7 +255,6 @@ export async function update_appearance(req, reply) {
 }
 
 export async function get_settings(req, reply) {
-  const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
