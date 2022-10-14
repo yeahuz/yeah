@@ -1,4 +1,4 @@
-import { BaseModel, Message, User } from "./index.js";
+import { BaseModel, Message, User, Posting } from "./index.js";
 import { hashids } from "../utils/hashid.js";
 import config from "../config/index.js";
 
@@ -9,6 +9,15 @@ export class Chat extends BaseModel {
 
   static get relationMappings() {
     return {
+      posting: {
+        modelClass: Posting,
+        relation: BaseModel.BelongsToOneRelation,
+        filter: (builder) => builder.select("id", "cover_url", "url", "title"),
+        join: {
+          from: "chats.posting_id",
+          to: "postings.id",
+        },
+      },
       creator: {
         modelClass: User,
         relation: BaseModel.BelongsToOneRelation,
@@ -20,6 +29,28 @@ export class Chat extends BaseModel {
       messages: {
         modelClass: Message,
         relation: BaseModel.HasManyRelation,
+        filter: (builder) => builder.orderBy("created_at", "asc"),
+        join: {
+          from: "chats.id",
+          to: "messages.chat_id",
+        },
+      },
+      members: {
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: User,
+        join: {
+          from: "chats.id",
+          through: {
+            from: "chat_members.chat_id",
+            to: "chat_members.user_id",
+          },
+          to: "users.id",
+        },
+      },
+      latest_message: {
+        modelClass: Message,
+        relation: BaseModel.HasOneRelation,
+        filter: (builder) => builder.orderBy("created_at", "desc").limit(1),
         join: {
           from: "chats.id",
           to: "messages.chat_id",
@@ -27,6 +58,7 @@ export class Chat extends BaseModel {
       },
     };
   }
+
   async $afterInsert(ctx) {
     await super.$afterInsert(ctx);
     const hash_id = hashids.encode(this.id);

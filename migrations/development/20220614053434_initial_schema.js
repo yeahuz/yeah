@@ -756,6 +756,7 @@ export function up(knex) {
       table.string("hash_id").index();
       table.string("url", 512);
       table.timestamps(false, true);
+      table.index("created_at");
     })
     .createTable("chat_members", (table) => {
       table

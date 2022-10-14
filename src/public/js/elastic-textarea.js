@@ -1,5 +1,5 @@
 class ElasticTextarea extends HTMLElement {
- connectedCallback() {
+  connectedCallback() {
     this.querySelectorAll("textarea").forEach((textarea_el) => {
       const lines = textarea_el.value.split("\n").length;
       const rows = (lines >= 2 ? lines : textarea_el.rows) || 2;

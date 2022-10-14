@@ -11,7 +11,7 @@ export function create_date_formatter(locale, options = {}) {
 }
 
 export function create_relative_formatter(locale) {
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "always" });
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "always", style: "short" });
   const dtf = create_date_formatter(locale, { month: "numeric" });
   return function format_relative(date, date2) {
     const diff = Math.abs(new Date(date).valueOf() - new Date(date2).valueOf());

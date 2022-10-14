@@ -12,6 +12,31 @@
         <a href="/users/user-id" class="btn btn-md btn-primary">View profile</a>
       </div>
     </header>
+    <div class="flex flex-col space-y-6">
+      <ul class="overflow-y-auto space-y-1 flex-1 max-h-[42rem] p-4">
+        <% it.chat.groups.forEach(function (group) { %>
+          <div class="text-center py-4">
+            <span class="inline-block text-xs text-gray-400 bg-zinc-800 px-3 py-1 rounded-full">
+                <%= group.date %>
+            </span>
+          </div>
+          <% group.messages.forEach(function (message) { %>
+            <li class="py-2.5 px-3 rounded-lg block relative max-w-max <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
+              <p>
+                <%= message.content %>
+              </p>
+              <span class="block text-right text-xs mt-0.5 <%= message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
+                <%= it.formatter.format(new Date(message.created_at)) %>
+              </span>
+            </li>
+          <% }) %>
+        <% }) %>
+      </ul>
+      <form method="post" action="/chats/hash-id" class="flex items-center space-x-2 px-4 pb-4">
+        <elastic-textarea style="display: inline-flex"><textarea class="form-control" name="content" id="" rows="1" cols="100" tabindex=""></textarea></elastic-textarea>
+        <button class="btn btn-primary btn-lg">Send</button>
+      </form>
+    </div>
   <% } else { %>
     <div class="flex items-center justify-center h-full">
       <h3 class="text-gray-700 dark:text-gray-200 text-xl font-medium"><%= it.t("select_to_see", { ns: "chats" })%></h3>
@@ -20,3 +45,4 @@
 </section>
 </div>
 </main>
+<script defer async type="module" src="/public/js/elastic-textarea.js"></script>
