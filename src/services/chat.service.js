@@ -37,6 +37,11 @@ export async function get_one({ hash_id, current_user_id }) {
   return chat;
 }
 
+export async function is_chat_member(user_id, hash_id) {
+  const chat = await Chat.query().findOne({ hash_id });
+  return await chat.$relatedQuery("members").findOne({ user_id });
+}
+
 function create_one_impl(trx) {
   return async ({ created_by, posting_id }) =>
     await Chat.query(trx).insert({ created_by, posting_id });

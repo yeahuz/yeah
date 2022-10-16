@@ -1,5 +1,6 @@
 import * as CredentialService from "../services/credential.service.js";
 import * as SessionService from "../services/session.service.js";
+import * as ChatService from "../services/chat.service.js";
 
 export function authenticated_user(user) {
   return user != null;
@@ -13,4 +14,8 @@ export async function own_credential(user, params) {
 
 export async function own_session(user, params) {
   return !!(await SessionService.belongs_to(user.id, params.id));
+}
+
+export async function chat_member(user, params) {
+  return !!(await ChatService.is_chat_member(user.id, params.hash_id));
 }
