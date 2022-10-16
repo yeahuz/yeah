@@ -1,5 +1,6 @@
 {
   "login": "Login",
+  "logout": "Log out",
   "create_poster": "Create a posting",
   "create_account": "Create account",
   "save_changes": "Save changes",
@@ -12,6 +13,7 @@
   "create": "Create",
   "liked": "Liked",
   "post": "Post",
+  "messages": "Messages",
   "search": "Search",
   "continue": "Continue",
   "cancel": "Cancel",

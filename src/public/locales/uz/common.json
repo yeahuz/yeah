@@ -1,5 +1,6 @@
 {
   "login": "Kirish",
+  "logout": "Chiqish",
   "create_poster": "E'lon berish",
   "create_account": "Akkaunt yaratish",
   "save_changes": "Saqlash",
@@ -12,6 +13,7 @@
   "create": "Yaratish",
   "liked": "Saralangan",
   "post": "E'lon",
+  "messages": "Xabarlar",
   "search": "Izlash",
   "continue": "Davom etish",
   "cancel": "Bekor qilish",
