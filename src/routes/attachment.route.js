@@ -6,6 +6,6 @@ export const attachment = async (fastify) => {
     method: "DELETE",
     url: "/:id",
     handler: AttachmentController.delete_one,
-    onRequest: fastify.can(guest_user),
+    onRequest: fastify.can([guest_user]),
   });
 };

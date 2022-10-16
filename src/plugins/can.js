@@ -7,14 +7,19 @@ export const can = fp(function can(fastify, opts = {}, done) {
   done();
 });
 
-async function async_some(arr, ...params) {
-  for (const item of arr) {
-    if (await item(...params)) return true;
+async function some(fns, ...params) {
+  for (const fn of fns) {
+    if (await fn(...params)) return true;
     return false;
   }
 }
 
-function can_impl(...validation_fns) {
+async function every(fns, ...params) {
+  const flags = await Promise.all(fns.map((fn) => fn(...params)));
+  return flags.every(Boolean);
+}
+
+function can_impl(validation_fns = [], options = { relation: "or" }) {
   return async (req, reply) => {
     const accept_lang = [
       req.language instanceof Function ? req.language() : req.language,
@@ -23,7 +28,8 @@ function can_impl(...validation_fns) {
 
     const t = i18next.getFixedT(accept_lang);
     const user = req.user;
-    const can_access = await async_some(validation_fns, user, req.params);
+    const validate = options.relation === "or" ? some : every;
+    const can_access = await validate(validation_fns, user, req.params);
     if (!can_access) {
       if (req.xhr) {
         throw new AuthorizationError();

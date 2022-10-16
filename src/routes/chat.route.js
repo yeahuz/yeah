@@ -6,12 +6,12 @@ export const chat = async (fastify) => {
     method: "GET",
     url: "/",
     handler: ChatController.get_many,
-    onRequest: fastify.can(authenticated_user),
+    onRequest: fastify.can([authenticated_user]),
   });
   fastify.route({
     method: "GET",
     url: "/:hash_id",
     handler: ChatController.get_one,
-    onRequest: fastify.can(authenticated_user, chat_member),
+    onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
   });
 };

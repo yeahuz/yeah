@@ -21,7 +21,6 @@ export async function get_many(req, reply) {
   stream.push(chats_top);
 
   const chats = await ChatService.get_many({ user_id: user.id });
-  console.log(chats);
   const chat_list = await render_file("/chats/list.html", {
     t,
     chats,
@@ -73,7 +72,6 @@ export async function get_one(req, reply) {
   stream.push(chat_list);
 
   const chat = await ChatService.get_one({ hash_id, current_user_id: user.id });
-  console.log(chat);
   const chat_area = await render_file("/chats/chat-area.html", {
     t,
     chat,
