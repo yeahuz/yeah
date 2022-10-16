@@ -25,13 +25,15 @@ export function scan_profile_tmpl(profile) {
 export async function qr_code_tmpl(url) {
   const { t } = await import("./i18n.js");
   const fragment = new DocumentFragment();
-  const img = create_node("img", { src: url, class: "w-36 h-36 object-cover js-qr-code" });
-  const h2 = create_node("h2", { class: "text-gray-900 text-lg font-medium mt-2 dark:text-white" });
+  const img_container = create_node("div", { class: "p-3 rounded-lg bg-white max-w-max" });
+  const img = create_node("img", { src: url, class: "w-40 h-40 object-cover js-qr-code" });
+  const h2 = create_node("h2", { class: "text-gray-900 text-lg font-medium mt-3 dark:text-white" });
   const p = create_node("p", { class: "text-gray-700 dark:text-gray-200" });
 
   h2.textContent = t("qr.title", { ns: "login" });
   p.textContent = t("qr.description", { ns: "login" });
-  fragment.append(img, h2, p);
+  img_container.append(img);
+  fragment.append(img_container, h2, p);
 
   return fragment;
 }
