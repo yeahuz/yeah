@@ -15,7 +15,8 @@
     "seed": "NODE_ENV=production knex seed:run --env production",
     "rollback:dev": "knex migrate:rollback",
     "rollback": "NODE_ENV=production knex migrate:rollback --env production",
-    "seed:dev": "knex seed:run"
+    "seed:dev": "knex seed:run",
+    "setup-es": "node ./src/elasticsearch-setup.js"
   },
   "repository": {
     "type": "git",
