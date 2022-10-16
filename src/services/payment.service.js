@@ -58,7 +58,7 @@ class Octo {
         shop_transaction_id: params.payment.id,
         octo_secret: this.api_key,
         octo_shop_id: this.merchant_id,
-        return_url: "http://localhost:3000/settings/billing",
+        return_url: config.octo_redirect_uri,
         language: "uz",
         ttl: 15,
         init_time,

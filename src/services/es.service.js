@@ -2,7 +2,7 @@ import config from "../config/index.js";
 import { Client } from "@elastic/elasticsearch";
 
 export const elastic_client = new Client({
-  node: "http://localhost:9200",
+  node: config.es_uri,
 });
 
 export function get_ranked_lang_indices(index_name, languages) {
@@ -41,6 +41,7 @@ export async function general_search(
   if (region_id) {
     filters.push({ term: { "search_data.region_id": region_id } });
   }
+
   if (district_id) {
     filters.push({ term: { "search_data.district_id": district_id } });
   }

@@ -29,6 +29,8 @@ import {
   S3_ORIGIN,
   ES_PASSWORD,
   ES_USERNAME,
+  ES_URI,
+  ES_URI_DEV,
   ORIGIN,
   ORIGIN_DEV,
   JWT_SECRET,
@@ -51,6 +53,8 @@ import {
   OCTO_API_KEY,
   OCTO_API_URI,
   OCTO_MERCHANT_ID,
+  OCTO_REDIRECT_URI,
+  OCTO_REDIRECT_URI_DEV,
   SMS_API_TOKEN,
 } from "./secrets.js";
 
@@ -79,6 +83,7 @@ export const configs = {
     aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
     es_username: ES_USERNAME,
     es_password: ES_PASSWORD,
+    es_uri: ES_URI,
     origin: ORIGIN,
     jwt_secret: JWT_SECRET,
     ws_uri_local: WS_URI_LOCAL,
@@ -100,6 +105,7 @@ export const configs = {
     octo_api_key: OCTO_API_KEY,
     octo_api_uri: OCTO_API_URI,
     octo_merchant_id: OCTO_MERCHANT_ID,
+    octo_redirect_uri: OCTO_REDIRECT_URI,
   },
   development: {
     port: PORT_DEV,
@@ -123,6 +129,7 @@ export const configs = {
     aws_secret_key: AWS_SECRET_KEY,
     aws_s3_region: AWS_S3_REGION,
     aws_s3_bucket_name: AWS_S3_BUCKET_NAME,
+    es_uri: ES_URI_DEV,
     es_username: ES_USERNAME,
     es_password: ES_PASSWORD,
     origin: ORIGIN_DEV,
@@ -146,5 +153,6 @@ export const configs = {
     octo_api_key: OCTO_API_KEY,
     octo_api_uri: OCTO_API_URI,
     octo_merchant_id: OCTO_MERCHANT_ID,
+    octo_redirect_uri: OCTO_REDIRECT_URI_DEV,
   },
 };
