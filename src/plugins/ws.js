@@ -9,7 +9,7 @@ export const ws = fp(async function (fastify, opts, next) {
     if (timeout_id) clearTimeout(timeout_id);
     if (retries === 0) return;
 
-    wss = new WebSocket(config.ws_uri);
+    wss = new WebSocket(config.ws_uri_local);
 
     wss.on("error", (e) => {
       fastify.log.error(`WebSocket connection failed: ${e.message}`);
@@ -22,7 +22,9 @@ export const ws = fp(async function (fastify, opts, next) {
       timeout_id = setTimeout(() => connect({ retries }), 2000);
     });
 
-    wss.on("open", () => fastify.log.info(`WebSocket connection established to ${config.ws_uri}`));
+    wss.on("open", () =>
+      fastify.log.info(`WebSocket connection established to ${config.ws_uri_local}`)
+    );
   };
 
   connect({ retries: 100 });

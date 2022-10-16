@@ -131,6 +131,7 @@ export async function get_login(req, reply) {
     oauth_state,
     nonce,
     method,
+    ws_uri_public: config.ws_uri_public,
   });
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);

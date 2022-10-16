@@ -18,7 +18,7 @@ let ws = null;
 function connect({ retries }) {
   if (retries === 0) return;
 
-  ws = new WebSocket("ws://localhost:3020/qr-auth");
+  ws = new WebSocket(`${WS_URI_PUBLIC}/qr-auth`);
 
   ws.binaryType = "arraybuffer";
 
