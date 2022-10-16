@@ -2,7 +2,7 @@ import { create_node } from "./dom.js";
 
 export function scan_profile_tmpl(profile) {
   const div = create_node("div", {
-    class: "shadow-xs py-4 px-8 bg-gray-50 text-center rounded-lg",
+    class: "shadow-xs py-4 px-8 bg-gray-50 text-center rounded-lg dark:bg-zinc-800",
   });
 
   const img = create_node("img", {
