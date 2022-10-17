@@ -15,8 +15,10 @@ async function some(fns, ...params) {
 }
 
 async function every(fns, ...params) {
-  const flags = await Promise.all(fns.map((fn) => fn(...params)));
-  return flags.every(Boolean);
+  for (const fn of fns) {
+    if (!(await fn(...params))) return false;
+  }
+  return true;
 }
 
 function can_impl(validation_fns = [], options = { relation: "or" }) {
