@@ -1,3 +1,4 @@
+<% const distinct_dates = new Map() %>
 <section class="border-l border-l-gray-200 dark:border-l-zinc-800 w-full">
   <% if (it.chat) { %>
     <header class="flex justify-between w-full dark:bg-zinc-900 p-4 shadow-lg dark:drop-shadow-lg">
@@ -14,22 +15,25 @@
     </header>
     <div class="flex flex-col space-y-6">
       <ul class="overflow-y-auto space-y-1 flex-1 max-h-[42rem] p-4">
-        <% it.chat.groups.forEach(function (group) { %>
-          <div class="text-center py-4">
-            <span class="inline-block text-xs text-gray-400 bg-zinc-800 px-3 py-1 rounded-full">
-                <%= group.date %>
-            </span>
-          </div>
-          <% group.messages.forEach(function (message) { %>
-            <li class="py-2.5 px-3 rounded-lg block relative max-w-max <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
-              <p>
-                <%= message.content %>
-              </p>
-              <span class="block text-right text-xs mt-0.5 <%= message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
-                <%= it.formatter.format(new Date(message.created_at)) %>
+        <% it.chat.messages.forEach(function (message) { %>
+          <% const yyyymmdd = new Date(message.created_at).toISOString().split("T")[0] %>
+          <% const existing = distinct_dates.has(yyyymmdd) %>
+          <% if (!existing) distinct_dates.set(yyyymmdd, 1) %>
+          <% if (!existing) {%>
+            <div class="text-center py-4">
+              <span class="inline-block text-xs text-gray-400 bg-zinc-800 px-3 py-1 rounded-full">
+                <%= yyyymmdd %>
               </span>
-            </li>
-          <% }) %>
+            </div>
+          <% } %>
+          <li class="py-2.5 px-3 rounded-lg block relative max-w-max <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
+            <p>
+              <%= message.content %>
+            </p>
+            <span class="block text-right text-xs mt-0.5 <%= message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
+              <%= it.formatter.format(new Date(message.created_at)) %>
+            </span>
+          </li>
         <% }) %>
       </ul>
       <form method="post" action="/chats/hash-id" class="flex items-center space-x-2 px-4 pb-4">

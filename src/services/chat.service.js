@@ -13,7 +13,7 @@ export async function get_many({ user_id }) {
 }
 
 export async function get_one({ hash_id, current_user_id }) {
-  const chat = await Chat.query()
+  return await Chat.query()
     .findOne({ hash_id })
     .withGraphFetched("[messages.[sender], posting]")
     .modifyGraph("messages", (builder) =>
@@ -23,18 +23,6 @@ export async function get_one({ hash_id, current_user_id }) {
         raw("case when sender_id = ? then 1 else 0 end as is_own_message", [current_user_id])
       )
     );
-
-  const groups = chat.messages.reduce((prev, curr) => {
-    const date = new Date(curr.created_at).toISOString().split("T")[0];
-    if (prev[date]) prev[date].push(curr);
-    else prev[date] = [curr];
-
-    return prev;
-  }, {});
-
-  chat.groups = Object.keys(groups).map((date) => ({ date, messages: groups[date] }));
-
-  return chat;
 }
 
 export async function is_chat_member(user_id, hash_id) {
