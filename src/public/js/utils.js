@@ -31,8 +31,14 @@ export async function request(
   { body, query, method, timeout = 60000, state = {}, ...custom_config } = {}
 ) {
   if (query) {
-    url += `?${new URLSearchParams(query).toString()}`;
+    const params = new URLSearchParams();
+    for (const key in query) {
+      if (query[key]) params.append(key, query[key]);
+    }
+
+    url += "?" + params.toString();
   }
+
   const isFormData = body instanceof FormData;
   const controller = new AbortController();
   const timerId = setTimeout(controller.abort, timeout);

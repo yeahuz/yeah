@@ -57,15 +57,23 @@ export async function delete_attachment(req, reply) {
 
 export async function sync_attachments(req, reply) {
   const { id } = req.params;
-  const { attachments = [] } = req.body;
+  const { photo_id } = req.body;
   const existing = JSON.parse((await redis_client.get(id)) || null) || {};
-  const clean_attachments = (existing.attachments || []).concat(
-    attachments.map(CFImageService.get_cf_image_url)
-  );
 
   await redis_client.set(
     id,
-    JSON.stringify(Object.assign(existing, { attachments: clean_attachments }))
+    JSON.stringify(
+      Object.assign(existing, {
+        attachments: [
+          ...new Set(
+            (existing.attachments || []).concat({
+              id: photo_id,
+              url: CFImageService.get_cf_image_url(photo_id),
+            })
+          ),
+        ],
+      })
+    )
   );
 
   reply.send({ status: "oke" });

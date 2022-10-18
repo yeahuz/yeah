@@ -8,10 +8,32 @@ export const chat = async (fastify) => {
     handler: ChatController.get_many,
     onRequest: fastify.can([authenticated_user]),
   });
+
   fastify.route({
     method: "GET",
-    url: "/:hash_id",
+    url: "/:id",
     handler: ChatController.get_one,
+    onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
+  });
+
+  fastify.route({
+    method: "POST",
+    url: "/:id/messages",
+    handler: ChatController.create_message,
+    onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
+  });
+
+  fastify.route({
+    method: "POST",
+    url: "/:id/photo",
+    handler: ChatController.link_photo,
+    onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
+  });
+
+  fastify.route({
+    method: "POST",
+    url: "/:id/file",
+    handler: ChatController.link_file,
     onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
   });
 };

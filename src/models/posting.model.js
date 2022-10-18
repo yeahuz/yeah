@@ -1,6 +1,6 @@
 import {
   BaseModel,
-  Attachment_v2,
+  Attachment,
   Category,
   CategoryFieldValue,
   PostingLocation,
@@ -18,14 +18,14 @@ export class Posting extends BaseModel {
     return {
       attachments: {
         relation: BaseModel.ManyToManyRelation,
-        modelClass: Attachment_v2,
+        modelClass: Attachment,
         join: {
           from: "postings.id",
           through: {
             from: "posting_attachments.posting_id",
             to: "posting_attachments.attachment_id",
           },
-          to: "attachments_v2.id",
+          to: "attachments.id",
         },
       },
       categories: {

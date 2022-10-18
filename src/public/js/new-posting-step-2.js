@@ -185,7 +185,9 @@ function upload_to(urls) {
 
 async function upload_files(files = []) {
   const [urls, err] = await option(
-    request(`/cloudflare/images/direct_upload?count=${files.length}`)
+    request("/cloudflare/images/direct_upload", {
+      body: { files: Array.from(files).map((file) => ({ size: file.size, type: file.type })) },
+    })
   );
 
   for await (const result of async_pool(10, files, upload_to(urls))) {
@@ -201,7 +203,7 @@ async function upload_files(files = []) {
     const [_, err] = await option(
       request(attachment_sync_form.action, {
         method: "PATCH",
-        body: { attachments: [{ id: result.result.id, name: result.result.filename }] },
+        body: { photo_id: result.result.id },
       })
     );
 

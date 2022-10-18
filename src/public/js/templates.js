@@ -153,3 +153,88 @@ export function chat_files_preview_tmpl(files = [], container) {
   file_previews.append(label, list);
   return file_previews;
 }
+
+export function file_message_tmpl(files = []) {
+  const msg = create_node("li", {
+    class: "max-w-sm ml-auto bg-primary-600 text-white rounded-lg overflow-hidden",
+  });
+  const list = create_node("ul");
+
+  for (const file of files) {
+    const list_item = create_node("li", { class: "flex items-center", id: file.id });
+    const span = create_node("span", {
+      class:
+        "flex items-center justify-center flex-shrink-0 p-4 ml-0.5 rounded-lg bg-gray-100 text-gray-600 dark:bg-white dark:text-primary-600",
+    });
+
+    span.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 2.26946V6.4C14 6.96005 14 7.24008 14.109 7.45399C14.2049 7.64215 14.3578 7.79513 14.546 7.89101C14.7599 8 15.0399 8 15.6 8H19.7305M20 9.98822V17.2C20 18.8802 20 19.7202 19.673 20.362C19.3854 20.9265 18.9265 21.3854 18.362 21.673C17.7202 22 16.8802 22 15.2 22H8.8C7.11984 22 6.27976 22 5.63803 21.673C5.07354 21.3854 4.6146 20.9265 4.32698 20.362C4 19.7202 4 18.8802 4 17.2V6.8C4 5.11984 4 4.27976 4.32698 3.63803C4.6146 3.07354 5.07354 2.6146 5.63803 2.32698C6.27976 2 7.11984 2 8.8 2H12.0118C12.7455 2 13.1124 2 13.4577 2.08289C13.7638 2.15638 14.0564 2.27759 14.3249 2.44208C14.6276 2.6276 14.887 2.88703 15.4059 3.40589L18.5941 6.59411C19.113 7.11297 19.3724 7.3724 19.5579 7.67515C19.7224 7.94356 19.8436 8.2362 19.9171 8.5423C20 8.88757 20 9.25445 20 9.98822Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>`;
+
+    const info = create_node("div", { class: "p-2 overflow-hidden w-full" });
+    const file_name = create_node("span", {
+      class: "block font-meidum text-gray-700 dark:text-gray-200 truncate",
+    });
+    const meta = create_node("div", {
+      class: "flex justify-between text-xs space-x-4 mt-0.5 text-primary-50",
+    });
+
+    const file_size = create_node("span");
+    const date = create_node("span");
+
+    file_name.textContent = file.name;
+    file_size.textContent = format_bytes(file.size);
+    date.textContent = "14:45";
+    meta.append(file_size, date);
+
+    info.append(file_name, meta);
+
+    list_item.append(span, info);
+    list.append(list_item);
+  }
+
+  msg.append(list);
+  return msg;
+}
+
+const formatter = new Intl.DateTimeFormat(navigator.language, {
+  hour: "numeric",
+  minute: "numeric",
+});
+
+export function media_message_tmpl(files = []) {
+  const msg = create_node("li", { class: "w-full max-w-sm ml-auto relative" });
+  const list = create_node("ul", {
+    class: "flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg",
+  });
+
+  const date_info = create_node("div", {
+    class:
+      "inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50",
+  });
+
+  const time = create_node("span");
+  const clock = create_node("span");
+  clock.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>`;
+
+  time.textContent = formatter.format(new Date());
+  date_info.append(time, clock);
+
+  for (const file of files) {
+    const src = URL.createObjectURL(file);
+    const list_item = create_node("li", { class: "basis-40 flex-1 max-h-64", id: file.id });
+    const img = create_node("img", {
+      class: "w-full h-full object-cover align-middle rounded-lg",
+      src,
+    });
+
+    list_item.append(img);
+    list.append(list_item);
+  }
+
+  msg.append(list, date_info);
+
+  return msg;
+}

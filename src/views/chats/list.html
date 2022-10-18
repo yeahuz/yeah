@@ -6,7 +6,7 @@
     <ul class="overflow-y-auto max-h-[42rem]">
       <% it.chats.forEach(function (chat) { %>
         <li>
-          <a id="<%= chat.hash_id %>" href="<%= chat.url %>#<%= chat.hash_id %>" class="flex flex-col space-y-2 hover:bg-gray-100 dark:hover:bg-zinc-800 duration-200 p-4">
+          <a id="<%= chat.id %>" href="<%= chat.url %>#<%= chat.id %>" class="flex flex-col space-y-2 hover:bg-gray-100 dark:hover:bg-zinc-800 duration-200 p-4">
             <div class="flex items-start justify-between">
               <div class="flex items-center">
                 <img src="<%= chat.posting.cover_url %>/width=80" srcset="<%= it.generate_srcset(chat.posting.cover_url, "fit=scale-down", 2) %>" alt="" class="w-12 h-12 object-cover rounded-full overflow-hidden mr-2 flex-shrink-0" />

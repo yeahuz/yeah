@@ -48,13 +48,12 @@ export async function create_posting(payload) {
       status_id: 3,
     }); // status_id = 3 means moderation;
 
-    const attachments_to_insert = attachments.map((attachment) => ({
-      resource_id: attachment.id,
-      name: attachment.name || attachment.filename,
-      service: "CF_IMAGES",
-    }));
+    const att = await Promise.all(
+      attachments.map((a) =>
+        AttachmentService.createt_one_trx(trx)({ resource_id: a.id, service: "CF_IMAGES" })
+      )
+    );
 
-    const att = await AttachmentService.createt_one_trx_v2(trx)(attachments_to_insert);
     const categories = await CategoryService.get_parents(category_id);
     await posting.$relatedQuery("attachments", trx).relate(att);
     await posting.$relatedQuery("categories", trx).relate(

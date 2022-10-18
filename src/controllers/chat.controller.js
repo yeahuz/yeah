@@ -1,4 +1,5 @@
 import * as ChatService from "../services/chat.service.js";
+import * as AttachmentService from "../services/attachment.service.js";
 import { render_file } from "../utils/eta.js";
 import { parse_url, generate_srcset, group_by } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
@@ -47,7 +48,7 @@ export async function get_one(req, reply) {
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
-  const { hash_id } = req.params;
+  const { id } = req.params;
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
@@ -71,7 +72,7 @@ export async function get_one(req, reply) {
   });
   stream.push(chat_list);
 
-  const chat = await ChatService.get_one({ hash_id, current_user_id: user.id });
+  const chat = await ChatService.get_one({ id, current_user_id: user.id });
   const chat_area = await render_file("/chats/chat-area.html", {
     t,
     chat,
@@ -88,3 +89,34 @@ export async function get_one(req, reply) {
 
   return reply;
 }
+
+export async function create_message(req, reply) {
+  const user = req.user;
+  const { id } = req.params;
+  const { content, reply_to } = req.body;
+  const message = await ChatService.create_message({
+    chat_id: id,
+    content,
+    reply_to,
+    sender_id: user.id,
+  });
+  reply.send(message);
+  return reply;
+}
+
+export async function link_photo(req, reply) {
+  const user = req.user;
+  const { id } = req.params;
+  const { photo_id, reply_to } = req.body;
+  const result = await ChatService.link_photo({
+    chat_id: id,
+    photo_id,
+    reply_to,
+    sender_id: user.id,
+  });
+
+  reply.send(result);
+  return reply;
+}
+
+export async function link_file(req, reply) {}

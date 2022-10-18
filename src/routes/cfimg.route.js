@@ -2,7 +2,7 @@ import * as CFImagesController from "../controllers/cfimg.controller.js";
 
 export const cfimg = async (fastify) => {
   fastify.route({
-    method: "GET",
+    method: "POST",
     url: "/direct_upload",
     handler: CFImagesController.direct_upload,
     response: {

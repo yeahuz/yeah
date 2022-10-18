@@ -17,5 +17,5 @@ export async function own_session(user, params) {
 }
 
 export async function chat_member(user, params) {
-  return !!(await ChatService.is_chat_member(user.id, params.hash_id));
+  return !!(await ChatService.is_chat_member(user.id, params.id));
 }
