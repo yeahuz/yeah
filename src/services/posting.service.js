@@ -50,7 +50,7 @@ export async function create_posting(payload) {
 
     const att = await Promise.all(
       attachments.map((a) =>
-        AttachmentService.createt_one_trx(trx)({ resource_id: a.id, service: "CF_IMAGES" })
+        AttachmentService.create_one_trx(trx)({ resource_id: a.id, service: "CF_IMAGES" })
       )
     );
 

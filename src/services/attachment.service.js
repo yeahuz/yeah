@@ -4,7 +4,7 @@ import * as CFR2Service from "../services/cfr2.service.js";
 import { Attachment } from "../models/index.js";
 
 export const create_one = create_one_impl();
-export const createt_one_trx = (trx) => create_one_impl(trx);
+export const create_one_trx = (trx) => create_one_impl(trx);
 
 export async function delete_one(id) {
   return await Attachment.query().deleteById(id);
@@ -24,6 +24,10 @@ function create_one_impl(trx) {
     switch (service) {
       case "CF_IMAGES": {
         resource = await CFImageService.get_one(resource_id);
+        break;
+      }
+      case "CF_R2": {
+        resource = await CFR2Service.head_object(resource_id);
         break;
       }
       default:

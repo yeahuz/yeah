@@ -1,7 +1,6 @@
 import * as ChatService from "../services/chat.service.js";
-import * as AttachmentService from "../services/attachment.service.js";
 import { render_file } from "../utils/eta.js";
-import { parse_url, generate_srcset, group_by } from "../utils/index.js";
+import { parse_url, generate_srcset, format_bytes } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 
 export async function get_many(req, reply) {
@@ -77,6 +76,7 @@ export async function get_one(req, reply) {
     t,
     chat,
     formatter: new Intl.DateTimeFormat(req.language, { hour: "numeric", minute: "numeric" }),
+    format_bytes,
   });
   stream.push(chat_area);
 
@@ -104,13 +104,13 @@ export async function create_message(req, reply) {
   return reply;
 }
 
-export async function link_photo(req, reply) {
+export async function link_photos(req, reply) {
   const user = req.user;
   const { id } = req.params;
-  const { photo_id, reply_to } = req.body;
-  const result = await ChatService.link_photo({
+  const { photos = [], reply_to } = req.body;
+  const result = await ChatService.link_photos({
     chat_id: id,
-    photo_id,
+    photos,
     reply_to,
     sender_id: user.id,
   });
@@ -119,4 +119,17 @@ export async function link_photo(req, reply) {
   return reply;
 }
 
-export async function link_file(req, reply) {}
+export async function link_files(req, reply) {
+  const user = req.user;
+  const { id } = req.params;
+  const { files = [], reply_to } = req.body;
+  const result = await ChatService.link_files({
+    chat_id: id,
+    files,
+    reply_to,
+    sender_id: user.id,
+  });
+
+  reply.send(result);
+  return reply;
+}

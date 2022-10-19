@@ -696,6 +696,26 @@ video {
   bottom: 0px;
 }
 
+.left-1\/2 {
+  left: 50%;
+}
+
+.left-2 {
+  left: 0.5rem;
+}
+
+.top-2 {
+  top: 0.5rem;
+}
+
+.left-1 {
+  left: 0.25rem;
+}
+
+.top-1 {
+  top: 0.25rem;
+}
+
 .\!z-10 {
   z-index: 10 !important;
 }
@@ -1006,6 +1026,10 @@ video {
   height: 0.875rem;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
 .max-h-64 {
   max-height: 16rem;
 }
@@ -1106,6 +1130,10 @@ video {
   width: 60%;
 }
 
+.w-screen {
+  width: 100vw;
+}
+
 .min-w-min {
   min-width: -webkit-min-content;
   min-width: -moz-min-content;
@@ -1158,6 +1186,14 @@ video {
 
 .max-w-4xl {
   max-width: 56rem;
+}
+
+.max-w-\[70\%\] {
+  max-width: 70%;
+}
+
+.max-w-\[80\%\] {
+  max-width: 80%;
 }
 
 .flex-1 {
@@ -1241,6 +1277,10 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.cursor-zoom-in {
+  cursor: zoom-in;
 }
 
 .list-none {
@@ -1606,6 +1646,18 @@ video {
   background-color: rgb(0 0 0 / 0.1);
 }
 
+.bg-black\/90 {
+  background-color: rgb(0 0 0 / 0.9);
+}
+
+.bg-black\/80 {
+  background-color: rgb(0 0 0 / 0.8);
+}
+
+.bg-black\/60 {
+  background-color: rgb(0 0 0 / 0.6);
+}
+
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
@@ -1707,6 +1759,11 @@ video {
   padding-right: 0.875rem;
 }
 
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
 .pb-4 {
   padding-bottom: 1rem;
 }
@@ -1765,6 +1822,10 @@ video {
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
+}
+
+.text-\[10px\] {
+  font-size: 10px;
 }
 
 .font-semibold {
@@ -1855,6 +1916,11 @@ video {
           text-decoration-line: underline;
 }
 
+.decoration-transparent {
+  -webkit-text-decoration-color: transparent;
+          text-decoration-color: transparent;
+}
+
 .antialiased {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1939,6 +2005,10 @@ video {
 
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.will-change-transform {
+  will-change: transform;
 }
 
 html {
@@ -3077,6 +3147,15 @@ checkbox-control {
   background-color: rgb(39 39 42 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-black\/50:hover {
+  background-color: rgb(0 0 0 / 0.5);
+}
+
+.hover\:bg-zinc-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 63 70 / var(--tw-bg-opacity));
+}
+
 .hover\:text-gray-900:hover {
   color: rgb(var(--gray-900));
 }
@@ -3087,6 +3166,16 @@ checkbox-control {
 
 .hover\:text-error-700:hover {
   color: rgb(var(--error-700));
+}
+
+.hover\:underline:hover {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+}
+
+.hover\:decoration-white:hover {
+  -webkit-text-decoration-color: #fff;
+          text-decoration-color: #fff;
 }
 
 .hover\:shadow-xs:hover {
@@ -3123,6 +3212,14 @@ checkbox-control {
   --tw-scale-x: 1;
   --tw-scale-y: 1;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+.group:hover .group-hover\:opacity-10 {
+  opacity: 0.1;
 }
 
 .group:hover .group-hover\:after\:scale-100::after {

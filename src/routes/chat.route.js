@@ -25,15 +25,15 @@ export const chat = async (fastify) => {
 
   fastify.route({
     method: "POST",
-    url: "/:id/photo",
-    handler: ChatController.link_photo,
+    url: "/:id/photos",
+    handler: ChatController.link_photos,
     onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
   });
 
   fastify.route({
     method: "POST",
-    url: "/:id/file",
-    handler: ChatController.link_file,
+    url: "/:id/files",
+    handler: ChatController.link_files,
     onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
   });
 };

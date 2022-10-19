@@ -761,6 +761,7 @@ export function up(knex) {
     .createTable("messages", (table) => {
       table.increments("id");
       table.text("content");
+      table.enu("type", ["photo", "file", "video", "text"]);
       table.integer("reply_to").index().references("id").inTable("messages");
       table
         .integer("sender_id")
@@ -777,6 +778,22 @@ export function up(knex) {
         .inTable("chats")
         .onDelete("CASCADE");
       table.timestamps(false, true);
+    })
+    .createTable("read_messages", (table) => {
+      table
+        .integer("message_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("messages")
+        .onDelete("CASCADE");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
     })
     .createTable("message_attachments", (table) => {
       table
@@ -957,6 +974,7 @@ export function down(knex) {
     .dropTable("posting_bookmarks")
     .dropTable("posting_location")
     .dropTable("chat_members")
+    .dropTable("read_messages")
     .dropTable("message_attachments")
     .dropTable("messages")
     .dropTable("chats")

@@ -1,6 +1,9 @@
 const noop = () => {};
 
-export function upload_request(url, { data, method, on_progress = noop, on_done = noop } = {}) {
+export function upload_request(
+  url,
+  { data, method, on_progress = noop, on_done = noop, ...config } = {}
+) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.responseType = "json";
@@ -22,6 +25,13 @@ export function upload_request(url, { data, method, on_progress = noop, on_done 
     });
 
     xhr.open(method || "POST", url, true);
+
+    if (config.headers) {
+      for (const key in config.headers) {
+        xhr.setRequestHeader(key, config.headers[key]);
+      }
+    }
+
     xhr.send(data);
   });
 }
@@ -91,9 +101,9 @@ export async function request(
 export async function option(promise) {
   try {
     const result = await promise;
-    return [result, null];
+    return [result, undefined];
   } catch (err) {
-    return [null, err];
+    return [undefined, err];
   }
 }
 

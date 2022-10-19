@@ -1,8 +1,8 @@
 import * as CFR2Service from "../services/cfr2.service.js";
 
 export async function direct_upload(req, reply) {
-  const { filenames } = req.body;
-  const urls = await CFR2Service.get_direct_upload_urls(filenames);
+  const { files = [] } = req.body;
+  const urls = await CFR2Service.get_direct_upload_urls(files);
   reply.send(urls);
   return reply;
 }

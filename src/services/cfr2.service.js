@@ -11,32 +11,64 @@ const client = new S3({
 });
 
 export async function update_bucket_cors() {
-  return await client.putBucketCors({
-    Bucket: "s3-needs-uz",
-    CORSConfiguration: {
-      CORSRules: [
-        {
-          AllowedMethods: ["PUT", "POST"],
-          AllowedOrigins: ["http://localhost:3000"],
-          AllowedHeaders: ["*"],
-        },
-      ],
-    },
-  });
+  return await client
+    .putBucketCors({
+      Bucket: "s3-needs-uz",
+      CORSConfiguration: {
+        CORSRules: [
+          {
+            AllowedMethods: ["PUT", "POST", "GET"],
+            AllowedOrigins: ["http://localhost:3000"],
+            AllowedHeaders: [
+              "content-type",
+              "Content-Type",
+              "Cotent-Disposition",
+              "content-disposition",
+            ],
+            ExposeHeaders: ["Content-Disposition"],
+          },
+        ],
+      },
+    })
+    .promise();
 }
 
-export async function get_direct_upload_url(filename) {
-  const Key = `${randomUUID()}-${filename}`;
-  return await client.getSignedUrlPromise("putObject", {
+export async function get_bucket_cors() {
+  return await client.getBucketCors({ Bucket: "s3-needs-uz" }).promise();
+}
+
+export function get_public_url(id) {
+  return `${config.cf_r2_base_public_uri}/${id}`;
+}
+
+export async function get_direct_upload_url(file) {
+  const id = `${randomUUID()}-${file.name}`;
+  const uploadURL = await client.getSignedUrlPromise("putObject", {
     Bucket: "s3-needs-uz",
-    Key,
+    Key: id,
     Expires: 3600,
+    ContentType: file.type,
   });
+
+  return { id, uploadURL };
 }
 
-export async function get_direct_upload_urls(filenames = []) {
+export async function head_object(key) {
+  const [filename] = key.match(/(\w+)[^-]*$/);
+  const result = await client.headObject({ Key: key, Bucket: "s3-needs-uz" }).promise();
+
+  if (result) {
+    return {
+      id: key,
+      name: filename,
+      meta: { size: result.ContentLength, type: result.ContentType },
+    };
+  }
+}
+
+export async function get_direct_upload_urls(files = []) {
   const urls = [];
-  for await (const url of async_pool(16, filenames, get_direct_upload_url)) {
+  for await (const url of async_pool(16, files, get_direct_upload_url)) {
     urls.push(url);
   }
   return urls;
