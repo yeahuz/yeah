@@ -26,7 +26,8 @@ const GOOGLE_APIS_REGEX = new RegExp("https://maps\\.googleapis\\.com.*");
 const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
 const SEARCH_ROUTE_REGEX = new RegExp("/search/?.*");
 const AUTH_ROUTE_REGEX = new RegExp("/auth/(signup|login)");
-const GLOBAL_VERSION = 8;
+const CHAT_ROUTE_REGEX = new RegExp("/chats/?.*");
+const GLOBAL_VERSION = 11;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
   static_assets: `static_assets-${GLOBAL_VERSION}.6`,
@@ -218,13 +219,18 @@ const swr_content_route = new Route(({ request, url }) => {
   else if (AUTH_ROUTE_REGEX.test(url.pathname)) return;
   else if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
   else if (SEARCH_ROUTE_REGEX.test(url.pathname)) return;
+  else if (CHAT_ROUTE_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
 }, swr_content_handler);
 
 const nf_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   if (request.mode === "navigate") {
-    return POSTING_WIZARD_REGEX.test(url.pathname) || AUTH_ROUTE_REGEX.test(url.pathname);
+    return (
+      POSTING_WIZARD_REGEX.test(url.pathname) ||
+      AUTH_ROUTE_REGEX.test(url.pathname) ||
+      CHAT_ROUTE_REGEX.test(url.pathname)
+    );
   }
 }, nf_content_handler);
 

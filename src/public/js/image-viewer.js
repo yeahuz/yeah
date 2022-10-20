@@ -46,6 +46,10 @@ class ImageViewer {
         e.preventDefault();
         this.next();
         break;
+      case "Escape":
+        e.preventDefault();
+        this.close(e);
+        break;
       case "ArrowLeft":
         e.preventDefault();
         this.prev();
@@ -92,12 +96,18 @@ class ImageViewer {
     this.container.classList.toggle("z-50");
     this.container.classList.toggle("scale-90");
     this.container.classList.toggle("opacity-0");
+
+    const is_open = this.container.classList.contains("z-50");
+    if (is_open) {
+      document.body.style.overflow = is_open ? "hidden" : "auto";
+      this.container.focus();
+    }
   }
 
   create_container() {
     const container = create_node("div", {
       class:
-        "flex items-center justify-center fixed top-0 left-0 w-screen h-screen bg-black/60 duration-300 will-change-transform -z-10 opacity-0 scale-90 text-white",
+        "flex items-center justify-center fixed top-0 left-0 w-screen h-screen bg-black/60 duration-300 will-change-transform -z-10 opacity-0 scale-90 text-white outline-none",
       tabindex: "-1",
     });
     this.container = container;
