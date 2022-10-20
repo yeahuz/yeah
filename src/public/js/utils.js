@@ -195,3 +195,12 @@ export function format_bytes(bytes, decimals = 2) {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))}${sizes[i]}`;
 }
+
+export function generate_srcset(url, options, count = 20) {
+  let srcset = "";
+  for (let i = 1; i <= count; i++) {
+    let w = i * 100;
+    srcset += `${url}/width=${w},${options} ${w}w, `;
+  }
+  return srcset;
+}

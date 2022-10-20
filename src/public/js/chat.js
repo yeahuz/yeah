@@ -1,8 +1,7 @@
 import { add_listeners, create_node } from "./dom.js";
 import { media_message_tmpl, file_message_tmpl } from "./templates.js";
-import { option, request, async_pool, upload_request } from "./utils.js";
+import { option, request, async_pool, upload_request, generate_srcset } from "./utils.js";
 import { toast } from "./toast.js";
-// import { enqueue_photo } from "./chat-queue.js";
 
 const files_input = document.querySelector(".js-files");
 const messages = document.querySelector(".js-messages");
@@ -184,15 +183,6 @@ async function on_file_download(e) {
   document.body.append(a);
   a.click();
   a.remove();
-}
-
-export function generate_srcset(url, options, count = 20) {
-  let srcset = "";
-  for (let i = 1; i <= count; i++) {
-    let w = i * 100;
-    srcset += `${url}/width=${w},${options} ${w}w, `;
-  }
-  return srcset;
 }
 
 function is_media(type) {

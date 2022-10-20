@@ -241,7 +241,6 @@ warm_strategy_cache({
 });
 
 setCatchHandler(({ request }) => {
-  console.log("here");
   if (request.destination === "document") {
     return matchPrecache("/partials/offline.html");
   }
