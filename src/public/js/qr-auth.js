@@ -1,7 +1,7 @@
 import { toDataURL } from "/node_modules/qrcode/build/qrcode.esm.js";
+import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 import { add_listeners } from "./dom.js";
 import { qr_code_tmpl, scan_profile_tmpl } from "./templates.js";
-import { encoder } from "./byte-utils.js";
 import { option, request, wait, message_sw } from "./utils.js";
 import { toast } from "./toast.js";
 
@@ -9,6 +9,7 @@ const MAX_RETRIES = 5;
 const qr_container = document.querySelector(".js-qr-container");
 
 const listeners = {};
+let encoder = null;
 
 function on(op, callback) {
   listeners[op] = callback;
@@ -32,12 +33,18 @@ function connect({ retries }) {
   });
 
   ws.addEventListener("message", (e) => {
+    if (!encoder) {
+      encoder = new PackBytes(e.data);
+      ws.send(encoder.encode("auth_init"));
+      return;
+    }
+
     const [op, payload] = encoder.decode(e.data);
     if (listeners[op]) listeners[op](payload);
   });
 }
 
-async function on_auth_init(url) {
+async function on_auth_pending(url) {
   qr_container.innerHTML = "";
   const qr_url = await toDataURL(url, {
     margin: 0,
@@ -78,7 +85,7 @@ function on_auth_denied() {
   if (ws) ws.close();
 }
 
-on("auth_init", on_auth_init);
+on("auth_pending", on_auth_pending);
 on("auth_scan", on_auth_scan);
 on("auth_confirmed", on_auth_confirm);
 on("auth_denied", on_auth_denied);

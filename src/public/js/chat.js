@@ -10,6 +10,12 @@ const files_link_form = document.querySelector(".js-files-link-form");
 const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 
+const ws = new WebSocket("ws://localhost:3020/chat");
+
+ws.addEventListener("open", () => console.log("OPENED"));
+ws.addEventListener("close", () => console.log("CLOSED"));
+ws.addEventListener("error", () => console.log("ERRORED"));
+
 function on_media_progress(item) {
   item.classList.add("pointer-events-none");
   const span = create_node("span", {

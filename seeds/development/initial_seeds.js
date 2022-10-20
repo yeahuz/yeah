@@ -680,6 +680,10 @@ export async function seed(knex) {
       title: "Needs Admin",
       token: "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15",
     },
+    {
+      title: "Needs Socket",
+      token: "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860",
+    },
   ]);
 
   await insert_regions();

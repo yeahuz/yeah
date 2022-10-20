@@ -20,13 +20,13 @@ import { AuthenticationError, GoneError } from "../utils/errors.js";
 import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
 import { randomBytes } from "crypto";
-import { encoder } from "../utils/byte-utils.js";
 import { events } from "../utils/events.js";
 
 export async function get_qr_login(req, reply) {
   const { token } = req.params;
   const { name, profile_photo_url } = req.user || {};
   const ws = req.server.ws;
+  const encoder = req.server.ws_encoder;
   const stream = reply.init_stream();
   const t = req.i18n.t;
   const user = req.user;
@@ -61,6 +61,7 @@ export async function qr_login_confirm(req, reply) {
   const { _action } = req.body;
   const user = req.user;
   const ws = req.server.ws;
+  const encoder = req.server.ws_encoder;
   const t = req.i18n.t;
 
   const [decoded, err] = await option(jwt.verify(token));
