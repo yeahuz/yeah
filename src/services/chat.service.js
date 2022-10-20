@@ -15,6 +15,10 @@ export async function get_many({ user_id }) {
     });
 }
 
+export async function get_chat_ids({ user_id }) {
+  return await User.relatedQuery("chats").select("id").for(user_id);
+}
+
 export async function get_one({ id, current_user_id }) {
   return await Chat.query()
     .findOne({ id })

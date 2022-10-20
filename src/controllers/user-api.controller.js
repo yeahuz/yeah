@@ -1,4 +1,5 @@
 import * as UserService from "../services/user.service.js";
+import * as ChatService from "../services/chat.service.js";
 
 export async function get_one(req, reply) {
   const { id } = req.params;
@@ -27,5 +28,12 @@ export async function delete_one(req, reply) {
   const { id } = req.params;
   const result = await UserService.delete_one(id);
   reply.send(result);
+  return reply;
+}
+
+export async function get_chats(req, reply) {
+  const { id } = req.params;
+  const chats = await ChatService.get_chat_ids({ user_id: id });
+  reply.send(chats);
   return reply;
 }

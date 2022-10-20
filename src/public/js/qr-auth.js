@@ -10,12 +10,12 @@ const qr_container = document.querySelector(".js-qr-container");
 
 const listeners = {};
 let encoder = null;
+let ws = null;
 
 function on(op, callback) {
   listeners[op] = callback;
 }
 
-let ws = null;
 function connect({ retries }) {
   if (retries === 0) return;
 

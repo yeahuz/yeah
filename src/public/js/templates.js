@@ -244,3 +244,37 @@ export function media_message_tmpl(files = []) {
 
   return msg;
 }
+
+// <li class="p-2 rounded-lg block relative max-w-max <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
+//   <p>
+//     <%= message.content %>
+//   </p>
+//   <span class="block text-right text-xs mt-0.5 <%= message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
+//     <%= it.formatter.format(new Date(message.created_at)) %>
+//   </span>
+// </li>
+
+export function text_message_tmpl(payload, is_own_message) {
+  const msg = create_node("li", {
+    class: `p-2 rounded-lg block relative max-w-max ${
+      is_own_message
+        ? "ml-auto text-white bg-primary-600"
+        : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800"
+    } `,
+  });
+
+  const content = create_node("p");
+  content.textContent = payload.content;
+
+  const date = create_node("span", {
+    class: `block text-right text-xs mt-0.5 ${
+      is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300"
+    }`,
+  });
+
+  date.textContent = formatter.format(new Date(payload.timestamp));
+
+  msg.append(content, date);
+
+  return msg;
+}

@@ -63,6 +63,7 @@ export const api_routes = async (fastify) => {
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
   fastify.register(posting_api, { prefix: "/postings" });
+
   fastify.setErrorHandler((err, req, reply) => {
     const lang = req.language;
     const t = i18next.getFixedT(lang);

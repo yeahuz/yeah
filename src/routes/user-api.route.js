@@ -8,6 +8,11 @@ export const user_api = async (fastify) => {
   });
   fastify.route({
     method: "GET",
+    url: "/:id/chats",
+    handler: UserApiController.get_chats,
+  });
+  fastify.route({
+    method: "GET",
     url: "/",
     handler: UserApiController.get_many,
   });

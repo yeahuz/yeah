@@ -1,7 +1,8 @@
 import { add_listeners, create_node } from "./dom.js";
-import { media_message_tmpl, file_message_tmpl } from "./templates.js";
+import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates.js";
 import { option, request, async_pool, upload_request, generate_srcset } from "./utils.js";
 import { toast } from "./toast.js";
+import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 
 const files_input = document.querySelector(".js-files");
 const messages = document.querySelector(".js-messages");
@@ -9,12 +10,69 @@ const photos_link_form = document.querySelector(".js-photos-link-form");
 const files_link_form = document.querySelector(".js-files-link-form");
 const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
+const message_form = document.querySelector(".js-message-form");
+const message_textarea = message_form.querySelector("textarea[name='content']");
 
-const ws = new WebSocket("ws://localhost:3020/chat");
+let ws = null;
+let encoder = null;
+const listeners = {};
 
-ws.addEventListener("open", () => console.log("OPENED"));
-ws.addEventListener("close", () => console.log("CLOSED"));
-ws.addEventListener("error", () => console.log("ERRORED"));
+function on(op, callback) {
+  listeners[op] = callback;
+}
+
+function connect({ retries }) {
+  if (retries === 0) return;
+
+  ws = new WebSocket("ws://localhost:3020/chat");
+
+  ws.binaryType = "arraybuffer";
+  ws.addEventListener("close", () => connect({ retires: retries - 1 }));
+  ws.addEventListener("error", () => connect({ retries: retries - 1 }));
+
+  ws.addEventListener("message", (e) => {
+    if (!encoder) {
+      encoder = new PackBytes(e.data);
+      return;
+    }
+    const [op, payload] = encoder.decode(e.data);
+    if (listeners[op]) listeners[op](payload);
+  });
+}
+
+connect({ retries: 5 });
+
+add_listeners(message_form, {
+  submit: on_send_message,
+});
+
+function on_send_message(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  const textarea = form.querySelector("textarea[name='content']");
+
+  if (ws) {
+    const payload = {
+      topic: data.get("topic"),
+      content: data.get("content"),
+      timestamp: Date.now(),
+    };
+    ws.send(encoder.encode("new_message", payload));
+    messages.append(text_message_tmpl(payload, true));
+
+    textarea.focus();
+    form.reset();
+    scroll_to_bottom(messages);
+  }
+}
+
+function on_new_message(payload) {
+  messages.append(text_message_tmpl(payload, false));
+  scroll_to_bottom(messages);
+}
+
+on("new_message", on_new_message);
 
 function on_media_progress(item) {
   item.classList.add("pointer-events-none");
@@ -195,6 +253,14 @@ function is_media(type) {
   return /(image\/*)|(video\/*)/.test(type);
 }
 
+function scroll_to_bottom(element) {
+  element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
+}
+
+add_listeners(message_textarea, {
+  focusout: (e) => e.target.focus(),
+});
+
 add_listeners(files_input, {
   change: on_files_change,
 });
@@ -202,6 +268,7 @@ add_listeners(files_input, {
 add_listeners(file_download_btns, {
   click: on_file_download,
 });
+
 add_listeners(photo_download_btns, {
   click: on_photo_download,
 });
