@@ -11,7 +11,15 @@ const files_link_form = document.querySelector(".js-files-link-form");
 const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 const message_form = document.querySelector(".js-message-form");
-const message_textarea = message_form.querySelector("textarea[name='content']");
+// const message_textarea = message_form.querySelector("textarea[name='content']");
+
+const top = window.localStorage.getItem(window.location.pathname);
+if (top && messages) messages.scrollTop = parseInt(top, 10);
+
+window.addEventListener("beforeunload", () => {
+  const pathname = window.location.pathname;
+  localStorage.setItem(pathname, messages.scrollTop);
+});
 
 let ws = null;
 let encoder = null;
@@ -21,14 +29,19 @@ function on(op, callback) {
   listeners[op] = callback;
 }
 
+const MAX_RETRIES = 10;
+
 function connect({ retries }) {
   if (retries === 0) return;
 
   ws = new WebSocket("ws://localhost:3020/chat");
 
   ws.binaryType = "arraybuffer";
-  ws.addEventListener("close", () => connect({ retires: retries - 1 }));
-  ws.addEventListener("error", () => connect({ retries: retries - 1 }));
+
+  ws.addEventListener("close", () => {
+    ws = null;
+    setTimeout(() => connect({ retries: retries - 1 }), 1000);
+  });
 
   ws.addEventListener("message", (e) => {
     if (!encoder) {
@@ -40,7 +53,7 @@ function connect({ retries }) {
   });
 }
 
-connect({ retries: 5 });
+connect({ retries: MAX_RETRIES });
 
 add_listeners(message_form, {
   submit: on_send_message,
@@ -256,10 +269,6 @@ function is_media(type) {
 function scroll_to_bottom(element) {
   element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
 }
-
-add_listeners(message_textarea, {
-  focusout: (e) => e.target.focus(),
-});
 
 add_listeners(files_input, {
   change: on_files_change,

@@ -20,6 +20,7 @@ import { chat } from "./chat.route.js";
 import { auth_api } from "./auth-api.route.js";
 import { user_api } from "./user-api.route.js";
 import { posting_api } from "./posting-api.route.js";
+import { chat_api } from "./chat-api.route.js";
 
 // Plugins
 import { attach_user } from "../plugins/attach-user.js";
@@ -63,6 +64,7 @@ export const api_routes = async (fastify) => {
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
   fastify.register(posting_api, { prefix: "/postings" });
+  fastify.register(chat_api, { prefix: "/chats" });
 
   fastify.setErrorHandler((err, req, reply) => {
     const lang = req.language;
