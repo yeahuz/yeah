@@ -9,7 +9,8 @@ const { raw } = objection;
 export async function get_many({ user_id }) {
   return await User.relatedQuery("chats")
     .for(user_id)
-    .withGraphFetched("[latest_message.[sender], members, posting]")
+    .withGraphFetched("[latest_message.[sender, attachments], members, posting]")
+    .modifyGraph("attachments", (builder) => builder.select("name"))
     .modifyGraph("members", (builder) => {
       builder.whereNot("user_id", user_id);
     });
@@ -22,7 +23,7 @@ export async function get_chat_ids({ user_id }) {
 export async function get_one({ id, current_user_id }) {
   return await Chat.query()
     .findOne({ id })
-    .withGraphFetched("[messages.[sender, attachments], posting]")
+    .withGraphFetched("[messages.[sender, attachments, read_by], posting]")
     .modifyGraph("messages", (builder) =>
       builder.select(
         "content",
@@ -34,7 +35,15 @@ export async function get_one({ id, current_user_id }) {
 }
 
 export async function create_message({ chat_id, content, reply_to, sender_id }) {
-  return await MessageService.create_one({ chat_id, content, reply_to, sender_id, type: "text" });
+  const message = await MessageService.create_one({
+    chat_id,
+    content,
+    reply_to,
+    sender_id,
+    type: "text",
+  });
+
+  return Object.assign(message, { attachments: [] });
 }
 
 export async function link_photos({ chat_id, photos = [], sender_id, reply_to }) {
@@ -51,6 +60,7 @@ export async function link_photos({ chat_id, photos = [], sender_id, reply_to })
     );
     await message.$relatedQuery("attachments", trx).relate(attachments);
     await trx.commit();
+    return Object.assign(message, { attachments });
   } catch (err) {
     console.log({ err });
     trx.rollback();
@@ -74,7 +84,7 @@ export async function link_files({ chat_id, files = [], sender_id, reply_to }) {
     );
     await message.$relatedQuery("attachments", trx).relate(attachments);
     await trx.commit();
-    return { message, attachments };
+    return Object.assign(message, { attachments });
   } catch (err) {
     console.log({ err });
     trx.rollback();

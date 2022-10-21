@@ -17,7 +17,19 @@ export class Message extends BaseModel {
           to: "users.id",
         },
       },
-
+      read_by: {
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: User,
+        filter: (builder) => builder.select("id", "name"),
+        join: {
+          from: "messages.id",
+          through: {
+            from: "read_messages.message_id",
+            to: "read_messages.user_id",
+          },
+          to: "users.id",
+        },
+      },
       attachments: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: Attachment,

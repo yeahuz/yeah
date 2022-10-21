@@ -12,7 +12,7 @@
                 <img src="<%= chat.posting.cover_url %>/width=80" srcset="<%= it.generate_srcset(chat.posting.cover_url, "fit=scale-down", 2) %>" alt="" class="w-12 h-12 object-cover rounded-full overflow-hidden mr-2 flex-shrink-0" />
                 <div class="flex flex-col max-w-[200px]">
                   <span class="text-gray-500 dark:text-gray-300 text-sm truncate"><%= chat.members.map(member => member.name).join(', ') %></span>
-                  <span class="text-gray-700 dark:text-gray-200 font-medium truncate"><%= chat.posting.title %>asdjakdjak</span>
+                  <span class="text-gray-700 dark:text-gray-200 font-medium truncate"><%= chat.posting.title %></span>
                 </div>
               </div>
               <% if (chat.latest_message) { %>
@@ -21,7 +21,12 @@
             </div>
             <% if (chat.latest_message) {%>
               <p class="text-gray-500 dark:text-gray-300 text-sm truncate">
-                <%= chat.latest_message.sender.id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%> <%= chat.latest_message.content %>
+                <%= chat.latest_message.sender.id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
+                <% if (chat.latest_message.type === "text") { %>
+                  <%= chat.latest_message.content %>
+                <% } else { %>
+                  <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1].name %>
+                <% } %>
               </p>
             <% } %>
           </a>

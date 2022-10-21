@@ -97,8 +97,19 @@ function on_message_sent(payload) {
 
   date_info.append(check);
 }
+
 function on_new_message(payload) {
-  messages.append(text_message_tmpl(payload, false));
+  switch (payload.type) {
+    case "text":
+      messages.append(text_message_tmpl(payload, false));
+      break;
+    case "file":
+      messages.append(file_message_tmpl(payload, false));
+      break;
+    default:
+      break;
+  }
+
   scroll_to_bottom(messages);
 }
 
@@ -210,11 +221,15 @@ async function upload_media_files(files = []) {
   await request(photos_link_form.action, { method: photos_link_form.method, body: { photos } });
 }
 
-async function upload_files(files = []) {
+async function upload_files(message) {
   const [urls, err] = await option(
     request("/cloudflare/r2/direct_upload", {
       body: {
-        files: files.map((file) => ({ name: file.name, size: String(file.size), type: file.type })),
+        files: message.attachments.map((file) => ({
+          name: file.name,
+          size: String(file.size),
+          type: file.type,
+        })),
       },
     })
   );
@@ -225,36 +240,47 @@ async function upload_files(files = []) {
   }
 
   const file_ids = [];
-  for await (const [result, err] of async_pool(10, files, upload_files_to(urls))) {
+  for await (const [result, err] of async_pool(10, message.attachments, upload_files_to(urls))) {
     file_ids.push(result.id);
   }
 
-  await request(files_link_form.action, {
-    method: files_link_form.method,
-    body: { files: file_ids },
-  });
+  if (ws) {
+    const data = new FormData(files_link_form);
+    ws.send(
+      encoder.encode("publish_files", {
+        chat_id: data.get("chat_id"),
+        files: file_ids,
+        temp_id: message.temp_id,
+      })
+    );
+  }
+
+  // await request(files_link_form.action, {
+  //   method: files_link_form.method,
+  //   body: { files: file_ids },
+  // });
 }
 
 async function on_files_change(e) {
   const files = e.target.files;
   if (!files.length) return;
 
-  const media_files = [];
-  const other_files = [];
+  const media_message = { temp_id: `temp-${Math.random().toString(32).slice(2)}`, attachments: [] };
+  const other_message = { temp_id: `temp-${Math.random().toString(32).slice(2)}`, attachments: [] };
 
   for (const file of files) {
     const id = `temp-${Math.random().toString(32).slice(2)}`;
-    if (is_media(file.type)) media_files.push(Object.assign(file, { id }));
-    else other_files.push(Object.assign(file, { id }));
+    if (is_media(file.type)) media_message.attachments.push(Object.assign(file, { id }));
+    else other_message.attachments.push(Object.assign(file, { id }));
   }
 
-  if (media_files.length) {
-    messages.append(media_message_tmpl(media_files));
-    upload_media_files(media_files);
+  if (media_message.attachments.length) {
+    messages.append(media_message_tmpl(media_message));
+    upload_media_files(media_message.attachments);
   }
-  if (other_files.length) {
-    messages.append(file_message_tmpl(other_files));
-    upload_files(other_files);
+  if (other_message.attachments.length) {
+    messages.append(file_message_tmpl(other_message));
+    upload_files(other_message);
   }
 }
 

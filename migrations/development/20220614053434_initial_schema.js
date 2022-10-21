@@ -760,8 +760,8 @@ export function up(knex) {
     })
     .createTable("messages", (table) => {
       table.increments("id");
-      table.text("content");
-      table.enu("type", ["photo", "file", "video", "text"]);
+      table.text("content").defaultTo("");
+      table.enu("type", ["photo", "file", "video", "text"]).defaultTo("text");
       table.integer("reply_to").index().references("id").inTable("messages");
       table
         .integer("sender_id")
@@ -794,6 +794,7 @@ export function up(knex) {
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
+      table.unique(["message_id", "user_id"]);
     })
     .createTable("message_attachments", (table) => {
       table
@@ -810,6 +811,7 @@ export function up(knex) {
         .references("id")
         .inTable("attachments")
         .onDelete("CASCADE");
+      table.unique(["message_id", "attachment_id"]);
     })
     .createTable("countries", (table) => {
       table.string("code").primary();

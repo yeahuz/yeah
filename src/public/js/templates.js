@@ -154,13 +154,17 @@ export function chat_files_preview_tmpl(files = [], container) {
   return file_previews;
 }
 
-export function file_message_tmpl(files = []) {
+export function file_message_tmpl(payload, is_own_files = true) {
   const msg = create_node("li", {
-    class: "max-w-sm ml-auto bg-primary-600 text-white rounded-lg overflow-hidden",
+    "data-temp_id": payload.temp_id,
+    class: `max-w-sm bg-primary-600 text-white rounded-lg overflow-hidden ${
+      is_own_files
+        ? "bg-primary-600 ml-auto"
+        : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800"
+    }`,
   });
   const list = create_node("ul");
-
-  for (const file of files) {
+  for (const file of payload.attachments) {
     const list_item = create_node("li", {
       class: "flex items-center relative",
       "data-id": file.id,
@@ -178,18 +182,32 @@ export function file_message_tmpl(files = []) {
     const file_name = create_node("span", {
       class: "block font-meidum text-gray-700 dark:text-gray-200 truncate",
     });
+
     const meta = create_node("div", {
       class: "flex justify-between text-xs space-x-4 mt-0.5 text-primary-50",
     });
 
     const file_size = create_node("span");
-    const date = create_node("span");
+    const time = create_node("span");
+    const date_info = create_node("div", {
+      class: `js-date-info flex items-center justify-end text-xs mt-0.5 space-x-1 ${
+        is_own_files ? "text-primary-50" : "text-gray-500 dark:text-gray-300"
+      }`,
+    });
+
+    if (is_own_files) {
+      const clock = create_node("span", { class: "js-date-info-clock" });
+      clock.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>`;
+      date_info.append(time, clock);
+    } else date_info.append(time);
 
     file_name.textContent = file.name;
     file_size.textContent = format_bytes(file.size);
-    date.textContent = "14:45";
-    meta.append(file_size, date);
+    time.textContent = "14:45";
 
+    meta.append(file_size, date_info);
     info.append(file_name, meta);
 
     list_item.append(icon, info);
@@ -244,15 +262,6 @@ export function media_message_tmpl(files = []) {
 
   return msg;
 }
-
-// <li class="p-2 rounded-lg block relative max-w-max <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
-//   <p>
-//     <%= message.content %>
-//   </p>
-//   <span class="block text-right text-xs mt-0.5 <%= message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
-//     <%= it.formatter.format(new Date(message.created_at)) %>
-//   </span>
-// </li>
 
 export function text_message_tmpl(payload, is_own_message) {
   const msg = create_node("li", {
