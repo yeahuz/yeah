@@ -9,6 +9,8 @@ export const create_one = create_one_impl();
 
 function create_one_impl(trx) {
   return async ({ sender_id, content, reply_to, chat_id, type } = {}) => {
-    return await Message.query(trx).insert({ content, sender_id, reply_to, chat_id, type });
+    return await Message.query(trx)
+      .insert({ content, sender_id, reply_to, chat_id, type })
+      .returning(["content", "sender_id", "reply_to", "chat_id", "type", "created_at", "id"]);
   };
 }

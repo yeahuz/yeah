@@ -33,14 +33,16 @@ function connect({ retries }) {
   });
 
   ws.addEventListener("message", (e) => {
-    if (!encoder) {
-      encoder = new PackBytes(e.data);
-      ws.send(encoder.encode("auth_init"));
+    if (e.data instanceof ArrayBuffer && encoder) {
+      const [op, payload] = encoder.decode(e.data);
+      if (listeners[op]) listeners[op](payload);
       return;
     }
 
-    const [op, payload] = encoder.decode(e.data);
-    if (listeners[op]) listeners[op](payload);
+    if (!encoder) {
+      encoder = new PackBytes(e.data);
+      ws.send(encoder.encode("auth_init"));
+    }
   });
 }
 

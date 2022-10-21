@@ -29,7 +29,7 @@ export class Chat extends BaseModel {
       messages: {
         modelClass: Message,
         relation: BaseModel.HasManyRelation,
-        filter: (builder) => builder.orderBy("created_at", "asc"),
+        filter: (builder) => builder.orderBy("id", "desc").limit(10),
         join: {
           from: "chats.id",
           to: "messages.chat_id",

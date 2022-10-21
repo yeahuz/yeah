@@ -1,6 +1,6 @@
 import { add_listeners, create_node } from "./dom.js";
 import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates.js";
-import { option, request, async_pool, upload_request, generate_srcset } from "./utils.js";
+import { option, request, async_pool, upload_request, generate_srcset, wait } from "./utils.js";
 import { toast } from "./toast.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 
@@ -29,31 +29,33 @@ function on(op, callback) {
   listeners[op] = callback;
 }
 
-const MAX_RETRIES = 10;
-
-function connect({ retries }) {
-  if (retries === 0) return;
-
+function connect() {
   ws = new WebSocket("ws://localhost:3020/chat");
 
   ws.binaryType = "arraybuffer";
 
-  ws.addEventListener("close", () => {
+  ws.addEventListener("close", async () => {
+    await wait(3000);
+    connect();
+  });
+
+  ws.addEventListener("error", () => {
+    ws.close();
     ws = null;
-    setTimeout(() => connect({ retries: retries - 1 }), 1000);
   });
 
   ws.addEventListener("message", (e) => {
-    if (!encoder) {
-      encoder = new PackBytes(e.data);
+    if (e.data instanceof ArrayBuffer && encoder) {
+      const [op, payload] = encoder.decode(e.data);
+      if (listeners[op]) listeners[op](payload);
       return;
     }
-    const [op, payload] = encoder.decode(e.data);
-    if (listeners[op]) listeners[op](payload);
+
+    if (!encoder) {
+      encoder = new PackBytes(e.data);
+    }
   });
 }
-
-connect({ retries: MAX_RETRIES });
 
 add_listeners(message_form, {
   submit: on_send_message,
@@ -67,11 +69,13 @@ function on_send_message(e) {
 
   if (ws) {
     const payload = {
-      topic: data.get("topic"),
+      chat_id: data.get("chat_id"),
       content: data.get("content"),
-      timestamp: Date.now(),
+      created_at: Date.now(),
+      temp_id: `temp-${Math.random().toString(32).slice(2)}`,
     };
-    ws.send(encoder.encode("new_message", payload));
+
+    ws.send(encoder.encode("publish_message", payload));
     messages.append(text_message_tmpl(payload, true));
 
     textarea.focus();
@@ -80,12 +84,26 @@ function on_send_message(e) {
   }
 }
 
+function on_message_sent(payload) {
+  const item = messages.querySelector(`li[data-temp_id=${payload.temp_id}]`);
+  const date_info = item.querySelector(".js-date-info");
+  const clock = date_info.querySelector(".js-date-info-clock");
+  clock.remove();
+
+  const check = create_node("span");
+  check.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+  date_info.append(check);
+}
 function on_new_message(payload) {
   messages.append(text_message_tmpl(payload, false));
   scroll_to_bottom(messages);
 }
 
 on("new_message", on_new_message);
+on("message_sent", on_message_sent);
 
 function on_media_progress(item) {
   item.classList.add("pointer-events-none");
@@ -225,7 +243,7 @@ async function on_files_change(e) {
   const other_files = [];
 
   for (const file of files) {
-    const id = Math.random().toString(32).slice(2);
+    const id = `temp-${Math.random().toString(32).slice(2)}`;
     if (is_media(file.type)) media_files.push(Object.assign(file, { id }));
     else other_files.push(Object.assign(file, { id }));
   }
@@ -270,6 +288,18 @@ function scroll_to_bottom(element) {
   element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
 }
 
+function is_tab_in_focus() {
+  return document.visibilityState === "visible";
+}
+
+function on_visibility_change() {
+  if (is_tab_in_focus() && !ws) connect();
+}
+
+// add_listeners(document, {
+//   visibilitychange: on_visibility_change,
+// });
+
 add_listeners(files_input, {
   change: on_files_change,
 });
@@ -281,3 +311,5 @@ add_listeners(file_download_btns, {
 add_listeners(photo_download_btns, {
   click: on_photo_download,
 });
+
+connect();
