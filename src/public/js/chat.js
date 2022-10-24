@@ -96,6 +96,7 @@ function on_message_sent(payload) {
 </svg>`;
 
   date_info.append(check);
+  item.setAttribute("date-message_id", payload.message_id);
 }
 
 function on_new_message(payload) {

@@ -1,5 +1,4 @@
 <%~ includeFile('./footer.html', it) %>
-<%~ includeFile('./toolbar.html', it) %>
 <% if (it.scripts) {%>
 	<% it.scripts.forEach(function (src) {%>
 		<script defer async type="module" src="<%= src %>"></script>

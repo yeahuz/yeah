@@ -216,10 +216,7 @@ const nf_content_handler = compose_strategies([
 const swr_content_route = new Route(({ request, url }) => {
   if (url.pathname === "/postings/new") return;
   else if (url.pathname === "/auth/google") return;
-  else if (AUTH_ROUTE_REGEX.test(url.pathname)) return;
-  else if (POSTING_WIZARD_REGEX.test(url.pathname)) return;
   else if (SEARCH_ROUTE_REGEX.test(url.pathname)) return;
-  else if (CHAT_ROUTE_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
 }, swr_content_handler);
 
@@ -237,8 +234,8 @@ const nf_content_route = new Route(({ request, url }) => {
 // enable_navigation_preload();
 google_fonts_cache();
 cleanup_outdated_caches();
-registerRoute(swr_content_route);
 registerRoute(nf_content_route);
+registerRoute(swr_content_route);
 registerRoute(image_route);
 registerRoute(static_assets_route);
 warm_strategy_cache({

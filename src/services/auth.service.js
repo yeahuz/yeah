@@ -49,7 +49,7 @@ export async function signup({
     if (err instanceof UniqueViolationError) {
       throw new ConflictError({
         key: "user_exists",
-        params: { user: phone || email || masked_phone },
+        params: { user: identifier },
       });
     }
     throw new InternalError();
@@ -107,7 +107,7 @@ export async function google_auth(payload) {
   const trx = await UserService.start_transaction();
   try {
     const user = await UserService.create_one_trx(trx)({
-      email_phone: email,
+      email,
       name: name || given_name,
       profile_photo_url: picture,
     });
