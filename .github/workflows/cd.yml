@@ -13,7 +13,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: yeahuz/yeah
-        token: ${{ secrets.token }}
+        token: ${{ secrets.TOKEN }}
     - name: Deploy using ssh
       uses: appleboy/ssh-action@master
       with:
