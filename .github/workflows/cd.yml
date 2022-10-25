@@ -9,11 +9,10 @@ jobs:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: Set token
-      uses: actions/checkout@v2
+    - name: Setup ssh keys
+      uses: webfactory/ssh-agent@v0.6.0
       with:
-        repository: yeahuz/yeah
-        token: ${{ secrets.TOKEN }}
+        ssh-private-key: ${{ secrets.USER_PRIVATE_KEY }}
     - name: Deploy using ssh
       uses: appleboy/ssh-action@master
       with:
