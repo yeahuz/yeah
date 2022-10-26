@@ -5,6 +5,8 @@
   "create_account": "Create account",
   "save_changes": "Save changes",
   "saving_changes": "Saving changes",
+  "save": "Save",
+  "edit": "Edit",
   "online": "Online",
   "home": "Home",
   "profile": "Profile",
@@ -18,5 +20,7 @@
   "continue": "Continue",
   "cancel": "Cancel",
   "install": "Install",
-  "upload": "Upload"
+  "upload": "Upload",
+  "verified": "Verified",
+  "add": "Add"
 }

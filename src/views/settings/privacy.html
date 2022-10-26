@@ -12,7 +12,7 @@
           <%= it.t("devices.title", { ns: "settings-privacy" }) %>
         </h3>
         <% if (it.sessions.length > 1) { %>
-        <form action="/auth/sessions?return_to=/settings/privacy" method="post">
+        <form action="/auth/sessions?return_to=<%= it.mobile ? "/settings/privacy?mobile=true" : "/settings/privacy" %>" method="post">
           <button class="btn btn-md btn-tertiary-danger" name="_action" value="terminate_other_sessions">
             <%= it.t("terminate_other_sessions", { ns: "settings-privacy" } )%>
           </button>
@@ -45,7 +45,7 @@
               </td>
               <% if (idx !== 0) { %>
                 <td class="p-3 text-gray-500 w-16">
-                  <form action="/auth/sessions/<%= session.id %>?return_to=/settings/privacy" method="post" class="flex justify-center items-center">
+                  <form action="/auth/sessions/<%= session.id %>?return_to=<%= it.mobile ? "/settings/privacy?mobile=true" : "/settings/privacy" %>" method="post" class="flex justify-center items-center">
                     <button class="hover:bg-error-50 hover:text-error-700 duration-200 rounded-lg p-2.5 dark:hover:bg-zinc-800 dark:hover:text-error-600" name="_action" value="delete_one">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -65,7 +65,7 @@
           <%= it.t("passkeys.title", { ns: "settings-privacy" }) %>
         </h3>
         <% if (it.credentials.length > 1) { %>
-        <form action="/auth/credentials?return_to=/settings/privacy" method="post" class="js-credentials-delete-form">
+        <form action="/auth/credentials?return_to=<%= it.mobile ? "/settings/privacy?mobile=true" : "/settings/privacy" %>" method="post" class="js-credentials-delete-form">
           <button class="btn btn-md btn-tertiary-danger" name="_action" value="delete_credentials">
             <%= it.t("delete_all_keys", { ns: "settings-privacy" } )%>
           </button>
@@ -87,7 +87,7 @@
               <td class="p-3 text-gray-900 font-medium dark:text-white"><%= credential.title %></td>
               <td class="p-3 text-gray-500"><%= it.date_formatter.format(credential.created_at) %></td>
               <td class="p-3 text-gray-500 w-16">
-                <form action="/auth/credentials/<%= credential.id %>?return_to=/settings/privacy#passkeys" method="post" class="flex justify-center items-center js-credential-delete-form">
+                <form action="/auth/credentials/<%= credential.id %>?return_to=<%= it.mobile ? "/settings/privacy?mobile=true#passkeys" : "/settings/privacy#passkeys" %>" method="post" class="flex justify-center items-center js-credential-delete-form">
                   <button class="hover:bg-error-50 hover:text-error-700 duration-200 rounded-lg p-2.5 dark:hover:bg-zinc-800 dark:hover:text-error-600" name="_action" value="delete_one">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

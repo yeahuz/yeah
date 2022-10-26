@@ -88,6 +88,15 @@ html {
   --color-btn-ripple-bg: var(--gray-400);
   --shadow-btn: var(--shadow-xs);
 
+  /* Text button */
+  --color-text-btn-bg: transparent;
+  --color-text-btn-text: var(--primary-600);
+  --color-text-border: transparent;
+  --color-text-btn-hover: transparent;
+  --color-text-btn-text-hover: var(--primary-700);
+  --color-text-btn-ripple-bg: var(--white);
+  --color-text-btn-ring: var(--primary-100);
+
   /* Primary button */
   --color-primary-btn-bg: var(--primary-600);
   --color-primary-btn-text: var(--white);
@@ -104,6 +113,7 @@ html {
   --color-secondary-btn-text-hover: var(--gray-800);
   --color-secondary-btn-ring: var(--gray-100);
   --color-secondary-btn-ripple-bg: var(--gray-400);
+  --color-secondary-btn-hover: var(--gray-50);
   --shadow-secondary-btn: var(--shadow-xs);
 
   /* Tertiary button color */
@@ -169,6 +179,15 @@ html.light {
   --color-btn-ripple-bg: var(--gray-400);
   --shadow-btn: var(--shadow-xs);
 
+  /* Text button */
+  --color-text-btn-bg: transparent;
+  --color-text-btn-text: var(--primary-600);
+  --color-text-border: transparent;
+  --color-text-btn-hover: transparent;
+  --color-text-btn-text-hover: var(--primary-700);
+  --color-text-btn-ripple-bg: var(--white);
+  --color-text-btn-ring: var(--primary-100);
+
   /* Primary button */
   --color-primary-btn-bg: var(--primary-600);
   --color-primary-btn-text: var(--white);
@@ -185,6 +204,7 @@ html.light {
   --color-secondary-btn-text-hover: var(--gray-800);
   --color-secondary-btn-ring: var(--gray-100);
   --color-secondary-btn-ripple-bg: var(--gray-400);
+  --color-secondary-btn-hover: var(--gray-50);
   --shadow-secondary-btn: var(--shadow-xs);
 
   /* Tertiary button color */
@@ -239,6 +259,9 @@ html.light {
 html.dark {
   color-scheme: dark;
 
+  /* Text button */
+  --color-text-btn-text-hover: var(--primary-500);
+
   /* Primary button */
   --color-primary-btn-ring: var(--primary-400);
 
@@ -250,7 +273,6 @@ html.dark {
   --color-secondary-btn-text-hover: var(--white);
   --color-secondary-btn-ring: var(--zinc-800);
   --color-secondary-btn-ripple-bg: var(--zinc-400);
-
 
   /* Tertiary button color */
   --color-tertiary-cr-btn-text: var(--gray-300);
@@ -286,6 +308,16 @@ html.dark {
   --color-success-badge-bg: var(--zinc-800);
   --color-success-badge-text: var(--success-600);
 }
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  background: rgb(var(--primary-600));
+  color: rgb(var(--white));
+}
+
 
 details > summary {
   list-style: none;
@@ -346,7 +378,6 @@ details[open] summary::before {
   box-shadow: var(--shadow);
   transition-duration: 200ms;
   border-radius: 0.5rem;
-  text-decoration: none;
   display: flex;
   justify-content: var(--justify);
   align-items: var(--align);
@@ -354,11 +385,14 @@ details[open] summary::before {
   pointer-events: var(--events);
   opacity: var(--opacity);
   font-weight: 500;
-  cursor: pointer;
   white-space: nowrap;
   font-size: var(--font-size);
   position: relative;
   overflow: hidden;
+}
+
+button {
+  cursor: default;
 }
 
 button:disabled {
@@ -382,6 +416,16 @@ button:disabled {
 
 .btn-left {
   --justify: flex-start;
+}
+
+.btn-text {
+  --text-color: var(--color-text-btn-text);
+  --bg-color: var(--color-text-btn-bg);
+  --bg-hover: var(--color-text-btn-hover);
+  --shadow: none;
+  --text-hover: var(--color-text-btn-text-hover);
+  --ring-color: var(--color-text-btn-ring);
+  --ripple-bg: var(--color-text-btn-ripple-bg);
 }
 
 .btn-primary {
@@ -434,6 +478,10 @@ button:disabled {
   --text-hover: var(--color-secondary-cr-btn-text-hover);
   --ring-color: var(--color-secondary-cr-btn-ring);
   --ripple-bg: var(--color-secondary-cr-btn-ripple-bg);
+}
+
+.btn-0 {
+  --size: 0;
 }
 
 .btn-xl {

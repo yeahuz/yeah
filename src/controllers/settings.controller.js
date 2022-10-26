@@ -60,6 +60,8 @@ export async function get_tab(req, reply) {
 }
 
 export async function get_details(req, reply) {
+  const new_phone = req.session.get("new_phone");
+  const new_email = req.session.get("new_email");
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;
@@ -91,6 +93,7 @@ export async function get_details(req, reply) {
     user,
     flash,
     t,
+    mobile,
   });
   stream.push(details);
 
@@ -142,6 +145,7 @@ export async function get_privacy(req, reply) {
     sessions,
     credentials,
     date_formatter: create_date_formatter(req.language),
+    mobile,
   });
   stream.push(privacy);
 
@@ -188,6 +192,7 @@ export async function get_billing(req, reply) {
     flash,
     t,
     billing_account,
+    mobile,
   });
   stream.push(billing);
 
@@ -234,6 +239,7 @@ export async function get_appearance(req, reply) {
     flash,
     t,
     theme,
+    mobile,
   });
   stream.push(appearance);
 

@@ -21,8 +21,18 @@ function create_one_impl(trx) {
     password = crypto.randomBytes(12).toString("hex"),
     name,
     profile_photo_url,
+    phone_verified,
+    email_verified,
   }) => {
-    const user = await User.query(trx).insert({ email, phone, password, name, profile_photo_url });
+    const user = await User.query(trx).insert({
+      email,
+      phone,
+      password,
+      name,
+      profile_photo_url,
+      phone_verified,
+      email_verified,
+    });
     await BillingService.create_one_trx(trx)(user.id);
     return user;
   };

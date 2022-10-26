@@ -5,6 +5,9 @@
   "create_account": "Akkaunt yaratish",
   "save_changes": "Saqlash",
   "saving_changes": "Saqlanmoqda",
+  "save": "Saqlash",
+  "saving": "Saqlanmoqda",
+  "edit": "Tahrirlash",
   "online": "Onlayn",
   "home": "Asosiy",
   "profile": "Profil",
@@ -18,5 +21,7 @@
   "continue": "Davom etish",
   "cancel": "Bekor qilish",
   "install": "O'rnatish",
-  "upload": "Yuklash"
+  "upload": "Yuklash",
+  "verified": "Tasdiqlangan",
+  "add": "Qo'shish"
 }

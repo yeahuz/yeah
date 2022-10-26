@@ -3,6 +3,11 @@ import * as UserController from "../controllers/user.controller.js";
 export const user = async (fastify) => {
   fastify.route({
     method: "POST",
+    url: "/:id/phones",
+    handler: UserController.update_phone,
+  });
+  fastify.route({
+    method: "POST",
     url: "/:id",
     handler: UserController.update_one,
     schema: {

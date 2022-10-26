@@ -890,8 +890,16 @@ video {
   margin-left: 0.25rem;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .ml-6 {
   margin-left: 1.5rem;
+}
+
+.-ml-3 {
+  margin-left: -0.75rem;
 }
 
 .-mt-6 {
@@ -1444,12 +1452,6 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(3rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(3rem * var(--tw-space-y-reverse));
-}
-
-.space-x-6 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 0;
-  margin-right: calc(1.5rem * var(--tw-space-x-reverse));
-  margin-left: calc(1.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
 .space-y-5 > :not([hidden]) ~ :not([hidden]) {
@@ -2077,6 +2079,14 @@ html {
   --color-btn-ring: transparent;
   --color-btn-ripple-bg: var(--gray-400);
   --shadow-btn: var(--shadow-xs);
+  /* Text button */
+  --color-text-btn-bg: transparent;
+  --color-text-btn-text: var(--primary-600);
+  --color-text-border: transparent;
+  --color-text-btn-hover: transparent;
+  --color-text-btn-text-hover: var(--primary-700);
+  --color-text-btn-ripple-bg: var(--white);
+  --color-text-btn-ring: var(--primary-100);
   /* Primary button */
   --color-primary-btn-bg: var(--primary-600);
   --color-primary-btn-text: var(--white);
@@ -2092,6 +2102,7 @@ html {
   --color-secondary-btn-text-hover: var(--gray-800);
   --color-secondary-btn-ring: var(--gray-100);
   --color-secondary-btn-ripple-bg: var(--gray-400);
+  --color-secondary-btn-hover: var(--gray-50);
   --shadow-secondary-btn: var(--shadow-xs);
   /* Tertiary button color */
   --color-tertiary-cr-btn-bg: transparent;
@@ -2148,6 +2159,14 @@ html.light {
   --color-btn-ring: transparent;
   --color-btn-ripple-bg: var(--gray-400);
   --shadow-btn: var(--shadow-xs);
+  /* Text button */
+  --color-text-btn-bg: transparent;
+  --color-text-btn-text: var(--primary-600);
+  --color-text-border: transparent;
+  --color-text-btn-hover: transparent;
+  --color-text-btn-text-hover: var(--primary-700);
+  --color-text-btn-ripple-bg: var(--white);
+  --color-text-btn-ring: var(--primary-100);
   /* Primary button */
   --color-primary-btn-bg: var(--primary-600);
   --color-primary-btn-text: var(--white);
@@ -2163,6 +2182,7 @@ html.light {
   --color-secondary-btn-text-hover: var(--gray-800);
   --color-secondary-btn-ring: var(--gray-100);
   --color-secondary-btn-ripple-bg: var(--gray-400);
+  --color-secondary-btn-hover: var(--gray-50);
   --shadow-secondary-btn: var(--shadow-xs);
   /* Tertiary button color */
   --color-tertiary-cr-btn-bg: transparent;
@@ -2210,6 +2230,8 @@ html.light {
 
 html.dark {
   color-scheme: dark;
+  /* Text button */
+  --color-text-btn-text-hover: var(--primary-500);
   /* Primary button */
   --color-primary-btn-ring: var(--primary-400);
   /* Secondary button */
@@ -2248,6 +2270,20 @@ html.dark {
   /* Badge success */
   --color-success-badge-bg: var(--zinc-800);
   --color-success-badge-text: var(--success-600);
+}
+
+a {
+  text-decoration: none;
+}
+
+::-moz-selection {
+  background: rgb(var(--primary-600));
+  color: rgb(var(--white));
+}
+
+::selection {
+  background: rgb(var(--primary-600));
+  color: rgb(var(--white));
 }
 
 details > summary {
@@ -2309,7 +2345,6 @@ details[open] summary::before {
   box-shadow: var(--shadow);
   transition-duration: 200ms;
   border-radius: 0.5rem;
-  text-decoration: none;
   display: flex;
   justify-content: var(--justify);
   align-items: var(--align);
@@ -2317,11 +2352,14 @@ details[open] summary::before {
   pointer-events: var(--events);
   opacity: var(--opacity);
   font-weight: 500;
-  cursor: pointer;
   white-space: nowrap;
   font-size: var(--font-size);
   position: relative;
   overflow: hidden;
+}
+
+button {
+  cursor: default;
 }
 
 button:disabled {
@@ -2345,6 +2383,16 @@ button:disabled {
 
 .btn-left {
   --justify: flex-start;
+}
+
+.btn-text {
+  --text-color: var(--color-text-btn-text);
+  --bg-color: var(--color-text-btn-bg);
+  --bg-hover: var(--color-text-btn-hover);
+  --shadow: none;
+  --text-hover: var(--color-text-btn-text-hover);
+  --ring-color: var(--color-text-btn-ring);
+  --ripple-bg: var(--color-text-btn-ripple-bg);
 }
 
 .btn-primary {
@@ -2397,6 +2445,10 @@ button:disabled {
   --text-hover: var(--color-secondary-cr-btn-text-hover);
   --ring-color: var(--color-secondary-cr-btn-ring);
   --ripple-bg: var(--color-secondary-cr-btn-ripple-bg);
+}
+
+.btn-0 {
+  --size: 0;
 }
 
 .btn-xl {
@@ -3153,6 +3205,11 @@ checkbox-control {
           text-decoration-color: #fff;
 }
 
+.hover\:decoration-primary-500:hover {
+  -webkit-text-decoration-color: rgb(var(--primary-500));
+          text-decoration-color: rgb(var(--primary-500));
+}
+
 .hover\:shadow-xs:hover {
   --tw-shadow: 0 1px 2px rgb(16 24 40 / 0.05);
   --tw-shadow-colored: 0 1px 2px var(--tw-shadow-color);
@@ -3239,6 +3296,10 @@ checkbox-control {
   display: block;
 }
 
+.peer:checked ~ .peer-checked\:hidden {
+  display: none;
+}
+
 .peer:checked ~ .peer-checked\:border-primary-600 {
   border-color: rgb(var(--primary-600));
 }
@@ -3321,6 +3382,10 @@ checkbox-control {
 .peer:focus ~ .peer-focus\:after\:ring-offset-2::after {
   content: var(--tw-content);
   --tw-ring-offset-width: 2px;
+}
+
+.peer:checked ~ .group .group-peer-checked\:hidden {
+  display: none;
 }
 
 .dark .dark\:divide-zinc-800 > :not([hidden]) ~ :not([hidden]) {
@@ -3540,18 +3605,6 @@ checkbox-control {
     margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .sm\:space-y-0 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(0px * var(--tw-space-y-reverse));
-  }
-
-  .sm\:space-x-6 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(1.5rem * var(--tw-space-x-reverse));
-    margin-left: calc(1.5rem * calc(1 - var(--tw-space-x-reverse)));
-  }
-
   .sm\:border-none {
     border-style: none;
   }
@@ -3575,10 +3628,6 @@ checkbox-control {
 @media (min-width: 768px) {
   .md\:block {
     display: block;
-  }
-
-  .md\:inline-block {
-    display: inline-block;
   }
 
   .md\:inline {

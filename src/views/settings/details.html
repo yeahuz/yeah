@@ -5,40 +5,95 @@
       <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("personal.description", { ns: "settings-details" }) %></p>
     </header>
     <%~ includeFile('../partials/flash.html', it) %> 
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#personal-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
-      <div class="p-6">
-        <div class="flex flex-col space-y-6 mb-6 sm:flex-row sm:space-y-0 sm:space-x-6">
-          <label class="text-sm font-medium text-gray-700 w-full dark:text-gray-200"> <%= it.t("personal.name.label", { ns: "settings-details" }) %>
-            <input type="text" class="form-control mt-2" placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
-          </label>
-          <label class="text-sm font-medium text-gray-700 w-full dark:text-gray-200">
-            <%= it.t("personal.email.label", { ns: "settings-details" }) %>
-            <input type="text" inputmode="email" class="form-control mt-2"
-            placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
-            <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
-          </label>
+    <div action="/users/<%= it.user.id %>?return_to=<%= it.mobile ? "/settings/details?mobile=true#personal-details" : "/settings/details#personal-details" %>" data-cache_key="/settings/details" method="post" class="space-y-6 p-6 bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
+      <div>
+        <input type="checkbox" id="name-toggle" class="peer opacity-0 absolute -z-10 w-0" />
+        <div class="flex items-center group">
+          <span class="text-sm font-medium text-gray-700 w-full dark:text-gray-200">
+            <%= it.t("personal.name.label", { ns: "settings-details" })%>
+          </span>
+          <label for="name-toggle" class="btn btn-text btn-0 flex-shrink-0 underline decoration-transparent hover:decoration-primary-500 duration-300 group-peer-checked:hidden"><%= it.t("edit", { ns: "common" })%></label>
         </div>
-        <div class="flex space-x-6">
-          <label class="w-full">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("personal.phone.label", { ns: "settings-details" }) %></span>
-            <div class="flex mt-2">
-              <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">+998</span>
-              <input type="text" class="form-control !rounded-l-none" inputmode="numeric" placeholder="<%= it.t("personal.phone.placeholder", { ns: "settings-details" }) %>" name="phone" value="<%= it.user.phone ?? "" %>">
-            </div>
-            <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
-          </label>
-        </div>
+        <span class="block mt-2 peer-checked:hidden">
+          <%= it.user.name ?? "" %>
+        </span>
+        <form method="post" action="/users/<%= it.user.id %>?return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details" %>" class="flex-col w-full hidden mt-2 peer-checked:block">
+          <input type="text" class="form-control"
+          placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.name ?? ""%></small>
+          <div class="flex space-x-2 mt-2">
+            <label for="name-toggle" class="btn btn-md btn-secondary"><%= it.t("cancel", { ns: "common" })%></label>
+            <button class="btn btn-md btn-primary"><%= it.t("save", { ns: "common" })%></button>
+          </div>
+        </form>
       </div>
-      <hr class="bg-gray-200 w-full border-none h-px dark:bg-zinc-800" />
-      <button data-loading_text="<%= it.t("saving_changes", { ns: "common" })%>" class="btn btn-primary btn-md ml-auto my-4 mr-6"><%= it.t("save_changes", { ns: "common" }) %></button>
-    </form>
+      <div>
+        <input type="checkbox" id="email-toggle" class="peer opacity-0 absolute -z-10 w-0" />
+        <div class="flex items-center group">
+          <span class="text-sm font-medium text-gray-700 w-full dark:text-gray-200">
+            <%= it.t("personal.email.label", { ns: "settings-details" })%>
+          </span>
+          <label for="email-toggle" class="btn btn-text btn-0 flex-shrink-0 underline decoration-transparent hover:decoration-primary-500 duration-300 group-peer-checked:hidden"><%= it.user.email ? it.t("edit", { ns: "common" }) : it.t("add", { ns: "common" })%></label>
+        </div>
+        <% if (it.user.email) { %>
+          <div class="flex flex-col space-y-2 mt-2 peer-checked:hidden">
+            <span>
+              <%= it.user.email %>
+            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400"><%= it.user.email_verified ? it.t("verified", { ns: "common" }) : it.t("unverified", { ns: "common" }) %></span>
+          </div>
+        <% } %>
+        <form method="post" action="/users/otp?method=email&return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details" %>" class="flex-col w-full hidden mt-2 peer-checked:block">
+          <input type="text" inputmode="email" class="form-control"
+          placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="identifier" value="<%= it.user.email ?? "" %>" />
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
+          <div class="flex space-x-2 mt-2">
+            <label for="email-toggle" class="btn btn-md btn-secondary"><%= it.t("cancel", { ns: "common" })%></label>
+            <button class="btn btn-md btn-primary"><%= it.t("save", { ns: "common" })%></button>
+          </div>
+        </form>
+      </div>
+      <div>
+        <input type="checkbox" id="phone-toggle" class="peer opacity-0 absolute -z-10 w-0" />
+        <div class="flex items-center group">
+          <span class="text-sm font-medium text-gray-700 w-full dark:text-gray-200">
+            <%= it.t("personal.phone.label", { ns: "settings-details" })%>
+          </span>
+          <label for="phone-toggle" class="btn btn-text btn-0 flex-shrink-0 underline decoration-transparent hover:decoration-primary-500 duration-300 group-peer-checked:hidden"><%= it.user.phone ? it.t("edit", { ns: "common" }) : it.t("add", { ns: "common" })%></label>
+        </div>
+        <% if (it.user.phone) { %>
+          <div class="flex flex-col space-y-2 mt-2 peer-checked:hidden">
+            <span>
+              <%= it.user.formatted_phone ?? "" %>
+            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400"><%= it.user.phone_verified ? it.t("verified", { ns: "common" }) : it.t("unverified", { ns: "common" }) %></span>
+          </div>
+        <% } %>
+        <form method="post" action="/users/<%= it.user.id %>/phones?return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details" %>" class="flex-col w-full hidden mt-2 peer-checked:block">
+          <input type="hidden" name="country_code" value="998" />
+          <div class="flex">
+            <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">+998</span>
+            <input
+              data-mask="## ### ## ##"
+              data-unmask="#########"
+              pattern="^(33|55|77|88|90|91|93|94|95|97|98|99)\s?(\d{3})\s?(\d{2})\s?(\d{2})$" required
+              type="text" class="form-control !rounded-l-none js-masked-input" inputmode="numeric" placeholder="<%= it.t("personal.phone.placeholder", { ns: "settings-details" }) %>" name="phone" value="<%= it.user.phone ?? "" %>">
+          </div>
+          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
+          <div class="flex space-x-2 mt-2">
+            <label for="phone-toggle" class="btn btn-md btn-secondary"><%= it.t("cancel", { ns: "common" })%></label>
+            <button class="btn btn-md btn-primary"><%= it.t("save", { ns: "common" })%></button>
+          </div>
+        </form>
+      </div>
+    </div>
   </section>
   <section id="general-details">
     <header>
       <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("general.description", { ns: "settings-details" }) %></p>
     </header>
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=<%= it.mobile ? "/settings/details?mobile=true#general-details" : "/settings/details#general-details"%>" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
       <div class="p-6">
         <label class="w-full mb-6">
           <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>

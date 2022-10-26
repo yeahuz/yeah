@@ -52,21 +52,29 @@ export async function add_credential(credential) {
     encode(credential.response.clientDataJSON),
   ]);
 
-  return await request("/auth/credentials?return_to=/settings/privacy", {
-    body: {
-      id: credential.id,
-      raw_id,
-      type: credential.type,
-      response: {
-        attestation_object,
-        client_data_json,
+  const params = new URLSearchParams(window.location.search);
+  const is_mobile = params.get("mobile");
+
+  return await request(
+    `/auth/credentials?return_to=${
+      is_mobile ? "/settings/privacy?mobile=true" : "/settings/privacy"
+    }`,
+    {
+      body: {
+        id: credential.id,
+        raw_id,
+        type: credential.type,
+        response: {
+          attestation_object,
+          client_data_json,
+        },
+        transports: credential.response.getTransports?.() || [],
+        title: credential.title,
       },
-      transports: credential.response.getTransports?.() || [],
-      title: credential.title,
-    },
-    state: {
-      replace: true,
-      reload: true,
-    },
-  });
+      state: {
+        replace: true,
+        reload: true,
+      },
+    }
+  );
 }

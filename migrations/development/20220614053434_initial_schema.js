@@ -22,12 +22,14 @@ export function up(knex) {
     .createTable("users", (table) => {
       table.increments("id");
       table.string("phone", 15).unique();
+      table.boolean("phone_verified").defaultTo(false);
       table.string("name");
       table.string("username").unique();
       table.text("bio");
       table.string("website_url");
       table.string("profile_photo_url");
       table.string("email").unique();
+      table.boolean("email_verified").defaultTo(false);
       table.string("password").notNullable();
       table.string("hash_id").index();
       table.boolean("verified").defaultTo(false);

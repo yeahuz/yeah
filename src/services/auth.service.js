@@ -31,6 +31,8 @@ export async function signup({
   try {
     const user = await UserService.create_one_trx(trx)({
       [field_name]: identifier,
+      email_verified: field_name === "email",
+      phone_verified: field_name === "phone",
       password,
       name,
       profile_photo_url,
@@ -110,6 +112,7 @@ export async function google_auth(payload) {
       email,
       name: name || given_name,
       profile_photo_url: picture,
+      email_verified: true,
     });
 
     const session = await SessionService.create_one_trx(trx)({
