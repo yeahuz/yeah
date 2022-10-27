@@ -7,7 +7,8 @@
   },
   "update_email": {
     "title": "Elektron pochta manzilingizni tasdiqlang",
-    "description": "Akkauntingizni himoyalash uchun elektron pochta manzilingizni tasdiqlashimiz kifoya: {{email}}",
+    "description": "Akkauntingizni himoyalash uchun {{old_email}} dan {{new_email}} ga e-pochtangizni yangilamoqchi ekanligingizni tasdiqlashimiz kifoya.",
+    "hint": "Havola faqat bir soat davomida amal qiladi",
     "verify_btn": "Tasdiqlash"
   },
   "regards": "Rahmat!"

@@ -6,8 +6,8 @@ export const events = new EventEmitter();
 
 // const sms_client = await SMSService.build();
 
-events.on("send_email", async (data) => {
-  await EmailService.send_email(data);
+events.on("send_email", async ({ tmpl_name, vars, to }) => {
+  await EmailService.send_email({ tmpl_name, vars, to });
 });
 
 events.on("send_phone_otp", async (data) => {

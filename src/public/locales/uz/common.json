@@ -23,5 +23,7 @@
   "install": "O'rnatish",
   "upload": "Yuklash",
   "verified": "Tasdiqlangan",
+  "unverified": "Tasdiqlanmagan",
+  "verify": "Tasdiqlash",
   "add": "Qo'shish"
 }

@@ -17,7 +17,7 @@
       padding: 24px;
     }
     .body {
-      height: 100%;
+      min-height: 100%;
       width: 100%;
       background-color: rgb(249, 250, 251);
       padding: 24px;
@@ -30,6 +30,7 @@
       color: rgb(16, 24, 40);
       width: 100%;
       border-radius: 8px;
+      height: 100%;
     }
     .container__description {
       margin-top: 16px;
@@ -40,6 +41,10 @@
       margin-top: 24px;
       font-size: 16px;
       color: rgb(63, 63, 70);
+    }
+    .container__hint {
+      color: rgb(63, 63, 70);
+      font-size: 16px;
     }
     .container__logo {
       max-width: 64px;
@@ -55,6 +60,9 @@
     .logo-container__logo {
       max-width: 64px;
     }
+    .container__form {
+      margin-bottom: 20px;
+    }
     .container__btn {
       text-decoration: none;
       background-color: rgb(0, 112, 243);
@@ -63,6 +71,10 @@
       display: inline-block;
       border-radius: 0.5rem;
       transition-duration: 200ms;
+      outline: none;
+      border: none;
+      font-size: 16px;
+      font-weight: medium;
     }
     .container__btn:hover {
       background-color: rgb(0, 102, 233);
@@ -76,8 +88,11 @@
     </a>
     <div class="container">
       <h1 class="container__heading"><%= it.t("update_email.title", { ns: "email-templates" }) %></h1>
-      <p class="container__description"><%= it.t("update_email.description", { ns: "email-templates", email: it.email }) %></p>
-      <a href="<%= it.verification_link %>" class="container__btn"><%= it.t("update_email.verify_btn", { ns: "email-templates" })%></a>
+      <p class="container__description"><%= it.t("update_email.description", { ns: "email-templates", old_email: it.old_email, new_email: it.new_email  }) %></p>
+      <form method="post" action="<%= it.verification_link %>" class="container__form">
+        <button name="intent" value="verify_email" class="container__btn"><%= it.t("update_email.verify_btn", { ns: "email-templates" })%></button>
+      </form>
+      <p class="container__hint"><%= it.t("update_email.hint", { ns: "email-templates" }) %></p>
       <p class="container__regards"><%= it.t("regards", { ns: "email-templates" }) %></p>
     </div>
   </div>

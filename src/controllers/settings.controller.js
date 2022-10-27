@@ -60,8 +60,6 @@ export async function get_tab(req, reply) {
 }
 
 export async function get_details(req, reply) {
-  const new_phone = req.session.get("new_phone");
-  const new_email = req.session.get("new_email");
   const flash = reply.flash();
   const stream = reply.init_stream();
   const user = req.user;

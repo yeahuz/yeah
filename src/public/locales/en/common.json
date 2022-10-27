@@ -22,5 +22,7 @@
   "install": "Install",
   "upload": "Upload",
   "verified": "Verified",
+  "unverified": "Unverified",
+  "verify": "Verify",
   "add": "Add"
 }

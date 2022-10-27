@@ -78,12 +78,16 @@ module.exports = {
       });
     }),
     plugin(function groupPeer({ addVariant }) {
-      let pseudoVariants = ["checked"].map((variant) =>
+      let pseudoVariants = ["checked", "focus", "focus-visible"].map((variant) =>
         Array.isArray(variant) ? variant : [variant, `&:${variant}`]
       );
 
       for (let [variantName, state] of pseudoVariants) {
         addVariant(`group-peer-${variantName}`, (ctx) => {
+          let result = typeof state === "function" ? state(ctx) : state;
+          return result.replace(/&(\S+)/, ":merge(.peer)$1 ~ .group &");
+        });
+        addVariant(`dark:group-peer-${variantName}`, (ctx) => {
           let result = typeof state === "function" ? state(ctx) : state;
           return result.replace(/&(\S+)/, ":merge(.peer)$1 ~ .group &");
         });

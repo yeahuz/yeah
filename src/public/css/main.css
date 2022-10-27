@@ -261,6 +261,7 @@ html.dark {
 
   /* Text button */
   --color-text-btn-text-hover: var(--primary-500);
+  --color-text-btn-ring: var(--primary-600);
 
   /* Primary button */
   --color-primary-btn-ring: var(--primary-400);

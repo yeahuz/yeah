@@ -12,6 +12,7 @@ i18next
       "signup",
       "login",
       "errors",
+      "success",
       "settings",
       "settings-details",
       "settings-privacy",

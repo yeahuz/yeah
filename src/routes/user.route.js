@@ -8,6 +8,11 @@ export const user = async (fastify) => {
   });
   fastify.route({
     method: "POST",
+    url: "/:id/emails",
+    handler: UserController.update_email,
+  });
+  fastify.route({
+    method: "POST",
     url: "/:id",
     handler: UserController.update_one,
     schema: {

@@ -7,7 +7,7 @@ import crypto from "crypto";
 
 const { raw } = pkg;
 
-async function generate(identifier, exp_time = 15) {
+export async function generate(identifier, exp_time = 15) {
   const expires_at = add_minutes_to_now(exp_time);
   const code = crypto.randomInt(100000, 999999);
   await ConfirmationCode.query()

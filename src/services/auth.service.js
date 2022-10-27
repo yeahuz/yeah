@@ -108,10 +108,12 @@ export async function google_auth(payload) {
 
   const trx = await UserService.start_transaction();
   try {
+    const uploaded = await CFImageService.upload_url(picture);
+
     const user = await UserService.create_one_trx(trx)({
       email,
       name: name || given_name,
-      profile_photo_url: picture,
+      profile_photo_url: CFImageService.get_cf_image_url(uploaded.id),
       email_verified: true,
     });
 
@@ -176,7 +178,7 @@ export async function telegram_auth(payload) {
 
     const user = await UserService.create_one_trx(trx)({
       name: tg_user.first_name || tg_user.username,
-      profile_photo_url: `${url}/public`,
+      profile_photo_url: url,
     });
 
     const session = await SessionService.create_one_trx(trx)({

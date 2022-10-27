@@ -13,6 +13,9 @@
     "phone": {
       "label": "Telefon raqam",
       "placeholder": "93 915 20 00"
+    },
+    "photo": {
+      "label": "Rasm"
     }
   },
   "general": {

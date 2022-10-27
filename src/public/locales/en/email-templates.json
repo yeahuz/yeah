@@ -6,9 +6,10 @@
     "verification_code": "Verification code - {{code}}"
   },
   "update_email": {
-    "title": "Confirm your email address",
-    "description": "To secure your account, we just need to verify your email address: {{email}}",
-    "verify_btn": "Verify email address"
+    "title": "Confirm email address update",
+    "description": "To secure your account, we just need to verify your really want to update your email from {{old_email}} to {{new_email}}",
+    "hint": "The link is only valid for an hour.",
+    "verify_btn": "Yes, update"
   },
   "regards": "Thank you!"
 }
