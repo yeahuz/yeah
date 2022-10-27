@@ -91,7 +91,7 @@
             underline decoration-transparent duration-300
             hover:decoration-primary-500 group-peer-checked:hidden group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(209,224,255)]
             dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]">
-            <%= it.t("edit", { ns: "common" })%>
+            <%= it.user.phone ?  it.t("edit", { ns: "common" }) : it.t("add", { ns: "common" })%>
           </label>
         </div>
         <% if (it.user.phone) { %>
