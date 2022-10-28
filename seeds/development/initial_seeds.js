@@ -25,6 +25,7 @@ export async function seed(knex) {
   await knex("notifications").del();
   await knex("notification_types").del();
   await knex("notification_type_translations").del();
+  await knex("roles").del();
 
   async function insert_regions() {
     const { cities: regions } = JSON.parse(
@@ -683,6 +684,50 @@ export async function seed(knex) {
     {
       title: "Needs Socket",
       token: "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860",
+    },
+  ]);
+
+  await knex("roles").insert([
+    {
+      id: 1,
+      code: "admin",
+    },
+    {
+      id: 2,
+      code: "moderator",
+    },
+  ]);
+
+  await knex("role_translations").insert([
+    {
+      role_id: 1,
+      title: "Администратор",
+      language_code: "ru",
+    },
+    {
+      role_id: 1,
+      title: "Administrator",
+      language_code: "en",
+    },
+    {
+      role_id: 1,
+      title: "Administrator",
+      language_code: "uz",
+    },
+    {
+      role_id: 2,
+      title: "Модератор",
+      language_code: "ru",
+    },
+    {
+      role_id: 2,
+      title: "Moderator",
+      language_code: "en",
+    },
+    {
+      role_id: 2,
+      title: "Moderator",
+      language_code: "uz",
     },
   ]);
 
