@@ -7,6 +7,15 @@ async function create_index(name) {
   return await elastic_client.indices.create({ index: name });
 }
 
+async function create_index_template({ name, body }) {
+  const existing = await elastic_client.indices.existsIndexTemplate({ name });
+  if (existing) {
+    console.log(`Index template ${name} already exists. Skipping...`);
+    return false;
+  }
+  return await elastic_client.indices.putIndexTemplate({ name, body });
+}
+
 async function insert_regions() {
   const result = { en: 0, ru: 0, uz: 0 };
 
@@ -50,7 +59,7 @@ async function insert_regions() {
 
 (async () => {
   console.log("Putting needs_* index template");
-  await elastic_client.indices.putIndexTemplate({
+  await create_index_template({
     name: "needs",
     body: {
       index_patterns: ["needs_*"],
@@ -228,7 +237,7 @@ async function insert_regions() {
   await Promise.all(SUPPORTED_LANGS.map((lang) => create_index(`needs_${lang}`)));
 
   console.log("Putting regions_* index template");
-  await elastic_client.indices.putIndexTemplate({
+  await create_index_template({
     name: "regions",
     body: {
       index_patterns: ["regions_*"],
