@@ -22,12 +22,14 @@ export function up(knex) {
     .createTable("users", (table) => {
       table.increments("id");
       table.string("phone", 15).unique();
+      table.boolean("phone_verified").defaultTo(false);
       table.string("name");
       table.string("username").unique();
       table.text("bio");
       table.string("website_url");
       table.string("profile_photo_url");
       table.string("email").unique();
+      table.boolean("email_verified").defaultTo(false);
       table.string("password").notNullable();
       table.string("hash_id").index();
       table.boolean("verified").defaultTo(false);
@@ -650,22 +652,15 @@ export function up(knex) {
       table.enu("placement", ["SEARCH", "FRONT"]).defaultTo("SEARCH");
       table.timestamps(false, true);
     })
-    .createTable("attachments_v2", (table) => {
+    .createTable("attachments", (table) => {
       table.increments("id");
       table.string("resource_id").index();
       table.string("name");
-      table.string("caption");
-      table.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
-      table.timestamps(false, true);
-    })
-    .createTable("attachments", (table) => {
-      table.uuid("id").defaultTo(knex.raw("gen_random_uuid()")).primary();
+      table.string("type");
+      table.string("caption").nullable();
+      table.integer("size").defaultTo(0);
       table.string("url", 512);
-      table.string("mimetype");
-      table.string("name");
-      table.string("s3_url", 512);
-      table.string("s3_key", 512);
-      table.string("caption");
+      table.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
       table.timestamps(false, true);
     })
     .createTable("posting_attachments", (table) => {
@@ -678,16 +673,6 @@ export function up(knex) {
         .onDelete("CASCADE");
       table
         .integer("attachment_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("attachments_v2")
-        .onDelete("CASCADE");
-    })
-    .createTable("entity_attachments", (table) => {
-      table.integer("entity_id").notNullable().index();
-      table
-        .uuid("attachment_id")
         .index()
         .notNullable()
         .references("id")
@@ -777,7 +762,8 @@ export function up(knex) {
     })
     .createTable("messages", (table) => {
       table.increments("id");
-      table.text("content");
+      table.text("content").defaultTo("");
+      table.enu("type", ["photo", "file", "video", "text"]).defaultTo("text");
       table.integer("reply_to").index().references("id").inTable("messages");
       table
         .integer("sender_id")
@@ -794,6 +780,40 @@ export function up(knex) {
         .inTable("chats")
         .onDelete("CASCADE");
       table.timestamps(false, true);
+    })
+    .createTable("read_messages", (table) => {
+      table
+        .integer("message_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("messages")
+        .onDelete("CASCADE");
+      table
+        .integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table.unique(["message_id", "user_id"]);
+    })
+    .createTable("message_attachments", (table) => {
+      table
+        .integer("message_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("messages")
+        .onDelete("CASCADE");
+      table
+        .integer("attachment_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
+      table.unique(["message_id", "attachment_id"]);
     })
     .createTable("countries", (table) => {
       table.string("code").primary();
@@ -958,6 +978,8 @@ export function down(knex) {
     .dropTable("posting_bookmarks")
     .dropTable("posting_location")
     .dropTable("chat_members")
+    .dropTable("read_messages")
+    .dropTable("message_attachments")
     .dropTable("messages")
     .dropTable("chats")
     .dropTable("user_notifications")
@@ -999,9 +1021,7 @@ export function down(knex) {
     .dropTable("category_field_values")
     .dropTable("category_fields")
     .dropTable("categories")
-    .dropTable("entity_attachments")
     .dropTable("attachments")
-    .dropTable("attachments_v2")
     .dropTable("confirmation_codes")
     .dropTable("external_clients")
     .then(() => knex.raw(DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION));
