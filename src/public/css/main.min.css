@@ -3396,6 +3396,16 @@ checkbox-control {
   --tw-ring-offset-width: 2px;
 }
 
+.peer:checked ~ .group .group-peer-checked\:hidden {
+  display: none;
+}
+
+.peer:focus-visible ~ .group .group-peer-focus-visible\:shadow-\[0px_0px_0px_2px_rgb\(209\2c 224\2c 255\)\] {
+  --tw-shadow: 0px 0px 0px 2px rgb(209,224,255);
+  --tw-shadow-colored: 0px 0px 0px 2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
 .dark .dark\:divide-zinc-800 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(39 39 42 / var(--tw-divide-opacity));
@@ -3566,6 +3576,12 @@ checkbox-control {
 .dark .peer:checked ~ .dark\:peer-checked\:text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.dark .peer:focus-visible ~ .group .dark\:group-peer-focus-visible\:shadow-\[0px_0px_0px_2px_rgb\(41\2c 112\2c 255\)\] {
+  --tw-shadow: 0px 0px 0px 2px rgb(41,112,255);
+  --tw-shadow-colored: 0px 0px 0px 2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 @media (min-width: 360px) {
