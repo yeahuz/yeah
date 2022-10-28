@@ -91,6 +91,11 @@ async function cursor_paginate(model, list = [], excludes = []) {
   return { list, has_next, has_prev };
 }
 
+export async function get_one(id) {
+  if (!id) return;
+  return await Posting.query().findById(id).withGraphFetched("[attachments, location]");
+}
+
 export async function get_many({
   currency = "USD",
   status_id = 1,
@@ -105,6 +110,7 @@ export async function get_many({
       "postings.id",
       "cover_url",
       "url",
+      "status_id",
       "exchange_rates.to_currency as currency",
       "postings.created_at as created_at",
       "postings.id as id",

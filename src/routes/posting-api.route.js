@@ -11,4 +11,9 @@ export const posting_api = async (fastify) => {
     url: "/filters",
     handler: PostingApiController.get_filters,
   });
+  fastify.route({
+    method: "GET",
+    url: "/:id",
+    handler: PostingApiController.get_one,
+  });
 };
