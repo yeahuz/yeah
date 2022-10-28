@@ -30,4 +30,5 @@ jobs:
           pnpm rollback
           pnpm migrate
           pnpm seed
+          pnpm setup-es
           pm2 restart ecosystem.config.cjs
