@@ -1,22 +1,6 @@
 <main class="px-4 xl:px-0 max-w-7xl mx-auto">
-  <% if (it.categories.length) { %>
-    <ul class="md:hidden">
-      <% it.categories.forEach(function (category) { %>
-        <li>
-          <a href="/c/<%= category.id %>" class="flex items-center w-full py-3">
-            <%= category.title %>
-            <% if (category.has_children) { %>
-              <svg class="w-5 h-5 ml-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            <% } %>
-          </a>
-        </li>
-      <% }) %>
-    </ul>
-  <% } %>
   <%~ includeFile('../partials/search-bar.html', it) %>
-  <% if (it.q) {%>
+  <% if (it.q) { %>
     <h1 class="font-semibold text-xl mt-16 hidden md:block">Объявления по запросу &laquo;<%= it.q %>&raquo;</h1>
   <% } %>
-  <div class="flex flex-col space-y-12 lg:space-y-0 lg:flex-row lg:space-x-6 mt-5">
+  <div class="flex flex-col space-y-12 lg:space-y-0 lg:flex-row lg:space-x-4 mt-5">
