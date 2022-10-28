@@ -3,13 +3,18 @@ import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as jwt from "../utils/jwt.js";
-import { ResourceNotFoundError } from "../utils/errors.js";
+import { AuthorizationError, ResourceNotFoundError } from "../utils/errors.js";
 import { AssertionRequest, CredentialRequest } from "../utils/webauthn.js";
 
 export async function login(req, reply) {
   const { email, password } = req.body;
 
   const user = await AuthService.verify_password({ identifier: email, password });
+  const is_admin = user.roles.some((role) => role.code === "admin");
+
+  if (!is_admin) {
+    throw new AuthorizationError();
+  }
 
   const has_credential = await CredentialService.exists_for(user.id);
 

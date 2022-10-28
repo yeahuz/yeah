@@ -14,6 +14,7 @@ async function attach_user_impl(req, reply) {
   if (sid && !session) {
     req.session.delete();
   }
-  const user = await UserService.get_one(session?.user_id);
+
+  const user = await UserService.get_one(session?.user_id, ["roles"]);
   req.user = user?.toJSON();
 }

@@ -34,3 +34,4 @@ export * from "./external-client.model.js";
 export * from "./posting-status.model.js";
 export * from "./chat.model.js";
 export * from "./message.model.js";
+export * from "./role.model.js";

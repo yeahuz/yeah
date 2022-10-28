@@ -41,7 +41,7 @@
         <span class="block mt-2 peer-checked:hidden">
           <%= it.user.name ?? "" %>
         </span>
-        <form method="post" action="/users/<%= it.user.id %>?return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details" %>" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="text" class="form-control" placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.name ?? ""%></small>
           <div class="flex space-x-2 mt-2">
@@ -71,7 +71,7 @@
             <span class="text-xs text-gray-500 dark:text-gray-400"><%= it.user.email_verified ? it.t("verified", { ns: "common" }) : it.t("unverified", { ns: "common" }) %></span>
           </div>
         <% } %>
-        <form method="post" action="/users/<%= it.user.id %>/emails?return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details" %>" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>/emails?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="text" inputmode="email" class="form-control"
           placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
@@ -105,7 +105,7 @@
               <% } %>
               <span class="text-xs text-gray-500 dark:text-gray-400 peer-checked:hidden"><%= it.user.phone_verified ? it.t("verified", { ns: "common" }) : it.t("unverified", { ns: "common" }) %></span>
               <% if (!it.user.phone_verified) { %>
-                <form method="post" action="/users/<%= it.user.id %>/phones?return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details"%>" class="hidden peer-checked:block">
+                <form method="post" action="/users/<%= it.user.id %>/phones?return_to=/settings/details" class="hidden peer-checked:block">
                   <input type="hidden" name="phone" value="<%= it.user.phone %>" />
                   <input type="text" inputmode="numeric" class="form-control max-w-[9ch]" maxlength="6" name="otp" placeholder="123456" />
                   <div class="flex space-x-2 mt-2">
@@ -118,7 +118,7 @@
             </div>
           </div>
         <% } %>
-        <form method="post" action="/users/<%= it.user.id %>/phones?return_to=<%= it.mobile ? "/settings/details?mobile=true" : "/settings/details" %>" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>/phones?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="hidden" name="country_code" value="998" />
           <div class="flex">
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">+998</span>
@@ -143,7 +143,7 @@
       <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("general.description", { ns: "settings-details" }) %></p>
     </header>
-    <form action="/users/<%= it.user.id %>?return_to=<%= it.mobile ? "/settings/details?mobile=true#general-details" : "/settings/details#general-details"%>" data-cache_key="/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
       <div class="p-6">
         <label class="w-full mb-6">
           <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>

@@ -1,41 +1,41 @@
-<ul class="flex flex-col space-y-2 lg:max-w-[14rem] w-full">
+<ul class="flex-col space-y-2 <%= !it.tab ? "" : "hidden lg:flex" %> lg:max-w-[14rem] w-full">
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'details' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/details<%= it.mobile ? "?mobile=true" : ""%>"
+      href="/settings/details"
       ><%= it.t("tabs.details", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'privacy' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/privacy<%= it.mobile ? "?mobile=true" : ""%>"
+      href="/settings/privacy"
       ><%= it.t("tabs.privacy", { ns: "settings" })%></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'billing' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/billing<%= it.mobile ? "?mobile=true" : ""%>"
+      href="/settings/billing"
       ><%= it.t("tabs.billing", { ns: "settings" }) %></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'appearance' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/appearance<%= it.mobile ? "?mobile=true" : ""%>"
+      href="/settings/appearance"
       ><%= it.t("tabs.appearance", { ns: "settings" })%></a
     >
   </li>
   <li>
     <a
       class="btn btn-md btn-left <%= it.tab === 'notifications' ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-      href="/settings/notifications<%= it.mobile ? "?mobile=true" : ""%>"
+      href="/settings/notifications"
       ><%= it.t("tabs.notifications", { ns: "settings" })%></a
     >
   </li>
 </ul>
-<% if (it.mobile) { %>
+<% if (!it.tab) { %>
 </div>
 </div>
 </main>

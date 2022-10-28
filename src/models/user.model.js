@@ -1,4 +1,4 @@
-import { BaseModel, BillingAccount, UserPrefence, UserNotification, Chat } from "./index.js";
+import { BaseModel, BillingAccount, UserPrefence, UserNotification, Chat, Role } from "./index.js";
 import { hashids } from "../utils/hashid.js";
 import * as argon2 from "argon2";
 import { createHash } from "crypto";
@@ -14,6 +14,18 @@ export class User extends BaseModel {
 
   static get relationMappings() {
     return {
+      roles: {
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: Role,
+        join: {
+          from: "users.id",
+          through: {
+            from: "user_roles.user_id",
+            to: "user_roles.role_id",
+          },
+          to: "roles.id",
+        },
+      },
       chats: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: Chat,
