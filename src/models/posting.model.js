@@ -5,6 +5,7 @@ import {
   CategoryFieldValue,
   PostingLocation,
   PostingPrice,
+  PostingStatus,
 } from "./index.js";
 import { hashids } from "../utils/hashid.js";
 import config from "../config/index.js";
@@ -16,6 +17,14 @@ export class Posting extends BaseModel {
 
   static get relationMappings() {
     return {
+      status: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: PostingStatus,
+        join: {
+          from: "postings.posting_id",
+          to: "postings.id",
+        },
+      },
       attachments: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: Attachment,

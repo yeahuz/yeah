@@ -1,6 +1,55 @@
 import { elastic_client } from "./services/es.service.js";
+import * as RegionService from "./services/region.service.js";
+
+const SUPPORTED_LANGS = ["en", "uz", "ru"];
+
+async function create_index(name) {
+  return await elastic_client.indices.create({ index: name });
+}
+
+async function insert_regions() {
+  const result = { en: 0, ru: 0, uz: 0 };
+
+  for (const lang of SUPPORTED_LANGS) {
+    const regions = await RegionService.get_regions({ lang });
+    for (const region of regions) {
+      const other_langs = SUPPORTED_LANGS.filter((l) => l !== lang);
+      const districts = await RegionService.get_districts({ region_id: region.id, lang });
+
+      for (const district of districts) {
+        let combined = `${district.long_name}, ${region.long_name}`;
+        for (const other_lang of other_langs) {
+          const sibling = await RegionService.get_region({ id: region.id, lang: other_lang });
+          const sibling_district = await RegionService.get_district({
+            id: district.id,
+            lang: other_lang,
+          });
+          combined += `; ${sibling_district.long_name}, ${sibling.long_name}`;
+        }
+
+        await elastic_client.index({
+          index: `regions_${lang}`,
+          body: {
+            region_id: region.id,
+            district_id: district.id,
+            formatted_address: `${district.long_name}, ${region.long_name}`,
+            combined_address: combined,
+            ...(district.coords && {
+              coords: { lat: district.coords.x, lon: district.coords.y },
+            }),
+          },
+        });
+
+        result[lang] += 1;
+      }
+    }
+  }
+
+  return result;
+}
 
 (async () => {
+  console.log("Putting needs_* index template");
   await elastic_client.indices.putIndexTemplate({
     name: "needs",
     body: {
@@ -176,10 +225,13 @@ import { elastic_client } from "./services/es.service.js";
     },
   });
 
+  await Promise.all(SUPPORTED_LANGS.map((lang) => create_index(`needs_${lang}`)));
+
+  console.log("Putting regions_* index template");
   await elastic_client.indices.putIndexTemplate({
-    name: "needs",
+    name: "regions",
     body: {
-      index_patterns: ["needs_*"],
+      index_patterns: ["regions_*"],
       template: {
         mappings: {
           dynamic_templates: [],
@@ -211,6 +263,7 @@ import { elastic_client } from "./services/es.service.js";
     },
   });
 
-  const result = await fetch("/elastic/regions");
-  console.log({ result });
+  console.log("Inserting regions to regions_*");
+  const inserted_regions = await insert_regions();
+  console.log({ inserted_regions });
 })();

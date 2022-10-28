@@ -1,13 +1,4 @@
-<header class="bg-white border-b border-b-gray-200 py-4 px-4 xl:px-0 sticky duration-300 top-0 z-30 js-header dark:bg-zinc-900 dark:border-b-zinc-800">
-  <% if (it.mobile_search) { %>
-    <div class="max-w-7xl mx-auto flex items-center justify-between md:hidden">
-      <form method="get" action="/search" class="md:hidden w-full relative">
-        <input autofocus type="text" name="q" autocomplete="off" minlength="3" value="<%= it.q ?? "" %>" class="outline-none py-2.5 px-3.5 w-full bg-zinc-800 rounded-lg text-base js-search-input" placeholder="Search postings"/>
-        <ul class="absolute bg-white shadow-lg w-full rounded-lg border border-gray-100 mt-1 overflow-hidden max-h-60 overflow-y-auto -z-10 opacity-0 translate-y-2 duration-200 dark:bg-zinc-900 dark:border-zinc-700 js-search-suggestions">
-        </ul>
-      </form>
-    </div>
-  <% } %>
+<header class="bg-white border-b-gray-200 py-4 px-4 xl:px-0 duration-300 dark:bg-zinc-900 dark:border-b-zinc-800">
   <div class="max-w-7xl mx-auto items-center justify-between <%= it.mobile_search ? 'hidden' : 'flex' %> md:flex">
     <div class="flex items-center">
       <%~ includeFile('./mobile-nav.html', it) %>

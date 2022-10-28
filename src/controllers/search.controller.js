@@ -15,14 +15,20 @@ export async function get_search(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
 
-  const { q, min_amount, max_amount, placement, region_id, ...facets } = cleanup_object(req.query);
+  const {
+    q = "",
+    min_amount,
+    max_amount,
+    placement,
+    region_id,
+    ...facets
+  } = cleanup_object(req.query);
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
       t,
-      mobile_search: true,
       q: q.trim(),
     });
     stream.push(top);

@@ -498,6 +498,11 @@ button:disabled {
   --font-size: 0.875rem;
 }
 
+.btn-xs {
+  --size: 0.5rem 1rem;
+  --font-size: 0.75rem;
+}
+
 .form-control {
   --placeholder-color: var(--color-form-control-placeholder);
   --text-color: var(--color-form-control-text);

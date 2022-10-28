@@ -1,3 +1,25 @@
+<div class="md:hidden">
+  <form action="/search">
+    <div class="flex relative">
+      <input type="search" name="q" class="form-control !pr-16" placeholder="Search for anything" value="<%= it.q ?? "" %>"/>
+      <button class="btn btn-primary btn-md !absolute top-1/2 right-0.5 -translate-y-1/2">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 21L15.0001 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </form>
+  <div class="flex justify-end mt-5">
+    <div class="flex">
+      <button class="btn btn-text btn-xs">
+        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 12H18M3 6H21M9 18H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Filter
+      </button>
+    </div>
+  </div>
+</div>
 <section class="mt-16 hidden md:block">
   <header>
     <h1 class="font-semibold text-2xl text-gray-900 dark:text-white">Поиск по объявлениям</h1>
