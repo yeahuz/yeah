@@ -24,10 +24,10 @@ jobs:
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
           cd ~/projects/yeah
-          git pull origin master
-          git status
           pnpm install
           pnpm rollback
+          git pull origin master
+          git status
           pnpm migrate
           pnpm seed
           pnpm setup-es
