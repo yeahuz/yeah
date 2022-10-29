@@ -7,6 +7,7 @@ export function authenticated_user(user) {
 }
 
 export const guest_user = (user) => !authenticated_user(user);
+export const current_user = (user, params) => String(params.id) === params.id;
 
 export async function own_credential(user, params) {
   return !!(await CredentialService.belongs_to(user.id, params.id));

@@ -1,37 +1,33 @@
 import { request, option, upload_request } from "./utils.js";
-import { add_listeners, disable_form, replace_text } from "./dom.js";
+import { add_listeners, create_node } from "./dom.js";
 
-const forms = document.querySelectorAll(".js-details-form");
 const photo_input = document.querySelector(".js-photo-input");
-
-async function on_submit(e) {
-  e.preventDefault();
-  const form = e.target;
-  const data = Object.fromEntries(new FormData(form));
-
-  const enable_form = disable_form(form);
-  const button = form.querySelector("button");
-  const restore_text = replace_text(button, button.dataset.loading_text);
-
-  const [result, err] = await option(
-    request(form.action, {
-      method: form.method,
-      body: data,
-      state: {
-        replace: true,
-      },
-    })
-  );
-
-  enable_form(err);
-  restore_text();
-}
-
-// forms.forEach((form) => form.addEventListener("submit", on_submit));
+const profile_photo_container = document.querySelector(".js-profile-photo-container");
 
 add_listeners(photo_input, {
   change: on_photo_change,
 });
+
+function on_progress(item) {
+  item.classList.add("pointer-events-none");
+  const span = create_node("span", {
+    class:
+      "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
+  });
+  span.textContent = "0";
+  item.append(span);
+  return (progress) => {
+    span.textContent = `${Math.floor(progress.percent)}%`;
+  };
+}
+
+function on_done(item) {
+  return () => {
+    item.classList.remove("pointer-events-none");
+    const upload_progress = item.querySelector(".upload-progress");
+    if (upload_progress) upload_progress.remove();
+  };
+}
 
 async function on_photo_change(e) {
   const file = e.target.files[0];
@@ -46,6 +42,18 @@ async function on_photo_change(e) {
   const fd = new FormData();
   fd.append("file", file);
 
-  const [uploaded, upload_err] = await option(upload_request(url.uploadURL, { data: fd }));
-  console.log({ uploaded });
+  const [uploaded, upload_err] = await option(
+    upload_request(url.uploadURL, {
+      data: fd,
+      on_progress: on_progress(profile_photo_container),
+      on_done: on_done(profile_photo_container),
+    })
+  );
+
+  const [result, update_err] = await option(
+    request(form.action, {
+      body: { photo_id: uploaded.result.id },
+      state: { replace: true, reload: true },
+    })
+  );
 }

@@ -1,21 +1,26 @@
 import * as ConfirmationCodeService from "../services/confirmation-code.service.js";
 import * as UserService from "../services/user.service.js";
 import * as jwt from "../utils/jwt.js";
+import * as CFImageService from "../services/cfimg.service.js";
 import config from "../config/index.js";
 import { events } from "../utils/events.js";
 import { option, add_t, transform_object } from "../utils/index.js";
 
 export async function update_one(req, reply) {
   const t = req.i18n.t;
+  const user = req.user;
   const { id } = req.params;
   const { return_to = "/" } = req.query;
-  const { name, website_url, username } = req.body;
+  const { name, website_url, username, photo_id } = req.body;
 
   const [result, err] = await option(
     UserService.update_one(id, {
       name,
       website_url,
       username,
+      profile_photo_url: photo_id
+        ? CFImageService.get_cf_image_url(photo_id)
+        : user.profile_photo_url,
     })
   );
 

@@ -7,7 +7,7 @@
     <%~ includeFile('../partials/flash.html', it) %> 
     <div class="space-y-6 p-6 bg-white shadow-sm border border-gray-200 rounded-lg w-full mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
       <div>
-        <form method="post" action="/users/<%= it.user.id %>" id="photo-form">
+        <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details" id="photo-form">
         </form>
         <input type="file" accept="image/*" name="file" id="photo-input" class="peer opacity-0 w-0 absolute js-photo-input" form="photo-form" />
         <div class="flex items-center group">
@@ -21,8 +21,8 @@
             <%= it.t("edit", { ns: "common" })%>
           </label>
         </div>
-        <span class="block mt-2">
-          <img src="<%= it.user.profile_photo_url %>/128x128" class="w-16 h-16 object-cover rounded-full" alt="<%= it.user.name %>'s profile photo" crossorigin referrerpolicy="no-referrer" />
+        <span class="inline-block mt-2 relative js-profile-photo-container">
+          <img src="<%= it.user.profile_photo_url %>/128x128" class="w-16 h-16 object-cover rounded-full js-profile-photo" alt="<%= it.user.name %>'s profile photo" crossorigin referrerpolicy="no-referrer" />
         </span>
       </div>
       <div>
