@@ -3,6 +3,7 @@ import * as CategoryService from "./category.service.js";
 import objection from "objection";
 import { Posting, PostingStatus } from "../models/index.js";
 import { InternalError } from "../utils/errors.js";
+import { format_relations } from "../utils/index.js";
 
 const { raw } = objection;
 
@@ -33,12 +34,13 @@ export async function create_posting(payload) {
       cover_index,
       currency_code,
       price,
-      ...rest
+      created_by,
+      params,
     } = payload;
 
-    const attributes = Object.entries(rest)
-      .filter(([key]) => /\d/.test(key))
-      .flatMap(([_, value]) => value);
+    const attributes = Object.values(params)
+      .flatMap((param) => param.value)
+      .map((v) => v.split("|")[1]);
 
     const cover = attachments[cover_index];
     const posting = await create_one_trx(trx)({
@@ -46,6 +48,7 @@ export async function create_posting(payload) {
       description,
       cover_url: cover.url,
       status_id: 3,
+      created_by,
     }); // status_id = 3 means moderation;
 
     const att = await Promise.all(
@@ -94,6 +97,11 @@ async function cursor_paginate(model, list = [], excludes = []) {
 export async function get_one(id) {
   if (!id) return;
   return await Posting.query().findById(id).withGraphFetched("[attachments, location]");
+}
+
+export async function get_by_hash_id(hash_id, relations = ["attachments", "location"]) {
+  if (!hash_id) return;
+  return await Posting.query().findOne({ hash_id }).withGraphFetched(format_relations(relations));
 }
 
 export async function get_many({

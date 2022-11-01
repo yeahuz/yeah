@@ -1,4 +1,4 @@
-<form method="post" class="max-w-4xl js-posting-step-3 mx-auto shadow-lg rounded-lg">
+<form <%= it.user ? "method=post" : "action=/auth/login?return_to=/" %> class="max-w-4xl js-posting-step-3 mx-auto shadow-lg rounded-lg">
   <h1 class="text-gray-900 text-xl font-semibold dark:text-white"><%= it.posting_data?.title %></h1>
   <% if (it.posting_data?.attachments?.length) { %>
     <div class="js-carousel my-5">
@@ -57,12 +57,13 @@
       <span class="basis-1/3 text-gray-500 dark:text-gray-300 hidden md:inline"> <%= it.t("form.description.label", { ns: "new-posting" }) %> </span>
       <p class="text-gray-900 basis-2/3 whitespace-pre-wrap dark:text-white"><%= it.posting_data?.description %></p>
     </li>
-    <% it.paramaters?.forEach(function (param) { %>
+    <% for (const key in it.posting_data.params) { %>
+      <% const param = it.posting_data.params[key] %>
       <li class="flex w-full text-left flex-col md:flex-row">
         <span class="basis-1/3 text-gray-500 dark:text-gray-300 hidden md:inline"> <%= param.label %> </span>
-        <p class="text-gray-900 basis-2/3 whitespace-pre-wrap dark:text-white"><%= param.values.map((value) => value.label).join(', ') %></p>
+        <p class="text-gray-900 basis-2/3 whitespace-pre-wrap dark:text-white"><%= [param.value].flat().map((value) => value.split("|")[0]).join(", ") %></p>
       </li>
-    <% }) %>
+    <% } %>
   </ul>
   <button class="btn btn-lg btn-primary mt-8"><%= it.t("create", { ns: "common" })%></button>
 </form>

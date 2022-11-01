@@ -24,6 +24,7 @@ import { redis_client } from "./services/redis.service.js";
 import * as RegionService from "./services/region.service.js";
 import { pg_to_es } from "./jobs.js";
 import { render_file } from "./utils/eta.js";
+import qs from "qs";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
@@ -40,7 +41,9 @@ export async function start() {
   });
 
   try {
-    app.register(form_body);
+    app.register(form_body, {
+      parser: (str) => qs.parse(str, { allowDots: true }),
+    });
     app.register(multipart);
     app.register(fastify_rate_limit, {
       max: 100,

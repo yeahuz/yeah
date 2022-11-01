@@ -3,6 +3,7 @@ import * as S3Service from "../services/s3.service.js";
 import * as AttachmentService from "../services/attachment.service.js";
 import * as CFImageService from "../services/cfimg.service.js";
 import * as PostingService from "../services/posting.service.js";
+import * as RegionService from "../services/region.service.js";
 import { render_file } from "../utils/eta.js";
 import { array_to_tree, parse_url, generate_srcset, option } from "../utils/index.js";
 import { redis_client } from "../services/redis.service.js";
@@ -161,8 +162,9 @@ export async function submit_third_step(req, reply) {
 
 export async function submit_fourth_step(req, reply) {
   const { id } = req.params;
+  const user = req.user;
   const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
-  await PostingService.create_posting(posting_data);
+  await PostingService.create_posting(Object.assign(posting_data, { created_by: user.id }));
   reply.redirect(req.url);
   return reply;
 }
@@ -247,32 +249,13 @@ export async function get_step(req, reply) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;
       }
-      const fields = await CategoryService.get_fields({
-        category_id: posting_data.category_id,
-        lang: req.language,
-      });
-      let number_keys = {};
-      for (const [key, value] of Object.entries(posting_data)) {
-        if (/\d/.test(key)) number_keys[key] = value;
-      }
-      const paramaters = [];
-      for (const field of fields) {
-        const found = number_keys[field.id];
-        if (number_keys[field.id]) {
-          field.values = field.values.filter((value) => {
-            if (Array.isArray(found)) return found.includes(String(value.id));
-            return found === String(value.id);
-          });
-          paramaters.push(field);
-        }
-      }
 
       rendered_step = await render_file(`/posting/new/step-${step}`, {
         flash,
         t,
         posting_data,
         generate_srcset,
-        paramaters,
+        user,
       });
       break;
     }
@@ -298,6 +281,52 @@ export async function get_step(req, reply) {
 export async function get_new(req, reply) {
   const id = Math.random().toString(32).slice(2);
   reply.code(302).redirect(`/postings/wizard/${id}/1`);
+}
+
+export async function get_one(req, reply) {
+  const flash = reply.flash();
+  const stream = reply.init_stream();
+  const { hash_id } = req.params;
+  const t = req.i18n.t;
+  const user = req.user;
+  const { region_id } = req.query;
+
+  if (!req.partial) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: t("home", { ns: "common" }), lang: req.language },
+      user,
+      t,
+    });
+    stream.push(top);
+  }
+
+  const categories = await CategoryService.get_by_parent({ lang: req.language });
+  const regions = await RegionService.get_regions({ lang: req.language });
+  const search_top = await render_file("/search/top.html", {
+    t,
+    user,
+    categories,
+    region_id,
+    regions,
+  });
+  stream.push(search_top);
+
+  const posting = await PostingService.get_by_hash_id(hash_id, [
+    "attachments",
+    "location",
+    "attributes.[field.[translation], translation]",
+  ]);
+
+  const single = await render_file("/posting/single.html", { posting, t, generate_srcset });
+  stream.push(single);
+
+  if (!req.partial) {
+    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
 }
 
 export async function submit_step(req, reply) {

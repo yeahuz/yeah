@@ -78,6 +78,7 @@
     "packbytes": "^1.0.0",
     "pg": "^8.7.3",
     "qrcode": "github:jcbbb/node-qrcode",
+    "qs": "^6.11.0",
     "ua-parser-js": "^1.0.2",
     "ws": "^8.8.1"
   },

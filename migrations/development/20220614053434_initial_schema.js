@@ -331,6 +331,13 @@ export function up(knex) {
       table.string("hash_id").index();
       table.string("url", 512);
       table
+        .integer("created_by")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      table
         .integer("status_id")
         .index()
         .notNullable()

@@ -110,13 +110,14 @@
       </div>
     <% } %>
     <% if (field.type === "radio") { %>
+      <input type="hidden" name="params[<%= field.name %>].label" value="<%= field.label %>" />
       <div class="space-y-2 mt-5">
         <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
           <%= field.label %>
         </span>
-        <% field.values.forEach(function (val) { %>
+        <% field.values.forEach(function (val, index) { %>
           <div class="flex items-center">
-            <input <%= it.posting_data?.[field.id] === String(val.id) ? "checked" : ""%> type="radio" name="<%= field.id %>" value="<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+            <input <%= it.posting_data?.params[field.name]?.value === String(`${val.label}|${val.id}`) ? "checked" : ""%> type="radio" name="params[<%= field.name %>].value" value="<%= val.label %>|<%= val.id %>" id="<%= field.name %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
                         font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                         relative checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
@@ -126,6 +127,7 @@
       </div>
     <% } %>
     <% if (field.type === "checkbox") { %>
+      <input type="hidden" name="params[<%= field.name %>].label" value="<%= field.label %>" />
       <div class="space-y-2 mt-5">
           <div class="text-sm block">
             <span class="font-medium text-gray-700 dark:text-gray-200">
@@ -134,7 +136,7 @@
           </div>
           <% field.values.forEach(function (val) { %>
             <div class="flex items-center">
-              <input <%= it.posting_data?.[field.id]?.includes(String(val.id)) ? "checked" : "" %> type="<%= field.type %>" name="<%= field.id %>" id="<%= field.name %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/>
+              <input <%= it.posting_data?.params[field.name]?.value?.includes(String(`${val.label}|${val.id}`)) ? "checked" : "" %> type="<%= field.type %>" name="params[<%= field.name %>].value" id="<%= field.name %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.label %>|<%= val.id %>"/>
               <label for="<%= field.name %>-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
