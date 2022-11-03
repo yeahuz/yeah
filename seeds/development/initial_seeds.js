@@ -1,4 +1,5 @@
 import fs from "fs";
+import * as argon2 from "argon2";
 
 export async function seed(knex) {
   await knex("auth_providers").del();
@@ -696,6 +697,10 @@ export async function seed(knex) {
       id: 2,
       code: "moderator",
     },
+    {
+      id: 3,
+      code: "external_client",
+    },
   ]);
 
   await knex("role_translations").insert([
@@ -728,6 +733,53 @@ export async function seed(knex) {
       role_id: 2,
       title: "Moderator",
       language_code: "uz",
+    },
+    {
+      role_id: 3,
+      title: "Внешний клиент",
+      language_code: "ru",
+    },
+    {
+      role_id: 3,
+      title: "External client",
+      language_code: "en",
+    },
+    {
+      role_id: 3,
+      title: "Tashqi klient",
+      language_code: "uz",
+    },
+  ]);
+
+  await knex("users").insert([
+    {
+      id: 1,
+      email: "yeah-admin@needs.uz",
+      password: await argon2.hash(
+        "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15"
+      ),
+      email_verified: true,
+      name: "Yeah Admin",
+    },
+    {
+      id: 2,
+      email: "yeah-socket@needs.uz",
+      password: await argon2.hash(
+        "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860"
+      ),
+      email_verified: true,
+      name: "Yeah Socket",
+    },
+  ]);
+
+  await knex("user_roles").insert([
+    {
+      user_id: 1,
+      role_id: 3,
+    },
+    {
+      user_id: 2,
+      role_id: 3,
     },
   ]);
 

@@ -4,6 +4,7 @@ import { i18next } from "../utils/i18n.js";
 
 export const can = fp(function can(fastify, opts = {}, done) {
   fastify.decorate("can", can_impl);
+  fastify.decorate("can_api", can_api_impl);
   done();
 });
 
@@ -19,6 +20,15 @@ async function every(fns, ...params) {
     if (!(await fn(...params))) return false;
   }
   return true;
+}
+
+function can_api_impl(validations_fns = [], options = { relation: "or" }) {
+  return async (req, reply) => {
+    const user = req.user;
+    const validate = options.relation === "or" ? some : every;
+    const can_access = await validate(validations_fns, user, req.params);
+    if (!can_access) throw new AuthorizationError();
+  };
 }
 
 function can_impl(validation_fns = [], options = { relation: "or" }) {

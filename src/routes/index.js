@@ -28,7 +28,6 @@ import { is_xhr } from "../plugins/is-xhr.js";
 import { is_partial } from "../plugins/is-partial.js";
 import { chunk_view } from "../plugins/chunk-view.js";
 import { init_stream } from "../plugins/init-stream.js";
-import { external_client } from "../plugins/external-client.js";
 import { DomainError, ValidationError, InternalError } from "../utils/errors.js";
 
 export const routes = async (fastify) => {
@@ -60,7 +59,7 @@ export const routes = async (fastify) => {
 };
 
 export const api_routes = async (fastify) => {
-  fastify.register(external_client);
+  fastify.register(attach_user);
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
   fastify.register(posting_api, { prefix: "/postings" });

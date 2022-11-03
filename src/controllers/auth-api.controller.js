@@ -5,16 +5,14 @@ import * as SessionService from "../services/session.service.js";
 import * as jwt from "../utils/jwt.js";
 import { AuthorizationError, ResourceNotFoundError } from "../utils/errors.js";
 import { AssertionRequest, CredentialRequest } from "../utils/webauthn.js";
+import { admin_user, external_client } from "../utils/roles.js";
 
-export async function login(req, reply) {
-  const { email, password } = req.body;
+export async function admin_login(req, reply) {
+  const { identifier, password } = req.body;
 
-  const user = await AuthService.verify_password({ identifier: email, password });
-  const is_admin = user.roles.some((role) => role.code === "admin");
+  const user = await AuthService.verify_password({ identifier, password });
 
-  if (!is_admin) {
-    throw new AuthorizationError();
-  }
+  if (!admin_user(user)) throw new AuthorizationError();
 
   const has_credential = await CredentialService.exists_for(user.id);
 
@@ -24,6 +22,37 @@ export async function login(req, reply) {
 
   const token = jwt.sign({ id: user.id }, { expiresIn: 120 });
   reply.send({ token });
+  return reply;
+}
+
+export async function external_client_login(req, reply) {
+  const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
+  const { identifier, password } = req.body;
+  const user = await AuthService.verify_password({ identifier, password });
+  if (!external_client(user)) throw new AuthorizationError();
+  const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
+  reply.send(session);
+  return reply;
+}
+
+export async function login(req, reply) {
+  const { identifier, password } = req.body;
+  const user_agent = req.headers["user-agent"];
+  const ip = req.ip;
+
+  const user = await AuthService.verify_password({ identifier, password });
+
+  const has_credential = await CredentialService.exists_for(user.id);
+
+  if (has_credential) {
+    const token = jwt.sign({ id: user.id }, { expiresIn: 120 });
+    reply.send({ has_credential, token });
+    return reply;
+  }
+
+  const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
+  reply.send(session);
   return reply;
 }
 

@@ -389,7 +389,7 @@ export function up(knex) {
     })
     .createTable("roles", (table) => {
       table.increments("id");
-      table.enu("code", ["admin", "moderator"]);
+      table.enu("code", ["admin", "moderator", "external_client"]);
       table.timestamps(false, true);
     })
     .createTable("role_translations", (table) => {
