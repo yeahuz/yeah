@@ -279,6 +279,7 @@ export function up(knex) {
     })
     .createTable("user_agents", (table) => {
       table.increments("id");
+      table.string("raw");
       table.string("browser_name");
       table.string("browser_version");
       table.string("engine_name");
@@ -1003,7 +1004,6 @@ export function down(knex) {
     .dropTable("payment_providers")
     .dropTable("billing_accounts")
     .dropTable("user_preferences")
-    .dropTable("users")
     .dropTable("auth_providers")
     .dropTable("posting_prices")
     .dropTable("exchange_rates")
@@ -1020,6 +1020,7 @@ export function down(knex) {
     .dropTable("countries")
     .dropTable("promotions")
     .dropTable("postings")
+    .dropTable("users")
     .dropTable("posting_statuses")
     .dropTable("category_translations")
     .dropTable("category_field_translations")

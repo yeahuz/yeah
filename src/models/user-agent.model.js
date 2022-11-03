@@ -8,7 +8,7 @@ export class UserAgent extends BaseModel {
   static get modifiers() {
     return {
       browser_selects(builder) {
-        builder.select("id", "browser_name", "browser_version", "created_at");
+        builder.select("id", "browser_name", "browser_version", "created_at", "raw");
       },
     };
   }

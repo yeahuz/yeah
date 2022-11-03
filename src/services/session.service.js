@@ -19,6 +19,7 @@ function create_one_impl(trx) {
       device_type: device.type,
       device_model: device.model,
       device_vendor: device.vendor,
+      raw: user_agent,
     });
     return session;
   };

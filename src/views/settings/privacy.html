@@ -24,25 +24,20 @@
           <tr class="border-b border-b-gray-200 dark:border-b-zinc-800">
             <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-1/2"><%= it.t("devices.name", { ns: 'settings-privacy' })%></th>
             <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800"><%= it.t("devices.ip", { ns: 'settings-privacy' })%></th>
-            <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800"><%= it.t("devices.status", { ns: 'settings-privacy' })%></th>
             <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800"></th>
           </tr>
         </thead>
         <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800">
           <% it.sessions.forEach(function (session, idx) { %>
             <tr>
-              <td class="font-medium p-3 text-gray-900 dark:text-white"><%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %></td>
-              <td class="p-3 text-gray-500 dark:text-gray-200"><%= session.ip %></td>
-              <td class="p-3 text-gray-500">
-                <span class="badge badge-sm <%= idx === 0 ? "badge-success" : ""%>">
-                  <% if (idx === 0) {%>
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-2">
-                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <% } %>
-                  <%= idx === 0 ? it.t("online", { ns: "common" }) : it.date_formatter.format(session.created_at) %>
-                </span>
+              <td class="font-medium p-3 text-gray-900 dark:text-white">
+                <% if (session.user_agent.browser_name) {%>
+                  <%= session.user_agent.browser_name %> <%= parseFloat(session.user_agent.browser_version) %>
+                <% } else { %>
+                  <%= session.user_agent.raw %>
+                <% } %>
               </td>
+              <td class="p-3 text-gray-500 dark:text-gray-200"><%= session.ip %></td>
               <% if (idx !== 0) { %>
                 <td class="p-3 text-gray-500 w-16">
                   <form action="/auth/sessions/<%= session.id %>?return_to=/settings/privacy" method="post" class="flex justify-center items-center">

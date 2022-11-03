@@ -25,4 +25,9 @@ export const auth_api = async (fastify) => {
     url: "/sessions/:id",
     handler: AuthApiController.get_session,
   });
+  fastify.route({
+    method: "DELETE",
+    url: "/sessions/:id",
+    handler: AuthApiController.delete_session,
+  });
 };

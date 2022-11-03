@@ -77,3 +77,10 @@ export async function get_session(req, reply) {
   reply.send(session);
   return reply;
 }
+
+export async function delete_session(req, reply) {
+  const { id } = req.params;
+  const result = await SessionService.delete_one(id);
+  reply.send(result);
+  return reply;
+}

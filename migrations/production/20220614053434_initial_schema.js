@@ -279,6 +279,7 @@ export function up(knex) {
     })
     .createTable("user_agents", (table) => {
       table.increments("id");
+      table.string("raw");
       table.string("browser_name");
       table.string("browser_version");
       table.string("engine_name");
@@ -330,6 +331,13 @@ export function up(knex) {
       table.string("cover_url", 512);
       table.string("hash_id").index();
       table.string("url", 512);
+      table
+        .integer("created_by")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
       table
         .integer("status_id")
         .index()
