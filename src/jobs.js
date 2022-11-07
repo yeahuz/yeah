@@ -3,11 +3,9 @@ import { elastic_client } from "./services/es.service.js";
 import cron from "node-cron";
 import objection from "objection";
 
-const { ref, raw } = objection;
+const { raw } = objection;
 
 export const pg_to_es = cron.schedule("*/5 * * * * *", pg_to_es_impl);
-
-let called = 0;
 
 function boosted_description(title, facets) {
   let description = title;
@@ -29,7 +27,6 @@ function boosted_description(title, facets) {
 }
 
 async function pg_to_es_impl() {
-  console.log({ called: ++called });
   const postings = await Posting.query()
     .alias("p")
     .select(
@@ -78,8 +75,6 @@ async function pg_to_es_impl() {
         checkbox_facets.push({
           facet_id: attribute.category_field_id,
           facet_name: attribute.field.translation.label,
-          // facet_name: `${attribute.category_field_id}|${attribute.field.translation.label}`,
-          // facet_value: `${attribute.id}|${attribute.translation.label}`,
           facet_value_id: attribute.id,
           facet_value_name: attribute.translation.label,
         });
@@ -88,8 +83,6 @@ async function pg_to_es_impl() {
         radio_facets.push({
           facet_id: attribute.category_field_id,
           facet_name: attribute.field.translation.label,
-          // facet_name: `${attribute.category_field_id}|${attribute.field.translation.label}`,
-          // facet_value: `${attribute.id}|${attribute.translation.label}`,
           facet_value_id: attribute.id,
           facet_value_name: attribute.translation.label,
         });
@@ -98,8 +91,6 @@ async function pg_to_es_impl() {
         number_facets.push({
           facet_id: attribute.category_field_id,
           facet_name: attribute.field.translation.label,
-          // facet_name: `${attribute.category_field_id}|${attribute.field.translation.label}`,
-          // facet_value: `${attribute.id}|${attribute.translation.label}`,
           facet_value_id: attribute.id,
           facet_value_name: attribute.translation.label,
         });
