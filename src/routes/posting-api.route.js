@@ -1,4 +1,5 @@
 import * as PostingApiController from "../controllers/posting-api.controller.js";
+import { external_client, admin_user } from "../utils/roles.js";
 
 export const posting_api = async (fastify) => {
   fastify.route({
@@ -15,5 +16,11 @@ export const posting_api = async (fastify) => {
     method: "GET",
     url: "/:id",
     handler: PostingApiController.get_one,
+  });
+  fastify.route({
+    method: "PATCH",
+    url: "/:id",
+    handler: PostingApiController.update_one,
+    onRequest: fastify.can_api([external_client, admin_user]),
   });
 };
