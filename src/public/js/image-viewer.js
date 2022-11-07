@@ -88,6 +88,8 @@ class ImageViewer {
     const srcset = generate_srcset(photo_url, "fit=scale-down", 12);
     this.viewer.setAttribute("src", `${photo_url}/public`);
     this.viewer.setAttribute("srcset", srcset);
+    this.viewer.setAttribute("crossorigin", "anonymous");
+    this.viewer.setAttribute("referrerpolicy", "no-referrer");
     this.update_controls();
   }
 
