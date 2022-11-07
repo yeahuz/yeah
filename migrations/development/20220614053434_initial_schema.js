@@ -324,6 +324,45 @@ export function up(knex) {
       table.string("code").notNullable();
       table.timestamps(false, true);
     })
+    .createTable("attributes", (table) => {
+      table.increments("id");
+      table.integer("parent_id").index().references("id").inTable("attributes").onDelete("CASCADE");
+      table.enu("type", [
+        "range",
+        "radio",
+        "text",
+        "checkbox",
+        "select",
+        "search",
+        "url",
+        "number",
+        "password",
+        "file",
+        "search",
+        "tel",
+      ]);
+      table.string("key");
+      table.specificType("category_set", "INT[]").index(null, "GIN");
+      table.timestamps(false, true);
+    })
+    .createTable("attribute_translations", (table) => {
+      table.increments("id");
+      table
+        .integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes")
+        .onDelete("CASCADE");
+      table
+        .string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      table.string("name");
+    })
     .createTable("postings", (table) => {
       table.increments("id");
       table.string("title");
@@ -331,6 +370,7 @@ export function up(knex) {
       table.string("cover_url", 512);
       table.string("hash_id").index();
       table.string("url", 512);
+      table.specificType("attribute_set", "INT[]").index(null, "GIN");
       table
         .integer("created_by")
         .index()
@@ -1022,6 +1062,8 @@ export function down(knex) {
     .dropTable("postings")
     .dropTable("users")
     .dropTable("posting_statuses")
+    .dropTable("attribute_translations")
+    .dropTable("attributes")
     .dropTable("category_translations")
     .dropTable("category_field_translations")
     .dropTable("category_field_value_translations")

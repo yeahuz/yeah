@@ -3,6 +3,7 @@ import * as S3Service from "../services/s3.service.js";
 import * as AttachmentService from "../services/attachment.service.js";
 import * as CFImageService from "../services/cfimg.service.js";
 import * as PostingService from "../services/posting.service.js";
+import * as AttributeService from "../services/attribute.service.js";
 import * as RegionService from "../services/region.service.js";
 import { render_file } from "../utils/eta.js";
 import { array_to_tree, parse_url, generate_srcset, option } from "../utils/index.js";
@@ -213,18 +214,20 @@ export async function get_step(req, reply) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;
       }
-      const fields = await CategoryService.get_fields({
-        category_id: posting_data.category_id,
+
+      const attributes = await AttributeService.get_category_attributes({
+        category_set: [Number(posting_data.category_id)],
         lang: req.language,
       });
+
       rendered_step = await render_file(`/posting/new/step-${step}`, {
         flash,
         id,
         step,
-        fields,
         t,
         posting_data,
         generate_srcset,
+        attributes: array_to_tree(attributes),
       });
       break;
     }
@@ -284,40 +287,48 @@ export async function get_new(req, reply) {
 }
 
 export async function get_one(req, reply) {
-  const flash = reply.flash();
-  const stream = reply.init_stream();
   const { hash_id } = req.params;
+  const { region_id } = req.query;
+  const stream = reply.init_stream();
   const t = req.i18n.t;
   const user = req.user;
-  const { region_id } = req.query;
+
+  const posting = PostingService.get_by_hash_id(hash_id, ["attachments", "location"]);
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: t("home", { ns: "common" }), lang: req.language },
+      meta: { title: (await posting).title, lang: req.language },
       user,
       t,
     });
     stream.push(top);
   }
 
-  const categories = await CategoryService.get_by_parent({ lang: req.language });
-  const regions = await RegionService.get_regions({ lang: req.language });
+  const [categories, regions] = await Promise.all([
+    CategoryService.get_many({ lang: req.language }),
+    RegionService.get_regions({ lang: req.language }),
+  ]);
+
   const search_top = await render_file("/search/top.html", {
     t,
     user,
-    categories,
+    categories: array_to_tree(categories),
     region_id,
     regions,
   });
   stream.push(search_top);
 
-  const posting = await PostingService.get_by_hash_id(hash_id, [
-    "attachments",
-    "location",
-    "attributes.[field.[translation], translation]",
-  ]);
-
-  const single = await render_file("/posting/single.html", { posting, t, generate_srcset });
+  const single = await render_file("/posting/single.html", {
+    posting: await posting,
+    t,
+    generate_srcset,
+    attributes: array_to_tree(
+      await PostingService.get_attributes({
+        attribute_set: (await posting).attribute_set,
+        lang: req.language,
+      })
+    ),
+  });
   stream.push(single);
 
   if (!req.partial) {

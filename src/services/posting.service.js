@@ -1,7 +1,7 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import objection from "objection";
-import { Posting, PostingStatus } from "../models/index.js";
+import { Posting, PostingStatus, Attribute } from "../models/index.js";
 import { InternalError } from "../utils/errors.js";
 import { format_relations } from "../utils/index.js";
 
@@ -38,8 +38,8 @@ export async function create_posting(payload) {
       params,
     } = payload;
 
-    const attributes = Object.values(params)
-      .flatMap((param) => param.value)
+    const attribute_set = Object.values(params)
+      .flatMap((param) => [param.parent, ...param.value])
       .map((v) => v.split("|")[1]);
 
     const cover = attachments[cover_index];
@@ -49,7 +49,8 @@ export async function create_posting(payload) {
       cover_url: cover.url,
       status_id: 3,
       created_by,
-    }); // status_id = 3 means moderation;
+      attribute_set,
+    });
 
     const att = await Promise.all(
       attachments.map((a) =>
@@ -72,7 +73,6 @@ export async function create_posting(payload) {
       region_id,
     });
 
-    await posting.$relatedQuery("attributes", trx).relate(attributes);
     await posting.$relatedQuery("price", trx).insert({ currency_code, price });
     await trx.commit();
   } catch (err) {
@@ -102,6 +102,15 @@ export async function get_one(id) {
 export async function get_by_hash_id(hash_id, relations = ["attachments", "location"]) {
   if (!hash_id) return;
   return await Posting.query().findOne({ hash_id }).withGraphFetched(format_relations(relations));
+}
+
+export async function get_attributes({ attribute_set = [], lang = "en" }) {
+  return await Attribute.query()
+    .whereIn("id", attribute_set)
+    .withGraphFetched("translation")
+    .modifyGraph("translation", (builder) =>
+      builder.where({ language_code: lang.substring(0, 2) })
+    );
 }
 
 export async function get_many({
@@ -147,4 +156,8 @@ export async function get_statuses({ lang = "en" }) {
     .select("pst.name as name", "posting_statuses.id", "posting_statuses.code")
     .join("posting_status_translations as pst", "pst.status_id", "posting_statuses.id")
     .where({ language_code: lang.substring(0, 2) });
+}
+
+export async function update_one(id, update) {
+  return await Posting.query().findById(id).patch(update);
 }

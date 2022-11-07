@@ -1,0 +1,70 @@
+<div class="grid grid-cols-12 items-start w-full space-x-4">
+  <section class="rounded-lg col-span-8 p-4 border border-zinc-800">
+    <h1 class="font-semibold text-gray-900 dark:text-gray-200 text-xl"> <%= it.posting.title %> </h1>
+    <div class="js-carousel my-5 overflow-hidden">
+      <div class="relative">
+        <div class="justify-between items-center absolute z-10 top-1/2 -translate-y-1/2 w-full hidden lg:flex px-4">
+          <button class="flex items-center justify-center rounded-full p-2 bg-white text-gray-700 hover:bg-gray-100 duration-200 js-carousel-prev" type="button">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="flex items-center justify-center rounded-full p-2 bg-white text-gray-700 hover:bg-gray-100 duration-200 js-carousel-next" type="button">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="js-carousel-scroller hide-scroll" style="overscroll-behavior-x: contain; scroll-snap-type: x mandatory; display:grid; grid-column: 1/-1; grid-row: 1; grid-auto-columns: 100%; grid-auto-flow: column; align-items:center; overflow-x: auto;">
+          <% it.posting?.attachments?.forEach(function (photo, i) { %>
+            <div class="js-carousel-snap overflow-hidden" style="scroll-snap-align: center;">
+              <img
+                <%= i > 0  ? 'loading="lazy"' : "" %>
+                width="896"
+                height="896"
+                srcset="<%= it.generate_srcset(photo.url, "fit=scale-down") %>"
+                sizes="(min-width: 896px) 896px, 100vw"
+                src="<%= photo.url %>/thumbnail"
+                class="animate-visibility h-72 md:h-[500px] object-contain rounded-lg relative after:block after:absolute after:w-full after:h-full after:bg-red-500 overflow-hidden js-zoomable" alt="<%= photo.name %>"
+                data-photo_url=<%= photo.url %>
+                crossorigin />
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="flex space-x-1 mt-4 js-carousel-pagination">
+        <% it.posting?.attachments?.forEach(function (photo, i) { %>
+          <button type="button" class="border rounded-lg p-0.5 border-transparent hover:border-white duration-200 active:border-white">
+            <img
+              src="<%= photo.url %>/width=160"
+              srcset="<%= it.generate_srcset(photo.url, "fit=scale-down", 2) %>"
+              sizes="(min-width: 640px) 80px, 64px"
+              loading="lazy"
+              class="w-16 sm:w-20 object-cover aspect-square rounded-lg pointer-events-none"
+              crossorigin />
+          </button>
+        <% })%>
+      </div>
+    </div>
+    <ul class="flex flex-col w-full space-y-5">
+      <% it.attributes.forEach(function (attribute) {%>
+        <li class="flex w-full text-left flex-col md:flex-row">
+          <span class="basis-1/3 text-gray-500 dark:text-gray-300 hidden md:inline"> <%= attribute.translation.name %> </span>
+          <p class="text-gray-900 basis-2/3 dark:text-white">
+            <%= attribute.children.map((child) => child.translation.name).join(", ") %>
+          </p>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+  <section class="rounded-lg border border-zinc-800 col-span-4 p-4">
+    <span class="font-semibold text-xl text-gray-900 dark:text-gray-200">$500</span>
+    <div class="">
+    </div>
+  </section>
+</div>
+<script>
+ document.title = "<%= it.posting.title %> | Needs"
+</script>
+<script src="/public/js/carousel.js" type="module" async defer></script>
+<script src="/public/js/image-viewer.js" type="module" async defer></script>
