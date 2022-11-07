@@ -5,6 +5,7 @@ import {
   parse_url,
   remove_query_value,
   append_query_value,
+  array_to_tree,
 } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 import { render_file } from "../utils/eta.js";
@@ -40,7 +41,7 @@ export async function get_search(req, reply) {
     q: q.trim(),
     t,
     user,
-    categories,
+    categories: array_to_tree(categories),
     region_id,
     regions,
   });

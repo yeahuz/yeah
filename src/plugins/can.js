@@ -11,7 +11,7 @@ export const can = fp(function can(fastify, opts = {}, done) {
 async function some(fns, ...params) {
   for (const fn of fns) {
     if (await fn(...params)) return true;
-    return false;
+    continue;
   }
 }
 

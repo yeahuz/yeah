@@ -1,5 +1,3 @@
-import { create_node } from "./dom.js";
-
 export class Carousel {
   constructor(element) {
     this.elements = {

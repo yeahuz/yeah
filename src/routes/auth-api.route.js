@@ -14,13 +14,11 @@ export const auth_api = async (fastify) => {
     method: "POST",
     url: "/admin/login",
     handler: AuthApiController.admin_login,
-    onRequest: fastify.can_api([guest_user]),
   });
   fastify.route({
     method: "POST",
     url: "/external/login",
     handler: AuthApiController.external_client_login,
-    onRequest: fastify.can_api([guest_user]),
   });
   fastify.route({
     method: "GET",
