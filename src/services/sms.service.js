@@ -37,10 +37,8 @@ export class SMSClient {
     return json.data.token;
   }
 
-  async get_refresh_token() {
-    const json = await this.request("/auth/refresh", { method: "PATCH" });
-    this.token = json.data.token;
-    await update_env({ SMS_API_TOKEN: this.token });
+  async refresh_token() {
+    await this.request("/auth/refresh", { method: "PATCH" });
     return this.token;
   }
 
@@ -57,7 +55,7 @@ export class SMSClient {
 
     if (response.status === 401) {
       if (!this.refresh_token_promise) {
-        this.refresh_token_promise = this.get_refresh_token().then(() => {
+        this.refresh_token_promise = this.refresh_token().then(() => {
           this.refresh_token_promise = null;
         });
       }
