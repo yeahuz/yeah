@@ -101,7 +101,20 @@ export async function get_one(id) {
 
 export async function get_by_hash_id(hash_id, relations = ["attachments", "location"]) {
   if (!hash_id) return;
-  return await Posting.query().findOne({ hash_id }).withGraphFetched(format_relations(relations));
+  return await Posting.query()
+    .select(
+      "title",
+      "description",
+      "postings.created_at",
+      "attribute_set",
+      "er.to_currency as currency_code",
+      raw("round(price * rate) as price")
+    )
+    .findOne({ hash_id })
+    .join("posting_prices as pp", "postings.id", "pp.posting_id")
+    .join("exchange_rates as er", "er.from_currency", "pp.currency_code")
+    .where("er.to_currency", "=", "UZS")
+    .withGraphFetched(format_relations(relations));
 }
 
 export async function get_attributes({ attribute_set = [], lang = "en" }) {
@@ -114,7 +127,7 @@ export async function get_attributes({ attribute_set = [], lang = "en" }) {
 }
 
 export async function get_many({
-  currency = "USD",
+  currency = "UZS",
   status_id = 1,
   limit = 15,
   after,

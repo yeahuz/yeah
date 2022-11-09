@@ -1,5 +1,7 @@
 {
   "edit_profile": "Profilni tahrirlash",
   "archived": "Arxivlangan",
-  "active": "Faol"
+  "active": "Faol",
+  "show_phone": "Telefonni ko'rsatish",
+  "verified_user": "Tasdiqlangan foydalanuvchi"
 }

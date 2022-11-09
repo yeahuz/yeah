@@ -2,10 +2,10 @@ import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
 import * as PostingService from "../services/posting.service.js";
 import * as RegionService from "../services/region.service.js";
-import * as NotificationService from "../services/notification.service.js";
 import path from "path";
+import fs from "fs";
 import { render_file } from "../utils/eta.js";
-import { parse_url, array_to_tree } from "../utils/index.js";
+import { parse_url, array_to_tree, generate_srcset } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 import { registerFont, createCanvas } from "canvas";
 
@@ -24,6 +24,44 @@ export async function get_partial(req, reply) {
   });
 
   reply.header("Content-Type", "text/html").send(html);
+  return reply;
+}
+
+export async function get_time(req, reply) {
+  let { size = 100, color = "0070f3", font_size = 0.3, radius = 10 } = req.query;
+  size = parseInt(size);
+  font_size = parseFloat(font_size);
+  radius = parseInt(radius);
+  const hours = 24;
+  const minutes = 60;
+
+  const is_one_digit = (str) => str.length === 1;
+
+  for (let hour = 0; hour < hours; hour++) {
+    for (let minute = 0; minute < minutes; minute++) {
+      let hour_str = is_one_digit(String(hour)) ? `0${hour}` : hour;
+      let minute_str = is_one_digit(String(minute)) ? `0${minute}` : minute;
+      let time = `${hour_str}:${minute_str}`;
+
+      const canvas = createCanvas(size, size);
+      const ctx = canvas.getContext("2d");
+
+      ctx.beginPath();
+      ctx.roundRect(0, (size - size / 1.5) * 0.5, size, size / 1.5, radius);
+      ctx.strokeStyle = `#${color}`;
+      ctx.stroke();
+
+      ctx.font = `${font_size * size}px "Inter"`;
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillStyle = `#${color}`;
+      ctx.fillText(time, size / 2, size / 2);
+      ctx.lineWidth = 10;
+      fs.writeFileSync(`./clock/${time}.png`, canvas.toBuffer());
+    }
+  }
+
+  reply.send({ status: "ok" });
   return reply;
 }
 
@@ -92,14 +130,14 @@ export async function get_index(req, reply) {
 }
 
 export async function get_me(req, reply) {
-  const { ps } = req.query;
+  const { ps = "active" } = req.query;
   const stream = reply.init_stream();
   const user = req.user;
   const t = req.i18n.t;
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: "Home", lang: req.language },
+      meta: { title: user.name, lang: req.language },
       t,
       user,
     });
@@ -113,7 +151,9 @@ export async function get_me(req, reply) {
     const profile_html = await render_file("/profile.html", {
       t,
       profile: user,
+      current_user: user,
       ps,
+      generate_srcset,
     });
     stream.push(profile_html);
   }
@@ -129,21 +169,21 @@ export async function get_me(req, reply) {
 
 export async function get_profile(req, reply) {
   const { username } = req.params;
-  const { ps } = req.query;
+  const { ps = "active" } = req.query;
   const stream = reply.init_stream();
-  const user = req.user;
+  const current_user = req.user;
   const t = req.i18n.t;
+
+  const profile =
+    current_user.username === username ? current_user : UserService.get_by_username(username);
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: "Home", lang: req.language },
+      meta: { title: (await profile)?.name, lang: req.language },
       t,
-      user,
     });
     stream.push(top);
   }
-
-  const profile = user?.username === username ? user : await UserService.get_by_username(username);
 
   if (!profile) {
     const not_found = await render_file("/partials/404.html", { t });
@@ -151,14 +191,20 @@ export async function get_profile(req, reply) {
   } else {
     const profile_html = await render_file("/profile.html", {
       t,
-      profile,
+      profile: await profile,
+      current_user,
       ps,
+      generate_srcset,
     });
     stream.push(profile_html);
   }
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", {
+      t,
+      user: current_user,
+      url: parse_url(req.url),
+    });
     stream.push(bottom);
   }
 

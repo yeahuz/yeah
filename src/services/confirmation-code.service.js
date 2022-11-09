@@ -18,6 +18,16 @@ export async function generate(identifier, exp_time = 15) {
   return code;
 }
 
+export async function has_expired_code(identifier) {
+  const code = await ConfirmationCode.query()
+    .select(raw("case when now() > expires_at then 1 else 0 end as expired"))
+    .findOne({ identifier });
+
+  if (code?.expired) await code.$query().delete();
+
+  return code?.expired;
+}
+
 export async function generate_auth_code(identifier, mins = 15) {
   const existing = await UserService.get_by_email_phone(identifier);
   if (existing) {

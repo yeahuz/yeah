@@ -6,6 +6,7 @@ import {
   PostingLocation,
   PostingPrice,
   PostingStatus,
+  User,
 } from "./index.js";
 import { hashids } from "../utils/hashid.js";
 import config from "../config/index.js";
@@ -17,6 +18,22 @@ export class Posting extends BaseModel {
 
   static get relationMappings() {
     return {
+      creator: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: User,
+        filter: (query) =>
+          query.select(
+            "verified",
+            "name",
+            "profile_photo_url",
+            "last_activity_date",
+            "profile_url"
+          ),
+        join: {
+          from: "postings.created_by",
+          to: "users.id",
+        },
+      },
       status: {
         relation: BaseModel.HasOneRelation,
         modelClass: PostingStatus,

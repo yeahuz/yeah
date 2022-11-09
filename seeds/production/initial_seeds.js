@@ -1,8 +1,11 @@
 import fs from "fs";
+import * as argon2 from "argon2";
 
 export async function seed(knex) {
   await knex("auth_providers").del();
   await knex("languages").del();
+  await knex("attributes").del();
+  await knex("attribute_translations").del();
   await knex("categories").del();
   await knex("category_translations").del();
   await knex("category_field_values").del();
@@ -542,6 +545,180 @@ export async function seed(knex) {
     },
   ]);
 
+  await knex("attributes").insert([
+    {
+      id: 1,
+      type: "checkbox",
+      key: "apartment_has",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 2,
+      type: "radio",
+      key: "apartment_repair",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 3,
+      parent_id: 1,
+      key: "internet",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 4,
+      parent_id: 1,
+      key: "refrigirator",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 5,
+      parent_id: 1,
+      key: "washing_machine",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 6,
+      parent_id: 2,
+      key: "not_needed",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 7,
+      parent_id: 2,
+      key: "euro",
+      category_set: [1, 2, 3],
+    },
+    {
+      id: 8,
+      parent_id: 2,
+      key: "designer",
+      category_set: [1, 2, 3],
+    },
+  ]);
+
+  await knex("attribute_translations").insert([
+    {
+      attribute_id: 1,
+      language_code: "ru",
+      name: "В квартире есть",
+    },
+    {
+      attribute_id: 1,
+      language_code: "en",
+      name: "Apartment has",
+    },
+    {
+      attribute_id: 1,
+      language_code: "uz",
+      name: "Kvartirada bor",
+    },
+    {
+      attribute_id: 3,
+      language_code: "ru",
+      name: "Интернет",
+    },
+    {
+      attribute_id: 3,
+      language_code: "en",
+      name: "Internet",
+    },
+    {
+      attribute_id: 3,
+      language_code: "uz",
+      name: "Internet",
+    },
+    {
+      attribute_id: 4,
+      language_code: "ru",
+      name: "Холодильник",
+    },
+    {
+      attribute_id: 4,
+      language_code: "en",
+      name: "Refrigirator",
+    },
+    {
+      attribute_id: 4,
+      language_code: "uz",
+      name: "Muzlatgich",
+    },
+    {
+      attribute_id: 5,
+      language_code: "ru",
+      name: "Стиральная машина",
+    },
+    {
+      attribute_id: 5,
+      language_code: "en",
+      name: "Washing machine",
+    },
+    {
+      attribute_id: 5,
+      language_code: "uz",
+      name: "Kir uvish mashinasi",
+    },
+    {
+      attribute_id: 2,
+      language_code: "ru",
+      name: "Ремонт",
+    },
+    {
+      attribute_id: 2,
+      language_code: "en",
+      name: "Repair",
+    },
+    {
+      attribute_id: 2,
+      language_code: "uz",
+      name: "Ta'mir",
+    },
+    {
+      attribute_id: 6,
+      language_code: "ru",
+      name: "Не требуется",
+    },
+    {
+      attribute_id: 6,
+      language_code: "en",
+      name: "Not needed",
+    },
+    {
+      attribute_id: 6,
+      language_code: "uz",
+      name: "Kerak emas",
+    },
+    {
+      attribute_id: 7,
+      language_code: "ru",
+      name: "Евроремонт",
+    },
+    {
+      attribute_id: 7,
+      language_code: "en",
+      name: "Renovation",
+    },
+    {
+      attribute_id: 7,
+      language_code: "uz",
+      name: "Yevroremont",
+    },
+    {
+      attribute_id: 8,
+      language_code: "ru",
+      name: "Дизайнерская",
+    },
+    {
+      attribute_id: 8,
+      language_code: "en",
+      name: "Designer",
+    },
+    {
+      attribute_id: 8,
+      language_code: "uz",
+      name: "Dizayner",
+    },
+  ]);
+
   await knex("countries").insert({
     code: "uz",
   });
@@ -696,6 +873,10 @@ export async function seed(knex) {
       id: 2,
       code: "moderator",
     },
+    {
+      id: 3,
+      code: "external_client",
+    },
   ]);
 
   await knex("role_translations").insert([
@@ -729,7 +910,52 @@ export async function seed(knex) {
       title: "Moderator",
       language_code: "uz",
     },
+    {
+      role_id: 3,
+      title: "Внешний клиент",
+      language_code: "ru",
+    },
+    {
+      role_id: 3,
+      title: "External client",
+      language_code: "en",
+    },
+    {
+      role_id: 3,
+      title: "Tashqi klient",
+      language_code: "uz",
+    },
   ]);
+
+  await knex("users").insert([
+    {
+      email: "yeah-admin@needs.uz",
+      password: await argon2.hash(
+        "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15"
+      ),
+      email_verified: true,
+      name: "Yeah Admin",
+    },
+    {
+      email: "yeah-socket@needs.uz",
+      password: await argon2.hash(
+        "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860"
+      ),
+      email_verified: true,
+      name: "Yeah Socket",
+    },
+  ]);
+
+  // await knex("user_roles").insert([
+  //   {
+  //     user_id: 1,
+  //     role_id: 3,
+  //   },
+  //   {
+  //     user_id: 2,
+  //     role_id: 3,
+  //   },
+  // ]);
 
   await insert_regions();
 

@@ -163,6 +163,10 @@ html {
   /* Badge success */
   --color-success-badge-bg: var(--success-50);
   --color-success-badge-text: var(--success-700);
+
+  /* Tooltip */
+  --tooltip-bg: var(--gray-900);
+  --tooltip-text: var(--white);
 }
 
 
@@ -254,6 +258,10 @@ html.light {
   /* Badge success */
   --color-success-badge-bg: var(--success-50);
   --color-success-badge-text: var(--success-700);
+
+  /* Tooltip */
+  --tooltip-bg: var(--gray-900);
+  --tooltip-text: var(--white);
 }
 
 html.dark {
@@ -308,6 +316,10 @@ html.dark {
   /* Badge success */
   --color-success-badge-bg: var(--zinc-800);
   --color-success-badge-text: var(--success-600);
+
+  /* Tooltip */
+  --tooltip-bg: var(--primary-600);
+  --tooltip-text: var(--white);
 }
 
 a {
@@ -673,29 +685,6 @@ checkbox-control {
   animation: ripple 800ms linear;
 }
 
-@keyframes ripple {
-  to {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
-
-@keyframes check-offset {
-  from {
-    stroke-dashoffset: -24;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes check-offset2 {
-  to {
-    stroke-dashoffset: 24;
-  }
-}
-
-
 /* https://github.com/nzbin/three-dots/blob/master/dist/three-dots.css */
 .dot-pulse {
   --size: 0.625rem;
@@ -737,6 +726,176 @@ checkbox-control {
   box-shadow: 10014px 0 0 -5px;
   animation: dot-pulse-after var(--animation-duration) infinite linear;
   animation-delay: 0.5s;
+}
+
+.toolbar-font-size {
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+}
+
+.hide-scroll {
+  scrollbar-width: none;
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.animate-visibility {
+  transition: transform .3s ease-in-out;
+  will-change: transform;
+}
+
+.js-carousel-snap:not(.in-view) .animate-visibility {
+  transform: scale(0.9);
+}
+
+[data-tooltip] {
+  --left: auto;
+  --bottom: auto;
+  --top: auto;
+  --right: auto;
+  --bg: var(--tooltip-bg);
+  --color: var(--tooltip-text);
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]:before,
+[data-tooltip]:after {
+  --transform-origin: left;
+  --translate: auto;
+  --scale: 0.9;
+  line-height: 1;
+  font-size: .9em;
+  pointer-events: none;
+  position: absolute;
+  box-sizing: border-box;
+  transform: scale(var(--scale)) translate(var(--translate));
+  transform-origin: var(--transform-origin);
+  transition: all 200ms ease-in-out;
+  opacity: 0;
+  left: var(--left);
+  right: var(--right);
+  top: var(--top);
+  bottom: var(--bottom);
+}
+
+[data-tooltip]:before {
+  content: "";
+  border: 5px solid transparent;
+  z-index: 100;
+}
+
+[data-tooltip]:after {
+  content: attr(data-tooltip);
+  text-align: center;
+  min-width: 3em;
+  max-width: 21em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 6px 8px;
+  border-radius: 3px;
+  background: rgb(var(--bg));
+  color: rgb(var(--color));
+  z-index: 99;
+}
+
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  --scale: 1;
+  opacity: 1;
+}
+
+[data-tooltip]:not([data-flow])::before,
+[data-tooltip][data-flow="top"]::before {
+  --bottom: 100%;
+  border-bottom-width: 0;
+  border-top-color: rgb(var(--bg));
+}
+
+[data-tooltip]:not([data-flow])::after,
+[data-tooltip][data-flow="top"]::after {
+  --bottom: calc(100% + 5px);
+}
+
+[data-tooltip]:not([data-flow])::before, [tooltip]:not([data-flow])::after,
+[data-tooltip][data-flow="top"]::before,
+[data-tooltip][data-flow="top"]::after {
+  --left: 50%;
+  --translate: -50%, -4px;
+}
+
+[data-tooltip]:not([data-flow])::before,
+[data-tooltip][data-flow="top right"]::before {
+  --bottom: calc(100% + 5px);
+  --translate: 50%, -4px;
+  border-bottom-width: 0;
+  border-top-color: rgb(var(--bg));
+}
+
+[tooltip]:not([data-flow])::after,
+[data-tooltip][data-flow="top right"]::after {
+  --right: 0;
+  --translate: 0, -8px;
+}
+
+[data-tooltip]:not([data-flow])::after,
+[data-tooltip][data-flow="top right"]::after {
+  --bottom: calc(100% + 5px);
+}
+
+[data-tooltip][data-flow="top right"]::after, [data-tooltip][data-flow="top right"]::before {
+  --transform-origin: top right;
+}
+
+[data-tooltip][data-flow="bottom"]::before {
+  --top: 100%;
+  border-top-width: 0;
+  border-bottom-color: rgb(var(--bg));
+}
+
+[data-tooltip][data-flow="bottom"]::after {
+  --top: calc(100% + 5px)
+}
+
+[data-tooltip][data-flow="bottom"]::before, [data-tooltip][data-flow="bottom"]::after {
+  --left: 50%;
+  --translate: -50%, 8px;
+}
+
+[data-tooltip][data-flow="left"]::before {
+  --top: 50%;
+  --left: calc(0em - 5px);
+  --translate: -8px, -50%;
+  border-right-width: 0;
+  border-left-color: rgb(var(--bg));
+}
+
+[data-tooltip][data-flow="left"]::after {
+  --transform-origin: bottom right;
+  --top: 50%;
+  --right: calc(100% + 5px);
+  --translate: -8px, -50%;
+}
+j
+[data-tooltip][data-flow="right"]::before {
+  --top: 50%;
+  --right: calc(0em - 5px);
+  --translate: 8px, -50%;
+  border-left-width: 0;
+  border-right-color: rgb(var(--bg));
+}
+
+[data-tooltip][data-flow="right"]::after {
+  --transform-origin: bottom left;
+  --top: 50%;
+  --left: calc(100% + 5px);
+  --translate: 8px, -50%;
+}
+
+[data-tooltip=""]::after, [data-tooltip=""]::before {
+  display: none !important;
 }
 
 @-webkit-keyframes dot-pulse-before {
@@ -832,115 +991,24 @@ checkbox-control {
   }
 }
 
-.toolbar-font-size {
-  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
-/*
-   @media (prefers-color-scheme: dark) {
-   .btn-secondary {
-   --bg-color: transparent;
-   --border-color: var(--zinc-700);
-   --text-color: var(--gray-300);
-   --bg-hover: var(--zinc-800);
-   --text-hover: var(--white);
-   --ring-color: var(--zinc-800);
-   }
-
-   .btn-primary {
-   --ring-color: var(--primary-400);
-   }
-
-   .btn-tertiary-color {
-   --text-color: var(--gray-300);
-   --bg-hover: var(--zinc-800);
-   --ring-color: var(--zinc-800);
-   --ripple-bg: var(--zinc-600);
-   }
-
-   .btn-secondary-color {
-   --bg-color: var(--zinc-800);
-   --bg-hover: var(--zinc-700);
-   --ring-color: var(--zinc-800);
-   --ripple-bg: var(--zinc-600);
-   }
-
-   .btn-tertiary-danger-btn {
-   --bg-hover: var(--zinc-800);
-   --text-hover: var(--error-600);
-   --ring-color: var(--zinc-800);
-   }
-
-   .form-control {
-   --bg-color: var(--bg-zinc-900);
-   --text-color: var(--white);
-   --placeholder-color: var(--gray-400);
-   --border-color: var(--zinc-800);
-   --ring-color: var(--zinc-800);
-   }
-
-   .badge {
-   --bg-color: var(--zinc-800);
-   --color: var(--gray-300);
-   }
-   .badge-success {
-   --bg-color: var(--zinc-800);
-   --color: var(--success-600);
-   }
-
-   .form-control:focus {
-   --border-color: var(--zinc-600);
-   }
-
-   .form-control:disabled {
-   --bg-color: var(--zinc-700);
-   }
-
-   .toast-item-err {
-   --bg-color: var(--zinc-900);
-   --border-color: var(--error-700);
-   --color: var(--error-600);
-   }
-
-   .toast-item-success {
-   --bg-color: var(--zinc-900);
-   --border-color: var(--success-700);
-   --color: var(--success-600);
-   }
-   } */
-
-
-
-.hide-scroll {
-  scrollbar-width: none;
-}
-.hide-scroll::-webkit-scrollbar {
-  display: none;
+@keyframes check-offset {
+  from {
+    stroke-dashoffset: -24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-.animate-visibility {
-  transition: transform .3s ease-in-out;
-  will-change: transform;
+@keyframes check-offset2 {
+  to {
+    stroke-dashoffset: 24;
+  }
 }
-
-.js-carousel-snap:not(.in-view) .animate-visibility {
-  transform: scale(0.9);
-}
-
-/* .in-view {
-   animation: carousel-snap-fade-in forwards;
-   animation-duration: 2s;
-   }
-
-   .js-carousel-snap:not(.in-view) {
-   transform: scale(0.9);
-   }
-
-   @keyframes carousel-snap-fade-in {
-   from {
-   transform: scale(0.9);
-   }
-   to {
-   transfor: scale(1);
-   }
-   } */
