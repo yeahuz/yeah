@@ -98,3 +98,9 @@ export class GoneError extends DomainError {
     super({ key, status_code: 410 });
   }
 }
+
+export class FloodError extends DomainError {
+  constructor({ key = "generic_flood", params } = {}) {
+    super({ key, status_code: 429, params });
+  }
+}
