@@ -2,6 +2,7 @@ import { BaseModel, BillingAccount, UserPrefence, UserNotification, Chat, Role }
 import { hashids } from "../utils/hashid.js";
 import * as argon2 from "argon2";
 import { createHash } from "crypto";
+import config from "../config/index.js";
 
 export class User extends BaseModel {
   static get tableName() {
@@ -82,15 +83,24 @@ export class User extends BaseModel {
 
   async $afterInsert(ctx) {
     await super.$afterInsert(ctx);
-    await this.$query(ctx.transaction).patch({ hash_id: hashids.encode(this.id) });
+    const hash_id = hashids.encode(this.id);
+    await this.$query(ctx.transaction).patch({
+      hash_id,
+      username: hash_id,
+      profile_url: `${config.origin}/${hash_id}`,
+    });
   }
 
   async $beforeUpdate(opts, ...args) {
-    await super.$beforeUpdate(opts, ...args);
-    if (opts.patch && this.password === undefined) {
-      return;
+    super.$beforeUpdate(opts, ...args);
+    if (opts.patch) {
+      if (this.password) {
+        await this.hash_password();
+      }
+      if (this.username) {
+        this.generate_url();
+      }
     }
-    return await this.hash_password();
   }
 
   formatted_phone() {
@@ -102,6 +112,10 @@ export class User extends BaseModel {
 
   async verify_password(password) {
     return await argon2.verify(this.password, password);
+  }
+
+  generate_url() {
+    this.profile_url = `${config.origin}/${this.username}`;
   }
 
   async hash_password() {

@@ -32,6 +32,7 @@ export function up(knex) {
       table.boolean("email_verified").defaultTo(false);
       table.string("password").notNullable();
       table.string("hash_id").index();
+      table.string("profile_url");
       table.boolean("verified").defaultTo(false);
       table.timestamp("last_activity_date").defaultTo(knex.fn.now());
       table.timestamps(false, true);

@@ -3,7 +3,8 @@
     <% if (it.profile.profile_photo_url) { %>
       <img
         referrerpolicy="no-referrer"
-        src="<%= it.profile.profile_photo_url %>"
+        src="<%= it.profile.profile_photo_url %>/public"
+        srcset="<%= it.generate_srcset(it.profile.profile_photo_url, "fit=scale-down", 4) %>"
         alt=""
         class="w-36 h-36 rounded-full overflow-hidden object-cover"
         crossorigin
@@ -36,8 +37,10 @@
     <% if (it.profile.username) {%>
       <span class="text-gray-500 text-sm"><%= it.profile.username %></span>
     <% } %>
-    <a href="/settings/details" class="btn btn-secondary-color mt-6 w-full !hidden lg:!flex"><%= it.t("edit_profile", { ns: "profile" }) %></a>
-    <a href="/settings" class="btn btn-secondary-color mt-6 w-full lg:!hidden"><%= it.t("edit_profile", { ns: "profile" }) %></a>
+      <% if (it.current_user?.id === it.profile?.id) {%>
+        <a href="/settings/details" class="btn btn-secondary-color mt-6 w-full !hidden lg:!flex"><%= it.t("edit_profile", { ns: "profile" }) %></a>
+        <a href="/settings" class="btn btn-secondary-color mt-6 w-full lg:!hidden"><%= it.t("edit_profile", { ns: "profile" }) %></a>
+      <% } %>
   </div>
   <div class="w-full">
     <ul class="flex gap-2">
