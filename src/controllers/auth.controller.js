@@ -227,26 +227,32 @@ export async function get_signup(req, reply) {
 }
 
 export async function create_otp(req, reply) {
+  const EXPIRATION_IN_MINUTES = 15;
+  const t = req.i18n.t;
   const { method } = req.query;
   const { identifier, country_code } = transform_object(req.body, {
     identifier: (v) => v.replace(/\s/g, ""),
   });
 
-  const t = req.i18n.t;
-  const [code, err] = await option(ConfirmationCodeService.generate_auth_code(identifier));
+  const has_expired_code = await ConfirmationCodeService.has_expired_code(identifier);
+  if (has_expired_code) {
+    const [code, err] = await option(
+      ConfirmationCodeService.generate_auth_code(identifier, EXPIRATION_IN_MINUTES)
+    );
 
-  if (err) {
-    req.flash("err", err.build(t));
-    return reply.redirect(add_t(`/auth/signup?method=${method}`));
+    if (err) {
+      req.flash("err", err.build(t));
+      return reply.redirect(add_t(`/auth/signup?method=${method}`));
+    }
+
+    events.emit("create_otp", {
+      tmpl_name: "verify",
+      method,
+      vars: { code, t },
+      to: identifier,
+      country_code,
+    });
   }
-
-  events.emit("create_otp", {
-    tmpl_name: "verify",
-    method,
-    vars: { code, t },
-    to: identifier,
-    country_code,
-  });
 
   req.session.set("identifier", identifier);
   reply.redirect(`/auth/signup?step=2&method=${method}`);

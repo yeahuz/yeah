@@ -23,6 +23,11 @@ export const home = async (fastify) => {
   });
   fastify.route({
     method: "GET",
+    url: "/clock",
+    handler: HomeController.get_time,
+  });
+  fastify.route({
+    method: "GET",
     url: "/:username",
     handler: HomeController.get_profile,
   });
