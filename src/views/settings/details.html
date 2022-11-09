@@ -21,7 +21,7 @@
             <%= it.t("edit", { ns: "common" })%>
           </label>
         </div>
-        <span class="inline-block mt-2 relative js-profile-photo-container">
+        <span class="inline-block mt-2 relative w-16 h-16 overflow-hidden rounded-full js-profile-photo-container">
           <img src="<%= it.user.profile_photo_url %>/128x128" class="w-16 h-16 object-cover rounded-full js-profile-photo" alt="<%= it.user.name %>'s profile photo" crossorigin referrerpolicy="no-referrer" />
         </span>
       </div>

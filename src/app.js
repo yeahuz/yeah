@@ -16,7 +16,7 @@ import * as eta from "eta";
 import { elastic_client } from "./services/es.service.js";
 import { i18next } from "./utils/i18n.js";
 import { routes, api_routes } from "./routes/index.js";
-import { DomainError, InternalError, ValidationError } from "./utils/errors.js";
+import { DomainError, FloodError, InternalError, ValidationError } from "./utils/errors.js";
 import { ws } from "./plugins/ws.js";
 import { can } from "./plugins/can.js";
 import { add_t } from "./utils/index.js";
@@ -46,10 +46,17 @@ export async function start() {
     });
     app.register(multipart);
     app.register(fastify_rate_limit, {
+      global: false,
       max: 100,
       timeWindow: 1000,
       ban: 2,
       redis: redis_client,
+      errorResponseBuilder: (req, ctx) => {
+        const rtf = new Intl.RelativeTimeFormat("ru", { numeric: "always", style: "long" });
+        return new FloodError({
+          params: { after: rtf.format(Math.floor(ctx.ttl / (1000 * 60 * 60)), "hour") },
+        });
+      },
     });
 
     app.register(i18n_http_middleware.plugin, {
@@ -122,7 +129,13 @@ export async function start() {
       }
 
       if (err instanceof DomainError) {
-        reply.code(err.status_code).send(err.build(t));
+        if (req.xhr) {
+          reply.code(err.status_code).send(err.build(t));
+          return reply;
+        }
+
+        req.flash("err", err.build(t));
+        reply.code(302).redirect(add_t(return_to || req.url));
         return reply;
       }
 

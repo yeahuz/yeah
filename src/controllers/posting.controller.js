@@ -293,7 +293,7 @@ export async function get_one(req, reply) {
   const t = req.i18n.t;
   const user = req.user;
 
-  const posting = PostingService.get_by_hash_id(hash_id, ["attachments", "location"]);
+  const posting = PostingService.get_by_hash_id(hash_id, ["attachments", "location", "creator"]);
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
@@ -322,6 +322,7 @@ export async function get_one(req, reply) {
     posting: await posting,
     t,
     generate_srcset,
+    lang: req.language,
     attributes: array_to_tree(
       await PostingService.get_attributes({
         attribute_set: (await posting).attribute_set,
