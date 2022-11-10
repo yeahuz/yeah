@@ -3,5 +3,6 @@
   "archived": "Arxivlangan",
   "active": "Faol",
   "show_phone": "Telefonni ko'rsatish",
-  "verified_user": "Tasdiqlangan foydalanuvchi"
+  "verified_user": "Tasdiqlangan foydalanuvchi",
+  "contact_user": "{{name}} bilan bog'lanish"
 }

@@ -18,7 +18,9 @@ if (top && messages) messages.scrollTop = parseInt(top, 10);
 
 window.addEventListener("beforeunload", () => {
   const pathname = window.location.pathname;
-  localStorage.setItem(pathname, messages.scrollTop);
+  if (messages) {
+    localStorage.setItem(pathname, messages.scrollTop);
+  }
 });
 
 let ws = null;

@@ -1,5 +1,6 @@
 {
   "email_verified": "Email verified successfully",
   "phone_verified": "Phone verified successfully",
-  "update_success": "Updated successfully"
+  "update_success": "Updated successfully",
+  "message_sent": "Message sent successfully"
 }

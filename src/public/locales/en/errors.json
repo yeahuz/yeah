@@ -9,6 +9,7 @@
   "generic_conflict": "Conflict",
   "generic_gone": "Gone",
   "generic_flood": "Flood. Try again {{after}}",
+  "chat_exists": "Chat already exists or you are trying to create chat with yourself",
   "user_exists": "Account with {{user}} already exists",
   "!user_exists": "Account with {{user}} does doesn't exist",
   "invalid_password": "Invalid email/phone or password. Maybe you logged in with social media?",

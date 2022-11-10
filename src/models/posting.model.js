@@ -27,7 +27,8 @@ export class Posting extends BaseModel {
             "name",
             "profile_photo_url",
             "last_activity_date",
-            "profile_url"
+            "profile_url",
+            "id"
           ),
         join: {
           from: "postings.created_by",

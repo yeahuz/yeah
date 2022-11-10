@@ -10,6 +10,7 @@
   "generic_gone": "Muddati tugagan",
   "generic_flood": "Flood. {{after}} qayta urinib ko'ring.",
   "user_exists": "{{user}} foydalanuvchi allaqachon mavjud",
+  "chat_exists": "Chat allaqachon mavjud yoki siz o'zingiz bilan chat yaratmoqchisiz",
   "!user_exists": "{{user}} foydalanuvchi mavjud emas",
   "invalid_password": "Noto'g'ri elektron pochta/telefon yoki parol. Balki siz ijtimoiy tarmoqlar orqali kirgansiz?",
   "!oauth_state_match": "OAuth2 holat parametrlari to'g'ri kelmadi. Iltimos, yana bir bor urinib ko'ring",

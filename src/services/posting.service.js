@@ -106,7 +106,10 @@ export async function get_by_hash_id(hash_id, relations = ["attachments", "locat
       "title",
       "description",
       "postings.created_at",
+      "postings.id",
       "attribute_set",
+      "url",
+      "cover_url",
       "er.to_currency as currency_code",
       raw("round(price * rate) as price")
     )

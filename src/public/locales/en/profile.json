@@ -3,5 +3,6 @@
   "archived": "Archived",
   "active": "Active",
   "show_phone": "Show phone",
-  "verified_user": "Verified user"
+  "verified_user": "Verified user",
+  "contact_user": "Contact {{name}}"
 }

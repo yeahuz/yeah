@@ -68,6 +68,7 @@ export async function get_one(req, reply) {
     format_relative: create_relative_formatter(req.language),
     user,
     generate_srcset,
+    current_chat_id: id,
   });
   stream.push(chat_list);
 

@@ -5,8 +5,9 @@ import * as CFImageService from "../services/cfimg.service.js";
 import * as PostingService from "../services/posting.service.js";
 import * as AttributeService from "../services/attribute.service.js";
 import * as RegionService from "../services/region.service.js";
+import * as ChatService from "../services/chat.service.js";
 import { render_file } from "../utils/eta.js";
-import { array_to_tree, parse_url, generate_srcset, option } from "../utils/index.js";
+import { array_to_tree, parse_url, generate_srcset, option, add_t } from "../utils/index.js";
 import { redis_client } from "../services/redis.service.js";
 import { new_posting_schema } from "../schemas/new-posting.schema.js";
 import { async_pool_all } from "../utils/async-pool.js";
@@ -286,6 +287,93 @@ export async function get_new(req, reply) {
   reply.code(302).redirect(`/postings/wizard/${id}/1`);
 }
 
+export async function get_contact(req, reply) {
+  const { hash_id } = req.params;
+  const { region_id } = req.query;
+  const flash = reply.flash();
+  const stream = reply.init_stream();
+  const t = req.i18n.t;
+  const user = req.user;
+
+  const posting = PostingService.get_by_hash_id(hash_id, ["creator"]);
+
+  if (!req.partial) {
+    const top = await render_file("/partials/top.html", {
+      meta: {
+        title: t("contact_user", { ns: "profile", name: (await posting).creator.name }),
+        lang: req.language,
+      },
+      user,
+      t,
+    });
+    stream.push(top);
+  }
+
+  const [categories, regions] = await Promise.all([
+    CategoryService.get_many({ lang: req.language }),
+    RegionService.get_regions({ lang: req.language }),
+  ]);
+
+  const contact = await render_file("/posting/contact", {
+    posting: await posting,
+    t,
+    flash,
+    user,
+    categories: array_to_tree(categories),
+    region_id,
+    regions,
+  });
+  stream.push(contact);
+
+  if (!req.partial) {
+    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
+
+export async function contact(req, reply) {
+  const t = req.i18n.t;
+  const user = req.user;
+  const { posting_id, creator_id } = req.query;
+  const { content } = req.body;
+  const chats = await ChatService.get_posting_chats(posting_id);
+  const [chat, err] = await option(
+    (await ChatService.get_member_chat(user.id, chats)) ||
+      ChatService.create_chat({
+        created_by: user.id,
+        posting_id,
+        members: [creator_id, user.id],
+      })
+  );
+
+  if (err) {
+    req.flash("err", err.build(t));
+    reply.redirect(add_t(req.url));
+    return reply;
+  }
+
+  const [sent, sent_err] = await option(
+    ChatService.create_message({
+      chat_id: chat.id,
+      content,
+      sender_id: user.id,
+    })
+  );
+
+  if (sent_err) {
+    req.flash("err", sent_err.build(t));
+    reply.redirect(add_t(req.url));
+    return reply;
+  }
+
+  req.flash("success", { message: t("message_sent", { ns: "success" }) });
+  reply.redirect(add_t(req.url));
+  return reply;
+}
+
 export async function get_one(req, reply) {
   const { hash_id } = req.params;
   const { region_id } = req.query;
@@ -309,20 +397,15 @@ export async function get_one(req, reply) {
     RegionService.get_regions({ lang: req.language }),
   ]);
 
-  const search_top = await render_file("/search/top.html", {
-    t,
-    user,
+  const single = await render_file("/posting/single.html", {
+    regions,
     categories: array_to_tree(categories),
     region_id,
-    regions,
-  });
-  stream.push(search_top);
-
-  const single = await render_file("/posting/single.html", {
     posting: await posting,
     t,
     generate_srcset,
     lang: req.language,
+    user,
     attributes: array_to_tree(
       await PostingService.get_attributes({
         attribute_set: (await posting).attribute_set,

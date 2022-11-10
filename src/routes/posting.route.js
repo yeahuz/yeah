@@ -14,6 +14,16 @@ export const posting = async (fastify) => {
   });
   fastify.route({
     method: "GET",
+    url: "/:hash_id/contact",
+    handler: PostingController.get_contact,
+  });
+  fastify.route({
+    method: "POST",
+    url: "/:hash_id/contact",
+    handler: PostingController.contact,
+  });
+  fastify.route({
+    method: "GET",
     url: "/wizard/:id/:step",
     handler: PostingController.get_step,
     schema: {

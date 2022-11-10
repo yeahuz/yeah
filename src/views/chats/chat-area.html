@@ -11,7 +11,9 @@
       <div class="flex space-x-2 items-center">
         <img src="<%= it.chat.posting.cover_url %>/width=80" class="w-12 h-12 rounded-full overflow-hidden" alt="" />
         <div class="flex flex-col">
-          <span class="text-gray-700 dark:text-gray-200 font-medium"><%= it.chat.posting.title %></span>
+          <a href="<%= it.chat.posting.url %>" class="underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium">
+            <%= it.chat.posting.title %>
+          </a>
           <span class="text-gray-500 dark:text-gray-300">@andi</span>
         </div>
       </div>
@@ -140,6 +142,9 @@
 </section>
 </div>
 </main>
+<script>
+ document.title = "<%= it.t("title", { ns: "chats" }) %> | Needs"
+</script>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
 <script defer async type="module" src="/public/js/chat.js"></script>
 <script defer async type="module" src="/public/js/image-viewer.js"></script>

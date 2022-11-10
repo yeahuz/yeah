@@ -2,5 +2,6 @@
   "title": "Barcha xabarlar",
   "select_to_see": "Suhbatingizni ko'rish uchun suhbatni tanlang",
   "you": "Siz",
-  "send_message": "Xabar yuborish"
+  "send_message": "Xabar yuborish",
+  "write_to": "{{name}}ga biror narsa yozing"
 }
