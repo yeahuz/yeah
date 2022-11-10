@@ -25,7 +25,7 @@ export async function has_expired_code(identifier) {
 
   if (code?.expired) await code.$query().delete();
 
-  return code?.expired;
+  return code?.expired || !code;
 }
 
 export async function generate_auth_code(identifier, mins = 15) {
