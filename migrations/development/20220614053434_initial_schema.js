@@ -787,8 +787,7 @@ export function up(knex) {
         .references("id")
         .inTable("postings")
         .onDelete("CASCADE");
-      table.string("hash_id").index();
-      table.string("url", 512);
+      table.string("url");
       table.timestamps(false, true);
       table.index("created_at");
     })

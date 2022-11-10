@@ -1,5 +1,4 @@
 import { BaseModel, Message, User, Posting } from "./index.js";
-import { hashids } from "../utils/hashid.js";
 import config from "../config/index.js";
 
 export class Chat extends BaseModel {
@@ -61,8 +60,7 @@ export class Chat extends BaseModel {
 
   async $afterInsert(ctx) {
     await super.$afterInsert(ctx);
-    const hash_id = hashids.encode(this.id);
-    const url = `${config.origin}/chats/${hash_id}`;
-    await this.$query(ctx.transaction).patch({ hash_id: hashids.encode(this.id), url });
+    const url = `${config.origin}/chats/${this.id}`;
+    await this.$query(ctx.transaction).patch({ url });
   }
 }
