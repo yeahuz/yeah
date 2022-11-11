@@ -11,5 +11,11 @@
     "hint": "Havola faqat bir soat davomida amal qiladi",
     "verify_btn": "Tasdiqlash"
   },
+  "new_email": {
+    "title": "Elektron pochta manzilingizni tasdiqlang",
+    "description": "Akkauntingizni himoyalash uchun biz elektron pochta manzilingizni qo'shishni xohlayotganingizga ishonch hosil qilishimiz kerak.",
+    "hint": "Havola faqat bir soat davomida amal qiladi",
+    "add_btn": "Qo'shish"
+  },
   "regards": "Rahmat!"
 }

@@ -51,7 +51,7 @@
         </form>
       </div>
       <div>
-        <input type="checkbox" id="email-toggle" class="peer opacity-0 w-0 absolute -z-10" />
+        <input type="checkbox" id="email-toggle" class="peer opacity-0 w-0 absolute -z-10" <%= it.flash.validation_errors?.[0]?.email ? "checked" : "" %> />
         <div class="flex items-center group">
           <span class="text-sm font-medium text-gray-700 w-full dark:text-gray-200">
             <%= it.t("personal.email.label", { ns: "settings-details" })%>
@@ -60,7 +60,7 @@
             underline decoration-transparent duration-300
             hover:decoration-primary-500 group-peer-checked:hidden group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(209,224,255)]
             dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]">
-            <%= it.t("edit", { ns: "common" })%>
+            <%= it.user.email ?  it.t("edit", { ns: "common" }) : it.t("add", { ns: "common" })%>
           </label>
         </div>
         <% if (it.user.email) { %>
@@ -71,7 +71,7 @@
             <span class="text-xs text-gray-500 dark:text-gray-400"><%= it.user.email_verified ? it.t("verified", { ns: "common" }) : it.t("unverified", { ns: "common" }) %></span>
           </div>
         <% } %>
-        <form method="post" action="/users/<%= it.user.id %>/emails?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>/emails/otp?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="text" inputmode="email" class="form-control"
           placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
@@ -118,7 +118,7 @@
             </div>
           </div>
         <% } %>
-        <form method="post" action="/users/<%= it.user.id %>/phones?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>/phones/otp?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="hidden" name="country_code" value="998" />
           <div class="flex">
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">+998</span>

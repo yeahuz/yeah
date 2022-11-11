@@ -223,7 +223,7 @@ const formatter = new Intl.DateTimeFormat(navigator.language, {
   minute: "numeric",
 });
 
-export function media_message_tmpl(files = []) {
+export function media_message_tmpl(payload) {
   const msg = create_node("li", { class: "w-full max-w-sm ml-auto relative" });
   const list = create_node("ul", {
     class: "flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg",
@@ -243,7 +243,7 @@ export function media_message_tmpl(files = []) {
   time.textContent = formatter.format(new Date());
   date_info.append(time, clock);
 
-  for (const file of files) {
+  for (const file of payload.attachments) {
     const src = URL.createObjectURL(file);
     const list_item = create_node("li", {
       class: "basis-40 flex-1 max-h-64 relative",

@@ -2,8 +2,9 @@
   <a href="<%= it.posting.url %>">
     <img
       src="<%= it.posting.cover_url %>/thumbnail"
-      sizes=""
-      alt="picture"
+      srcset="<%= it.generate_srcset(it.posting.cover_url,"fit=scale-down",6) %>"
+      sizes="(min-width: 640px) 50%, (min-width: 768px) calc(100% / 3), (min-width: 1280px) calc(100% / 4), 100vw"
+      alt="<%= it.posting.title %> cover"
       height="192"
       class="w-full sm:h-48 object-cover h-60 rounded-lg"
       crossorigin

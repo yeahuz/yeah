@@ -279,7 +279,7 @@ async function on_files_change(e) {
 
   if (media_message.attachments.length) {
     messages.append(media_message_tmpl(media_message));
-    upload_media_files(media_message.attachments);
+    upload_media_files(media_message);
   }
   if (other_message.attachments.length) {
     messages.append(file_message_tmpl(other_message));

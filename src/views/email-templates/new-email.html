@@ -85,12 +85,12 @@
       <img src="https://s3.yeah.uz/needs-logo.png" alt="needs.uz logo" class="logo-container__logo"/>
     </a>
     <div class="container">
-      <h1 class="container__heading"><%= it.t("update_email.title", { ns: "email-templates" }) %></h1>
-      <p class="container__description"><%= it.t("update_email.description", { ns: "email-templates", old_email: it.old_email, new_email: it.new_email  }) %></p>
-      <a href="<%= it.verification_link %>&tmpl_name=email-update-form" class="container__link">
-        <%= it.t("update_email.verify_btn", { ns: "email-templates" })%>
+      <h1 class="container__heading"><%= it.t("new_email.title", { ns: "email-templates" }) %></h1>
+      <p class="container__description"><%= it.t("new_email.description", { ns: "email-templates" }) %></p>
+      <a href="<%= it.verification_link %>&tmpl_name=new-email-form" class="container__link">
+        <%= it.t("new_email.add_btn", { ns: "email-templates" })%>
       </a>
-      <p class="container__hint"><%= it.t("update_email.hint", { ns: "email-templates" }) %></p>
+      <p class="container__hint"><%= it.t("new_email.hint", { ns: "email-templates" }) %></p>
       <p class="container__regards"><%= it.t("regards", { ns: "email-templates" }) %></p>
     </div>
   </div>

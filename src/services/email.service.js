@@ -23,6 +23,11 @@ const TEMPLATES = {
     subject: (vars) => vars.t("update_email.title", { ns: "email-templates" }),
     source: () => `Needs <noreply@needs.uz>`,
   },
+  new_email: {
+    render: (vars) => render_file("/email-templates/new-email.html", vars),
+    subject: (vars) => vars.t("new_email.title", { ns: "email-templates" }),
+    source: () => `Needs <noreply@needs.uz>`,
+  },
 };
 
 export async function send_email({ tmpl_name, to, vars }) {

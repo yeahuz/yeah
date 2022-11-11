@@ -6,6 +6,7 @@ import {
   remove_query_value,
   append_query_value,
   array_to_tree,
+  generate_srcset,
 } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 import { render_file } from "../utils/eta.js";
@@ -75,6 +76,7 @@ export async function get_search(req, reply) {
     lang: req.language,
     t,
     format_relative: create_relative_formatter(req.language),
+    generate_srcset,
   });
   stream.push(results);
 

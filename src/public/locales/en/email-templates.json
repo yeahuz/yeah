@@ -11,5 +11,11 @@
     "hint": "The link is only valid for an hour.",
     "verify_btn": "Yes, update"
   },
+  "new_email": {
+    "title": "Confirm email address",
+    "description": "To secure your account, we just need to verify you really want to add your email address",
+    "hint": "The link is only valid for an hour.",
+    "add_btn": "Yes, add"
+  },
   "regards": "Thank you!"
 }

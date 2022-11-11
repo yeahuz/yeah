@@ -117,6 +117,7 @@ export async function get_index(req, reply) {
     lang: req.language,
     format_relative: create_relative_formatter(req.language),
     regions,
+    generate_srcset,
   });
   stream.push(home);
 

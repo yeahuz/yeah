@@ -227,7 +227,6 @@ export async function get_signup(req, reply) {
 }
 
 export async function create_otp(req, reply) {
-  const EXPIRATION_IN_MINUTES = 15;
   const t = req.i18n.t;
   const { method } = req.query;
   const { identifier, country_code } = transform_object(req.body, {
@@ -236,13 +235,12 @@ export async function create_otp(req, reply) {
 
   const has_expired_code = await ConfirmationCodeService.has_expired_code(identifier);
   if (has_expired_code) {
-    const [code, err] = await option(
-      ConfirmationCodeService.generate_auth_code(identifier, EXPIRATION_IN_MINUTES)
-    );
+    const [code, err] = await option(ConfirmationCodeService.generate_auth_code(identifier));
 
     if (err) {
       req.flash("err", err.build(t));
-      return reply.redirect(add_t(`/auth/signup?method=${method}`));
+      reply.redirect(add_t(`/auth/signup?method=${method}`));
+      return reply;
     }
 
     events.emit("create_otp", {

@@ -1039,16 +1039,16 @@ video {
   height: 0.875rem;
 }
 
-.h-px {
-  height: 1px;
-}
-
 .h-10 {
   height: 2.5rem;
 }
 
 .h-4 {
   height: 1rem;
+}
+
+.h-px {
+  height: 1px;
 }
 
 .h-60 {
@@ -1459,6 +1459,12 @@ video {
   margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
 .space-y-5 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));
@@ -1469,12 +1475,6 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(3rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(3rem * var(--tw-space-y-reverse));
-}
-
-.space-y-4 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
 .divide-y > :not([hidden]) ~ :not([hidden]) {
@@ -1668,8 +1668,9 @@ video {
   background-color: rgb(0 0 0 / 0.5);
 }
 
-.bg-gray-200 {
-  background-color: rgb(var(--gray-200));
+.bg-zinc-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 39 42 / var(--tw-bg-opacity));
 }
 
 .bg-error-25 {
@@ -1684,9 +1685,8 @@ video {
   background-color: rgb(0 0 0 / 0.1);
 }
 
-.bg-zinc-800 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(39 39 42 / var(--tw-bg-opacity));
+.bg-gray-200 {
+  background-color: rgb(var(--gray-200));
 }
 
 .object-contain {
@@ -1792,11 +1792,6 @@ video {
 .py-1 {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
-}
-
-.py-8 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
 }
 
 .py-12 {
@@ -3122,21 +3117,6 @@ j
   bottom: 0px;
 }
 
-.after\:top-3::after {
-  content: var(--tw-content);
-  top: 0.75rem;
-}
-
-.after\:top-1\/2::after {
-  content: var(--tw-content);
-  top: 50%;
-}
-
-.after\:left-1\/2::after {
-  content: var(--tw-content);
-  left: 50%;
-}
-
 .after\:top-0::after {
   content: var(--tw-content);
   top: 0px;
@@ -3150,6 +3130,21 @@ j
 .after\:right-0::after {
   content: var(--tw-content);
   right: 0px;
+}
+
+.after\:top-3::after {
+  content: var(--tw-content);
+  top: 0.75rem;
+}
+
+.after\:top-1\/2::after {
+  content: var(--tw-content);
+  top: 50%;
+}
+
+.after\:left-1\/2::after {
+  content: var(--tw-content);
+  left: 50%;
 }
 
 .after\:-z-10::after {
