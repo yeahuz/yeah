@@ -204,3 +204,11 @@ export function generate_srcset(url, options, count = 20) {
   }
   return srcset;
 }
+
+export function async_pipe(...fns) {
+  return (...args) => fns.reduce((promise, fn) => promise.then(fn), Promise.resolve(...args));
+}
+
+export function pipe(...fns) {
+  return (...args) => fns.reduce((output, current_fn) => current_fn(output), ...args);
+}

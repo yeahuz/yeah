@@ -34,18 +34,9 @@ export function disable_element(element) {
   };
 }
 
-export function create_node_2(tag, mod = (node) => node) {
+export function create_node(tag, mod = (node) => node) {
   const node = document.createElement(tag);
   return mod(node);
-}
-
-export function create_node(tag, attributes = {}) {
-  const node = document.createElement(tag);
-  Object.entries(attributes).forEach(([key, value]) => {
-    node.setAttribute(key, value);
-  });
-
-  return node;
 }
 
 export function text(content) {
@@ -128,12 +119,32 @@ export function adjust_geo_links() {
   }
 }
 
+export function classes(constant, dynamic = {}) {
+  let classnames = constant;
+  return (node) => {
+    for (let prop in dynamic) {
+      if (dynamic[prop]) classnames += ` ${prop}`;
+    }
+
+    node.setAttribute("class", classnames);
+    return node;
+  };
+}
+
+export function html(str) {
+  return (node) => {
+    node.innerHTML = str;
+    return node;
+  };
+}
+
 export const svg = (mod) => create_svg_ns(mod);
 export const path = (mod) => create_path_ns(mod);
-export const span = (mod) => create_node_2("span", mod);
-export const div = (mod) => create_node_2("div", mod);
-export const ul = (mod) => create_node_2("ul", mod);
-export const li = (mod) => create_node_2("li", mod);
-export const p = (mod) => create_node_2("p", mod);
-export const img = (mod) => create_node_2("img", mod);
-export const h2 = (mod) => create_node_2("h2", mod);
+export const span = (mod) => create_node("span", mod);
+export const div = (mod) => create_node("div", mod);
+export const ul = (mod) => create_node("ul", mod);
+export const li = (mod) => create_node("li", mod);
+export const p = (mod) => create_node("p", mod);
+export const img = (mod) => create_node("img", mod);
+export const h2 = (mod) => create_node("h2", mod);
+export const a = (mod) => create_node("a", mod);

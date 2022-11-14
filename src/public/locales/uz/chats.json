@@ -3,5 +3,7 @@
   "select_to_see": "Suhbatingizni ko'rish uchun suhbatni tanlang",
   "you": "Siz",
   "send_message": "Xabar yuborish",
+  "send": "Yuborish",
+  "your_message": "Sizning xabaringiz",
   "write_to": "{{name}}ga biror narsa yozing"
 }

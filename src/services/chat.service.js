@@ -30,7 +30,7 @@ export async function get_chat_ids({ user_id }) {
 export async function get_one({ id, current_user_id }) {
   return await Chat.query()
     .findOne({ id })
-    .withGraphFetched("[messages.[sender, attachments, read_by], posting]")
+    .withGraphFetched("[messages.[sender, attachments, read_by], posting.[creator]]")
     .modifyGraph("messages", (builder) =>
       builder.select(
         "content",

@@ -1,5 +1,5 @@
 import { add_listeners, create_node } from "./dom.js";
-import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates.js";
+import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates-v2.js";
 import { option, request, async_pool, upload_request, generate_srcset, wait } from "./utils.js";
 import { toast } from "./toast.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
@@ -86,19 +86,21 @@ function on_send_message(e) {
   }
 }
 
-function on_message_sent(payload) {
-  const item = messages.querySelector(`li[data-temp_id=${payload.temp_id}]`);
-  const date_info = item.querySelector(".js-date-info");
-  const clock = date_info.querySelector(".js-date-info-clock");
-  clock.remove();
-
-  const check = create_node("span");
-  check.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+function on_message_sent(message) {
+  const item = messages.querySelector(`li[data-temp_id=${message.temp_id}]`);
+  const date_infos = item.querySelectorAll(".js-date-info");
+  for (const info of date_infos) {
+    const clock = info.querySelector(".js-date-info-clock");
+    if (clock) clock.remove();
+    const check = create_node("span");
+    check.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-  date_info.append(check);
-  item.setAttribute("date-message_id", payload.message_id);
+    info.append(check);
+  }
+
+  item.setAttribute("date-message_id", message.id);
 }
 
 function on_new_message(payload) {
@@ -204,10 +206,10 @@ function upload_files_to(urls) {
   };
 }
 
-async function upload_media_files(files = []) {
+async function upload_media_files(message) {
   const [urls, err] = await option(
     request("/cloudflare/images/direct_upload", {
-      body: { files: files.map((file) => ({ size: file.size, type: file.type })) },
+      body: { files: message.attachments.map((file) => ({ size: file.size, type: file.type })) },
     })
   );
 
@@ -217,11 +219,20 @@ async function upload_media_files(files = []) {
   }
 
   const photos = [];
-  for await (const [result, err] of async_pool(10, files, upload_media_to(urls))) {
+  for await (const [result, err] of async_pool(10, message.attachments, upload_media_to(urls))) {
     photos.push(result.result.id);
   }
 
-  await request(photos_link_form.action, { method: photos_link_form.method, body: { photos } });
+  if (ws) {
+    const data = new FormData(photos_link_form);
+    ws.send(
+      encoder.encode("publish_photos", {
+        chat_id: data.get("chat_id"),
+        photos: photos,
+        temp_id: message.temp_id,
+      })
+    );
+  }
 }
 
 async function upload_files(message) {
@@ -257,11 +268,6 @@ async function upload_files(message) {
       })
     );
   }
-
-  // await request(files_link_form.action, {
-  //   method: files_link_form.method,
-  //   body: { files: file_ids },
-  // });
 }
 
 async function on_files_change(e) {

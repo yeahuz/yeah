@@ -157,21 +157,22 @@ export function chat_files_preview_tmpl(files = [], container) {
 export function file_message_tmpl(payload, is_own_files = true) {
   const msg = create_node("li", {
     "data-temp_id": payload.temp_id,
-    class: `max-w-sm bg-primary-600 text-white rounded-lg overflow-hidden ${
-      is_own_files
-        ? "bg-primary-600 ml-auto"
-        : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800"
+    class: `max-w-md w-fit text-white rounded-lg overflow-hidden ${
+      is_own_files ? "ml-auto" : "mr-auto text-gray-900 dark:text-white"
     }`,
   });
+
   const list = create_node("ul");
   for (const file of payload.attachments) {
     const list_item = create_node("li", {
-      class: "flex items-center relative",
+      class: `max-w-md w-fit flex items-center rounded-l-lg ${
+        is_own_files ? "bg-primary-600 ml-auto" : "mr-auto bg-gray-100 dark:bg-zinc-800"
+      }`,
       "data-id": file.id,
     });
     const icon = create_node("div", {
       class:
-        "flex items-center justify-center flex-shrink-0 p-4 ml-0.5 rounded-lg bg-gray-100 text-gray-600 dark:bg-white dark:text-primary-600 relative js-file-icon",
+        "flex items-center justify-center flex-shrink-0 p-4 ml-1 rounded-lg bg-gray-100 text-gray-600 dark:bg-white dark:text-primary-600 relative js-file-icon",
     });
 
     icon.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -224,18 +225,22 @@ const formatter = new Intl.DateTimeFormat(navigator.language, {
 });
 
 export function media_message_tmpl(payload) {
-  const msg = create_node("li", { class: "w-full max-w-sm ml-auto relative" });
+  const msg = create_node("li", {
+    class: "w-full max-w-sm ml-auto relative",
+    "data-temp_id": payload.temp_id,
+  });
+
   const list = create_node("ul", {
     class: "flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg",
   });
 
   const date_info = create_node("div", {
     class:
-      "inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50",
+      "js-date-info inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50",
   });
 
   const time = create_node("span");
-  const clock = create_node("span");
+  const clock = create_node("span", { class: "js-date-info-clock" });
   clock.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>`;
@@ -262,6 +267,50 @@ export function media_message_tmpl(payload) {
 
   return msg;
 }
+
+// export function text_message_tmpl_2(payload, is_own_message) {
+//   const own_message_classes = is_own_message
+//     ? "ml-auto text-white bg-primary-600"
+//     : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800";
+
+//   const msg = li(
+//     attrs({
+//       class: `p-2 rounded-lg block relative max-w-max ${own_message_classes}`,
+//       "data-temp_id": payload.temp_id,
+//     })
+//   );
+
+//   const content = p(text(payload.content));
+//   const date_info = div(
+//     attrs({
+//       class: `js-date-info flex items-center justify-end text-xs mt-0.5 space-x-1 ${
+//         is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300"
+//       }`,
+//     })
+//   );
+
+//   const time = span(text(formatter.format(new Date(payload.created_at))));
+//   if (is_own_message) {
+//     const clock = span(attrs({ class: "js-date-info-clock" }));
+//     const icon = svg(attrs({ class: "w-3 h-3", viewBox: "0 0 24 24", fill: "none" }));
+//     const icon_path = path(
+//       attrs({
+//         d: "M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z",
+//         stroke: "currentColor",
+//         "stroke-width": "1.5",
+//         "stroke-linecap": "round",
+//         "stroke-linejoin": "round",
+//       })
+//     );
+//     icon.append(icon_path);
+//     clock.append(icon);
+//     date_info.append(time, clock);
+//   } else date_info.append(time);
+
+//   msg.append(content, date_info);
+
+//   return msg;
+// }
 
 export function text_message_tmpl(payload, is_own_message) {
   const msg = create_node("li", {

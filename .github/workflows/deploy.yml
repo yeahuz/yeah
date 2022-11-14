@@ -31,4 +31,4 @@ jobs:
           pnpm migrate
           pnpm seed
           pnpm setup-es
-          pm2 restart ecosystem.config.cjs
+          pm2 reload ecosystem.config.cjs

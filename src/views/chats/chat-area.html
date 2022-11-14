@@ -14,7 +14,7 @@
           <a href="<%= it.chat.posting.url %>" class="underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium">
             <%= it.chat.posting.title %>
           </a>
-          <span class="text-gray-500 dark:text-gray-300">@andi</span>
+          <a href="<%=it.chat.posting.creator.profile_url %>" class="text-gray-500 dark:text-gray-300">@<%= it.chat.posting.creator.username %></a>
         </div>
       </div>
       <div>
@@ -35,7 +35,7 @@
             </div>
           <% } %>
           <% if (message.type === "text") { %>
-            <li class="p-2 rounded-lg block relative max-w-max <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
+            <li class="p-2 rounded-lg block relative max-w-md w-fit <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
               <p>
                 <%= message.content %>
               </p>
@@ -65,7 +65,7 @@
             </li>
           <% } %>
           <% if (message.type === "photo") { %>
-            <li class="w-full max-w-sm ml-auto relative">
+            <li class="w-full max-w-md ml-auto relative <%= message.is_own_message ? "ml-auto" : "mr-auto" %>">
               <ul class="flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg js-image-viewer">
                 <% message.attachments.forEach(function (attachment) { %>
                   <li class="basis-40 flex-1 max-h-64 relative">
@@ -77,20 +77,38 @@
                         </svg>
                       </span>
                     </button>
-                    <img class="cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable" data-photo_url="<%= attachment.url %>" src="<%= attachment.url %>/width=10">
+                    <img class="cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable" data-photo_url="<%= attachment.url %>" src="<%= attachment.url %>/width=10" crossorigin referrerpolicy="no-referrer">
                   </li>
                 <% }) %>
               </ul>
             <div class="inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50">
               <span><%= it.formatter.format(new Date(message.created_at)) %></span>
+              <% if (message.is_own_message) { %>
+                <% if (message.read_by.length > 0) {%>
+                  <span class="flex">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <svg class="w-3.5 h-3.5 -ml-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                <% } else { %>
+                  <span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                <% } %>
+              <% } %>
             </div>
           </li>
           <% } %>
           <% if (message.type === "file") {%>
-            <li class="max-w-max text-white rounded-lg overflow-hidden <%= message.is_own_message ? "bg-primary-600 ml-auto" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
-              <ul>
+            <li class="max-w-md w-fit text-white rounded-lg overflow-hidden <%= message.is_own_message ? "ml-auto" : "mr-auto text-gray-900 dark:text-white" %>">
+              <ul class="flex flex-col space-y-1">
                 <% message.attachments.forEach(function (attachment) {%>
-                  <li class="flex items-center">
+                  <li class="max-w-md w-fit flex items-center rounded-l-lg <%= message.is_own_message ? "bg-primary-600 ml-auto" : "mr-auto bg-gray-100 dark:bg-zinc-800" %>">
                     <div class="relative group">
                       <button type="button" class="w-12 h-12 opacity-0 group-hover:opacity-100 duration-200 absolute flex items-center justify-center top-0 left-1 w-full h-full text-white bg-black/50 rounded-lg js-file-download-btn" data-file_url="<%= attachment.url %>" data-file_name="<%= attachment.name %>">
                         <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,11 +122,31 @@
                         </svg>
                       </span>
                     </div>
-                    <div class="p-2">
+                    <div class="p-2 overflow-hidden">
                       <a href="<%= attachment.url %>" class="underline decoration-transparent hover:decoration-white duration-300 block font-meidum text-gray-700 dark:text-gray-200 truncate"><%= attachment.name %></a>
                       <div class="flex justify-between text-xs space-x-4 mt-0.5 text-primary-50">
-                        <span class=""><%= it.format_bytes(attachment.size) %></span>
-                        <span class=""><%= it.formatter.format(new Date(message.created_at)) %></span>
+                        <span><%= it.format_bytes(attachment.size) %></span>
+                        <div class="flex items-center space-x-1">
+                          <span><%= it.formatter.format(new Date(message.created_at)) %></span>
+                          <% if (message.is_own_message) { %>
+                            <% if (message.read_by.length > 0) {%>
+                              <span class="flex">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <svg class="w-3.5 h-3.5 -ml-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                            <% } else { %>
+                              <span>
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                              </span>
+                            <% } %>
+                          <% } %>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -129,8 +167,8 @@
             </label>
             <input type="file" name="files" id="files" value="" class="hidden js-files" multiple />
           </div>
-          <elastic-textarea style="display: inline-flex"><textarea placeholder="Your message..." class="form-control" name="content" id="" rows="1" cols="100" tabindex=""></textarea></elastic-textarea>
-          <button class="btn btn-primary btn-lg">Send</button>
+          <elastic-textarea style="display: inline-flex"><textarea placeholder="<%= it.t("your_message", { ns: "chats" })%>" class="form-control" name="content" id="" rows="1" cols="100" tabindex=""></textarea></elastic-textarea>
+          <button class="btn btn-primary btn-lg"><%= it.t("send", { ns: "chats" })%></button>
         </form>
       </div>
     </div>

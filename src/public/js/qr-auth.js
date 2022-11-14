@@ -1,7 +1,7 @@
 import { toDataURL } from "/node_modules/qrcode/build/qrcode.esm.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 import { add_listeners } from "./dom.js";
-import { qr_code_tmpl, scan_profile_tmpl } from "./templates.js";
+import { qr_code_tmpl, scan_profile_tmpl } from "./templates-v2.js";
 import { option, request, wait, message_sw } from "./utils.js";
 import { toast } from "./toast.js";
 

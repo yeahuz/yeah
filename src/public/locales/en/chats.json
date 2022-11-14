@@ -3,5 +3,7 @@
   "select_to_see": "Select a chat to see your conversation",
   "you": "You",
   "send_message": "Send message",
+  "send": "Send",
+  "your_message": "Your message",
   "write_to": "Write something to {{name}}"
 }
