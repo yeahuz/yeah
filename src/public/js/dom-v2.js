@@ -34,9 +34,10 @@ export function disable_element(element) {
   };
 }
 
-export function create_node(tag, mod = (node) => node) {
+export function create_node(tag, fns = []) {
   const node = document.createElement(tag);
-  return mod(node);
+  for (const fn of fns) fn(node);
+  return node;
 }
 
 export function text(content) {
@@ -55,16 +56,18 @@ export function attrs(attrs) {
   };
 }
 
-export function create_svg_ns(mod = (node) => node) {
+export function create_svg_ns(fns = []) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  for (const fn of fns) fn(svg);
 
-  return mod(svg);
+  return svg;
 }
 
-export function create_path_ns(mod = (node) => node) {
+export function create_path_ns(fns = []) {
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  for (const fn of fns) fn(path);
 
-  return mod(path);
+  return path;
 }
 
 export function remove_node(node) {
@@ -131,6 +134,16 @@ export function classes(constant, dynamic = {}) {
   };
 }
 
+export function children(...nodes) {
+  return (node) => node.append(...nodes);
+}
+
+export function create_fragment(fns = []) {
+  const fragment = new DocumentFragment();
+  for (const fn of fns) fn(fragment);
+  return fragment;
+}
+
 export function html(str) {
   return (node) => {
     node.innerHTML = str;
@@ -138,13 +151,14 @@ export function html(str) {
   };
 }
 
-export const svg = (mod) => create_svg_ns(mod);
-export const path = (mod) => create_path_ns(mod);
-export const span = (mod) => create_node("span", mod);
-export const div = (mod) => create_node("div", mod);
-export const ul = (mod) => create_node("ul", mod);
-export const li = (mod) => create_node("li", mod);
-export const p = (mod) => create_node("p", mod);
-export const img = (mod) => create_node("img", mod);
-export const h2 = (mod) => create_node("h2", mod);
-export const a = (mod) => create_node("a", mod);
+export const fragment = (...fns) => create_fragment(fns);
+export const svg = (...fns) => create_svg_ns(fns);
+export const path = (...fns) => create_path_ns(fns);
+export const span = (...fns) => create_node("span", fns);
+export const div = (...fns) => create_node("div", fns);
+export const ul = (...fns) => create_node("ul", fns);
+export const li = (...fns) => create_node("li", fns);
+export const p = (...fns) => create_node("p", fns);
+export const img = (...fns) => create_node("img", fns);
+export const h2 = (...fns) => create_node("h2", fns);
+export const a = (...fns) => create_node("a", fns);

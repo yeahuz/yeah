@@ -1,6 +1,16 @@
-import { add_listeners, create_node } from "./dom.js";
-import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates-v2.js";
-import { option, request, async_pool, upload_request, generate_srcset, wait } from "./utils.js";
+import { add_listeners, attrs, create_node } from "./dom.js";
+import { span } from "./dom-v2.js";
+import { clock_icon } from "./icons.js";
+import { media_message_tmpl, file_message_tmpl_2, text_message_tmpl } from "./templates-v2.js";
+import {
+  option,
+  request,
+  async_pool,
+  upload_request,
+  generate_srcset,
+  wait,
+  gen_id,
+} from "./utils.js";
 import { toast } from "./toast.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 
@@ -88,15 +98,16 @@ function on_send_message(e) {
 
 function on_message_sent(message) {
   const item = messages.querySelector(`li[data-temp_id=${message.temp_id}]`);
+  item.classList.remove("pointer-events-none");
+
+  const upload_progresses = item.querySelectorAll(".upload-progress");
+  upload_progresses.forEach((progress) => progress.remove());
+
   const date_infos = item.querySelectorAll(".js-date-info");
   for (const info of date_infos) {
     const clock = info.querySelector(".js-date-info-clock");
     if (clock) clock.remove();
-    const check = create_node("span");
-    check.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`;
-
+    const check = span(html(clock_icon({ size: 12 })));
     info.append(check);
   }
 
@@ -109,7 +120,7 @@ function on_new_message(payload) {
       messages.append(text_message_tmpl(payload, false));
       break;
     case "file":
-      messages.append(file_message_tmpl(payload, false));
+      messages.append(file_message_tmpl_2(payload, false));
       break;
     default:
       break;
@@ -123,23 +134,23 @@ on("message_sent", on_message_sent);
 
 function on_media_progress(item) {
   item.classList.add("pointer-events-none");
-  const span = create_node("span", {
-    class:
-      "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
-  });
+  const progress = span(
+    attrs({
+      class:
+        "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
+    }),
+    text("0")
+  );
 
-  span.textContent = "0";
-  item.append(span);
+  item.append(progress);
   return (progress) => {
-    span.textContent = `${Math.floor(progress.percent)}%`;
+    progress.textContent = `${Math.floor(progress.percent)}%`;
   };
 }
 
 function on_media_done(item) {
   return () => {
     item.classList.remove("pointer-events-none");
-    const upload_progress = item.querySelector(".upload-progress");
-    if (upload_progress) upload_progress.remove();
   };
 }
 
@@ -168,24 +179,16 @@ function on_file_progress(item) {
       "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg text-white",
   });
 
-  item.querySelector(".js-file-icon").append(span);
+  item.append(span);
 
   return (progress) => {
     span.textContent = `${Math.floor(progress.percent)}%`;
   };
 }
 
-function on_file_done(item) {
-  return () => {
-    item.classList.remove("pointer-events-none");
-    const upload_progress = item.querySelector(".upload-progress");
-    if (upload_progress) upload_progress.remove();
-  };
-}
-
 function upload_files_to(urls) {
   return async function upload(file) {
-    const list_item = messages.querySelector(`[data-id="${file.id}"]`);
+    const left_container = messages.querySelector(`[data-id="${file.id}"]`);
     const url = urls.shift();
     const fd = new FormData();
     fd.append("file", file, file.name);
@@ -194,8 +197,8 @@ function upload_files_to(urls) {
       upload_request(url.uploadURL, {
         method: "PUT",
         data: fd,
-        on_progress: on_file_progress(list_item),
-        on_done: on_file_done(list_item),
+        on_progress: on_file_progress(left_container),
+        // on_done: on_file_done(left_container),
         headers: {
           "Content-Type": file.type,
         },
@@ -228,7 +231,7 @@ async function upload_media_files(message) {
     ws.send(
       encoder.encode("publish_photos", {
         chat_id: data.get("chat_id"),
-        photos: photos,
+        photos,
         temp_id: message.temp_id,
       })
     );
@@ -253,20 +256,18 @@ async function upload_files(message) {
     return;
   }
 
-  const file_ids = [];
-  for await (const [result, err] of async_pool(10, message.attachments, upload_files_to(urls))) {
-    file_ids.push(result.id);
-  }
+  const data = new FormData(files_link_form);
 
-  if (ws) {
-    const data = new FormData(files_link_form);
-    ws.send(
-      encoder.encode("publish_files", {
-        chat_id: data.get("chat_id"),
-        files: file_ids,
-        temp_id: message.temp_id,
-      })
-    );
+  for await (const [result, err] of async_pool(10, message.attachments, upload_files_to(urls))) {
+    if (ws) {
+      ws.send(
+        encoder.encode("publish_file", {
+          chat_id: data.get("chat_id"),
+          file: result.id,
+          temp_id: message.temp_id,
+        })
+      );
+    }
   }
 }
 
@@ -274,22 +275,29 @@ async function on_files_change(e) {
   const files = e.target.files;
   if (!files.length) return;
 
-  const media_message = { temp_id: `temp-${Math.random().toString(32).slice(2)}`, attachments: [] };
-  const other_message = { temp_id: `temp-${Math.random().toString(32).slice(2)}`, attachments: [] };
+  const media_message = { temp_id: gen_id(), attachments: [] };
+  const other_messages = [];
 
   for (const file of files) {
-    const id = `temp-${Math.random().toString(32).slice(2)}`;
-    if (is_media(file.type)) media_message.attachments.push(Object.assign(file, { id }));
-    else other_message.attachments.push(Object.assign(file, { id }));
+    if (is_media(file.type)) media_message.attachments.push(Object.assign(file, { id: gen_id() }));
+    else {
+      other_messages.push({
+        temp_id: gen_id(),
+        attachments: [Object.assign(file, { id: gen_id() })],
+      });
+    }
   }
 
   if (media_message.attachments.length) {
     messages.append(media_message_tmpl(media_message));
     upload_media_files(media_message);
   }
-  if (other_message.attachments.length) {
-    messages.append(file_message_tmpl(other_message));
-    upload_files(other_message);
+
+  if (other_messages.length) {
+    for (const msg of other_messages) {
+      messages.append(file_message_tmpl_2(msg));
+      upload_files(msg);
+    }
   }
 }
 
@@ -322,18 +330,6 @@ function is_media(type) {
 function scroll_to_bottom(element) {
   element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
 }
-
-function is_tab_in_focus() {
-  return document.visibilityState === "visible";
-}
-
-function on_visibility_change() {
-  if (is_tab_in_focus() && !ws) connect();
-}
-
-// add_listeners(document, {
-//   visibilitychange: on_visibility_change,
-// });
 
 add_listeners(files_input, {
   change: on_files_change,

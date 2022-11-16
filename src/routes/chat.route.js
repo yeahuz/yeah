@@ -33,7 +33,7 @@ export const chat = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/:id/files",
-    handler: ChatController.link_files,
+    handler: ChatController.link_file,
     onRequest: fastify.can([authenticated_user, chat_member], { relation: "and" }),
   });
 };

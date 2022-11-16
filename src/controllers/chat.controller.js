@@ -120,13 +120,13 @@ export async function link_photos(req, reply) {
   return reply;
 }
 
-export async function link_files(req, reply) {
+export async function link_file(req, reply) {
   const user = req.user;
   const { id } = req.params;
-  const { files = [], reply_to } = req.body;
-  const result = await ChatService.link_files({
+  const { file, reply_to } = req.body;
+  const result = await ChatService.link_file({
     chat_id: id,
-    files,
+    file,
     reply_to,
     sender_id: user.id,
   });

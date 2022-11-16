@@ -75,7 +75,7 @@ export async function link_photos({ chat_id, photos = [], sender_id, reply_to })
   }
 }
 
-export async function link_files({ chat_id, files = [], sender_id, reply_to }) {
+export async function link_file({ chat_id, file, sender_id, reply_to }) {
   const trx = await MessageService.start_transaction();
   try {
     const message = await MessageService.create_one_trx(trx)({
@@ -84,14 +84,15 @@ export async function link_files({ chat_id, files = [], sender_id, reply_to }) {
       reply_to,
       type: "file",
     });
-    const attachments = await Promise.all(
-      files.map((resource_id) =>
-        AttachmentService.create_one_trx(trx)({ resource_id, service: "CF_R2" })
-      )
-    );
-    await message.$relatedQuery("attachments", trx).relate(attachments);
+
+    const attachment = await AttachmentService.create_one_trx(trx)({
+      resource_id: file,
+      service: "CF_R2",
+    });
+
+    await message.$relatedQuery("attachments", trx).relate(attachment);
     await trx.commit();
-    return Object.assign(message, { attachments });
+    return Object.assign(message, { attachments: [attachment] });
   } catch (err) {
     console.log({ err });
     trx.rollback();

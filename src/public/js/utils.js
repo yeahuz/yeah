@@ -212,3 +212,9 @@ export function async_pipe(...fns) {
 export function pipe(...fns) {
   return (...args) => fns.reduce((output, current_fn) => current_fn(output), ...args);
 }
+
+export function gen_id(prefix = "temp") {
+  let rand = Math.random().toString(32).slice(2);
+  if (prefix) rand = prefix + rand;
+  return rand;
+}

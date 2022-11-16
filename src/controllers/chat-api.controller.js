@@ -15,13 +15,13 @@ export async function create_message(req, reply) {
   return reply;
 }
 
-export async function link_files(req, reply) {
+export async function link_file(req, reply) {
   const { id } = req.params;
-  const { files = [], reply_to, sender_id } = req.body;
-  const result = await ChatService.link_files({
+  const { file, reply_to, sender_id } = req.body;
+  const result = await ChatService.link_file({
     sender_id,
     reply_to,
-    files,
+    file,
     chat_id: id,
   });
 

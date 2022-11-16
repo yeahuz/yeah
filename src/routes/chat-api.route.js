@@ -11,7 +11,7 @@ export const chat_api = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/:id/files",
-    handler: ChatApiController.link_files,
+    handler: ChatApiController.link_file,
     onRequest: fastify.can_api([external_client, chat_member]),
   });
   fastify.route({
