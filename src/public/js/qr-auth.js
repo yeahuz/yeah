@@ -1,4 +1,4 @@
-import { toDataURL } from "/node_modules/qrcode/build/qrcode.esm.js";
+import { toDataURL } from "/node_modules/qrcode-esm/build/qrcode.esm.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 import { add_listeners } from "./dom.js";
 import { qr_code_tmpl, scan_profile_tmpl } from "./templates-v2.js";

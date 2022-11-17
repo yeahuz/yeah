@@ -52,7 +52,7 @@ specifiers:
   packbytes: ^1.0.0
   pg: ^8.7.3
   pino-pretty: ^9.0.1
-  qrcode: github:jcbbb/node-qrcode
+  qrcode-esm: ^1.5.1
   qs: ^6.11.0
   tailwindcss: ^3.1.6
   ua-parser-js: ^1.0.2
@@ -106,7 +106,7 @@ dependencies:
   otplib: 12.0.1
   packbytes: 1.0.5
   pg: 8.8.0
-  qrcode: github.com/jcbbb/node-qrcode/e95c52baa0cf29c8d0db7108dbd3fdeee3a5d971
+  qrcode-esm: 1.5.1
   qs: 6.11.0
   ua-parser-js: 1.0.2
   ws: 8.9.0
@@ -4225,6 +4225,17 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /qrcode-esm/1.5.1:
+    resolution: {integrity: sha512-5xOFQHJ+vYtDHB9J+fPdeD3eLsVCXNl0hIQiVdUQAHpd8qhXh0YJQ2QnFMZLOWiVXhx+70yjjsyPC/BGgwEiFQ==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dependencies:
+      dijkstrajs: 1.0.2
+      encode-utf8: 1.0.3
+      pngjs: 5.0.0
+      yargs: 15.4.1
+    dev: false
+
   /qs/6.11.0:
     resolution: {integrity: sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==}
     engines: {node: '>=0.6'}
@@ -5338,19 +5349,4 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-    dev: false
-
-  github.com/jcbbb/node-qrcode/e95c52baa0cf29c8d0db7108dbd3fdeee3a5d971:
-    resolution: {tarball: https://codeload.github.com/jcbbb/node-qrcode/tar.gz/e95c52baa0cf29c8d0db7108dbd3fdeee3a5d971}
-    name: qrcode
-    version: 1.5.1
-    engines: {node: '>=10.13.0'}
-    hasBin: true
-    prepare: true
-    requiresBuild: true
-    dependencies:
-      dijkstrajs: 1.0.2
-      encode-utf8: 1.0.3
-      pngjs: 5.0.0
-      yargs: 15.4.1
     dev: false
