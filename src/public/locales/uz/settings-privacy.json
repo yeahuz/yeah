@@ -1,6 +1,7 @@
 {
   "title": "Xavfsizlik",
   "description": "Xavfsizlik va maxfiylik sozlamalari",
+  "delete_key_confirmation": "Haqiqatan ham bu elektron kalitni o'chirib tashlamoqchimisiz?",
   "devices": {
     "title": "Qurilmalar",
     "name": "Nomi",

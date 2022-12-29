@@ -1,6 +1,7 @@
 {
   "title": "Security",
   "description": "Privacy and security settings",
+  "delete_key_confirmation": "Are you sure you want to remove this security key?",
   "devices": {
     "title": "Devices",
     "name": "Name",

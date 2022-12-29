@@ -26,12 +26,12 @@ export const auth = async (fastify) => {
     url: "/otp",
     handler: AuthController.create_otp,
     schema: auth_schema.create_otp,
-    config: {
-      rateLimit: {
-        max: 5,
-        timeWindow: 43200000,
-      },
-    },
+    // config: {
+    //   rateLimit: {
+    //     max: 5,
+    //     timeWindow: 43200000,
+    //   },
+    // },
   });
   fastify.route({
     method: "POST",

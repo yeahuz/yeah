@@ -114,7 +114,7 @@ export async function start() {
         .flat();
 
       const t = i18next.getFixedT(accept_lang);
-      const { return_to } = req.query;
+      const { err_to = "/" } = req.query;
 
       if (err.validation) {
         if (req.xhr) {
@@ -125,7 +125,7 @@ export async function start() {
           "validation_errors",
           new ValidationError({ errors: err.validation }).errors_as_object().build(t).errors
         );
-        return reply.code(302).redirect(add_t(return_to || req.url));
+        return reply.code(302).redirect(add_t(err_to || req.url));
       }
 
       if (err instanceof DomainError) {
@@ -135,7 +135,7 @@ export async function start() {
         }
 
         req.flash("err", err.build(t));
-        reply.code(302).redirect(add_t(return_to || req.url));
+        reply.code(302).redirect(add_t(err_to || req.url));
         return reply;
       }
 

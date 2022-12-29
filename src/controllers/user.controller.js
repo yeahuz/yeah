@@ -11,7 +11,7 @@ export async function update_one(req, reply) {
   const t = req.i18n.t;
   const user = req.user;
   const { id } = req.params;
-  const { return_to = "/" } = req.query;
+  const { return_to = "/", err_to = "/" } = req.query;
   const { name, website_url, username, photo_id } = req.body;
 
   const [result, err] = await option(
@@ -27,7 +27,7 @@ export async function update_one(req, reply) {
 
   if (err) {
     req.flash("err", err.build(t));
-    reply.redirect(add_t(return_to));
+    reply.redirect(add_t(err_to));
     return reply;
   }
 
@@ -39,7 +39,7 @@ export async function update_one(req, reply) {
 export async function send_phone_code(req, reply) {
   const t = req.i18n.t;
   const user = req.user;
-  const { return_to = "/settings/details" } = req.query;
+  const { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
   const { id } = req.params;
   const { phone, country_code = "998" } = transform_object(req.body, {
     phone: (v) => v.replace(/\s/g, ""),
@@ -56,7 +56,7 @@ export async function send_phone_code(req, reply) {
 
   if (update_err) {
     req.flash("validation_errors", update_err.errors_as_object().build(t).errors);
-    reply.redirect(add_t(return_to));
+    reply.redirect(add_t(err_to));
     return reply;
   }
 
@@ -67,7 +67,7 @@ export async function send_phone_code(req, reply) {
 
     if (err) {
       req.flash("err", err.build(t));
-      reply.redirect(add_t(return_to));
+      reply.redirect(add_t(err_to));
       return reply;
     }
 
@@ -87,7 +87,7 @@ export async function send_phone_code(req, reply) {
 export async function send_email_link(req, reply) {
   const t = req.i18n.t;
   const user = req.user;
-  const { return_to = "/settings/details" } = req.query;
+  const { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
   const { id } = req.params;
   const { email } = req.body;
 
@@ -102,7 +102,7 @@ export async function send_email_link(req, reply) {
 
   if (update_err) {
     req.flash("validation_errors", update_err.errors_as_object().build(t).errors);
-    reply.redirect(add_t(return_to));
+    reply.redirect(add_t(err_to));
     return reply;
   }
 
@@ -128,14 +128,14 @@ export async function send_email_link(req, reply) {
 
 export async function update_email(req, reply) {
   const t = req.i18n.t;
-  const { return_to = "/settings/details", token } = req.query;
+  const { return_to = "/settings/details", token, err_to = "/settings/details" } = req.query;
   const { id } = req.params;
 
   const [decoded, err] = await option(jwt.verify(token));
 
   if (err) {
     req.flash("err", err.build(t));
-    reply.redirect(return_to);
+    reply.redirect(err_to);
     return reply;
   }
 
@@ -143,7 +143,7 @@ export async function update_email(req, reply) {
 
   if (update_err) {
     req.flash("err", err.build(t));
-    reply.redirect(add_t(return_to));
+    reply.redirect(add_t(err_to));
     return reply;
   }
 
@@ -153,7 +153,7 @@ export async function update_email(req, reply) {
 
 export async function update_phone(req, reply) {
   const t = req.i18n.t;
-  const { return_to = "/settings/details" } = req.query;
+  const { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
   const { id } = req.params;
   const { phone, otp } = transform_object(req.body, {
     phone: (v) => v.replace(/\s/g, ""),
@@ -163,7 +163,7 @@ export async function update_phone(req, reply) {
 
   if (!is_valid) {
     req.flash("err", new GoneError({ key: "otp_expired" }).build(t));
-    reply.redirect(add_t(return_to));
+    reply.redirect(add_t(err_to));
     return reply;
   }
 
@@ -171,7 +171,7 @@ export async function update_phone(req, reply) {
 
   if (err) {
     req.flash("err", err.build(t));
-    reply.redirect(add_t(return_to));
+    reply.redirect(add_t(err_to));
     return reply;
   }
 

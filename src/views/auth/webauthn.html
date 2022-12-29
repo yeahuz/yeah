@@ -9,6 +9,7 @@
     </div>
     <h2 class="text-xl font-medium text-gray-900 mb-2 mt-3 dark:text-white"><%= it.t("security_key.title", { ns: "2fa" }) %></h2>
     <p class="text-sm text-gray-900 dark:text-white"><%= it.t("security_key.description", { ns: "2fa" }) %></p>
+    <form class="js-assertion-verification-form" method="post" action="/auth/assertions?err_to=/auth/webauthn&return_to=<%= encodeURIComponent(it.return_to) %>"></form>
     <form action="/auth/requests" class="js-assertion-request-form">
         <input type="hidden" name="type" value="get" />
         <button class="btn btn-primary btn-lg w-full mt-6" data-loading_text="<%= it.t("security_key.checking", { ns: "2fa" }) %>"> <%= it.t("security_key.use_key", { ns: "2fa" }) %> </button>

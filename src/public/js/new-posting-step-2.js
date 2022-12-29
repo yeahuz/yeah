@@ -1,4 +1,17 @@
-import { add_listeners, remove_node, create_node } from "./dom.js";
+import {
+  add_listeners,
+  remove_node,
+  ul,
+  classes,
+  li,
+  attrs,
+  img,
+  button,
+  input,
+  label,
+  html,
+  span
+} from "./dom.js";
 import { request, option, upload_request, async_pool } from "./utils.js";
 import { close_icon } from "./icons.js";
 
@@ -17,10 +30,7 @@ function on_drag_over(e) {
 function get_photos_preview(photos_area) {
   const existing = document.querySelector(".js-photos-preview");
   if (existing) return existing;
-  const photos_preview = create_node("ul", {
-    class:
-      "js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6",
-  });
+  const photos_preview = ul(classes("js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6"));
   photos_area.insertAdjacentElement("beforebegin", photos_preview);
   return photos_preview;
 }
@@ -37,34 +47,26 @@ async function generate_previews(files = []) {
     const i_children = i + children_length;
     const file = files[i];
     const url = URL.createObjectURL(file);
-    const li = create_node("li", {
-      class: "relative group rounded-lg",
-      "data-file_id": get_file_id(file),
-    });
-
-    const img = create_node("img", {
-      src: url,
-      class: "rounded-lg h-36 object-cover w-full",
-    });
-
-    const close_btn = create_node("button", {
+    const item = li(attrs({ class: "relative group rounded-lg", "data-file_id": get_file_id(file) }));
+    const pic = img(attrs({ src: url, class: "rounded-lg h-36 object-cover w-full" }));
+    const close_btn = button(attrs({
       type: "button",
       tabindex: "0",
       class: `outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
                                           focus:ring-offset-2 focus:ring-error-500 group-focus:scale-100 md:scale-0 duration-200
-                                          absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white rounded-full p-0.5`,
-    });
+                                          absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white rounded-full p-0.5`
+    }), html(close_icon({ size: 20 })));
 
-    const radio_input = create_node("input", {
+    const radio_input = input(attrs({
       type: "radio",
       value: i_children,
       name: "cover_index",
       id: `cover-${i_children}`,
       class: "absolute opacity-0 w-0 -z-10 peer",
       ...(i_children === 0 && { checked: true }),
-    });
+    }));
 
-    const main_label = create_node("label", {
+    const main_label = label(attrs({
       for: `cover-${i_children}`,
       "data-choose_cover_text": t("form.photos.choose_as_cover", { ns: "new-posting" }),
       "data-cover_text": t("form.photos.cover", { ns: "new-posting" }),
@@ -75,14 +77,13 @@ async function generate_previews(files = []) {
                         after:rounded-tr-lg after:whitespace-nowrap after:p-2
                         after:content-[attr(data-choose\\_cover\\_text)] after:bottom-0 after:bg-primary-600
                         after:text-white peer-checked:after:scale-100 peer-checked:after:opacity-100 peer-checked:after:content-[attr(data-cover\\_text)]`,
-    });
 
-    close_btn.innerHTML = close_icon({ size: 20 });
+    }));
 
-    add_listeners(img, { load: () => URL.revokeObjectURL(url) });
+    add_listeners(pic, { load: () => URL.revokeObjectURL(url) });
 
-    li.append(img, close_btn, radio_input, main_label);
-    container.append(li);
+    item.append(pic, close_btn, radio_input, main_label);
+    container.append(item);
   }
 }
 
@@ -113,14 +114,14 @@ function on_drag_leave(e) {
 
 function on_progress(item) {
   item.classList.add("pointer-events-none");
-  const span = create_node("span", {
-    class:
-      "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
-  });
-  span.textContent = "0";
-  item.append(span);
+  const upload_progress = span(attrs({
+    class: "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg"
+  }));
+
+  upload_progress.textContent = "0";
+  item.append(upload_progress);
   return (progress) => {
-    span.textContent = `${Math.floor(progress.percent)}%`;
+    upload_progress.textContent = `${Math.floor(progress.percent)}%`;
   };
 }
 
@@ -191,12 +192,12 @@ async function upload_files(files = []) {
   );
 
   for await (const result of async_pool(10, files, upload_to(urls))) {
-    const photo_input = create_node("input", {
+    const photo_input = input(attrs({
       type: "hidden",
       name: "photos",
       value: result.result.id,
       id: `photos-${result.result.id}`,
-    });
+    }));
 
     posting_form.prepend(photo_input);
 

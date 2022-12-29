@@ -7,12 +7,12 @@ export const user = async (fastify) => {
     url: "/:id/phones/otp",
     handler: UserController.send_phone_code,
     onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
-    config: {
-      rateLimit: {
-        max: 3,
-        timeWindow: 43200000,
-      },
-    },
+    // config: {
+    //   rateLimit: {
+    //     max: 3,
+    //     timeWindow: 43200000,
+    //   },
+    // },
   });
   fastify.route({
     method: "POST",

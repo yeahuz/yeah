@@ -7,7 +7,7 @@
     <%~ includeFile('../partials/flash.html', it) %> 
     <div class="space-y-6 p-6 bg-white shadow-sm border border-gray-200 rounded-lg w-full mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
       <div>
-        <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details" id="photo-form">
+        <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details&err_to=/settings/details" id="photo-form">
         </form>
         <input type="file" accept="image/*" name="file" id="photo-input" class="peer opacity-0 w-0 absolute js-photo-input" form="photo-form" />
         <div class="flex items-center group">
@@ -41,7 +41,7 @@
         <span class="block mt-2 peer-checked:hidden">
           <%= it.user.name ?? "" %>
         </span>
-        <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details&err_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="text" class="form-control" placeholder="<%= it.t("personal.name.placeholder", { ns: "settings-details" }) %>" name="name" value="<%= it.user.name ?? "" %>" />
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.name ?? ""%></small>
           <div class="flex space-x-2 mt-2">
@@ -71,12 +71,14 @@
             <span class="text-xs text-gray-500 dark:text-gray-400"><%= it.user.email_verified ? it.t("verified", { ns: "common" }) : it.t("unverified", { ns: "common" }) %></span>
           </div>
         <% } %>
-        <form method="post" action="/users/<%= it.user.id %>/emails/otp?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
-          <input type="text" inputmode="email" class="form-control"
-          placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
+        <form method="post" action="/users/<%= it.user.id %>/emails/otp?return_to=/settings/details&err_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
+          <input
+            <%= it.flash.validation_errors?.[0]?.email ? "autofocus" : "" %>
+            type="text" inputmode="email" class="form-control"
+            placeholder="<%= it.t("personal.email.placeholder", { ns: "settings-details" }) %>" name="email" value="<%= it.user.email ?? "" %>" />
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.email ?? ""%></small>
           <div class="flex space-x-2 mt-2">
-            <label for="email-toggle" class="btn btn-md btn-secondary"><%= it.t("cancel", { ns: "common" })%></label>
+            <label for="email-toggle" class="btn btn-md btn-secondary btn-enabled"><%= it.t("cancel", { ns: "common" })%></label>
             <button name="intent" value="update_email" class="btn btn-md btn-primary"><%= it.t("save", { ns: "common" })%></button>
           </div>
         </form>
@@ -109,7 +111,7 @@
                   <input type="hidden" name="phone" value="<%= it.user.phone %>" />
                   <input type="text" inputmode="numeric" class="form-control max-w-[9ch]" maxlength="6" name="otp" placeholder="123456" />
                   <div class="flex space-x-2 mt-2">
-                    <label for="phone-verification-toggle" class="btn btn-md btn-secondary"><%= it.t("cancel", { ns: "common" })%></label>
+                    <label for="phone-verification-toggle" class="btn btn-md btn-secondary btn-enabled"><%= it.t("cancel", { ns: "common" })%></label>
                     <button class="btn btn-md btn-primary" name="intent" value="verify_otp"><%= it.t("verify", { ns: "common" })%></button>
                   </div>
                 </form>
@@ -118,7 +120,7 @@
             </div>
           </div>
         <% } %>
-        <form method="post" action="/users/<%= it.user.id %>/phones/otp?return_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
+        <form method="post" action="/users/<%= it.user.id %>/phones/otp?return_to=/settings/details&err_to=/settings/details" class="flex-col w-full hidden mt-2 peer-checked:block">
           <input type="hidden" name="country_code" value="998" />
           <div class="flex">
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">+998</span>
@@ -131,7 +133,7 @@
           </div>
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.phone ?? ""%></small>
           <div class="flex space-x-2 mt-2">
-            <label for="phone-toggle" class="btn btn-md btn-secondary"><%= it.t("cancel", { ns: "common" })%></label>
+            <label for="phone-toggle" class="btn btn-md btn-secondary btn-enabled"><%= it.t("cancel", { ns: "common" })%></label>
             <button name="intent" value="send_otp" class="btn btn-md btn-primary"><%= it.t("save", { ns: "common" })%></button>
           </div>
         </form>
@@ -143,7 +145,7 @@
       <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("general.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("general.description", { ns: "settings-details" }) %></p>
     </header>
-    <form action="/users/<%= it.user.id %>?return_to=/settings/details#general-details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
+    <form action="/users/<%= it.user.id %>?return_to=/settings/details&err_to=/settings/details" method="post" class="bg-white shadow-sm border border-gray-200 rounded-lg w-full mt-6 mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
       <div class="p-6">
         <label class="w-full mb-6">
           <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>

@@ -16,6 +16,7 @@ events.on("send_phone_otp", async (data) => {
 
 events.on("create_otp", async (data) => {
   const { method, tmpl_name, vars, to, country_code } = data;
+  console.log({ method, tmpl_name, vars, to, country_code })
   if (method === "email") {
     await EmailService.send_email({ tmpl_name, vars, to });
   }

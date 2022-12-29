@@ -1,7 +1,7 @@
 <div class="w-full md:max-w-sm mx-auto space-y-8 mt-20 px-4 sm:px-0">
   <h1 class="font-semibold text-4xl text-gray-900 dark:text-white"><%= it.t("title", { ns: "signup"}) %></h1>
   <%~ includeFile('../../partials/flash.html', it) %>
-  <form action="/auth/otp?method=<%= it.method %>&return_to=/auth/signup?method=<%= it.method %>" method="post">
+  <form action="/auth/otp?method=<%= it.method %>&err_to=<%= encodeURIComponent(`/auth/signup?method=${it.method}`)%>&return_to=<%= encodeURIComponent(`/auth/signup?step=2&return_to=${it.return_to}&method=${it.method}`) %>" method="post">
     <input type="hidden" name="nonce" value="<%= it.nonce %>" />
     <div class="flex flex-col relative">
       <% if (it.method === "email") { %>
@@ -9,7 +9,7 @@
           <%= it.t("email.label", { ns: "signup"}) %> <input type="email" autocomplete="email" class="form-control mt-2"
           placeholder="<%= it.t("email.placeholder", { ns: "login" }) %>" name="identifier" required />
         </label>
-        <a href="/auth/signup?method=phone" noprefetch class="inline-block mt-1.5 self-end btn btn-enabled btn-md btn-tertiary-color">Phone-ID</a>
+        <a href="/auth/signup?method=phone&return_to=<%= it.return_to %>" noprefetch class="inline-block mt-1.5 self-end btn btn-enabled btn-md btn-tertiary-color">Phone-ID</a>
       <% } %>
       <% if (it.method === "phone") { %>
         <input type="hidden" name="country_code" value="998" />
@@ -25,7 +25,7 @@
             />
           </div>
         </label>
-        <a href="/auth/signup?method=email" noprefetch class="self-end btn btn-enabled btn-md btn-tertiary-color mt-1.5">Email-ID</a>
+        <a href="/auth/signup?method=email&return_to=<%= it.return_to %>" noprefetch class="self-end btn btn-enabled btn-md btn-tertiary-color mt-1.5">Email-ID</a>
       <% } %>
     </div>
     <button class="btn btn-primary btn-lg w-full mt-6 mb-4">
@@ -59,7 +59,7 @@
   </form>
   <p class="text-center font-medium text-gray-500 dark:text-gray-400">
     <%= it.t("have_account", { ns: "signup"}) %>
-    <a href="/auth/login" noprefetch class="text-primary-600"><%= it.t("login", { ns: "common" }) %></a>
+    <a href="/auth/login?return_to=<%= it.return_to %>" noprefetch class="text-primary-600"><%= it.t("login", { ns: "common" }) %></a>
   </p>
 </div>
 <script>

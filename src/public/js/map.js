@@ -1,4 +1,4 @@
-import { add_listeners, create_node, disable_element } from "./dom.js";
+import { add_listeners, disable_element, label, input, div, attrs, text, li } from "./dom.js";
 import { request, option, debounce } from "./utils.js";
 import { maskit } from "./mask.js";
 
@@ -12,7 +12,7 @@ const location_input = document.querySelector(".js-location");
 function get_map_container() {
   const map = document.getElementById("map");
   if (map) return map;
-  const node = create_node("div", { class: "h-72 w-full", id: "map" });
+  const node = div(attrs({ class: "h-72 w-full", id: "map" }));
   location_input_container.insertAdjacentElement("afterend", node);
   return node;
 }
@@ -102,22 +102,22 @@ async function on_geo_input_change(e) {
   predictions.innerHTML = "";
   predictions.classList.add("!opacity-100", "!translate-y-0", "!z-10");
   for (const result of results) {
-    const li = create_node("li");
-    const input = create_node("input", {
+    const item = li();
+    const radio_input = input(attrs({
       type: "radio",
       name: "loc",
       id: `location-${result.district_id}`,
       value: `${result.district_id},${result.region_id}`,
       class: "absolute opacity-0 w-0 -z-10 peer",
-    });
-    const label = create_node("label", {
+    }));
+
+    const address_label = label(attrs({
       for: `location-${result.district_id}`,
       class:
         "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 dark:text-gray-200 dark:hover:bg-zinc-800",
-    });
-    label.textContent = result.formatted_address;
+    }), text(result.formatted_address));
 
-    input.addEventListener("change", async () => {
+    radio_input.addEventListener("change", async () => {
       geo_input.value = result.formatted_address;
       predictions.classList.remove("!opacity-100", "!translate-y-0", "!z-10");
       if (!map) await init_map({ lat: result.coords.lat, lng: result.coords.lon });
@@ -130,9 +130,9 @@ async function on_geo_input_change(e) {
 
       location_input.value = `${result.formatted_address}|${result.coords.lat}|${result.coords.lon}|${result.district_id}|${result.region_id}`;
     });
-    li.append(input, label);
 
-    predictions.append(li);
+    item.append(radio_input, address_label);
+    predictions.append(item);
   }
 }
 

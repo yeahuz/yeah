@@ -4,6 +4,8 @@ import * as RegionService from "./services/region.service.js";
 const SUPPORTED_LANGS = ["en", "uz", "ru"];
 
 async function create_index(name) {
+  const existing = await elastic_client.indices.exists({ index: name });
+  if (existing) return;
   return await elastic_client.indices.create({ index: name });
 }
 

@@ -33,18 +33,9 @@ export function disable_element(element) {
     element.removeAttribute("disabled");
   };
 }
-
-export function create_node_2(tag, mod = (node) => node) {
+export function create_node(tag, fns = []) {
   const node = document.createElement(tag);
-  return mod(node);
-}
-
-export function create_node(tag, attributes = {}) {
-  const node = document.createElement(tag);
-  Object.entries(attributes).forEach(([key, value]) => {
-    node.setAttribute(key, value);
-  });
-
+  for (const fn of fns) fn(node);
   return node;
 }
 
@@ -64,16 +55,18 @@ export function attrs(attrs) {
   };
 }
 
-export function create_svg_ns(mod = (node) => node) {
+export function create_svg_ns(fns = []) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  for (const fn of fns) fn(svg);
 
-  return mod(svg);
+  return svg;
 }
 
-export function create_path_ns(mod = (node) => node) {
+export function create_path_ns(fns = []) {
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  for (const fn of fns) fn(path);
 
-  return mod(path);
+  return path;
 }
 
 export function remove_node(node) {
@@ -117,6 +110,36 @@ export function add_listeners(nodeOrNodes, events) {
   }
 }
 
+
+export function classes(constant, dynamic = {}) {
+  let classnames = constant;
+  return (node) => {
+    for (let prop in dynamic) {
+      if (dynamic[prop]) classnames += ` ${prop}`;
+    }
+
+    node.setAttribute("class", classnames);
+    return node;
+  };
+}
+
+export function children(...nodes) {
+  return (node) => node.append(...nodes);
+}
+
+export function create_fragment(fns = []) {
+  const fragment = new DocumentFragment();
+  for (const fn of fns) fn(fragment);
+  return fragment;
+}
+
+export function html(str) {
+  return (node) => {
+    node.innerHTML = str;
+    return node;
+  };
+}
+
 export function adjust_geo_links() {
   if (is_apple_device()) {
     const links = document.querySelectorAll("a[href*='geo:']");
@@ -128,12 +151,17 @@ export function adjust_geo_links() {
   }
 }
 
-export const svg = (mod) => create_svg_ns(mod);
-export const path = (mod) => create_path_ns(mod);
-export const span = (mod) => create_node_2("span", mod);
-export const div = (mod) => create_node_2("div", mod);
-export const ul = (mod) => create_node_2("ul", mod);
-export const li = (mod) => create_node_2("li", mod);
-export const p = (mod) => create_node_2("p", mod);
-export const img = (mod) => create_node_2("img", mod);
-export const h2 = (mod) => create_node_2("h2", mod);
+export const fragment = (...fns) => create_fragment(fns);
+export const svg = (...fns) => create_svg_ns(fns);
+export const path = (...fns) => create_path_ns(fns);
+export const span = (...fns) => create_node("span", fns);
+export const div = (...fns) => create_node("div", fns);
+export const ul = (...fns) => create_node("ul", fns);
+export const li = (...fns) => create_node("li", fns);
+export const p = (...fns) => create_node("p", fns);
+export const img = (...fns) => create_node("img", fns);
+export const h2 = (...fns) => create_node("h2", fns);
+export const a = (...fns) => create_node("a", fns);
+export const button = (...fns) => create_node("button", fns);
+export const input = (...fns) => create_node("input", fns);
+export const label = (...fns) => create_node("label", fns);

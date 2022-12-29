@@ -975,16 +975,16 @@ video {
   aspect-ratio: 1 / 1;
 }
 
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
 .h-36 {
   height: 9rem;
 }
 
 .h-16 {
   height: 4rem;
-}
-
-.h-3 {
-  height: 0.75rem;
 }
 
 .h-full {
@@ -1019,6 +1019,10 @@ video {
   height: 2.75rem;
 }
 
+.h-3 {
+  height: 0.75rem;
+}
+
 .h-6 {
   height: 1.5rem;
 }
@@ -1051,6 +1055,10 @@ video {
   height: 3.5rem;
 }
 
+.h-96 {
+  height: 24rem;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -1077,10 +1085,6 @@ video {
 
 .w-16 {
   width: 4rem;
-}
-
-.w-3 {
-  width: 0.75rem;
 }
 
 .w-screen {
@@ -1115,6 +1119,10 @@ video {
 
 .w-11 {
   width: 2.75rem;
+}
+
+.w-3 {
+  width: 0.75rem;
 }
 
 .w-6 {
@@ -1185,12 +1193,12 @@ video {
   max-width: 32rem;
 }
 
-.max-w-2xl {
-  max-width: 42rem;
-}
-
 .max-w-full {
   max-width: 100%;
+}
+
+.max-w-2xl {
+  max-width: 42rem;
 }
 
 .max-w-max {
@@ -1620,9 +1628,8 @@ video {
   border-top-color: rgb(var(--gray-200));
 }
 
-.border-t-zinc-700 {
-  --tw-border-opacity: 1;
-  border-top-color: rgb(63 63 70 / var(--tw-border-opacity));
+.border-t-gray-300 {
+  border-top-color: rgb(var(--gray-300));
 }
 
 .bg-gray-25 {
@@ -2130,15 +2137,19 @@ html {
     0 8px 8px -4px rgba(var(--gray-900), 0.03);
   --shadow-2xl: 0 24px 48px -12px rgba(var(--gray-900), 0.18);
   --shadow-3xl: 0 32px 64px -12px rgba(var(--gray-900), 0.14);
+  /* Dialog */
+  --color-dialog-bg: var(--white);
+  --color-dialog-text: var(--gray-700);
+  --shadow-dialog: var(--shadow-xs);
   /* Default button */
   --color-btn-bg: var(--white);
   --color-btn-text: var(--gray-500);
   --color-btn-border: transparent;
   --color-btn-hover: var(--gray-50);
   --color-btn-text-hover: var(--gray-600);
-  --color-btn-ring: transparent;
+  --color-btn-ring: var(--gray-100);
   --color-btn-ripple-bg: var(--gray-400);
-  --shadow-btn: var(--shadow-xs);
+  --shadow-btn: none;
   /* Text button */
   --color-text-btn-bg: transparent;
   --color-text-btn-text: var(--primary-600);
@@ -2213,15 +2224,19 @@ html {
 
 html.light {
   color-scheme: light;
+  /* Dialog */
+  --color-dialog-bg: var(--white);
+  --color-dialog-text: var(--gray-700);
+  --shadow-dialog: var(--shadow-xs);
   /* Default button */
   --color-btn-bg: var(--white);
   --color-btn-text: var(--gray-500);
   --color-btn-border: transparent;
   --color-btn-hover: var(--gray-50);
   --color-btn-text-hover: var(--gray-600);
-  --color-btn-ring: transparent;
+  --color-btn-ring: var(--gray-100);
   --color-btn-ripple-bg: var(--gray-400);
-  --shadow-btn: var(--shadow-xs);
+  --shadow-btn: none;
   /* Text button */
   --color-text-btn-bg: transparent;
   --color-text-btn-text: var(--primary-600);
@@ -2296,6 +2311,10 @@ html.light {
 
 html.dark {
   color-scheme: dark;
+  /* Dialog */
+  --color-dialog-bg: var(--zinc-900);
+  --color-dialog-text: var(--gray-200);
+  --shadow-dialog: var(--shadow-md);
   /* Text button */
   --color-text-btn-text-hover: var(--primary-500);
   --color-text-btn-ring: var(--primary-600);
@@ -2789,6 +2808,31 @@ checkbox-control {
   transform: scale(0.9);
 }
 
+dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  box-shadow: var(--shadow-dialog);
+  background: rgb(var(--color-dialog-bg));
+  color: rgb(var(--color-dialog-text));
+  transition: opacity 300ms cubic-bezier(.25, 0, .3, 1);
+  border-radius: 0.5rem;
+}
+
+dialog:not([open]) {
+  pointer-events: none;
+  opacity: 0;
+}
+
+dialog[open] {
+  -webkit-animation: slide-in-up 300ms cubic-bezier(.25, 0, .3, 1);
+          animation: slide-in-up 300ms cubic-bezier(.25, 0, .3, 1);
+}
+
+dialog[loading] {
+  visibility: hidden;
+}
+
 [data-tooltip] {
   --left: auto;
   --bottom: auto;
@@ -2938,6 +2982,30 @@ j
 
 [data-tooltip=""]::after, [data-tooltip=""]::before {
   display: none !important;
+}
+
+@-webkit-keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@-webkit-keyframes scale-down {
+  to {
+    transform: scale(.75)
+  }
+}
+
+@keyframes scale-down {
+  to {
+    transform: scale(.75)
+  }
 }
 
 @-webkit-keyframes dot-pulse-before {
@@ -3358,6 +3426,10 @@ j
   background-color: rgb(var(--error-50));
 }
 
+.hover\:bg-gray-200:hover {
+  background-color: rgb(var(--gray-200));
+}
+
 .hover\:text-gray-900:hover {
   color: rgb(var(--gray-900));
 }
@@ -3621,6 +3693,11 @@ j
   border-top-color: rgb(39 39 42 / var(--tw-border-opacity));
 }
 
+.dark .dark\:border-t-zinc-700 {
+  --tw-border-opacity: 1;
+  border-top-color: rgb(63 63 70 / var(--tw-border-opacity));
+}
+
 .dark .dark\:bg-zinc-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(24 24 27 / var(--tw-bg-opacity));
@@ -3768,6 +3845,10 @@ j
 
   .sm\:h-48 {
     height: 12rem;
+  }
+
+  .sm\:h-20 {
+    height: 5rem;
   }
 
   .sm\:w-20 {

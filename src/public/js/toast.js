@@ -1,4 +1,4 @@
-import { create_node, add_listeners } from './dom.js'
+import { add_listeners, ul, classes, li } from './dom.js';
 
 const ICONS = {
   info: ``,
@@ -30,10 +30,10 @@ const ICONS = {
         stroke-linejoin="round"
       />
     </svg>`,
-}
+};
 
 function init() {
-  const container = create_node("ul", { class: "toast-group" });
+  const container = ul(classes("toast-group"));
   document.firstElementChild.insertBefore(container, document.body);
   return container;
 }
@@ -55,13 +55,13 @@ function resume_animation(e) {
 }
 
 function create_toast(text, type) {
-  const toast = create_node("li", { class: `toast-item toast-item-${type}` });
-  const span = create_node("span", { class: "font-medium ml-2" });
+  const toast = li(classes(`toast-item toast-item-${type}`));
+  const toast_text = span(classes("font-medium ml-2"));
 
-  span.innerText = text;
+  toast_text.innerText = text;
 
   toast.innerHTML = ICONS[type];
-  toast.append(span);
+  toast.append(toast_text);
 
   add_listeners(toast, { mouseover: pause_animation, mouseleave: resume_animation });
 
@@ -77,7 +77,7 @@ export function toast(text, type = "info") {
     await Promise.allSettled(t.getAnimations().map((animation) => animation.finished));
     Toaster.removeChild(t);
     resolve();
-  })
+  });
 }
 
 function flip_toast(toast) {

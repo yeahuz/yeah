@@ -1,4 +1,4 @@
-import { create_node } from "./dom.js";
+import { div, classes, attrs, img, children, button, svg, path } from "./dom.js";
 import { generate_srcset } from "./utils.js";
 
 const zoomables = document.querySelectorAll(".js-zoomable");
@@ -107,20 +107,18 @@ class ImageViewer {
   }
 
   create_container() {
-    const container = create_node("div", {
-      class:
-        "flex items-center justify-center fixed top-0 left-0 w-screen h-screen bg-black/60 duration-300 will-change-transform -z-10 opacity-0 scale-90 text-white outline-none",
-      tabindex: "-1",
-    });
+    const container = div(
+      classes("flex items-center justify-center fixed top-0 left-0 w-screen h-screen bg-black/60 duration-300 will-change-transform -z-10 opacity-0 scale-90 text-white outline-none"),
+      attrs({ tabindex: "-1" })
+    );
     this.container = container;
     document.body.append(container);
   }
 
   create_viewer() {
-    const viewer_container = create_node("div", { class: "max-w-2xl w-full" });
-    const viewer = create_node("img", { class: "max-w-full max-h-full object-cover" });
+    const viewer = img(classes("max-w-full max-h-full object-cover"));
+    const viewer_container = div(classes("max-w-2xl w-full"), children(viewer));
     this.viewer = viewer;
-    viewer_container.append(viewer);
     this.container.append(viewer_container);
   }
 
@@ -134,9 +132,7 @@ class ImageViewer {
   }
 
   create_controls() {
-    const controls = create_node("div", {
-      class: "absolute flex justify-between left-0 top-1/2 -translate-y-1/2 w-full px-8",
-    });
+    const controls = div(classes("absolute flex justify-between left-0 top-1/2 -translate-y-1/2 w-full px-8"));
 
     const next_control = this.create_control("next");
     const prev_control = this.create_control("prev");
@@ -151,27 +147,27 @@ class ImageViewer {
   }
 
   create_control(type) {
-    const control = create_node("button", {
-      class: "p-3 rounded-full duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed",
-    });
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("fill", "none");
-    svg.setAttribute("class", "w-5 h-5 pointer-events-none");
+    const control = button(classes("p-3 rounded-full duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed"));
+    const icon = svg(attrs({
+      viewBox: "0 0 24 24",
+      fill: "none",
+      class: "w-5 h-5 pointer-events-none"
+    }));
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("stroke-width", "1.5");
-    path.setAttribute("stroke-linecap", "round");
-    path.setAttribute("stroke-linejoin", "round");
-    path.setAttribute("stroke", "currentColor");
+    const p = path(attrs({
+      "stroke-width": "1.5",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      "stroke": "currentColor"
+    }));
 
     const prev_path = "M20 12H4M4 12L10 18M4 12L10 6";
     const next_path = "M4 12H20M20 12L14 6M20 12L14 18";
 
-    path.setAttribute("d", type === "next" ? next_path : prev_path);
+    p.setAttribute("d", type === "next" ? next_path : prev_path);
 
-    svg.append(path);
-    control.append(svg);
+    icon.append(p);
+    control.append(icon);
     return control;
   }
 }

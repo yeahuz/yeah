@@ -1,11 +1,11 @@
-import { create_node, add_listeners } from "./dom.js";
+import { add_listeners, span, classes } from "./dom.js";
 
 const ripple_elements = document.querySelectorAll(".btn");
 
 function create_ripple(e) {
   const button = e.currentTarget;
 
-  const circle = create_node("span", { class: "ripple" });
+  const circle = span(classes("ripple"));
   const diameter = Math.max(button.clientWidth, button.clientHeight);
   const radius = diameter / 2;
 

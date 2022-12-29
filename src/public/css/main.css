@@ -78,15 +78,20 @@ html {
   --shadow-3xl: 0 32px 64px -12px rgba(var(--gray-900), 0.14);
 
 
+  /* Dialog */
+  --color-dialog-bg: var(--white);
+  --color-dialog-text: var(--gray-700);
+  --shadow-dialog: var(--shadow-xs);
+
   /* Default button */
   --color-btn-bg: var(--white);
   --color-btn-text: var(--gray-500);
   --color-btn-border: transparent;
   --color-btn-hover: var(--gray-50);
   --color-btn-text-hover: var(--gray-600);
-  --color-btn-ring: transparent;
+  --color-btn-ring: var(--gray-100);
   --color-btn-ripple-bg: var(--gray-400);
-  --shadow-btn: var(--shadow-xs);
+  --shadow-btn: none;
 
   /* Text button */
   --color-text-btn-bg: transparent;
@@ -173,15 +178,21 @@ html {
 html.light {
   color-scheme: light;
 
+
+  /* Dialog */
+  --color-dialog-bg: var(--white);
+  --color-dialog-text: var(--gray-700);
+  --shadow-dialog: var(--shadow-xs);
+
  /* Default button */
   --color-btn-bg: var(--white);
   --color-btn-text: var(--gray-500);
   --color-btn-border: transparent;
   --color-btn-hover: var(--gray-50);
   --color-btn-text-hover: var(--gray-600);
-  --color-btn-ring: transparent;
+  --color-btn-ring: var(--gray-100);
   --color-btn-ripple-bg: var(--gray-400);
-  --shadow-btn: var(--shadow-xs);
+  --shadow-btn: none;
 
   /* Text button */
   --color-text-btn-bg: transparent;
@@ -266,6 +277,11 @@ html.light {
 
 html.dark {
   color-scheme: dark;
+
+  /* Dialog */
+  --color-dialog-bg: var(--zinc-900);
+  --color-dialog-text: var(--gray-200);
+  --shadow-dialog: var(--shadow-md);
 
   /* Text button */
   --color-text-btn-text-hover: var(--primary-500);
@@ -749,6 +765,30 @@ checkbox-control {
   transform: scale(0.9);
 }
 
+dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  box-shadow: var(--shadow-dialog);
+  background: rgb(var(--color-dialog-bg));
+  color: rgb(var(--color-dialog-text));
+  transition: opacity 300ms cubic-bezier(.25, 0, .3, 1);
+  border-radius: 0.5rem;
+}
+
+dialog:not([open]) {
+  pointer-events: none;
+  opacity: 0;
+}
+
+dialog[open] {
+  animation: slide-in-up 300ms cubic-bezier(.25, 0, .3, 1);
+}
+
+dialog[loading] {
+  visibility: hidden;
+}
+
 [data-tooltip] {
   --left: auto;
   --bottom: auto;
@@ -896,6 +936,16 @@ j
 
 [data-tooltip=""]::after, [data-tooltip=""]::before {
   display: none !important;
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes scale-down {
+  to { transform: scale(.75) }
 }
 
 @-webkit-keyframes dot-pulse-before {

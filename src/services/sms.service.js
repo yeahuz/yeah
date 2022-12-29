@@ -27,6 +27,7 @@ export class SMSClient {
       method: "POST",
       body: fd,
     });
+
     const json = await response.json().catch(() => {});
 
     if (!response.ok) {
@@ -38,8 +39,9 @@ export class SMSClient {
   }
 
   async refresh_token() {
-    await this.request("/auth/refresh", { method: "PATCH" });
-    return this.token;
+    await update_env({ SMS_API_TOKEN: '' });
+    const token = await SMSClient.get_token().catch((err) => console.log({ err }));
+    this.token = token;
   }
 
   async request(url, { method, data } = {}) {

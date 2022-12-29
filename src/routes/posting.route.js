@@ -1,5 +1,6 @@
 import { new_posting_schema } from "../schemas/new-posting.schema.js";
 import * as PostingController from "../controllers/posting.controller.js";
+import { authenticated_user } from "../utils/roles.js";
 
 export const posting = async (fastify) => {
   fastify.route({
@@ -58,6 +59,7 @@ export const posting = async (fastify) => {
     method: "POST",
     url: "/wizard/:id/4",
     handler: PostingController.submit_fourth_step,
+    onRequest: fastify.can([authenticated_user])
   });
   fastify.route({
     method: "POST",

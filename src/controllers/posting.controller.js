@@ -260,6 +260,7 @@ export async function get_step(req, reply) {
         posting_data,
         generate_srcset,
         user,
+        id
       });
       break;
     }

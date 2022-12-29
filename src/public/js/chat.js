@@ -1,7 +1,6 @@
-import { add_listeners, attrs, create_node } from "./dom.js";
-import { span } from "./dom-v2.js";
-import { clock_icon } from "./icons.js";
-import { media_message_tmpl, file_message_tmpl_2, text_message_tmpl } from "./templates-v2.js";
+import { add_listeners, attrs, span, text, html, classes } from "./dom.js";
+import { check_icon } from "./icons.js";
+import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates.js";
 import {
   option,
   request,
@@ -29,7 +28,7 @@ if (top && messages) messages.scrollTop = parseInt(top, 10);
 window.addEventListener("beforeunload", () => {
   const pathname = window.location.pathname;
   if (messages) {
-    localStorage.setItem(pathname, messages.scrollTop);
+    window.localStorage.setItem(pathname, messages.scrollTop);
   }
 });
 
@@ -107,7 +106,7 @@ function on_message_sent(message) {
   for (const info of date_infos) {
     const clock = info.querySelector(".js-date-info-clock");
     if (clock) clock.remove();
-    const check = span(html(clock_icon({ size: 12 })));
+    const check = span(html(check_icon({ size: 14 })));
     info.append(check);
   }
 
@@ -120,7 +119,7 @@ function on_new_message(payload) {
       messages.append(text_message_tmpl(payload, false));
       break;
     case "file":
-      messages.append(file_message_tmpl_2(payload, false));
+      messages.append(file_message_tmpl(payload, false));
       break;
     default:
       break;
@@ -174,15 +173,12 @@ function upload_media_to(urls) {
 function on_file_progress(item) {
   item.classList.add("pointer-events-none");
 
-  const span = create_node("span", {
-    class:
-      "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg text-white",
-  });
+  const upload_progress = span(classes("upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg text-white"));
 
-  item.append(span);
+  item.append(upload_progress);
 
   return (progress) => {
-    span.textContent = `${Math.floor(progress.percent)}%`;
+    upload_progress.textContent = `${Math.floor(progress.percent)}%`;
   };
 }
 
@@ -295,7 +291,7 @@ async function on_files_change(e) {
 
   if (other_messages.length) {
     for (const msg of other_messages) {
-      messages.append(file_message_tmpl_2(msg));
+      messages.append(file_message_tmpl(msg));
       upload_files(msg);
     }
   }

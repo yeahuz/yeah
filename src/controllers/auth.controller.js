@@ -56,7 +56,7 @@ export async function get_qr_login(req, reply) {
 }
 
 export async function qr_login_confirm(req, reply) {
-  const { return_to = "/" } = req.query;
+  const { return_to = "/", err_to = "/" } = req.query;
   const { token } = req.params;
   const { _action } = req.body;
   const user = req.user;
@@ -133,6 +133,7 @@ export async function get_login(req, reply) {
     nonce,
     method,
     ws_uri_public: config.ws_uri_public,
+    return_to
   });
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);
@@ -185,6 +186,7 @@ export async function get_signup(req, reply) {
         oauth_state,
         nonce,
         method,
+        return_to
       });
       break;
     }
@@ -193,7 +195,7 @@ export async function get_signup(req, reply) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;
       }
-      rendered_step = await render_file("/auth/signup/step-2.html", { t, flash, nonce, method });
+      rendered_step = await render_file("/auth/signup/step-2.html", { t, flash, nonce, method, return_to });
       break;
     }
     case "3": {
@@ -203,6 +205,7 @@ export async function get_signup(req, reply) {
         nonce,
         method,
         identifier,
+        return_to
       });
       break;
     }
@@ -228,7 +231,7 @@ export async function get_signup(req, reply) {
 
 export async function create_otp(req, reply) {
   const t = req.i18n.t;
-  const { method } = req.query;
+  const { method, err_to = "/auth/signup", return_to = "/auth/signup" } = req.query;
   const { identifier, country_code } = transform_object(req.body, {
     identifier: (v) => v.replace(/\s/g, ""),
   });
@@ -239,7 +242,7 @@ export async function create_otp(req, reply) {
 
     if (err) {
       req.flash("err", err.build(t));
-      reply.redirect(add_t(`/auth/signup?method=${method}`));
+      reply.redirect(add_t(err_to));
       return reply;
     }
 
@@ -253,12 +256,12 @@ export async function create_otp(req, reply) {
   }
 
   req.session.set("identifier", identifier);
-  reply.redirect(`/auth/signup?step=2&method=${method}`);
+  reply.redirect(return_to);
   return reply;
 }
 
 export async function confirm_otp(req, reply) {
-  const { method = "phone" } = req.query;
+  const { err_to = "/auth/signup", return_to = "/auth/signup" } = req.query;
   const { otp } = transform_object(req.body, {
     otp: (v) => (Array.isArray(v) ? v.join("") : v),
   });
@@ -269,17 +272,17 @@ export async function confirm_otp(req, reply) {
 
   if (!is_valid) {
     req.flash("err", new GoneError({ key: "otp_expired" }).build(t));
-    return reply.redirect(add_t(`/auth/signup?step=2&method=${method}`));
+    return reply.redirect(add_t(err_to));
   }
 
   const otp_token = jwt.sign({ otp }, { expiresIn: 1000 * 60 * 15 });
   req.session.set("otp_token", otp_token);
-  reply.redirect(`/auth/signup?step=3&method=${method}`);
+  reply.redirect(return_to);
   return reply;
 }
 
 export async function signup(req, reply) {
-  const { return_to = "/" } = req.query;
+  const { return_to = "/", err_to = "/" } = req.query;
   const { identifier, password, name } = transform_object(req.body, {
     identifier: (v) => v.replace(/\s/g, ""),
   });
@@ -293,7 +296,7 @@ export async function signup(req, reply) {
 
   if (decoding_err) {
     req.flash("err", decoding_err.build(t));
-    return reply.redirect(add_t(req.url));
+    return reply.redirect(add_t(err_to));
   }
 
   const [result, err] = await option(
@@ -308,7 +311,7 @@ export async function signup(req, reply) {
 
   if (err) {
     req.flash("err", err.build(t));
-    return reply.redirect(req.url);
+    return reply.redirect(err_to);
   }
 
   req.session.set("sid", result.session.id);
@@ -320,7 +323,7 @@ export async function signup(req, reply) {
 }
 
 export async function login(req, reply) {
-  const { return_to = "/" } = req.query;
+  const { return_to = "/", err_to = "/" } = req.query;
   const { identifier, password } = req.body;
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
@@ -334,7 +337,7 @@ export async function login(req, reply) {
       return reply;
     }
     req.flash("err", user_err.build(t));
-    return reply.redirect(req.url);
+    return reply.redirect(err_to);
   }
 
   const has_credential = await CredentialService.exists_for(user.id);
@@ -355,7 +358,7 @@ export async function login(req, reply) {
       return reply;
     }
     req.flash("err", err.build(t));
-    return reply.redirect(req.url);
+    return reply.redirect(err_to);
   }
 
   req.session.set("sid", session.id);
@@ -464,7 +467,7 @@ export async function update_sessions(req, reply) {
   const user = req.user;
   const sid = req.session.get("sid");
   const { _action } = req.body;
-  const { return_to } = req.query;
+  const { return_to = "/", err_to = "/" } = req.query;
 
   switch (_action) {
     case "terminate_other_sessions":
@@ -480,7 +483,7 @@ export async function update_sessions(req, reply) {
 export async function update_session(req, reply) {
   const { id } = req.params;
   const { _action } = req.body;
-  const { return_to } = req.query;
+  const { return_to = "/", err_to = "/" } = req.query;
 
   switch (_action) {
     case "delete_one":
@@ -616,10 +619,10 @@ export async function delete_credentials(req, reply) {
 
 export async function get_webauthn(req, reply) {
   const user_id = req.session.get("user_id");
-  const { return_to = "/" } = req.query;
+  const { err_to = "/", return_to = "/" } = req.query;
 
   if (!user_id) {
-    reply.redirect(`/auth/login?return_to=${return_to}`);
+    reply.redirect(err_to);
     return reply;
   }
 
@@ -634,7 +637,7 @@ export async function get_webauthn(req, reply) {
     stream.push(top);
   }
 
-  const webauthn = await render_file("/auth/webauthn.html", { t });
+  const webauthn = await render_file("/auth/webauthn.html", { t, return_to });
   stream.push(webauthn);
 
   if (!req.partial) {

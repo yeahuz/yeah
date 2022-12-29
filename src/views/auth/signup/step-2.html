@@ -1,7 +1,7 @@
 <div class="w-full md:max-w-sm mx-auto space-y-8 mt-20 px-4 sm:px-0">
   <h1 class="font-semibold text-4xl text-gray-900 dark:text-white"><%= it.t("title", { ns: "signup"}) %></h1>
   <%~ includeFile('../../partials/flash.html', it) %>
-  <form action="/auth/otp/confirmation?method=<%= it.method %>" method="post">
+  <form action="/auth/otp/confirmation?method=<%= it.method %>&err_to=<%= encodeURIComponent(`/auth/signup?step=2&method=${it.method}`)%>&return_to=<%= encodeURIComponent(`/auth/signup?step=3&return_to=${it.return_to}&method=${it.method}`)%>" method="post">
     <input type="hidden" name="nonce" value="<%= it.nonce %>" />
     <label class="text-sm font-medium text-gray-700 mt-5 block dark:text-gray-200">
       <%= it.t("code.label", { ns: "signup" }) %>
