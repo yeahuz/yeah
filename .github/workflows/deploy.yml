@@ -12,13 +12,13 @@ jobs:
     - name: Setup ssh keys
       uses: webfactory/ssh-agent@v0.6.0
       with:
-        ssh-private-key: ${{ secrets.USER_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.ACTIONS_PRIVATE_KEY }}
     - name: Deploy using ssh
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
+        key: ${{ secrets.VM_PRIVATE_KEY }}
         port: 22
         script: |
           export NVM_DIR=~/.nvm
