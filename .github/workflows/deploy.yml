@@ -9,10 +9,6 @@ jobs:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: Setup ssh keys
-      uses: webfactory/ssh-agent@v0.6.0
-      with:
-        ssh-private-key: ${{ secrets.ACTIONS_PRIVATE_KEY }}
     - name: Deploy using ssh
       uses: appleboy/ssh-action@master
       with:
