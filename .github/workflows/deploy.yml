@@ -17,12 +17,13 @@ jobs:
         key: ${{ secrets.VM_PRIVATE_KEY }}
         port: 22
         script: |
+          eval "$(ssh-agent -s)"
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
           cd ~/projects/yeah
           pnpm install
           pnpm rollback
-          git pull origin master
+          git pull origin master -v
           git status
           pnpm migrate
           pnpm seed
