@@ -182,10 +182,6 @@ export function create_tree2(array, rootNodes, customID, childrenProperty) {
   return tree;
 }
 
-export function parse_url(url) {
-  return new URL(url, config.origin);
-}
-
 export function cleanup_object(obj) {
   for (const prop in obj) {
     if (!obj[prop]) delete obj[prop];

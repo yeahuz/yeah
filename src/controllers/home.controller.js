@@ -5,7 +5,7 @@ import * as RegionService from "../services/region.service.js";
 import path from "path";
 import fs from "fs";
 import { render_file } from "../utils/eta.js";
-import { parse_url, array_to_tree, generate_srcset } from "../utils/index.js";
+import { array_to_tree, generate_srcset } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 import { registerFont, createCanvas } from "canvas";
 
@@ -122,7 +122,7 @@ export async function get_index(req, reply) {
   stream.push(home);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { user, t });
     stream.push(bottom);
   }
 
@@ -160,7 +160,7 @@ export async function get_me(req, reply) {
   }
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -203,8 +203,7 @@ export async function get_profile(req, reply) {
   if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
-      user: current_user,
-      url: parse_url(req.url),
+      user: current_user
     });
     stream.push(bottom);
   }

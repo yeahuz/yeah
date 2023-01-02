@@ -7,7 +7,7 @@ import * as AttributeService from "../services/attribute.service.js";
 import * as RegionService from "../services/region.service.js";
 import * as ChatService from "../services/chat.service.js";
 import { render_file } from "../utils/eta.js";
-import { array_to_tree, parse_url, generate_srcset, option, add_t } from "../utils/index.js";
+import { array_to_tree, generate_srcset, option, add_t } from "../utils/index.js";
 import { redis_client } from "../services/redis.service.js";
 import { new_posting_schema } from "../schemas/new-posting.schema.js";
 import { async_pool_all } from "../utils/async-pool.js";
@@ -273,8 +273,7 @@ export async function get_step(req, reply) {
   if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
-      url: parse_url(req.url),
-      user,
+      user
     });
     stream.push(bottom);
   }
@@ -327,7 +326,7 @@ export async function get_contact(req, reply) {
   stream.push(contact);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { user, t });
     stream.push(bottom);
   }
 
@@ -343,11 +342,11 @@ export async function contact(req, reply) {
   const chats = await ChatService.get_posting_chats(posting_id);
   const [chat, err] = await option(
     (await ChatService.get_member_chat(user.id, chats)) ||
-      ChatService.create_chat({
-        created_by: user.id,
-        posting_id,
-        members: [creator_id, user.id],
-      })
+    ChatService.create_chat({
+      created_by: user.id,
+      posting_id,
+      members: [creator_id, user.id],
+    })
   );
 
   if (err) {
@@ -417,7 +416,7 @@ export async function get_one(req, reply) {
   stream.push(single);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { user, t });
     stream.push(bottom);
   }
 

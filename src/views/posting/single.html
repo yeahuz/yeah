@@ -92,7 +92,7 @@
           </span>
         </div>
       </div>
-      <% if (it.posting.creator.id !== it.user.id) { %>
+      <% if (it.posting.creator.id !== it.user?.id) { %>
         <div class="flex flex-col space-y-3 p-4">
           <button class="btn btn-primary w-full"><%= it.t("show_phone", { ns: "profile" })%></button>
           <a class="btn btn-secondary w-full" href="<%= it.posting.url %>/contact"><%= it.t("send_message", { ns: "chats" })%></a>

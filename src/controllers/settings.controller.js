@@ -2,7 +2,7 @@ import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
 import * as BillingService from "../services/billing.service.js";
 import { render_file } from "../utils/eta.js";
-import { parse_url, add_t } from "../utils/index.js";
+import { add_t } from "../utils/index.js";
 import { create_date_formatter } from "../utils/date.js";
 
 export async function get_tab(req, reply) {
@@ -47,7 +47,7 @@ export async function get_tab(req, reply) {
   stream.push(settings_bottom);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -87,7 +87,7 @@ export async function get_details(req, reply) {
   stream.push(details);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -134,7 +134,7 @@ export async function get_privacy(req, reply) {
   stream.push(privacy);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -176,7 +176,7 @@ export async function get_billing(req, reply) {
   stream.push(billing);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -218,7 +218,7 @@ export async function get_appearance(req, reply) {
   stream.push(appearance);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -259,7 +259,7 @@ export async function get_settings(req, reply) {
   stream.push(settings_tabs);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 

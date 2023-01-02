@@ -1,7 +1,7 @@
 import * as PaymentService from "../services/payment.service.js";
 import * as BillingService from "../services/billing.service.js";
 import { render_file } from "../utils/eta.js";
-import { parse_url, option } from "../utils/index.js";
+import { option } from "../utils/index.js";
 
 export async function get_new(req, reply) {
   const flash = reply.flash();
@@ -25,8 +25,7 @@ export async function get_new(req, reply) {
   if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
-      url: parse_url(req.url),
-      user,
+      user
     });
     stream.push(bottom);
   }

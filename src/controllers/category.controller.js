@@ -1,4 +1,3 @@
-import { parse_url } from "../utils/index.js";
 import { render_file } from "../utils/eta.js";
 import * as CategoryService from "../services/category.service.js";
 
@@ -27,8 +26,7 @@ export async function get_many(req, reply) {
   if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       user,
-      t,
-      url: parse_url(req.url),
+      t
     });
     stream.push(bottom);
   }

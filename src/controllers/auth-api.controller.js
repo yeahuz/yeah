@@ -6,6 +6,7 @@ import * as jwt from "../utils/jwt.js";
 import { AuthorizationError, ResourceNotFoundError } from "../utils/errors.js";
 import { AssertionRequest, CredentialRequest } from "../utils/webauthn.js";
 import { admin_user, external_client } from "../utils/roles.js";
+import { transform_object } from "../utils/index.js";
 
 export async function admin_login(req, reply) {
   const { identifier, password } = req.body;
@@ -47,17 +48,22 @@ export async function login(req, reply) {
 
   if (has_credential) {
     const token = jwt.sign({ id: user.id }, { expiresIn: 120 });
+    req.session.set("token", token);
     reply.send({ has_credential, token });
     return reply;
   }
 
   const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
-  reply.send(session);
+  req.session.set("sid", session.id);
+  reply.send({ session, user });
   return reply;
 }
 
 export async function verify_assertion(req, reply) {
-  const { token, assertion, challenge } = req.body;
+  const { token, assertion, challenge } = transform_object(req.body, {
+    token: (v) => !v ? req.session.get("token") : v
+  });
+
   const decoded = await jwt.verify(token);
   const user_agent = req.headers["user-agent"];
   const ip = req.ip;
@@ -71,12 +77,19 @@ export async function verify_assertion(req, reply) {
   await credential.$query().patch({ counter: auth_data.counter });
 
   const session = await SessionService.create_one({ user_id: decoded.id, user_agent, ip });
-  reply.send(session);
+  const user = await UserService.get_one(decoded.id, ["roles"]);
+  req.session.set("sid", session.id);
+  req.session.set("token", null);
+  req.session.set("challenge", null);
+  reply.send({ user, session });
   return reply;
 }
 
 export async function generate_request(req, reply) {
-  const { type, token } = req.query;
+  const { type, token } = transform_object(req.query, {
+    token: (v) => !v ? req.session.get("token") : v
+  });
+
   const decoded = await jwt.verify(token);
   const user = await UserService.get_one(decoded.id);
 
@@ -96,6 +109,7 @@ export async function generate_request(req, reply) {
       break;
   }
 
+  req.session.set("challenge", request.challenge);
   reply.send(request);
   return reply;
 }
@@ -111,5 +125,18 @@ export async function delete_session(req, reply) {
   const { id } = req.params;
   const result = await SessionService.delete_one(id);
   reply.send(result);
+  return reply;
+}
+
+export async function get_me(req, reply) {
+  const user = req.user;
+  return user;
+}
+
+export async function logout(req, reply) {
+  const sid = req.session.get("sid");
+  const result = await AuthService.logout(sid);
+  req.session.delete();
+  reply.send(result)
   return reply;
 }

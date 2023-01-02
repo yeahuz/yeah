@@ -13,7 +13,6 @@ import {
   option,
   get_time,
   add_t,
-  parse_url,
   transform_object,
 } from "../utils/index.js";
 import { AuthenticationError, GoneError } from "../utils/errors.js";
@@ -141,8 +140,7 @@ export async function get_login(req, reply) {
   if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
-      user,
-      url: parse_url(req.url),
+      user
     });
     stream.push(bottom);
   }
@@ -219,8 +217,7 @@ export async function get_signup(req, reply) {
   if (!req.partial) {
     const bottom = await render_file("/partials/bottom.html", {
       t,
-      user,
-      url: parse_url(req.url),
+      user
     });
     stream.push(bottom);
   }
@@ -641,10 +638,7 @@ export async function get_webauthn(req, reply) {
   stream.push(webauthn);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", {
-      t,
-      url: parse_url(req.url),
-    });
+    const bottom = await render_file("/partials/bottom.html", { t });
     stream.push(bottom);
   }
 

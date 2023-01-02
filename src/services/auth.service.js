@@ -70,7 +70,7 @@ export async function verify_password({ identifier, password }) {
 
   if (!is_valid) throw new BadRequestError({ key: "invalid_password" });
 
-  return user;
+  return user.toJSON();
 }
 
 export async function login({ email_phone, password, user_agent, ip }) {

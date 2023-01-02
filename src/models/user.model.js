@@ -13,6 +13,14 @@ export class User extends BaseModel {
     return ["formatted_phone"];
   }
 
+  static get modifiers() {
+    return {
+      public_selects(builder) {
+        builder.select("id", "name", "username", "bio", "website_url", "profile_photo_url", "hash_id", "profile_url")
+      }
+    }
+  }
+
   static get relationMappings() {
     return {
       roles: {

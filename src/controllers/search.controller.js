@@ -2,7 +2,6 @@ import * as CategoryService from "../services/category.service.js";
 import * as RegionService from "../services/region.service.js";
 import {
   cleanup_object,
-  parse_url,
   remove_query_value,
   append_query_value,
   array_to_tree,
@@ -81,7 +80,7 @@ export async function get_search(req, reply) {
   stream.push(results);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { user, t, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { user, t });
     stream.push(bottom);
   }
 

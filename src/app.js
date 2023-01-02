@@ -12,7 +12,6 @@ import os from "os";
 import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
 import * as eta from "eta";
-
 import { elastic_client } from "./services/es.service.js";
 import { i18next } from "./utils/i18n.js";
 import { routes, api_routes } from "./routes/index.js";
@@ -25,6 +24,7 @@ import * as RegionService from "./services/region.service.js";
 import { pg_to_es } from "./jobs.js";
 import { render_file } from "./utils/eta.js";
 import qs from "qs";
+import cors from "@fastify/cors";
 
 process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
@@ -105,6 +105,11 @@ export async function start() {
       setHeaders: (res) => {
         res.setHeader("Service-Worker-Allowed", "/");
       },
+    });
+
+    app.register(cors, {
+      origin: config.origin.split(","),
+      credentials: true
     });
 
     app.setErrorHandler((err, req, reply) => {

@@ -1,6 +1,6 @@
 import * as ChatService from "../services/chat.service.js";
 import { render_file } from "../utils/eta.js";
-import { parse_url, generate_srcset, format_bytes } from "../utils/index.js";
+import { generate_srcset, format_bytes } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 
 export async function get_many(req, reply) {
@@ -34,7 +34,7 @@ export async function get_many(req, reply) {
   stream.push(chat_area);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 
@@ -82,7 +82,7 @@ export async function get_one(req, reply) {
   stream.push(chat_area);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t, user, url: parse_url(req.url) });
+    const bottom = await render_file("/partials/bottom.html", { t, user });
     stream.push(bottom);
   }
 

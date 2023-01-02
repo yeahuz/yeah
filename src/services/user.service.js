@@ -61,7 +61,7 @@ export async function get_by_email_phone(identifier, relations = []) {
 
 export async function get_one(id, relations = []) {
   if (!id) return;
-  return await User.query().findById(id).withGraphFetched(format_relations(relations));
+  return await User.query().modify("public_selects").findById(id).withGraphFetched(format_relations(relations));
 }
 
 async function cursor_paginate(model, list = [], excludes) {
