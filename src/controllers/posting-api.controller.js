@@ -7,7 +7,7 @@ export async function get_one(req, reply) {
 
 export async function get_many(req, reply) {
   const { status_id, limit = 15, after, before } = req.query;
-  return await PostingService.get_many({ status_id, limit, after, before });
+  return await PostingService.get_many({ status_id, limit, after, before, lang: req.language });
 }
 
 export async function get_filters(req, reply) {

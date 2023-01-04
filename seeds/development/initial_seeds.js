@@ -162,21 +162,29 @@ export async function seed(knex) {
       id: 1,
       active: true,
       code: "active",
+      bg_hex: "#ECFDF3",
+      fg_hex: "#027A48"
     },
     {
       id: 2,
       active: true,
       code: "archived",
+      bg_hex: "#F2F4F7",
+      fg_hex: "#344054"
     },
     {
       id: 3,
       active: true,
       code: "in_moderation",
+      bg_hex: "#FFFAEB",
+      fg_hex: "#B54708"
     },
     {
       id: 4,
       active: true,
       code: "indexing",
+      bg_hex: "#eff4ff",
+      fg_hex: "#0066e9"
     },
   ]);
 

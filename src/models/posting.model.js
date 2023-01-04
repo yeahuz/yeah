@@ -40,8 +40,8 @@ export class Posting extends BaseModel {
         relation: BaseModel.HasOneRelation,
         modelClass: PostingStatus,
         join: {
-          from: "postings.posting_id",
-          to: "postings.id",
+          from: "postings.status_id",
+          to: "posting_statuses.id",
         },
       },
       attachments: {

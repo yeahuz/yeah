@@ -112,6 +112,8 @@ export function up(knex) {
     })
     .createTable("payment_statuses", (table) => {
       table.string("code").primary();
+      table.string("fg_hex", 7);
+      table.string("bg_hex", 7);
       table.timestamps(false, true);
     })
     .createTable("payments", (table) => {
@@ -323,6 +325,8 @@ export function up(knex) {
       table.increments("id");
       table.boolean("active").defaultTo(false);
       table.string("code").notNullable();
+      table.string("fg_hex", 7);
+      table.string("bg_hex", 7);
       table.timestamps(false, true);
     })
     .createTable("attributes", (table) => {
@@ -749,6 +753,8 @@ export function up(knex) {
     })
     .createTable("transaction_statuses", (table) => {
       table.increments("id");
+      table.string("bg_hex", 7);
+      table.string("fg_hex", 7);
       table.timestamps(false, true);
     })
     .createTable("transaction_status_translations", (table) => {

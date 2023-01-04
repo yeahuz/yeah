@@ -66,6 +66,7 @@ export const api_routes = async (fastify) => {
   fastify.register(chat_api, { prefix: "/chats" });
 
   fastify.setErrorHandler((err, req, reply) => {
+    console.log({ err });
     const lang = req.language;
     const t = i18next.getFixedT(lang);
     if (err.validation) {

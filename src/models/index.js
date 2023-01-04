@@ -37,3 +37,4 @@ export * from "./message.model.js";
 export * from "./role.model.js";
 export * from "./attribute.model.js";
 export * from "./attribute-translation.model.js";
+export * from "./posting-status-translation.model.js";

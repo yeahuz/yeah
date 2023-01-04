@@ -131,12 +131,13 @@ export async function get_attributes({ attribute_set = [], lang = "en" }) {
 
 export async function get_many({
   currency = "UZS",
-  status_id = 1,
+  status_id,
   limit = 15,
   after,
   before,
+  lang = "en"
 } = {}) {
-  const list = await Posting.query()
+  const query = Posting.query()
     .select(
       "title",
       "description",
@@ -149,7 +150,6 @@ export async function get_many({
       "postings.id as id",
       raw("round(price * rate) as price")
     )
-    .where({ status_id })
     .join("posting_prices as pp", "postings.id", "pp.posting_id")
     .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
     .where("exchange_rates.to_currency", "=", currency)
@@ -161,15 +161,30 @@ export async function get_many({
       "postings.id",
       "pp.price"
     )
-    .withGraphFetched("location")
+    .orderBy("postings.id", "desc")
+    .withGraphFetched("[location,status.[translation]]")
+    .modifyGraph("status.translation", builder => builder.select("name").where({ language_code: lang.substring(0, 2) }))
     .limit(limit);
 
+  if (after) {
+    query.where("postings.id", "<", after);
+  }
+
+  if (before) {
+    query.where("postings.id", ">", before);
+  }
+
+  if (status_id) {
+    query.where({ status_id })
+  }
+
+  const list = await query;
   return await cursor_paginate(Posting, list);
 }
 
 export async function get_statuses({ lang = "en" }) {
   return await PostingStatus.query()
-    .select("pst.name as name", "posting_statuses.id", "posting_statuses.code")
+    .select("pst.name as name", "posting_statuses.id", "posting_statuses.code", "posting_statuses.bg_hex", "posting_statuses.fg_hex")
     .join("posting_status_translations as pst", "pst.status_id", "posting_statuses.id")
     .where({ language_code: lang.substring(0, 2) });
 }
