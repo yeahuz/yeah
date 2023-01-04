@@ -11,5 +11,16 @@ module.exports = {
         NODE_ENV: "production",
       }
     },
+    {
+      name: "needs-dev",
+      script: "./src/index.js",
+      instances: 1,
+      exec_mode: "cluster",
+      restart_delay: 10000,
+      listen_timeout: 10000,
+      env: {
+        NODE_ENV: "development",
+      }
+    },
   ],
 };

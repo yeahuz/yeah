@@ -108,7 +108,7 @@ export async function start() {
     });
 
     app.register(cors, {
-      origin: config.origin.split(","),
+      origin: config.origin_cors.split(","),
       credentials: true
     });
 
