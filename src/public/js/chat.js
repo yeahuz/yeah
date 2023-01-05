@@ -41,7 +41,7 @@ function on(op, callback) {
 }
 
 function connect() {
-  ws = new WebSocket("ws://localhost:3020/chat");
+  ws = new WebSocket(`${WS_URI_PUBLIC}/chat`);
 
   ws.binaryType = "arraybuffer";
 

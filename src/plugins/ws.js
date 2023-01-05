@@ -11,7 +11,7 @@ export const ws = fp(async function (fastify, opts, next) {
     if (timeout_id) clearTimeout(timeout_id);
     if (retries === 0) return;
 
-    wss = new WebSocket(config.ws_uri_local);
+    wss = new WebSocket(config.ws_uri_internal);
 
     wss.on("error", (e) => {
       fastify.log.error(`WebSocket connection failed: ${e.message}`);
@@ -25,7 +25,7 @@ export const ws = fp(async function (fastify, opts, next) {
     });
 
     wss.on("open", () =>
-      fastify.log.info(`WebSocket connection established to ${config.ws_uri_local}`)
+      fastify.log.info(`WebSocket connection established to ${config.ws_uri_internal}`)
     );
 
     wss.on("message", (msg) => {

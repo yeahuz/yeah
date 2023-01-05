@@ -13,6 +13,7 @@ export async function get_many(req, reply) {
       meta: { title: t("title", { ns: "chats" }), lang: req.language },
       t,
       user,
+      env: { WS_URI_PUBLIC: config.ws_uri_public }
     });
     stream.push(top);
   }
@@ -54,6 +55,7 @@ export async function get_one(req, reply) {
       meta: { title: t("title", { ns: "chats" }), lang: req.language },
       t,
       user,
+      env: { WS_URI_PUBLIC: config.ws_uri_public }
     });
     stream.push(top);
   }

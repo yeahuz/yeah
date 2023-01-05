@@ -12,14 +12,14 @@ module.exports = {
       }
     },
     {
-      name: "needs-dev",
+      name: "needs-staging",
       script: "./src/index.js",
       instances: 1,
       exec_mode: "cluster",
       restart_delay: 10000,
       listen_timeout: 10000,
       env: {
-        NODE_ENV: "development",
+        NODE_ENV: "staging",
       }
     },
   ],

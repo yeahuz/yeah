@@ -119,6 +119,7 @@ export async function get_login(req, reply) {
       meta: { title: t("title", { ns: "login" }), lang: req.language },
       t,
       user,
+      env: { WS_URI_PUBLIC: config.ws_uri_public }
     });
     stream.push(top);
   }
@@ -131,7 +132,6 @@ export async function get_login(req, reply) {
     oauth_state,
     nonce,
     method,
-    ws_uri_public: config.ws_uri_public,
     return_to
   });
   stream.push(login);

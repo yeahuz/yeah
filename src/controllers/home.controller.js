@@ -2,6 +2,7 @@ import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
 import * as PostingService from "../services/posting.service.js";
 import * as RegionService from "../services/region.service.js";
+import config from "../config/index.js";
 import path from "path";
 import fs from "fs";
 import { render_file } from "../utils/eta.js";
@@ -21,6 +22,7 @@ export async function get_partial(req, reply) {
     t,
     user,
     theme,
+    env: { WS_URI_PUBLIC: config.ws_uri_public }
   });
 
   reply.header("Content-Type", "text/html").send(html);

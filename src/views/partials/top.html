@@ -27,6 +27,9 @@
   </head>
   <body class="bg-gray-25 dark:bg-zinc-900 antialiased">
     <script>
+      <% for (key in it.env) { %>
+      const <%= key %> = "<%= it.env[key] %>"
+      <% } %>
       const root = document.documentElement;
       const is_system = root.className.includes("system");
       if (is_system) {
