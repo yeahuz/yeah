@@ -16,7 +16,7 @@ export class User extends BaseModel {
   static get modifiers() {
     return {
       public_selects(builder) {
-        builder.select("id", "name", "username", "bio", "website_url", "profile_photo_url", "hash_id", "profile_url")
+        builder.select("id", "name", "username", "bio", "website_url", "profile_photo_url", "hash_id", "profile_url");
       }
     }
   }
