@@ -68,7 +68,7 @@ export async function start() {
       cookieName: config.session_cookie_name,
       cookie: {
         httpOnly: true,
-        secure: config.node_env === "production",
+        secure: config.node_env === "production" || config.node_env === "staging",
         sameSite: "lax",
         path: "/",
         maxAge: 31556926,

@@ -8,7 +8,7 @@ const PORT_STAGING = parseInt(process.env.PORT_STAGING, 10);
 
 export { PORT, PORT_DEV, PORT_STAGING };
 export const {
-  NODE_ENV,
+  NODE_ENV = "development",
   KNEX_MIGRATIONS_DIR,
   KNEX_MIGRATIONS_DIR_DEV,
   POSTGRES_URI,
