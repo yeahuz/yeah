@@ -133,54 +133,52 @@ export async function get_many({
   currency = "UZS",
   status_id,
   limit = 15,
-  after,
-  before,
-  lang = "en"
+  lang = "en",
+  cursor,
+  direction
 } = {}) {
-  const query = Posting.query()
-    .select(
-      "title",
-      "description",
-      "postings.id",
-      "cover_url",
-      "url",
-      "status_id",
-      "exchange_rates.to_currency as currency",
-      "postings.created_at as created_at",
-      "postings.id as id",
-      raw("round(price * rate) as price")
-    )
-    .join("posting_prices as pp", "postings.id", "pp.posting_id")
-    .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
-    .where("exchange_rates.to_currency", "=", currency)
-    .groupBy(
-      "exchange_rates.to_currency",
-      "exchange_rates.rate",
-      "postings.title",
-      "postings.description",
-      "postings.id",
-      "pp.price"
-    )
-    .orderBy("postings.id", "desc")
-    .withGraphFetched("[location,status.[translation]]")
-    .modifyGraph("status.translation", builder => builder.select("name").where({ language_code: lang.substring(0, 2) }))
-    .limit(limit);
+  const knex = Posting.knex();
+  const list = await knex.with("t1",
+    knex()
+      .from("postings")
+      .join("posting_status_translations as pst", "postings.status_id", "pst.status_id")
+      .join("posting_statuses as ps", "postings.status_id", "ps.id")
+      .where("pst.language_code", "=", lang.substring(0, 2))
+      .join("posting_prices as pp", "postings.id", "pp.posting_id")
+      .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
+      .join("posting_location", "postings.id", "posting_location.posting_id")
+      .where("exchange_rates.to_currency", "=", currency)
+      .select(
+        "title",
+        "description",
+        "postings.id",
+        "cover_url",
+        "url",
+        "postings.created_at as created_at",
+        "exchange_rates.to_currency as currency",
+        knex.raw("round(price * rate) as price"),
+        knex.raw("(json_build_object('id', ps.id, 'name', pst.name, 'code', ps.code, 'bg_hex', ps.bg_hex, 'fg_hex', ps.fg_hex)) as status"),
+        knex.raw("(json_agg(posting_location.*) ->> 0)::json as location")
+      )
+      .groupBy(["postings.id", "pst.id", "pp.price", "exchange_rates.rate", "ps.id", "exchange_rates.to_currency"])
+      .orderBy("postings.id", direction === "before" ? "asc" : direction === "after" ? "desc" : "desc")
+      .modify((qb) => {
+        if (direction === "after") {
+          qb.where("postings.id", "<", cursor);
+        } else if (direction === "before") {
+          qb.where("postings.id", ">", cursor);
+        }
+        if (status_id) {
+          qb.where("postings.status_id", "=", status_id);
+        }
+      })
+      .limit(limit)
+  ).select("*").from("t1").orderBy("id", "desc")
 
-  if (after) {
-    query.where("postings.id", "<", after);
-  }
-
-  if (before) {
-    query.where("postings.id", ">", before);
-  }
-
-  if (status_id) {
-    query.where({ status_id })
-  }
-
-  const list = await query;
   return await cursor_paginate(Posting, list);
 }
+
+get_many({ limit: 2, direction: "before", cursor: 2 });
 
 export async function get_statuses({ lang = "en" }) {
   return await PostingStatus.query()

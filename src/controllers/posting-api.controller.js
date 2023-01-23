@@ -1,4 +1,5 @@
 import * as PostingService from "../services/posting.service.js";
+import { transform_object } from "../utils/index.js";
 
 export async function get_one(req, reply) {
   const { id } = req.params;
@@ -6,8 +7,10 @@ export async function get_one(req, reply) {
 }
 
 export async function get_many(req, reply) {
-  const { status_id, limit = 15, after, before } = req.query;
-  return await PostingService.get_many({ status_id, limit, after, before, lang: req.language });
+  const { status_id, limit = 15, cursor, direction } = transform_object(req.query, {
+    status_id: (v) => v ? v.trim() : ""
+  })
+  return await PostingService.get_many({ status_id, limit, direction, cursor, lang: req.language });
 }
 
 export async function get_filters(req, reply) {

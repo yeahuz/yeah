@@ -20,7 +20,9 @@ export async function get_many(req, reply) {
     lang: req.language,
     parent_id: category_id ?? null,
   });
+
   const list = await render_file("/category/list", { categories });
+
   stream.push(list);
 
   if (!req.partial) {

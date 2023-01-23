@@ -42,7 +42,9 @@ export async function start() {
 
   try {
     app.register(form_body, {
-      parser: (str) => qs.parse(str, { allowDots: true }),
+      parser: (str) => {
+        return qs.parse(str, { allowDots: true })
+      }
     });
     app.register(multipart);
     app.register(fastify_rate_limit, {

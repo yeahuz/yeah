@@ -1,7 +1,10 @@
 import pkg from "objection";
 const { raw, ref } = pkg;
-
 import { Category, CategoryField } from "../models/index.js";
+
+export async function create_one({ translation, parent_id }) {
+  return await Category.query().insertGraph({ parent_id, translation }, { relate: true })
+}
 
 export async function get_many({ lang = "en" }) {
   return await Category.query()

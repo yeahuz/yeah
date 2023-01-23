@@ -77,7 +77,7 @@ export async function get_avatar(req, reply) {
   size = parseInt(size);
   font_size = parseFloat(font_size);
 
-  const canvas = createCanvas(size, size, "svg");
+  const canvas = createCanvas(size, size);
   const ctx = canvas.getContext("2d");
   ctx.font = `${font_size * size}px "Inter"`;
   ctx.textBaseline = "middle";
@@ -89,8 +89,8 @@ export async function get_avatar(req, reply) {
 
   reply.header("Cache-Control", "public, max-age=31556926");
   reply.header("Content-Disposition", "inline");
-  reply.type("image/svg+xml");
-  reply.send(canvas.toBuffer());
+  reply.type("image/png");
+  reply.send(canvas.toBuffer("image/png"));
   return reply;
 }
 

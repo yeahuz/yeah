@@ -2115,10 +2115,8 @@ html {
   --success-700: 2, 122, 72;
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(var(--gray-900), 0.05);
-  --shadow-sm: 0 1px 3px rgba(var(--gray-900), 0.1),
-    0 1px 2px rgba(var(--gray-900), 0.06);
-  --shadow-md: 0 4px 8px -2px rgba(var(--gray-900), 0.1),
-    0 2px 4px -2px rgba(var(--gray-900), 0.06);
+  --shadow-sm: 0 1px 3px rgba(var(--gray-900), 0.1), 0 1px 2px rgba(var(--gray-900), 0.06);
+  --shadow-md: 0 4px 8px -2px rgba(var(--gray-900), 0.1), 0 2px 4px -2px rgba(var(--gray-900), 0.06);
   --shadow-lg: 0 12px 16px -4px rgba(var(--gray-900), 0.08),
     0 4px 6px -2px rgba(var(--gray-900), 0.03);
   --shadow-xl: 0 20px 24px -4px rgba(var(--gray-900), 0.08),
@@ -2381,8 +2379,8 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
-  -moz-appearance:textfield;
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 form:invalid .btn:not(.btn-enabled) {
@@ -2788,7 +2786,7 @@ checkbox-control {
 }
 
 .animate-visibility {
-  transition: transform .3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
   will-change: transform;
 }
 
@@ -2803,7 +2801,7 @@ dialog {
   box-shadow: var(--shadow-dialog);
   background: rgb(var(--color-dialog-bg));
   color: rgb(var(--color-dialog-text));
-  transition: opacity 300ms cubic-bezier(.25, 0, .3, 1);
+  transition: opacity 300ms cubic-bezier(0.25, 0, 0.3, 1);
   border-radius: 0.5rem;
 }
 
@@ -2813,8 +2811,8 @@ dialog:not([open]) {
 }
 
 dialog[open] {
-  -webkit-animation: slide-in-up 300ms cubic-bezier(.25, 0, .3, 1);
-          animation: slide-in-up 300ms cubic-bezier(.25, 0, .3, 1);
+  -webkit-animation: slide-in-up 300ms cubic-bezier(0.25, 0, 0.3, 1);
+          animation: slide-in-up 300ms cubic-bezier(0.25, 0, 0.3, 1);
 }
 
 dialog[loading] {
@@ -2838,7 +2836,7 @@ dialog[loading] {
   --translate: auto;
   --scale: 0.9;
   line-height: 1;
-  font-size: .9em;
+  font-size: 0.9em;
   pointer-events: none;
   position: absolute;
   box-sizing: border-box;
@@ -2891,7 +2889,8 @@ dialog[loading] {
   --bottom: calc(100% + 5px);
 }
 
-[data-tooltip]:not([data-flow])::before, [tooltip]:not([data-flow])::after,
+[data-tooltip]:not([data-flow])::before,
+[tooltip]:not([data-flow])::after,
 [data-tooltip][data-flow="top"]::before,
 [data-tooltip][data-flow="top"]::after {
   --left: 50%;
@@ -2917,7 +2916,8 @@ dialog[loading] {
   --bottom: calc(100% + 5px);
 }
 
-[data-tooltip][data-flow="top right"]::after, [data-tooltip][data-flow="top right"]::before {
+[data-tooltip][data-flow="top right"]::after,
+[data-tooltip][data-flow="top right"]::before {
   --transform-origin: top right;
 }
 
@@ -2928,11 +2928,11 @@ dialog[loading] {
 }
 
 [data-tooltip][data-flow="bottom"]::after {
-  --top: calc(100% + 5px)
-
+  --top: calc(100% + 5px);
 }
 
-[data-tooltip][data-flow="bottom"]::before, [data-tooltip][data-flow="bottom"]::after {
+[data-tooltip][data-flow="bottom"]::before,
+[data-tooltip][data-flow="bottom"]::after {
   --left: 50%;
   --translate: -50%, 8px;
 }
@@ -2952,8 +2952,7 @@ dialog[loading] {
   --translate: -8px, -50%;
 }
 
-j
-[data-tooltip][data-flow="right"]::before {
+j [data-tooltip][data-flow="right"]::before {
   --top: 50%;
   --right: calc(0em - 5px);
   --translate: 8px, -50%;
@@ -2968,7 +2967,8 @@ j
   --translate: 8px, -50%;
 }
 
-[data-tooltip=""]::after, [data-tooltip=""]::before {
+[data-tooltip=""]::after,
+[data-tooltip=""]::before {
   display: none !important;
 }
 
@@ -2986,13 +2986,13 @@ j
 
 @-webkit-keyframes scale-down {
   to {
-    transform: scale(.75)
+    transform: scale(0.75);
   }
 }
 
 @keyframes scale-down {
   to {
-    transform: scale(.75)
+    transform: scale(0.75);
   }
 }
 
