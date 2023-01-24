@@ -14,4 +14,10 @@ export const category_api = async (fastify) => {
     handler: CategoryApiController.create_one,
     onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
   });
+  fastify.route({
+    method: "DELETE",
+    url: "/:id",
+    handler: CategoryApiController.delete_one,
+    onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+  });
 };

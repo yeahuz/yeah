@@ -93,3 +93,7 @@ export async function get_desc({ lang = "en" }) {
     )
     .where("translation.language_code", lang.substring(0, 2));
 }
+
+export async function delete_one(id) {
+  return await Category.query().deleteById(id);
+}

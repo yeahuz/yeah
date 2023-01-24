@@ -10,3 +10,8 @@ export async function create_one(req, reply) {
   const { translation, parent_id } = req.body;
   return await CategoryService.create_one({ translation, parent_id });
 }
+
+export async function delete_one(req, reply) {
+  const { id } = req.params
+  return await CategoryService.delete_one(id);
+}
