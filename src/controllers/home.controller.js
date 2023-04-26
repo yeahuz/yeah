@@ -101,16 +101,15 @@ export async function get_index(req, reply) {
   const t = req.i18n.t;
 
   if (!req.partial) {
-    const notifications = await NotificationService.get_many({ user_id: user.id, lang: req.language });
-    const notifications_count = await NotificationService.get_count({ user_id: user.id });
+    const notifications = await NotificationService.get_many({ user_id: user?.id, lang: req.language });
+    const notifications_count = await NotificationService.get_count({ user_id: user?.id });
     const top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
       t,
       notifications,
       notifications_count,
-      interpolate,
-      fm: new Intl.DateTimeFormat(req.language, { weekday: "long", hour: "numeric", minute: "numeric", hourCycle: "h24" })
+      interpolate
     });
     stream.push(top);
   }
