@@ -334,7 +334,13 @@ html.dark {
 }
 
 a {
-  text-decoration: none;
+  color: rgb(var(--primary-500));
+  transition: all 200ms ease;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--primary-500));
 }
 
 ::selection {

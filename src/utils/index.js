@@ -14,6 +14,29 @@ export async function option(promise) {
   }
 }
 
+export function interpolate(str, params) {
+  let s = str;
+  const flat_params = flatten_obj(params)
+  for (const prop in flat_params) {
+    s = s.replace(new RegExp("{{" + prop + "}}"), flat_params[prop])
+  }
+
+  return s;
+}
+
+export function flatten_obj(obj, parent, res = {}) {
+  for (const prop in obj) {
+    let key = parent ? parent + "." + prop : prop;
+    if (typeof obj[prop] === "object") {
+      flatten_obj(obj[prop], key, res)
+    } else {
+      res[key] = obj[prop]
+    }
+  }
+
+  return res;
+}
+
 export function format_relations(relations = []) {
   const str = relations.toString();
   const newRelations = str ? `[${str}]` : str;

@@ -42,12 +42,34 @@
           </svg>
         </summary>
         <div class="absolute right-0 bg-white w-96 shadow-lg border border-gray-100 mt-2 rounded-lg z-50 dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-3">
-            <h3 class="text-lg font-medium">Notifications</h3>
+          <div class="p-3 flex justify-between items-center">
+            <h3 class="text-gray-900 text-lg font-medium dark:text-white">Notifications</h3>
+            <form>
+              <button class="btn btn-text btn-0 underline decoration-transparent
+                duration-300 hover:decoration-primary-500">Mark all as read</button>
+            </form>
           </div>
-          <ul>
-            <li>
-            </li>
+          <ul class="p-3">
+            <% it.notifications.forEach(function (notification) { %>
+              <li class="flex space-x-4 hover:bg-primary-50 p-3 rounded-lg duration-200 dark:hover:bg-zinc-800">
+                <img class="w-9 h-9 flex-shrink-0 rounded-full object-cover" src="<%= notification.sender.profile_photo_url ?? "" %>" alt="<%= notification.sender.name %>" crossorigin="anonymous" />
+                <div class="flex space-x-2">
+                  <div class="text-sm">
+                    <span class="text-gray-900 font-medium dark:text-white"><%= notification.title %></span>
+                    <div class="p-1.5 border rounded-md dark:border-zinc-700 mt-0.5">
+                      <p class="text-gray-700 dark:text-gray-200 text-ellipsis overflow-hidden"><%~ it.interpolate(notification.content, notification) %></p>
+                    </div> 
+                    <div class="flex justify-between mt-2 text-xs font-medium">
+                      <span><%= new Intl.DateTimeFormat(it.meta.lang, { weekday: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h24" }).format(notification.created_at) %></span>
+                      <span><%= new Intl.DateTimeFormat(it.meta.lang, { month: "short", year: "numeric", day: "2-digit" }).format(notification.created_at) %></span>  
+                    </div>
+                  </div>
+                  <% if (!notification.read) { %>
+                    <span class="flex-shrink-0 bg-primary-500 w-2.5 h-2.5 block rounded-full"></span>
+                  <% } %>
+                </div>
+              </li>
+            <% }) %>
           </ul>
         </div>
       </details>

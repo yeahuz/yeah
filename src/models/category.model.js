@@ -16,7 +16,7 @@ export class Category extends BaseModel {
         },
       },
       translation: {
-        relation: BaseModel.HasOneRelation,
+        relation: BaseModel.HasManyRelation,
         modelClass: CategoryTranslation,
         join: {
           from: "categories.id",

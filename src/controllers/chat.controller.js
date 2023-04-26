@@ -1,4 +1,5 @@
 import * as ChatService from "../services/chat.service.js";
+import config from "../config/index.js";
 import { render_file } from "../utils/eta.js";
 import { generate_srcset, format_bytes } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";

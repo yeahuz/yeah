@@ -6,6 +6,13 @@ export class Notification extends BaseModel {
     return "notifications";
   }
 
+  static get relationMappings() {
+    return {
+      type: {
+      }
+    }
+  }
+
   async $afterInsert(ctx) {
     await super.$afterInsert(ctx);
     await this.$query(ctx.transaction).patch({ hash_id: hashids.encode(this.id) });

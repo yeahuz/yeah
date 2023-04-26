@@ -9,8 +9,8 @@ export class Attribute extends BaseModel {
     return {
       translation: {
         modelClass: AttributeTranslation,
-        relation: BaseModel.HasOneRelation,
-        filter: (query) => query.select("name"),
+        relation: BaseModel.HasManyRelation,
+        filter: (query) => query.select("name", "language_code"),
         join: {
           from: "attributes.id",
           to: "attribute_translations.attribute_id",

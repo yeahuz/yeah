@@ -48,11 +48,11 @@ export const auth_api = async (fastify) => {
     url: "/session",
     handler: AuthApiController.get_me,
     onRequest: fastify.can_api([authenticated_user])
-  })
+  });
   fastify.route({
     method: "DELETE",
     url: "/session",
     handler: AuthApiController.logout,
     onRequest: fastify.can_api([authenticated_user])
-  })
+  });
 };

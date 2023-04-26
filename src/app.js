@@ -42,9 +42,7 @@ export async function start() {
 
   try {
     app.register(form_body, {
-      parser: (str) => {
-        return qs.parse(str, { allowDots: true })
-      }
+      parser: (str) => qs.parse(str, { allowDots: true })
     });
     app.register(multipart);
     app.register(fastify_rate_limit, {
@@ -174,7 +172,7 @@ export async function start() {
 
     const accept_strategy = {
       name: "accept",
-      storage: function () {
+      storage: function() {
         let handlers = {};
         return {
           get: (type) => {

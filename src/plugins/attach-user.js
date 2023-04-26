@@ -11,6 +11,7 @@ export const attach_user = fp(function attach_user(fastify, opts = {}, done) {
 async function attach_user_impl(req, reply) {
   const sid = req.session.get("sid") || req.headers["authorization"];
   const session = await SessionService.get_one(sid);
+
   if (sid && !session) {
     req.session.delete();
   }

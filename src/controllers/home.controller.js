@@ -2,11 +2,12 @@ import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
 import * as PostingService from "../services/posting.service.js";
 import * as RegionService from "../services/region.service.js";
+import * as NotificationService from "../services/notification.service.js";
 import config from "../config/index.js";
 import path from "path";
 import fs from "fs";
 import { render_file } from "../utils/eta.js";
-import { array_to_tree, generate_srcset } from "../utils/index.js";
+import { array_to_tree, generate_srcset, interpolate } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 import { registerFont, createCanvas } from "canvas";
 
@@ -100,21 +101,27 @@ export async function get_index(req, reply) {
   const t = req.i18n.t;
 
   if (!req.partial) {
+    const notifications = await NotificationService.get_many({ user_id: user.id, lang: req.language });
+    const notifications_count = await NotificationService.get_count({ user_id: user.id });
     const top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
       t,
+      notifications,
+      notifications_count,
+      interpolate,
+      fm: new Intl.DateTimeFormat(req.language, { weekday: "long", hour: "numeric", minute: "numeric", hourCycle: "h24" })
     });
     stream.push(top);
   }
 
-  const categories = await CategoryService.get_many({ lang: req.language });
+  const categories = await CategoryService.get_many({ lang: req.language, format: "tree" });
   const postings = await PostingService.get_many({ status_id: 1 });
   const regions = await RegionService.get_regions({ lang: req.language });
 
   const home = await render_file("/home.html", {
     t,
-    categories: array_to_tree(categories),
+    categories,
     postings,
     lang: req.language,
     format_relative: create_relative_formatter(req.language),

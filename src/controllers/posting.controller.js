@@ -199,10 +199,10 @@ export async function get_step(req, reply) {
   switch (step) {
     case 1: {
       const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
-      const categories = await CategoryService.get_many({ lang: req.language });
+      const categories = await CategoryService.get_many({ lang: req.language, format: "tree" });
       rendered_step = await render_file(`/posting/new/step-${step}`, {
         flash,
-        categories: array_to_tree(categories),
+        categories,
         t,
         posting_data,
       });
@@ -310,7 +310,7 @@ export async function get_contact(req, reply) {
   }
 
   const [categories, regions] = await Promise.all([
-    CategoryService.get_many({ lang: req.language }),
+    CategoryService.get_many({ lang: req.language, format: "tree" }),
     RegionService.get_regions({ lang: req.language }),
   ]);
 
@@ -319,7 +319,7 @@ export async function get_contact(req, reply) {
     t,
     flash,
     user,
-    categories: array_to_tree(categories),
+    categories,
     region_id,
     regions,
   });
@@ -393,13 +393,13 @@ export async function get_one(req, reply) {
   }
 
   const [categories, regions] = await Promise.all([
-    CategoryService.get_many({ lang: req.language }),
+    CategoryService.get_many({ lang: req.language, format: "tree" }),
     RegionService.get_regions({ lang: req.language }),
   ]);
 
   const single = await render_file("/posting/single.html", {
     regions,
-    categories: array_to_tree(categories),
+    categories,
     region_id,
     posting: await posting,
     t,

@@ -1,16 +1,20 @@
 import pkg from "objection";
 const { raw, ref } = pkg;
 import { Category, CategoryField } from "../models/index.js";
+import { array_to_tree } from "../utils/index.js";
 
 export async function create_one({ translation, parent_id }) {
-  return await Category.query().insertGraph({ parent_id, translation }, { relate: true })
+  return await Category.query().insertGraph({ parent_id, translation }, { relate: true });
 }
 
-export async function get_many({ lang = "en" }) {
-  return await Category.query()
+export async function get_many({ lang = "en", format = "tree" } = {}) {
+  const categories = await Category.query()
     .select("ct.title as title", "categories.id", "categories.parent_id")
     .join("category_translations as ct", "ct.category_id", "categories.id")
     .where({ language_code: lang.substring(0, 2) });
+
+  if (format === "tree") return array_to_tree(categories);
+  return categories;
 }
 
 export async function get_by_parent({ lang = "en", parent_id = null } = {}) {

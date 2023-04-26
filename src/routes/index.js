@@ -22,6 +22,7 @@ import { user_api } from "./user-api.route.js";
 import { posting_api } from "./posting-api.route.js";
 import { chat_api } from "./chat-api.route.js";
 import { category_api } from "./category-api.route.js";
+import { attribute_api } from "./attribute-api.route.js";
 
 // Plugins
 import { attach_user } from "../plugins/attach-user.js";
@@ -66,6 +67,7 @@ export const api_routes = async (fastify) => {
   fastify.register(posting_api, { prefix: "/postings" });
   fastify.register(chat_api, { prefix: "/chats" });
   fastify.register(category_api, { prefix: "/categories" });
+  fastify.register(attribute_api, { prefix: "/attributes" });
 
   fastify.setErrorHandler((err, req, reply) => {
     console.log({ err });

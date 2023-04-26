@@ -137,6 +137,6 @@ export async function logout(req, reply) {
   const sid = req.session.get("sid");
   const result = await AuthService.logout(sid);
   req.session.delete();
-  reply.send(result)
+  reply.send(result);
   return reply;
 }
