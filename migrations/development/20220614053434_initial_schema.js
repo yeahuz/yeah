@@ -182,7 +182,8 @@ export function up(knex) {
       table.increments("id").primary();
       table.integer("sender_id").index().notNullable().references("id").inTable("users");
       table.string("type").index().notNullable().references("name").inTable("notification_types");
-      table.string("hash_id");
+      table.string("href");
+      table.string("hash_id").unique();
       table.timestamps(false, true);
     })
     .createTable("user_notifications", (table) => {

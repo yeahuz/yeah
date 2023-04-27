@@ -20,7 +20,7 @@ export async function get_count({ user_id, read = false, limit = 10 } = {}) {
 
 export async function get_many({ user_id, lang = "en" } = {}) {
   if (!user_id) return [];
-  const [result, err] = await option(pool.query(`select n.id, n.created_at, type, read, title, content, 
+  const [result, err] = await option(pool.query(`select n.id, n.created_at, n.href, type, read, title, content, 
                       json_build_object(
                         'name', u.name, 
                         'profile_url', u.profile_url,

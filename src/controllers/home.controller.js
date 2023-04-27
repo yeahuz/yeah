@@ -101,8 +101,11 @@ export async function get_index(req, reply) {
   const t = req.i18n.t;
 
   if (!req.partial) {
-    const notifications = await NotificationService.get_many({ user_id: user?.id, lang: req.language });
-    const notifications_count = await NotificationService.get_count({ user_id: user?.id });
+    const [notifications, notifications_count] = await Promise.all([
+      NotificationService.get_many({ user_id: user?.id, lang: req.language }),
+      NotificationService.get_count({ user_id: user?.id })
+    ]);
+
     const top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
@@ -114,9 +117,11 @@ export async function get_index(req, reply) {
     stream.push(top);
   }
 
-  const categories = await CategoryService.get_many({ lang: req.language, format: "tree" });
-  const postings = await PostingService.get_many({ status_id: 1 });
-  const regions = await RegionService.get_regions({ lang: req.language });
+  const [categories, postings, regions] = await Promise.all([
+    CategoryService.get_many({ lang: req.language, format: "tree" }),
+    PostingService.get_many({ status_id: 1 }),
+    RegionService.get_regions({ lang: req.language })
+  ]);
 
   const home = await render_file("/home.html", {
     t,

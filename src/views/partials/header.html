@@ -52,13 +52,16 @@
           <% if(it.notifications) { %>
             <ul class="p-3">
               <% it.notifications.forEach(function (notification) { %>
-                <li class="flex space-x-4 hover:bg-primary-50 p-3 rounded-lg duration-200 dark:hover:bg-zinc-800">
-                  <img class="w-9 h-9 flex-shrink-0 rounded-full object-cover" src="<%= notification.sender.profile_photo_url ?? "" %>" alt="<%= notification.sender.name %>" crossorigin="anonymous" />
+                <li class="flex hover:bg-primary-50 p-3 rounded-lg duration-200 dark:hover:bg-zinc-800 relative">
+                  <% if(notification.href) { %>
+                    <a href="<%= notification.href %>" class="absolute top-0 left-0 right-0 bottom-0"></a>
+                  <% } %>
+                  <img class="w-9 h-9 flex-shrink-0 rounded-full object-cover mr-3" src="<%= notification.sender.profile_photo_url ?? "" %>" alt="<%= notification.sender.name %>" crossorigin="anonymous" />
                   <div class="flex space-x-2">
                     <div class="text-sm">
                       <span class="text-gray-900 font-medium dark:text-white"><%= notification.title %></span>
                       <div class="p-1.5 border rounded-md dark:border-zinc-700 mt-0.5">
-                        <p class="text-gray-700 dark:text-gray-200 text-ellipsis overflow-hidden"><%~ it.interpolate(notification.content, notification) %></p>
+                        <p class="relative z-10 text-gray-700 dark:text-gray-200 line-clamp line-clamp-2"><%~ it.interpolate(notification.content, notification) %></p>
                       </div> 
                       <div class="flex justify-between mt-2 text-xs font-medium">
                         <span><%= new Intl.DateTimeFormat(it.meta.lang, { weekday: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h24" }).format(notification.created_at) %></span>

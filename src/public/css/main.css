@@ -333,12 +333,12 @@ html.dark {
   --tooltip-text: var(--white);
 }
 
-a {
+a.link {
   color: rgb(var(--primary-500));
   transition: all 200ms ease;
 }
 
-a:hover {
+a.link:hover {
   text-decoration: underline;
   text-decoration-color: rgb(var(--primary-500));
 }
@@ -763,6 +763,17 @@ checkbox-control {
 
 .js-carousel-snap:not(.in-view) .animate-visibility {
   transform: scale(0.9);
+}
+
+.line-clamp {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-2 {
+  -webkit-line-clamp: 2;
 }
 
 dialog {
