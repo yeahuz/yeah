@@ -53,7 +53,5 @@ export async function send_email({ tmpl_name, to, vars }) {
     Source: template.source(),
   });
 
-  const result = await client.send(command);
-
-  console.log(result);
+  return await client.send(command);
 }

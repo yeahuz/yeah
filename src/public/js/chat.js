@@ -45,12 +45,14 @@ function connect() {
 
   ws.binaryType = "arraybuffer";
 
-  ws.addEventListener("close", async () => {
+  ws.addEventListener("close", async (event) => {
+    console.error("Websocket connection closed: ", event)
     await wait(3000);
     connect();
   });
 
-  ws.addEventListener("error", () => {
+  ws.addEventListener("error", (event) => {
+    console.error("ERROR: Websocket connection error: ", event)
     ws.close();
     ws = null;
   });

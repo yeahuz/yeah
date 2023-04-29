@@ -16,7 +16,7 @@ const {
   cleanupOutdatedCaches: cleanup_outdated_caches,
 } = workbox.precaching;
 const { strategy: compose_strategies } = workbox.streams;
-const { googleFontsCache: google_fonts_cache, warmStrategyCache: warm_strategy_cache } =
+const { warmStrategyCache: warm_strategy_cache } =
   workbox.recipes;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
 const { BackgroundSyncPlugin } = workbox.backgroundSync;
@@ -94,7 +94,7 @@ const image_route = new Route(
 
 const static_assets_route = new Route(
   ({ request, sameOrigin }) => {
-    return sameOrigin && ["script", "style"].includes(request.destination);
+    return sameOrigin && ["script", "style", "font"].includes(request.destination);
   },
   new CacheFirst({
     cacheName: CACHE_NAMES.static_assets,
@@ -232,7 +232,6 @@ const nf_content_route = new Route(({ request, url }) => {
 }, nf_content_handler);
 
 // enable_navigation_preload();
-google_fonts_cache();
 cleanup_outdated_caches();
 registerRoute(nf_content_route);
 registerRoute(swr_content_route);
