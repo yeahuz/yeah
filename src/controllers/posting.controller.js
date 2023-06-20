@@ -160,13 +160,22 @@ export async function submit_third_step(req, reply) {
     )
   );
   reply.redirect(`/postings/wizard/${id}/4`);
+  return reply;
 }
 
 export async function submit_fourth_step(req, reply) {
   const { id } = req.params;
+  const { err_to } = req.query;
+  const t = req.t;
   const user = req.user;
   const posting_data = JSON.parse((await redis_client.get(id)) || null) || {};
-  await PostingService.create_posting(Object.assign(posting_data, { created_by: user.id }));
+  const [_, err] = await option(PostingService.create_posting(Object.assign(posting_data, { created_by: user.id })));
+
+  if (err) {
+    req.flash("err", err.build(t))
+    return reply.redirect(err_to)
+  }
+
   reply.redirect(req.url);
   return reply;
 }

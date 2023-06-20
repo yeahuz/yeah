@@ -1,6 +1,5 @@
 import fastify_etag from "@fastify/etag";
 import fastify_accepts from "@fastify/accepts";
-import { i18next } from "../utils/i18n.js";
 import { home } from "./home.route.js";
 import { auth } from "./auth.route.js";
 import { settings } from "./settings.route.js";
@@ -15,6 +14,7 @@ import { billing } from "./billing.route.js";
 import { cfimg } from "./cfimg.route.js";
 import { cfr2 } from "./cfr2.route.js";
 import { chat } from "./chat.route.js";
+import { i18next } from "../utils/i18n.js";
 
 // API routes
 import { auth_api } from "./auth-api.route.js";
@@ -69,10 +69,9 @@ export const api_routes = async (fastify) => {
   fastify.register(category_api, { prefix: "/categories" });
   fastify.register(attribute_api, { prefix: "/attributes" });
 
-  fastify.setErrorHandler((err, req, reply) => {
-    console.log({ err });
-    const lang = req.language;
-    const t = i18next.getFixedT(lang);
+  fastify.setErrorHandler(function errorHandler(err, req, reply) {
+    const accept_lang = req.headers["accept-language"]
+    const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
     if (err.validation) {
       reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
       return reply;

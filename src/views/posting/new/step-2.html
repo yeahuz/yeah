@@ -61,7 +61,7 @@
       </ul>
     <% } %>
     <div class="rounded-lg border border-gray-200 flex flex-col items-center justify-center p-4 shadow-xs dark:border-zinc-800 js-photos-area">
-      <span class="inline-block p-3 rounded-full bg-gray-100 text-gray-600 inline-block mb-3 dark:bg-zinc-800 dark:text-gray-300">
+      <span class="p-3 rounded-full bg-gray-100 text-gray-600 inline-block mb-3 dark:bg-zinc-800 dark:text-gray-300">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
           <path d="M8 16L12 12M12 12L16 16M12 12V21M20 16.7428C21.2215 15.734 22 14.2079 22 12.5C22 9.46243 19.5376 7 16.5 7C16.2815 7 16.0771 6.886 15.9661 6.69774C14.6621 4.48484 12.2544 3 9.5 3C5.35786 3 2 6.35786 2 10.5C2 12.5661 2.83545 14.4371 4.18695 15.7935" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -120,7 +120,7 @@
             <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.translation.name}|${val.id}`) ? "checked" : ""%> type="radio" name="params[<%= field.key %>].value[]" value="<%= val.translation.name %>|<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
                         font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
-                        relative checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
+                        checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
             <label for="<%= field.key %>-<%= val.id %>" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white"><%= val.translation.name %></label>
           </div>
         <% }) %>

@@ -1,6 +1,6 @@
 <div class="w-full md:max-w-sm mx-auto space-y-8 mt-20 px-4 sm:px-0">
   <h1 class="font-semibold text-4xl text-gray-900 dark:text-white"><%= it.t("title", { ns: "signup"}) %></h1>
-  <%~ includeFile('../../partials/flash.html', it) %>
+  <%~ include('../../partials/flash.html', it) %>
   <form action="/auth/otp?method=<%= it.method %>&err_to=<%= encodeURIComponent(`/auth/signup?method=${it.method}`)%>&return_to=<%= encodeURIComponent(`/auth/signup?step=2&return_to=${it.return_to}?method=${it.method}`) %>" method="post">
     <input type="hidden" name="nonce" value="<%= it.nonce %>" />
     <div class="flex flex-col relative">

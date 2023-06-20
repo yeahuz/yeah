@@ -12,6 +12,7 @@ import {
 import config from "../config/index.js";
 import crypto from "crypto";
 import objection from "objection";
+import { option } from "../utils/index.js";
 
 const { UniqueViolationError } = objection;
 
@@ -103,14 +104,32 @@ export async function google_auth(payload) {
       user_id: account.user_id,
       ip,
     });
+
     return { session, user: account };
   }
 
   const trx = await UserService.start_transaction();
   try {
+    const existing_user = await UserService.get_by_email_phone(email)
+    if (existing_user) {
+      const session = await SessionService.create_one_trx(trx)({
+        user_agent,
+        user_id: existing_user.id,
+        ip
+      })
+
+      await AccountService.link_google_trx(trx)({
+        user_id: existing_user.id,
+        provider_account_id: sub
+      })
+
+      await trx.commit()
+      return { session, user: existing_user }
+    }
+
     const uploaded = await CFImageService.upload_url(picture);
 
-    const user = await UserService.create_one_trx(trx)({
+    const [user, err] = await UserService.create_one_trx(trx)({
       email,
       name: name || given_name,
       profile_photo_url: CFImageService.get_cf_image_url(uploaded.id),

@@ -9,7 +9,7 @@ export class Attribute extends BaseModel {
     return {
       translation: {
         modelClass: AttributeTranslation,
-        relation: BaseModel.HasManyRelation,
+        relation: BaseModel.HasOneRelation,
         filter: (query) => query.select("name", "language_code"),
         join: {
           from: "attributes.id",

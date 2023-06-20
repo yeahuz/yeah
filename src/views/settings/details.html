@@ -4,7 +4,7 @@
       <h2 class="text-gray-900 text-lg font-medium dark:text-white"><%= it.t("personal.title", { ns: "settings-details" }) %></h2>
       <p class="text-gray-500 mt-1 dark:text-gray-300"><%= it.t("personal.description", { ns: "settings-details" }) %></p>
     </header>
-    <%~ includeFile('../partials/flash.html', it) %> 
+    <%~ include('../partials/flash.html', it) %> 
     <div class="space-y-6 p-6 bg-white shadow-sm border border-gray-200 rounded-lg w-full mb-8 flex flex-col dark:bg-zinc-900 dark:border-zinc-800 js-details-form">
       <div>
         <form method="post" action="/users/<%= it.user.id %>?return_to=/settings/details&err_to=/settings/details" id="photo-form">

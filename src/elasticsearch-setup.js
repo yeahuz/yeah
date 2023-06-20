@@ -4,17 +4,23 @@ import * as RegionService from "./services/region.service.js";
 const SUPPORTED_LANGS = ["en", "uz", "ru"];
 
 async function create_index(name) {
-  const existing = await elastic_client.indices.exists({ index: name });
-  if (existing) return;
+  console.log(`Creating index ${name}`)
+  const response = await elastic_client.indices.exists({ index: name });
+  if (response.body) {
+    console.log(`Index ${name} already exists. Skipping...`)
+    return
+  }
+
   return await elastic_client.indices.create({ index: name });
 }
 
 async function create_index_template({ name, body }) {
-  const existing = await elastic_client.indices.existsIndexTemplate({ name });
-  if (existing) {
+  const response = await elastic_client.indices.existsIndexTemplate({ name });
+  if (response.body) {
     console.log(`Index template ${name} already exists. Skipping...`);
     return false;
   }
+
   return await elastic_client.indices.putIndexTemplate({ name, body });
 }
 
@@ -277,4 +283,5 @@ async function insert_regions() {
   console.log("Inserting regions to regions_*");
   const inserted_regions = await insert_regions();
   console.log({ inserted_regions });
+  process.exit(0)
 })();

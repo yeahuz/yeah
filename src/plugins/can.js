@@ -33,12 +33,8 @@ function can_api_impl(validations_fns = [], options = { relation: "or" }) {
 
 function can_impl(validation_fns = [], options = { relation: "or" }) {
   return async (req, reply) => {
-    const accept_lang = [
-      req.language instanceof Function ? req.language() : req.language,
-      "en",
-    ].flat();
-
-    const t = i18next.getFixedT(accept_lang);
+    const accept_lang = req.headers["accept-language"]
+    const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : []);
     const user = req.user;
     const validate = options.relation === "or" ? some : every;
     const can_access = await validate(validation_fns, user, req.params);

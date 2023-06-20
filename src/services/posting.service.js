@@ -42,7 +42,7 @@ export async function create_posting(payload) {
       .flatMap((param) => [param.parent, ...param.value])
       .map((v) => v.split("|")[1]);
 
-    const cover = attachments[cover_index];
+    const cover = attachments[cover_index || 0];
     const posting = await create_one_trx(trx)({
       title,
       description,

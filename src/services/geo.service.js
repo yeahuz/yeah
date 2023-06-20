@@ -22,9 +22,7 @@ export async function get_query_predictions({ q, lang = "en" }) {
       },
     });
 
-    const {
-      hits: { hits, total },
-    } = response.body;
+    const hits = response.hits.hits
     return hits.map((h) => h._source);
   } catch (err) {
     console.log(err);

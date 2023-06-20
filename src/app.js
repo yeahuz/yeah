@@ -9,16 +9,15 @@ import form_body from "@fastify/formbody";
 import multipart from "@fastify/multipart";
 import fastify_rate_limit from "@fastify/rate-limit";
 import os from "os";
-import i18n_http_middleware from "i18next-http-middleware";
 import ajv_errors from "ajv-errors";
 import * as eta from "eta";
 import { elastic_client } from "./services/es.service.js";
-import { i18next } from "./utils/i18n.js";
 import { routes, api_routes } from "./routes/index.js";
 import { DomainError, FloodError, InternalError, ValidationError } from "./utils/errors.js";
 import { ws } from "./plugins/ws.js";
 import { can } from "./plugins/can.js";
 import { add_t } from "./utils/index.js";
+import { i18next_plugin, i18next } from "./utils/i18n.js";
 import { redis_client } from "./services/redis.service.js";
 import * as RegionService from "./services/region.service.js";
 import { pg_to_es } from "./jobs.js";
@@ -59,9 +58,7 @@ export async function start() {
       },
     });
 
-    app.register(i18n_http_middleware.plugin, {
-      i18next,
-    });
+    app.register(i18next_plugin);
 
     app.register(fastify_session, {
       secret: config.session_cookie_secret,
@@ -114,11 +111,8 @@ export async function start() {
 
     app.setErrorHandler((err, req, reply) => {
       console.log({ err });
-      const accept_lang = [req.language instanceof Function ? req.language() : req.language, "en"]
-        .filter(Boolean)
-        .flat();
-
-      const t = i18next.getFixedT(accept_lang);
+      const accept_lang = req.headers["accept-language"]
+      const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
       const { err_to = "/" } = req.query;
 
       if (err.validation) {
@@ -149,11 +143,8 @@ export async function start() {
     });
 
     app.setNotFoundHandler(async (req, reply) => {
-      const accept_lang = [
-        req.language instanceof Function ? req.language() : req.language,
-        "en",
-      ].flat();
-      const t = i18next.getFixedT(accept_lang);
+      const accept_lang = req.headers["accept-language"]
+      const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
       const referer = req.headers["referer"];
       const theme = req.session.get("theme");
       const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";

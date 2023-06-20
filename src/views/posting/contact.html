@@ -1,9 +1,9 @@
 <main class="px-4 xl:px-0 max-w-7xl mx-auto">
-  <%~ includeFile('../partials/search-bar.html', it) %>
+  <%~ include('../partials/search-bar.html', it) %>
   <div class="grid grid-cols-12 items-start w-full space-x-4 py-12">
     <section class="col-span-8 space-y-4">
       <h1 class="font-semibold text-2xl text-gray-900 dark:text-white"><%= it.t("contact_user", { ns: "profile", name: it.posting.creator.name })%> </h1>
-      <%~ includeFile('../partials/flash.html', it) %>
+      <%~ include('../partials/flash.html', it) %>
       <div class="flex space-x-4 items-start rounded-lg border border-zinc-800 p-4">
         <div class="w-40">
           <img src="<%= it.posting.cover_url %>/w=320" alt="" class="max-w-full object-contain" />

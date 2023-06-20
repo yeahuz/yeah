@@ -16,12 +16,16 @@ export class DomainError extends Error {
   }
 
   build(t) {
-    let translated_errors = this.errors;
+    let translated_errors = [];
     if (Array.isArray(this.errors)) {
-      translated_errors = this.errors.map((err) => ({
-        ...err,
-        message: t(err.message, { ns: "errors", ...this.params }),
-      }));
+      for (const err of this.errors) {
+        if (err.keyword !== "errorMessage") continue
+        if (err.field) {
+          translated_errors.push({ field: err.field, message: t(err.message, { ns: "errors", ...this.params }) })
+        } else {
+          translated_errors.push({ field: err.params.errors[0].params.missingProperty, message: t(err.message, { ns: "errors", ...this.params }) })
+        }
+      }
     } else {
       for (const key in this.errors) {
         translated_errors[key] = t(this.errors[key], { ns: "errors", ...this.params });

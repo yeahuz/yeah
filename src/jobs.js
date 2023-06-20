@@ -98,6 +98,7 @@ async function pg_to_es_impl() {
     }
 
     await elastic_client.index({
+      id: posting.id,
       index: "needs_ru",
       body: {
         result: {
