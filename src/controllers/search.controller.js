@@ -57,7 +57,7 @@ export async function get_search(req, reply) {
   });
 
   const filters = await render_file("/search/filters.html", {
-    filters: result.body.aggregations,
+    filters: result.aggregations,
     min_amount,
     max_amount,
     facets,
@@ -71,12 +71,13 @@ export async function get_search(req, reply) {
   stream.push(filters);
 
   const results = await render_file("/search/results.html", {
-    hits: result.body.hits,
+    hits: result.hits,
     lang: req.language,
     t,
     format_relative: create_relative_formatter(req.language),
     generate_srcset,
   });
+
   stream.push(results);
 
   if (!req.partial) {
@@ -108,7 +109,7 @@ export async function get_completions(req, reply) {
     },
   });
 
-  const results = response.body.hits.hits;
+  const results = response.hits.hits;
   const suggestions = [];
   for (const result of results) {
     const title = result._source.result.title.toLowerCase();
