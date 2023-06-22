@@ -161,7 +161,7 @@
             </label>
             <input type="file" name="files" id="files" value="" class="hidden js-files" multiple />
           </div>
-          <elastic-textarea style="display: inline-flex"><textarea autofocus placeholder="<%= it.t("your_message", { ns: "chats" })%>" class="form-control" name="content" id="" rows="1" cols="100" tabindex=""></textarea></elastic-textarea>
+          <elastic-textarea style="display: inline-flex"><textarea required autofocus placeholder="<%= it.t("your_message", { ns: "chats" })%>" class="form-control" name="content" id="" rows="1" cols="100" tabindex=""></textarea></elastic-textarea>
           <button class="btn btn-primary btn-lg"><%= it.t("send", { ns: "chats" })%></button>
         </form>
       </div>

@@ -5,7 +5,6 @@ import { qr_code_tmpl, scan_profile_tmpl } from "./templates.js";
 import { option, request, wait, message_sw } from "./utils.js";
 import { toast } from "./toast.js";
 
-const MAX_RETRIES = 5;
 const qr_container = document.querySelector(".js-qr-container");
 
 const listeners = {};
@@ -16,20 +15,21 @@ function on(op, callback) {
   listeners[op] = callback;
 }
 
-function connect({ retries }) {
-  if (retries === 0) return;
-
+function connect() {
   ws = new WebSocket(`${WS_URI_PUBLIC}/qr-auth`);
 
   ws.binaryType = "arraybuffer";
 
-  ws.addEventListener("close", (e) => {
-    if (is_tab_in_focus()) connect({ retries: MAX_RETRIES });
+  ws.addEventListener("close", async (e) => {
+    console.error("Websocket connection closed: ", e)
+    await wait(1000)
+    connect();
   });
 
-  ws.addEventListener("error", async (err) => {
-    await wait(3000);
-    connect({ retries: retries - 1 });
+  ws.addEventListener("error", async (e) => {
+    console.error("Websocket connection error: ", e)
+    if (ws) ws.close()
+    ws = null
   });
 
   ws.addEventListener("message", (e) => {
@@ -41,8 +41,8 @@ function connect({ retries }) {
 
     if (!encoder) {
       encoder = new PackBytes(e.data);
-      ws.send(encoder.encode("auth_init"));
     }
+    ws.send(encoder.encode("auth_init"));
   });
 }
 
@@ -80,7 +80,7 @@ function is_tab_in_focus() {
 }
 
 function on_visibility_change() {
-  if (is_tab_in_focus() && ws && ws.readState === 3) connect({ retries: MAX_RETRIES });
+  if (is_tab_in_focus() && ws && ws.readState === 3) connect()
 }
 
 function on_auth_denied() {
@@ -96,4 +96,4 @@ add_listeners(document, {
   visibilitychange: on_visibility_change,
 });
 
-connect({ retries: MAX_RETRIES });
+connect();

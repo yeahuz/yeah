@@ -20,7 +20,6 @@ import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
 import { randomBytes } from "crypto";
 import { events } from "../utils/events.js";
-import { wss, wss_encoder } from "../services/wss.service.js";
 
 export async function get_qr_login(req, reply) {
   const { token } = req.params;
@@ -43,8 +42,7 @@ export async function get_qr_login(req, reply) {
   if (err) {
     stream.push(`<h1>${err.build(t).message}</h1>`);
   } else {
-    wss.send(wss_encoder.encode("auth_scan", { topic: decoded.data, name, profile_photo_url }));
-
+    redis_client.publish("auth/qr", JSON.stringify({ topic: decoded.data, name, profile_photo_url, op: "auth_scan" }))
     const qr_confirmation = await render_file("/auth/qr-login-confirmation.html", { token, t });
     stream.push(qr_confirmation);
   }
@@ -70,12 +68,12 @@ export async function qr_login_confirm(req, reply) {
   switch (_action) {
     case "confirm": {
       const auth_token = jwt.sign({ user_id: user.id }, { expiresIn: 120 });
-      wss.send(wss_encoder.encode("auth_confirmed", { topic: decoded.data, token: auth_token }));
+      redis_client.publish("auth/qr", JSON.stringify({ topic: decoded.data, token: auth_token, op: "auth_confirmed" }))
       reply.redirect(return_to);
       return reply;
     }
     case "deny": {
-      wss.send(wss_encoder.encode("auth_denied", decoded.data));
+      redis_client.publish("auth/qr", JSON.stringify({ topic: decoded.data, op: "auth_denied" }))
       reply.redirect(return_to);
       return reply;
     }

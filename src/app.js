@@ -18,7 +18,6 @@ import { i18next_plugin, i18next } from "./utils/i18n.js";
 import { redis_client } from "./services/redis.service.js";
 import { pg_to_es } from "./jobs.js";
 import { render_file, eta } from "./utils/eta.js";
-import { wss_connect } from "./services/wss.service.js";
 import qs from "qs";
 import cors from "@fastify/cors";
 
@@ -179,7 +178,6 @@ export async function start() {
     app.register(routes);
     app.register(api_routes, { prefix: "/api" });
 
-    wss_connect(app)
     await app.listen({ port: config.port });
   } catch (err) {
     app.log.error(err);

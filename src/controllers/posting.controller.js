@@ -11,7 +11,6 @@ import { array_to_tree, generate_srcset, option, add_t } from "../utils/index.js
 import { redis_client } from "../services/redis.service.js";
 import { new_posting_schema } from "../schemas/new-posting.schema.js";
 import { async_pool_all } from "../utils/async-pool.js";
-import { wss, wss_encoder } from "../services/wss.service.js";
 
 export async function update_attachment(req, reply) {
   const { id, attachment_id } = req.params;

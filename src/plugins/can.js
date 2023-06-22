@@ -44,7 +44,7 @@ function can_impl(validation_fns = [], options = { relation: "or" }) {
       if (req.xhr) {
         throw new AuthorizationError();
       }
-      reply.redirect(add_t(req.url))
+      reply.redirect(add_t("/"))
       return reply;
     }
   };
