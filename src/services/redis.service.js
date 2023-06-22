@@ -10,21 +10,23 @@ sub.on("message", async (channel, message) => {
     case "api/messages": {
       const result = JSON.parse(message);
       let item = await redis_client.rpop(result.queue)
-      if (!item) return
-      item = JSON.parse(item)
-      const [msg, err] = await option(ChatService.create_message({
-        chat_id: item.chat_id,
-        content: item.content,
-        sender_id: item.sender_id,
-        reply_to: item.reply_to
-      }));
+      while (item) {
+        item = JSON.parse(item)
+        const [msg, err] = await option(ChatService.create_message({
+          chat_id: item.chat_id,
+          content: item.content,
+          sender_id: item.sender_id,
+          reply_to: item.reply_to
+        }));
 
-      if (err) {
-        redis_client.rpush(result.queue, message)
-        return
+        if (err) {
+          redis_client.rpush(result.queue, message)
+          return
+        }
+
+        redis_client.publish("messages/sent", JSON.stringify(Object.assign(msg, { temp_id: item.temp_id })))
+        item = await redis_client.rpop(result.queue)
       }
-
-      redis_client.publish("messages/sent", JSON.stringify(Object.assign(msg, { temp_id: item.temp_id })))
     } break;
     default:
       break
