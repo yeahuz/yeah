@@ -94,9 +94,9 @@ async function cursor_paginate(model, list = [], excludes = []) {
   return { list, has_next, has_prev };
 }
 
-export async function get_one(id) {
+export async function get_one({ id, relations = [], modify } = {}) {
   if (!id) return;
-  return await Posting.query().findById(id).withGraphFetched("[attachments, location]");
+  return await Posting.query().findById(id).modify(modify).withGraphFetched(format_relations(relations));
 }
 
 export async function get_by_hash_id(hash_id, relations = ["attachments", "location"]) {

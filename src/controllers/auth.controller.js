@@ -20,12 +20,11 @@ import { google_oauth_client } from "../utils/google-oauth.js";
 import { CredentialRequest, AssertionRequest } from "../utils/webauthn.js";
 import { randomBytes } from "crypto";
 import { events } from "../utils/events.js";
+import { wss, wss_encoder } from "../services/wss.service.js";
 
 export async function get_qr_login(req, reply) {
   const { token } = req.params;
   const { name, profile_photo_url } = req.user || {};
-  const ws = req.server.ws;
-  const encoder = req.server.ws_encoder;
   const stream = reply.init_stream();
   const t = req.i18n.t;
   const user = req.user;
@@ -44,7 +43,7 @@ export async function get_qr_login(req, reply) {
   if (err) {
     stream.push(`<h1>${err.build(t).message}</h1>`);
   } else {
-    ws.send(encoder.encode("auth_scan", { topic: decoded.data, name, profile_photo_url }));
+    wss.send(wss_encoder.encode("auth_scan", { topic: decoded.data, name, profile_photo_url }));
 
     const qr_confirmation = await render_file("/auth/qr-login-confirmation.html", { token, t });
     stream.push(qr_confirmation);
@@ -59,8 +58,6 @@ export async function qr_login_confirm(req, reply) {
   const { token } = req.params;
   const { _action } = req.body;
   const user = req.user;
-  const ws = req.server.ws;
-  const encoder = req.server.ws_encoder;
   const t = req.i18n.t;
 
   const [decoded, err] = await option(jwt.verify(token));
@@ -73,12 +70,12 @@ export async function qr_login_confirm(req, reply) {
   switch (_action) {
     case "confirm": {
       const auth_token = jwt.sign({ user_id: user.id }, { expiresIn: 120 });
-      ws.send(encoder.encode("auth_confirmed", { topic: decoded.data, token: auth_token }));
+      wss.send(wss_encoder.encode("auth_confirmed", { topic: decoded.data, token: auth_token }));
       reply.redirect(return_to);
       return reply;
     }
     case "deny": {
-      ws.send(encoder.encode("auth_denied", decoded.data));
+      wss.send(wss_encoder.encode("auth_denied", decoded.data));
       reply.redirect(return_to);
       return reply;
     }
@@ -484,7 +481,7 @@ export async function update_session(req, reply) {
 
   switch (_action) {
     case "delete_one":
-      await SessionService.delete_one(id);
+      await SessionService.update_one(id, { active: false });
       break;
     default:
       break;
@@ -496,7 +493,7 @@ export async function update_session(req, reply) {
 export async function generate_request(req, reply) {
   const { type } = req.query;
   const user_id = req.session.get("user_id");
-  const user = req.user || (await UserService.get_one(user_id));
+  const user = req.user || (await UserService.get_by_id(user_id));
   let request;
 
   switch (type) {

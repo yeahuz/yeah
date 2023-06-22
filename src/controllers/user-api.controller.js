@@ -3,7 +3,7 @@ import * as ChatService from "../services/chat.service.js";
 
 export async function get_one(req, reply) {
   const { id } = req.params;
-  const user = await UserService.get_one(id);
+  const user = await UserService.get_by_id(id);
   reply.send(user);
   return reply;
 }

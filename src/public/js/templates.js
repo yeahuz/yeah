@@ -315,3 +315,62 @@ export function text_message_tmpl(payload, is_own_message) {
 
   return msg;
 }
+
+export function chat_list_item_tmpl(payload) {
+  const chat_link = a(attrs({
+    href: `/chats/${payload.id}#${payload.id}`,
+    class: "after:absolute after:top-0 after:left-0 after:right-0 after:bottom-0",
+  }));
+
+  const latest_message_date = span(classes("text-gray-500 dark:text-gray-300 text-sm js-latest-date"), text(Date.now()))
+  const latest_message = p(classes("text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message"))
+
+  const posting_cover = img(attrs({
+    src: payload.posting.cover_url + "/width=80",
+    class: "w-12 h-12 object-cover rounded-full overflow-hidden mr-2 flex-shrink-0",
+    crossorigin: "anonymous"
+  }));
+
+  const posting_link = a(attrs({
+    href: payload.posting.url,
+    class: "relative underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium truncate"
+  }), text(payload.posting.title));
+
+  const members = span(attrs({
+    class: "text-gray-500 dark:text-gray-300 text-sm truncate"
+  }), text(payload.members.map(m => m.name).join(", ")));
+
+  const members_container = div(
+    classes("flex flex-col max-w-[200px]"),
+    children(members, posting_link)
+  );
+
+  const container_left = div(
+    classes("flex items-center"),
+    children(
+      posting_cover,
+      members_container,
+    )
+  )
+
+  const container = div(
+    classes("flex items-start justify-between"),
+    children(
+      container_left,
+      latest_message_date
+    )
+  )
+
+  const item = li(
+    attrs({
+      id: `chat-${payload.id}`,
+      class: "flex flex-col hover:bg-gray-100 dark:hover:bg-zinc-800 duration-200 p-4 relative"
+    }),
+    children(
+      chat_link,
+      container,
+      latest_message
+    ));
+
+  return item
+}

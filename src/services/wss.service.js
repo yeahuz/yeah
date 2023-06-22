@@ -15,7 +15,7 @@ export function wss_connect(app) {
   wss.on("close", async (e) => {
     app.log.error(`ERROR: websocket connection closed: ${e}`)
     await wait(1000)
-    wss_connect()
+    wss_connect(app)
   });
 
   wss.on("error", (e) => {

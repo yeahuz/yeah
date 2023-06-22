@@ -1,5 +1,7 @@
 import * as MessageService from "./message.service.js";
 import * as AttachmentService from "./attachment.service.js";
+import * as UserService from "./user.service.js";
+import * as PostingService from "./posting.service.js";
 import { BadRequestError, InternalError } from "../utils/errors.js";
 import { Chat, User } from "../models/index.js";
 import objection from "objection";
@@ -107,11 +109,11 @@ export async function create_chat({ created_by, posting_id, members = [] }) {
     await trx.commit();
     return chat;
   } catch (err) {
+    trx.rollback();
     if (err instanceof UniqueViolationError) {
       throw new BadRequestError({ key: "chat_exists" });
     }
 
-    trx.rollback();
     throw new InternalError();
   }
 }
@@ -133,8 +135,14 @@ export async function get_member_chat(user_id, chats = []) {
 
 function create_one_impl(trx) {
   return async ({ created_by, posting_id, members = [] }) => {
-    const chat = await Chat.query(trx).insert({ created_by, posting_id });
-    await chat.$relatedQuery("members", trx).relate(members);
-    return chat;
+    const actual_members = await UserService.get_by_ids({ ids: members, modify: "minimum" });
+    const posting = await PostingService.get_one({ id: posting_id, modify: "minimum" })
+    const chat = await Chat.query(trx).insertGraph({
+      created_by,
+      posting,
+      members: actual_members
+    }, { relate: true })
+
+    return chat
   };
 }

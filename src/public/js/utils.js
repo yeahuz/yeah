@@ -1,4 +1,4 @@
-const noop = () => {};
+const noop = () => { };
 
 export function upload_request(
   url,
@@ -72,7 +72,7 @@ export async function request(
 
     switch (accept) {
       case "application/json": {
-        data = await response.json().catch(() => {});
+        data = await response.json().catch(() => { });
         break;
       }
       case "text/html": {
@@ -218,3 +218,36 @@ export function gen_id(prefix = "temp") {
   if (prefix) rand = prefix + rand;
   return rand;
 }
+export function get_locale() {
+  return navigator.languages && navigator.languages.length
+    ? navigator.languages[0]
+    : navigator.language
+}
+
+export function create_date_formatter(locale = get_locale(), options = {}) {
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "numeric",
+    hourCycle: "h24",
+    minute: "numeric",
+    ...options,
+  });
+}
+
+export function create_relative_formatter(locale = get_locale()) {
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "always", style: "short" });
+  const dtf = create_date_formatter(locale, { month: "numeric" });
+  return function format_relative(date, date2) {
+    const diff = Math.abs(new Date(date).valueOf() - new Date(date2).valueOf());
+    const seconds = Math.floor(diff / 1000);
+    if (seconds < 60) return rtf.format(-seconds, "second");
+    if (seconds < 3600) return rtf.format(-Math.floor(seconds / 60), "minute");
+    if (seconds < 86400) return rtf.format(-Math.floor(seconds / 60 / 60), "hour");
+    if (seconds < 1296000) return rtf.format(-Math.floor(seconds / 86400), "day"); // show until 15 days (1_296_000)
+    return dtf.format(new Date(date));
+  };
+}
+
+export const format_relative = create_relative_formatter()

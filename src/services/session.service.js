@@ -37,6 +37,10 @@ export async function delete_one(id) {
   return await Session.query().deleteById(id);
 }
 
+export async function update_one(id, update = {}) {
+  return await Session.query().findById(id).patch(update)
+}
+
 export async function validate_one(id) {
   if (!id) return;
   const session = await get_one(id);
@@ -47,7 +51,7 @@ export function get_many(query, relations = ["user_agent(browser_selects)"]) {
   return {
     async for(user_id, current_sid) {
       return await Session.query()
-        .where({ user_id })
+        .where({ user_id, active: true })
         .withGraphFetched(format_relations(relations))
         .orderByRaw(`(case when id = ? then 1 end) asc, created_at desc`, [current_sid]);
     },

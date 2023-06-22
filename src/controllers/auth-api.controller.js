@@ -77,7 +77,7 @@ export async function verify_assertion(req, reply) {
   await credential.$query().patch({ counter: auth_data.counter });
 
   const session = await SessionService.create_one({ user_id: decoded.id, user_agent, ip });
-  const user = await UserService.get_one(decoded.id, ["roles"]);
+  const user = await UserService.get_by_id(decoded.id, ["roles"]);
   req.session.set("sid", session.id);
   req.session.set("token", null);
   req.session.set("challenge", null);
@@ -91,7 +91,7 @@ export async function generate_request(req, reply) {
   });
 
   const decoded = await jwt.verify(token);
-  const user = await UserService.get_one(decoded.id);
+  const user = await UserService.get_by_id(decoded.id);
 
   let request;
 

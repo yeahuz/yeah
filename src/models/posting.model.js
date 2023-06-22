@@ -16,6 +16,14 @@ export class Posting extends BaseModel {
     return "postings";
   }
 
+  static get modifiers() {
+    return {
+      minimum(builder) {
+        builder.select("id", "cover_url", "url", "title")
+      }
+    }
+  }
+
   static get relationMappings() {
     return {
       creator: {

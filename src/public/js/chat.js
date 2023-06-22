@@ -1,6 +1,6 @@
 import { add_listeners, attrs, span, text, html, classes } from "./dom.js";
 import { check_icon } from "./icons.js";
-import { media_message_tmpl, file_message_tmpl, text_message_tmpl } from "./templates.js";
+import { media_message_tmpl, file_message_tmpl, text_message_tmpl, chat_list_item_tmpl } from "./templates.js";
 import {
   option,
   request,
@@ -9,6 +9,7 @@ import {
   generate_srcset,
   wait,
   gen_id,
+  format_relative
 } from "./utils.js";
 import { toast } from "./toast.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
@@ -20,6 +21,7 @@ const files_link_form = document.querySelector(".js-files-link-form");
 const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 const message_form = document.querySelector(".js-message-form");
+const chats_list = document.querySelector(".js-chats-list")
 // const message_textarea = message_form.querySelector("textarea[name='content']");
 
 const top = window.localStorage.getItem(window.location.pathname);
@@ -116,6 +118,8 @@ function on_message_sent(message) {
 }
 
 function on_new_message(payload) {
+  update_latest_message(payload)
+  if (!messages) return
   switch (payload.type) {
     case "text":
       messages.append(text_message_tmpl(payload, false));
@@ -130,8 +134,24 @@ function on_new_message(payload) {
   scroll_to_bottom(messages);
 }
 
+function update_latest_message(payload) {
+  const item = document.getElementById(`chat-${payload.chat_id}`);
+  if (item) {
+    const latest_date = item.querySelector(".js-latest-date");
+    const latest_message = item.querySelector(".js-latest-message");
+    if (latest_message) latest_message.textContent = payload.content
+    if (latest_date) latest_date.textContent = format_relative(new Date(payload.created_at), new Date())
+  }
+}
+
+function on_new_chat(payload) {
+  if (chats_list) chats_list.append(chat_list_item_tmpl(payload))
+  ws.send(encoder.encode("subscribe", String(payload.id)))
+}
+
 on("new_message", on_new_message);
 on("message_sent", on_message_sent);
+on("new_chat", on_new_chat)
 
 function on_media_progress(item) {
   item.classList.add("pointer-events-none");

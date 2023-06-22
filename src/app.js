@@ -8,24 +8,21 @@ import config from "./config/index.js";
 import form_body from "@fastify/formbody";
 import multipart from "@fastify/multipart";
 import fastify_rate_limit from "@fastify/rate-limit";
-import os from "os";
+//import os from "os";
 import ajv_errors from "ajv-errors";
-import * as eta from "eta";
-import { elastic_client } from "./services/es.service.js";
 import { routes, api_routes } from "./routes/index.js";
 import { DomainError, FloodError, InternalError, ValidationError } from "./utils/errors.js";
-import { ws } from "./plugins/ws.js";
 import { can } from "./plugins/can.js";
 import { add_t } from "./utils/index.js";
 import { i18next_plugin, i18next } from "./utils/i18n.js";
 import { redis_client } from "./services/redis.service.js";
-import * as RegionService from "./services/region.service.js";
 import { pg_to_es } from "./jobs.js";
-import { render_file } from "./utils/eta.js";
+import { render_file, eta } from "./utils/eta.js";
+import { wss_connect } from "./services/wss.service.js";
 import qs from "qs";
 import cors from "@fastify/cors";
 
-process.env.UV_THREADPOOL_SIZE = os.cpus().length;
+// process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
 export async function start() {
   const app = fastify({
@@ -74,8 +71,6 @@ export async function start() {
 
     app.register(can);
     app.register(fastify_flash);
-
-    app.register(ws);
 
     app.register(view, {
       engine: {
@@ -180,50 +175,11 @@ export async function start() {
     };
 
     app.addConstraintStrategy(accept_strategy);
-    app.get("/elastic/regions", async (req, reply) => {
-      const LANGS = ["en", "uz", "ru"];
-
-      for (const lang of LANGS) {
-        const regions = await RegionService.get_regions({ lang });
-        for (const region of regions) {
-          const other_langs = LANGS.filter((l) => l !== lang);
-          const districts = await RegionService.get_districts({ region_id: region.id, lang });
-
-          for (const district of districts) {
-            let combined = `${district.long_name}, ${region.long_name}`;
-            for (const other_lang of other_langs) {
-              const sibling = await RegionService.get_region({ id: region.id, lang: other_lang });
-              const sibling_district = await RegionService.get_district({
-                id: district.id,
-                lang: other_lang,
-              });
-              combined += `; ${sibling_district.long_name}, ${sibling.long_name}`;
-            }
-
-            await elastic_client.index({
-              index: `regions_${lang}`,
-              body: {
-                region_id: region.id,
-                district_id: district.id,
-                formatted_address: `${district.long_name}, ${region.long_name}`,
-                combined_address: combined,
-                ...(district.coords && {
-                  coords: { lat: district.coords.x, lon: district.coords.y },
-                }),
-              },
-            });
-          }
-        }
-      }
-
-      reply.send({ status: "oke" });
-      return reply;
-    });
-
     pg_to_es.start();
     app.register(routes);
     app.register(api_routes, { prefix: "/api" });
 
+    wss_connect(app)
     await app.listen({ port: config.port });
   } catch (err) {
     app.log.error(err);

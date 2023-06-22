@@ -11,6 +11,7 @@ import { array_to_tree, generate_srcset, option, add_t } from "../utils/index.js
 import { redis_client } from "../services/redis.service.js";
 import { new_posting_schema } from "../schemas/new-posting.schema.js";
 import { async_pool_all } from "../utils/async-pool.js";
+import { wss, wss_encoder } from "../services/wss.service.js";
 
 export async function update_attachment(req, reply) {
   const { id, attachment_id } = req.params;
@@ -349,19 +350,22 @@ export async function contact(req, reply) {
   const { posting_id, creator_id } = req.query;
   const { content } = req.body;
   const chats = await ChatService.get_posting_chats(posting_id);
-  const [chat, err] = await option(
-    (await ChatService.get_member_chat(user.id, chats)) ||
-    ChatService.create_chat({
+  let chat = await ChatService.get_member_chat(user.id, chats)
+  if (!chat) {
+    const [new_chat, err] = await option(ChatService.create_chat({
       created_by: user.id,
       posting_id,
-      members: [creator_id, user.id],
-    })
-  );
+      members: [creator_id, user.id]
+    }))
 
-  if (err) {
-    req.flash("err", err.build(t));
-    reply.redirect(add_t(req.url));
-    return reply;
+    if (err) {
+      req.flash("err", err.build(t));
+      reply.redirect(add_t(req.url));
+      return reply;
+    }
+
+    chat = new_chat
+    redis_client.publish("chats/new", JSON.stringify(chat))
   }
 
   const [sent, sent_err] = await option(
@@ -377,6 +381,8 @@ export async function contact(req, reply) {
     reply.redirect(add_t(req.url));
     return reply;
   }
+
+  redis_client.publish("messages/new", JSON.stringify(sent))
 
   req.flash("success", { message: t("message_sent", { ns: "success" }) });
   reply.redirect(add_t(req.url));

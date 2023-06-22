@@ -1,6 +1,8 @@
 import fp from "fastify-plugin";
 import { AuthorizationError } from "../utils/errors.js";
 import { i18next } from "../utils/i18n.js";
+import { render_file } from "../utils/eta.js";
+import { add_t } from "../utils/index.js";
 
 export const can = fp(function can(fastify, opts = {}, done) {
   fastify.decorate("can", can_impl);
@@ -42,8 +44,7 @@ function can_impl(validation_fns = [], options = { relation: "or" }) {
       if (req.xhr) {
         throw new AuthorizationError();
       }
-      const referer = req.headers["referer"];
-      reply.code(404).render("404.html", { referer, t });
+      reply.redirect(add_t(req.url))
       return reply;
     }
   };

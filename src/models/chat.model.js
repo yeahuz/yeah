@@ -37,6 +37,7 @@ export class Chat extends BaseModel {
       members: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: User,
+        filter: (builder) => builder.select("name"),
         join: {
           from: "chats.id",
           through: {

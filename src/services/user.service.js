@@ -59,9 +59,13 @@ export async function get_by_email_phone(identifier, relations = []) {
     .withGraphFetched(format_relations(relations));
 }
 
-export async function get_one(id, relations = []) {
+export async function get_by_id(id, relations = []) {
   if (!id) return;
   return await User.query().findById(id).withGraphFetched(format_relations(relations));
+}
+
+export async function get_by_ids({ ids, relations = [], modify } = {}) {
+  return await User.query().findByIds(ids).modify(modify).withGraphFetched(format_relations(relations))
 }
 
 async function cursor_paginate(model, list = [], excludes) {
@@ -136,7 +140,7 @@ export async function get_by_hashid(hash_id, relations = []) {
 }
 
 export async function get_preferences(id) {
-  const user = await get_one(id);
+  const user = await get_by_id(id);
   return await user?.$relatedQuery("preferences");
 }
 

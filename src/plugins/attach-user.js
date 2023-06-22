@@ -12,10 +12,10 @@ async function attach_user_impl(req, reply) {
   const sid = req.session.get("sid") || req.headers["authorization"];
   const session = await SessionService.get_one(sid);
 
-  if (sid && !session) {
-    req.session.delete();
+  if (sid) {
+    if (!session || session?.expired | !session.active) req.session.delete()
   }
 
-  const user = await UserService.get_one(session?.user_id, ["roles"]);
+  const user = await UserService.get_by_id(session?.user_id, ["roles"]);
   req.user = user?.toJSON();
 }

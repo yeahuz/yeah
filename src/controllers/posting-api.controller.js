@@ -3,7 +3,7 @@ import { transform_object } from "../utils/index.js";
 
 export async function get_one(req, reply) {
   const { id } = req.params;
-  return await PostingService.get_one(id);
+  return await PostingService.get_one({ id, relations: ["attachments", "location"] });
 }
 
 export async function get_many(req, reply) {
