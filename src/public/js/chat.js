@@ -91,7 +91,7 @@ function on_send_message(e) {
     };
 
     ws.send(encoder.encode("publish_message", payload));
-    messages.append(text_message_tmpl(payload, true));
+    if (messages) messages.append(text_message_tmpl(payload, true));
 
     textarea.focus();
     form.reset();
@@ -100,7 +100,9 @@ function on_send_message(e) {
 }
 
 function on_message_sent(message) {
+  if (!messages) return
   const item = messages.querySelector(`li[data-temp_id=${message.temp_id}]`);
+  if (!item) return
   item.classList.remove("pointer-events-none");
 
   const upload_progresses = item.querySelectorAll(".upload-progress");
@@ -115,6 +117,7 @@ function on_message_sent(message) {
   }
 
   item.setAttribute("date-message_id", message.id);
+  update_latest_message(message, true)
 }
 
 function on_new_message(payload) {
@@ -134,12 +137,13 @@ function on_new_message(payload) {
   scroll_to_bottom(messages);
 }
 
-function update_latest_message(payload) {
+async function update_latest_message(payload, you) {
+  const { t } = await import("./i18n.js");
   const item = document.getElementById(`chat-${payload.chat_id}`);
   if (item) {
     const latest_date = item.querySelector(".js-latest-date");
     const latest_message = item.querySelector(".js-latest-message");
-    if (latest_message) latest_message.textContent = payload.content
+    if (latest_message) latest_message.textContent = you ? `${t("you", { ns: "chats" })}: ` + payload.content : payload.content
     if (latest_date) latest_date.textContent = format_relative(new Date(payload.created_at), new Date())
   }
 }
