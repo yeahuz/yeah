@@ -8,9 +8,9 @@ export const create_one_trx = (trx) => create_one_impl(trx);
 export const create_one = create_one_impl();
 
 function create_one_impl(trx) {
-  return async ({ sender_id, content, reply_to, chat_id, type } = {}) => {
+  return async ({ sender_id, content, reply_to, chat_id, type, created_at, attachments = [] } = {}) => {
     return await Message.query(trx)
-      .insert({ content, sender_id, reply_to, chat_id, type })
+      .insertGraph({ content, sender_id, reply_to, chat_id, type, attachments, created_at }, { relate: true })
       .returning(["content", "sender_id", "reply_to", "chat_id", "type", "created_at", "id"]);
   };
 }

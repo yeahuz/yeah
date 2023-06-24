@@ -86,9 +86,9 @@ export function search_suggestions_tmpl(suggestions, query) {
   return list;
 }
 
-export function file_message_tmpl(payload, is_own_file = true) {
+export function file_message_tmpl(message, is_own_file = true) {
   const msg = li(
-    attrs({ "data-temp_id": payload.temp_id }),
+    attrs({ "data-temp_id": message.temp_id }),
     classes(
       "p-2 max-w-md w-fit text-white flex space-x-2 items-center rounded-lg overflow-hidden",
       {
@@ -98,7 +98,7 @@ export function file_message_tmpl(payload, is_own_file = true) {
     )
   );
 
-  for (const file of payload.attachments) {
+  for (const file of message.files) {
     const download_link = a(
       attrs({
         href: "#",
@@ -118,7 +118,7 @@ export function file_message_tmpl(payload, is_own_file = true) {
 
     const left_container = div(
       attrs({
-        "data-id": file.id,
+        id: file.temp_id,
         class:
           "relative group flex items-center justify-center w-12 h-12 flex-shrink-0 h-full js-file-icon",
       }),
@@ -130,9 +130,9 @@ export function file_message_tmpl(payload, is_own_file = true) {
         class:
           "underline decoration-transparent hover:decoration-white duration-300 block font-meidum text-gray-700 dark:text-gray-200 truncate",
       }),
-      text(file.name)
+      text(file.meta.name)
     );
-    const file_size = span(text(format_bytes(file.size)));
+    const file_size = span(text(format_bytes(file.meta.size)));
     const time = span(text(formatter.format(new Date())));
 
     const date_info = div(
@@ -246,7 +246,7 @@ const formatter = new Intl.DateTimeFormat(navigator.language, {
   minute: "numeric",
 });
 
-export function media_message_tmpl(payload, is_own_media = true) {
+export function media_message_tmpl(message, is_own_media = true) {
   const time = span(text(formatter.format(new Date())));
   const clock = span(attrs({ class: "js-date-info-clock" }), html(clock_icon({ size: 12 })));
 
@@ -265,7 +265,7 @@ export function media_message_tmpl(payload, is_own_media = true) {
   );
 
   const msg = li(
-    attrs({ "data-temp_id": payload.temp_id }),
+    attrs({ id: message.temp_id }),
     classes("w-full max-w-md ml-auto relative", {
       "ml-auto": is_own_media,
       "mr-auto": !is_own_media,
@@ -273,11 +273,11 @@ export function media_message_tmpl(payload, is_own_media = true) {
     children(list, date_info)
   );
 
-  for (const file of payload.attachments) {
-    const src = URL.createObjectURL(file);
+  for (const file of message.files) {
+    const src = URL.createObjectURL(file.raw);
     const photo = img(attrs({ class: "w-full h-full object-cover align-middle rounded-lg", src }));
     const item = li(
-      attrs({ class: "basis-40 flex-1 max-h-64 relative", "data-id": file.id }),
+      attrs({ class: "basis-40 flex-1 max-h-64 relative", id: file.temp_id }),
       children(photo)
     );
     list.append(item);

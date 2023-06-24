@@ -39,7 +39,8 @@ export async function get_direct_upload_url(file) {
   const fd = new FormData();
   fd.append("requireSignedURLs", "false");
   fd.append("metadata", JSON.stringify(file));
-  return await client.request("/v2/direct_upload", { data: fd });
+  const result = await client.request("/v2/direct_upload", { data: fd });
+  return { id: result.id, upload_url: result.uploadURL, public_url: get_cf_image_url(result.id) }
 }
 
 export async function get_direct_upload_urls(files) {

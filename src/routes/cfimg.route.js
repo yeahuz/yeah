@@ -12,7 +12,7 @@ export const cfimg = async (fastify) => {
           type: "object",
           properties: {
             id: { type: "string" },
-            uploadURL: { type: "string" },
+            upload_url: { type: "string" },
           },
         },
       },

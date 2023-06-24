@@ -10,14 +10,33 @@ sub.on("message", async (channel, message) => {
     case "api/messages": {
       const result = JSON.parse(message);
       let item = await redis_client.rpop(result.queue)
+      if (item) item = JSON.parse(item)
       while (item) {
-        item = JSON.parse(item)
-        const [msg, err] = await option(ChatService.create_message({
-          chat_id: item.chat_id,
-          content: item.content,
-          sender_id: item.sender_id,
-          reply_to: item.reply_to
-        }));
+        let msg = item;
+        let err = undefined
+        switch (item.type) {
+          case "text": {
+            [msg, err] = await option(ChatService.create_message({
+              chat_id: item.chat_id,
+              content: item.content,
+              sender_id: item.sender_id,
+              reply_to: item.reply_to,
+              created_at: item.created_at
+            }));
+          } break;
+          case "file": {
+            [msg, err] = await option(ChatService.link_file({
+              chat_id: item.chat_id,
+              content: item.content,
+              file: item.file,
+              sender_id: item.sender_id,
+              reply_to: item.reply_to,
+              created_at: item.created_at
+            }));
+          } break;
+          default:
+            break;
+        }
 
         if (err) {
           redis_client.rpush(result.queue, message)

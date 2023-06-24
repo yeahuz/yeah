@@ -43,7 +43,7 @@ async function on_photo_change(e) {
   fd.append("file", file);
 
   const [uploaded, upload_err] = await option(
-    upload_request(url.uploadURL, {
+    upload_request(url.upload_url, {
       data: fd,
       on_progress: on_progress(profile_photo_container),
       on_done: on_done(profile_photo_container),

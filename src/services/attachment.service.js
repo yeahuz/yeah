@@ -34,11 +34,14 @@ function create_one_impl(trx) {
         break;
     }
 
-    return await Attachment.query(trx).insert({
-      resource_id: resource.id,
-      name: resource.name,
-      service,
-      ...resource.meta,
-    });
+    if (resource) {
+      return await Attachment.query(trx).insert({
+        resource_id: resource.id,
+        name: resource.name,
+        service,
+        ...resource.meta,
+      });
+    }
+
   };
 }

@@ -43,19 +43,20 @@ export async function get_one({ id, current_user_id }) {
     );
 }
 
-export async function create_message({ chat_id, content, reply_to, sender_id }) {
+export async function create_message({ chat_id, content, reply_to, sender_id, created_at }) {
   const message = await MessageService.create_one({
     chat_id,
     content,
     reply_to,
     sender_id,
     type: "text",
+    created_at
   });
 
   return Object.assign(message, { attachments: [] });
 }
 
-export async function link_photos({ chat_id, photos = [], sender_id, reply_to }) {
+export async function link_photos({ chat_id, photos = [], sender_id, reply_to, created_at }) {
   const trx = await MessageService.start_transaction();
   try {
     const message = await MessageService.create_one_trx(trx)({
@@ -63,6 +64,7 @@ export async function link_photos({ chat_id, photos = [], sender_id, reply_to })
       sender_id,
       reply_to,
       type: "photo",
+      created_at
     });
     const attachments = await Promise.all(
       photos.map((resource_id) => AttachmentService.create_one_trx(trx)({ resource_id }))
@@ -77,24 +79,26 @@ export async function link_photos({ chat_id, photos = [], sender_id, reply_to })
   }
 }
 
-export async function link_file({ chat_id, file, sender_id, reply_to }) {
+export async function link_file({ chat_id, file, sender_id, reply_to, created_at, content = "" } = {}) {
   const trx = await MessageService.start_transaction();
   try {
+    const attachment = await AttachmentService.create_one_trx(trx)({
+      resource_id: file.id,
+      service: "CF_R2",
+    });
+
     const message = await MessageService.create_one_trx(trx)({
       chat_id,
       sender_id,
       reply_to,
       type: "file",
+      attachments: [attachment],
+      created_at,
+      content
     });
 
-    const attachment = await AttachmentService.create_one_trx(trx)({
-      resource_id: file,
-      service: "CF_R2",
-    });
-
-    await message.$relatedQuery("attachments", trx).relate(attachment);
     await trx.commit();
-    return Object.assign(message, { attachments: [attachment] });
+    return message;
   } catch (err) {
     console.log({ err });
     trx.rollback();

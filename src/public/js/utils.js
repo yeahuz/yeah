@@ -215,7 +215,7 @@ export function pipe(...fns) {
 
 export function gen_id(prefix = "temp") {
   let rand = Math.random().toString(32).slice(2);
-  if (prefix) rand = prefix + rand;
+  if (prefix) rand = prefix + "-" + rand;
   return rand;
 }
 export function get_locale() {

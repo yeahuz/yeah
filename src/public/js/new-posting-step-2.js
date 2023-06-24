@@ -141,7 +141,7 @@ function upload_to(urls) {
     const fd = new FormData();
     fd.append("file", file);
     const [result, err] = await option(
-      upload_request(url.uploadURL, {
+      upload_request(url.upload_url, {
         data: fd,
         on_progress: on_progress(item),
         on_done: on_done(item),

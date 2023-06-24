@@ -42,15 +42,15 @@ export function get_public_url(id) {
 }
 
 export async function get_direct_upload_url(file) {
-  const id = `${randomUUID()}-${file.name}`;
-  const uploadURL = await client.getSignedUrlPromise("putObject", {
+  const id = randomUUID()
+  const upload_url = await client.getSignedUrlPromise("putObject", {
     Bucket: "s3-needs-uz",
     Key: id,
     Expires: 3600,
     ContentType: file.type,
   });
 
-  return { id, uploadURL };
+  return { id, upload_url, public_url: get_public_url(id) };
 }
 
 export async function head_object(key) {

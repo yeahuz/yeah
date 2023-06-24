@@ -87,7 +87,7 @@ function on_send_message(e) {
       chat_id: data.get("chat_id"),
       content: data.get("content"),
       created_at: Date.now(),
-      temp_id: `temp-${Math.random().toString(32).slice(2)}`,
+      temp_id: gen_id()
     };
 
     ws.send(encoder.encode("publish_message", payload));
@@ -179,23 +179,6 @@ function on_media_done(item) {
   };
 }
 
-function upload_media_to(urls) {
-  return async function upload(file) {
-    const list_item = messages.querySelector(`[data-id="${file.id}"]`);
-    const url = urls.shift();
-    const fd = new FormData();
-    fd.append("file", file);
-
-    return await option(
-      upload_request(url.uploadURL, {
-        data: fd,
-        on_progress: on_media_progress(list_item),
-        on_done: on_media_done(list_item),
-      })
-    );
-  };
-}
-
 function on_file_progress(item) {
   item.classList.add("pointer-events-none");
 
@@ -208,119 +191,74 @@ function on_file_progress(item) {
   };
 }
 
-function upload_files_to(urls) {
-  return async function upload(file) {
-    const left_container = messages.querySelector(`[data-id="${file.id}"]`);
-    const url = urls.shift();
-    const fd = new FormData();
-    fd.append("file", file, file.name);
-
-    const [result = {}, err] = await option(
-      upload_request(url.uploadURL, {
-        method: "PUT",
-        data: fd,
-        on_progress: on_file_progress(left_container),
-        // on_done: on_file_done(left_container),
-        headers: {
-          "Content-Type": file.type,
-        },
-      })
-    );
-
-    return [Object.assign(result || {}, { id: url.id }), err];
-  };
-}
-
-async function upload_media_files(message) {
-  const [urls, err] = await option(
-    request("/cloudflare/images/direct_upload", {
-      body: { files: message.attachments.map((file) => ({ size: file.size, type: file.type })) },
-    })
-  );
-
-  if (err) {
-    toast("Unable to create direct creator upload urls. Please try again", "err");
-    return;
-  }
-
-  const photos = [];
-  for await (const [result, err] of async_pool(10, message.attachments, upload_media_to(urls))) {
-    photos.push(result.result.id);
-  }
-
-  if (ws) {
-    const data = new FormData(photos_link_form);
-    ws.send(
-      encoder.encode("publish_photos", {
-        chat_id: data.get("chat_id"),
-        photos,
-        temp_id: message.temp_id,
-      })
-    );
-  }
-}
-
-async function upload_files(message) {
-  const [urls, err] = await option(
-    request("/cloudflare/r2/direct_upload", {
-      body: {
-        files: message.attachments.map((file) => ({
-          name: file.name,
-          size: String(file.size),
-          type: file.type,
-        })),
-      },
-    })
-  );
-
-  if (err) {
-    toast("Unable to create direct creator upload urls. Please try again", "err");
-    return;
-  }
-
-  const data = new FormData(files_link_form);
-
-  for await (const [result, err] of async_pool(10, message.attachments, upload_files_to(urls))) {
-    if (ws) {
-      ws.send(
-        encoder.encode("publish_file", {
-          chat_id: data.get("chat_id"),
-          file: result.id,
-          temp_id: message.temp_id,
-        })
-      );
-    }
-  }
-}
-
 async function on_files_change(e) {
   const files = e.target.files;
   if (!files.length) return;
-
-  const media_message = { temp_id: gen_id(), attachments: [] };
-  const other_messages = [];
+  const media_msg = { temp_id: gen_id("message"), files: [] }
+  const files_msg = { temp_id: gen_id("message"), files: [] }
 
   for (const file of files) {
-    if (is_media(file.type)) media_message.attachments.push(Object.assign(file, { id: gen_id() }));
-    else {
-      other_messages.push({
-        temp_id: gen_id(),
-        attachments: [Object.assign(file, { id: gen_id() })],
-      });
-    }
+    const obj = /(image\/*)/.test(file.type) ? media_msg : files_msg;
+    obj.files.push({ temp_id: gen_id("attachment"), raw: file, meta: { name: file.name, size: file.size, type: file.type } })
   }
 
-  if (media_message.attachments.length) {
-    messages.append(media_message_tmpl(media_message));
-    upload_media_files(media_message);
+  if (messages) {
+    if (media_msg.files.length) messages.append(media_message_tmpl(media_msg, true))
+    if (files_msg.files.length) messages.append(file_message_tmpl(files_msg, true))
+  }
+  upload_all()
+  //upload_all(message)
+}
+
+function upload_to(urls) {
+  return async function upload(file) {
+    const is_image = /(image\/*)/.test(file.meta.type)
+    const key = is_image ? "images" : "files"
+    const url = urls[key].pop()
+    if (!url) return
+    const fd = new FormData();
+    fd.append("file", file.raw, file.meta.name);
+
+    const [_, err] = await option(
+      upload_request(url.upload_url, {
+        data: fd,
+        method: is_image ? "POST" : "PUT",
+        ...(!is_image && {
+          headers: {
+            "Content-Type": file.meta.type
+          }
+        })
+      })
+    );
+
+    if (err) {
+      console.error(err)
+      return
+    }
+
+    return Object.assign(file.meta, { url: url.public_url, id: url.id })
+  }
+}
+
+async function upload_all(message) {
+  const [urls, err] = await option(
+    request("/cf/direct_upload", {
+      body: { files: message.files.map(f => f.meta) }
+    })
+  );
+
+  if (err) {
+    toast("Unable to create direct creator upload urls. Please try again", "err");
+    return;
   }
 
-  if (other_messages.length) {
-    for (const msg of other_messages) {
-      messages.append(file_message_tmpl(msg));
-      upload_files(msg);
-    }
+  for await (const result of async_pool(10, message.files, upload_to(urls))) {
+    console.log(result)
   }
+
+  // 1.Generate urls for all attachments
+  // 2.Response should contain object with image and files keys with corresponding pre signed urls; 
+  // 3.Iterate over all attachments and pop from image or files url based on attachment type;
 }
 
 async function on_photo_download(e) {
@@ -343,10 +281,6 @@ async function on_file_download(e) {
   document.body.append(a);
   a.click();
   a.remove();
-}
-
-function is_media(type) {
-  return /(image\/*)|(video\/*)/.test(type);
 }
 
 function scroll_to_bottom(element) {
