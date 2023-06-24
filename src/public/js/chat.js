@@ -101,7 +101,7 @@ function on_send_message(e) {
 
 function on_message_sent(message) {
   if (!messages) return
-  const item = messages.querySelector(`li[data-temp_id=${message.temp_id}]`);
+  const item = messages.querySelector("#" + message.temp_id)
   if (!item) return
   item.classList.remove("pointer-events-none");
 
@@ -116,7 +116,7 @@ function on_message_sent(message) {
     info.append(check);
   }
 
-  item.setAttribute("date-message_id", message.id);
+  item.setAttribute("id", message.id)
   update_latest_message(message, true)
 }
 
@@ -157,37 +157,20 @@ on("new_message", on_new_message);
 on("message_sent", on_message_sent);
 on("new_chat", on_new_chat)
 
-function on_media_progress(item) {
-  item.classList.add("pointer-events-none");
-  const progress = span(
-    attrs({
-      class:
-        "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
-    }),
-    text("0")
-  );
-
-  item.append(progress);
-  return (progress) => {
-    progress.textContent = `${Math.floor(progress.percent)}%`;
-  };
-}
-
-function on_media_done(item) {
+function on_file_done(file, url, is_image) {
   return () => {
-    item.classList.remove("pointer-events-none");
-  };
+    const message = document.getElementById(file.msg_id);
+    if (message) {
+      const links = message.querySelectorAll("a");
+      for (const link of links) {
+        link.setAttribute("href", url.public_url);
+      }
+    }
+  }
 }
 
-function on_file_progress(item) {
-  item.classList.add("pointer-events-none");
-
-  const upload_progress = span(classes("upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg text-white"));
-
-  item.append(upload_progress);
-
+function on_file_progress(file, is_image) {
   return (progress) => {
-    upload_progress.textContent = `${Math.floor(progress.percent)}%`;
   };
 }
 
@@ -199,15 +182,15 @@ async function on_files_change(e) {
 
   for (const file of files) {
     const obj = /(image\/*)/.test(file.type) ? media_msg : files_msg;
-    obj.files.push({ temp_id: gen_id("attachment"), raw: file, meta: { name: file.name, size: file.size, type: file.type } })
+    obj.files.push({ temp_id: gen_id("attachment"), msg_id: obj.temp_id, raw: file, meta: { name: file.name, size: file.size, type: file.type } })
   }
 
   if (messages) {
     if (media_msg.files.length) messages.append(media_message_tmpl(media_msg, true))
     if (files_msg.files.length) messages.append(file_message_tmpl(files_msg, true))
   }
-  upload_all()
-  //upload_all(message)
+
+  upload_all({ media_msg, files_msg })
 }
 
 function upload_to(urls) {
@@ -223,6 +206,8 @@ function upload_to(urls) {
       upload_request(url.upload_url, {
         data: fd,
         method: is_image ? "POST" : "PUT",
+        on_progress: on_file_progress(file, is_image),
+        on_done: on_file_done(file, url, is_image),
         ...(!is_image && {
           headers: {
             "Content-Type": file.meta.type
@@ -240,10 +225,11 @@ function upload_to(urls) {
   }
 }
 
-async function upload_all(message) {
+async function upload_all({ media_msg, files_msg }) {
+  const files = media_msg.files.concat(files_msg.files);
   const [urls, err] = await option(
     request("/cf/direct_upload", {
-      body: { files: message.files.map(f => f.meta) }
+      body: { files: files.map(f => f.meta) }
     })
   );
 
@@ -252,13 +238,9 @@ async function upload_all(message) {
     return;
   }
 
-  for await (const result of async_pool(10, message.files, upload_to(urls))) {
+  for await (const result of async_pool(10, files, upload_to(urls))) {
     console.log(result)
   }
-
-  // 1.Generate urls for all attachments
-  // 2.Response should contain object with image and files keys with corresponding pre signed urls; 
-  // 3.Iterate over all attachments and pop from image or files url based on attachment type;
 }
 
 async function on_photo_download(e) {

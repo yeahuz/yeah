@@ -88,7 +88,7 @@ export function search_suggestions_tmpl(suggestions, query) {
 
 export function file_message_tmpl(message, is_own_file = true) {
   const msg = li(
-    attrs({ "data-temp_id": message.temp_id }),
+    attrs({ id: message.temp_id }),
     classes(
       "p-2 max-w-md w-fit text-white flex space-x-2 items-center rounded-lg overflow-hidden",
       {
@@ -297,7 +297,7 @@ export function text_message_tmpl(payload, is_own_message) {
 
   const msg = li(
     attrs({
-      "data-temp_id": payload.temp_id,
+      id: payload.temp_id,
     }),
     classes("p-2 rounded-lg block relative max-w-md w-fit", {
       "ml-auto text-white bg-primary-600": is_own_message,
