@@ -35,120 +35,15 @@
             </div>
           <% } %>
           <% if (message.type === "text") { %>
-            <li class="p-2 rounded-lg block relative max-w-md w-fit <%= message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
-              <p>
-                <%= message.content %>
-              </p>
-              <div class="flex items-center justify-end text-xs mt-0.5 space-x-1 <%= message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
-                <span>
-                  <%= it.formatter.format(new Date(message.created_at)) %>
-                </span>
-                <% if (message.is_own_message) { %>
-                  <% if (message.read_by.length > 0) {%>
-                    <span class="flex">
-                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <svg class="w-3.5 h-3.5 -ml-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                  <% } else { %>
-                    <span>
-                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </span>
-                  <% } %>
-                <% } %>
-              </div>
-            </li>
+            <%~ include('./text-message.html', {message, formatter: it.formatter}) %>
           <% } %>
           <% if (message.type === "photo") { %>
-            <li class="w-full max-w-md ml-auto relative <%= message.is_own_message ? "ml-auto" : "mr-auto" %>">
-              <ul class="flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg js-image-viewer">
-                <% message.attachments.forEach(function (attachment) { %>
-                  <li class="basis-40 flex-1 max-h-64 relative">
-                    <span class="absolute left-1 top-1 inline-block bg-black/50 rounded-lg py-0.5 px-2 text-white text-xs"><%= it.format_bytes(attachment.size) %></span>
-                    <button type="button" class="absolute top-0 left-0 w-full h-full text-white js-photo-download-btn" data-photo_url="<%= attachment.url %>">
-                      <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full inline-block pointer-events-none">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 4V20M12 20L18 14M12 20L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </button>
-                    <img class="cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable" data-photo_url="<%= attachment.url %>" src="<%= attachment.url %>/width=10" crossorigin referrerpolicy="no-referrer">
-                  </li>
-                <% }) %>
-              </ul>
-            <div class="inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50">
-              <span><%= it.formatter.format(new Date(message.created_at)) %></span>
-              <% if (message.is_own_message) { %>
-                <% if (message.read_by.length > 0) {%>
-                  <span class="flex">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <svg class="w-3.5 h-3.5 -ml-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </span>
-                <% } else { %>
-                  <span>
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                  </span>
-                <% } %>
-              <% } %>
-            </div>
-          </li>
+            <%~ include('./photo-message.html', {message, formatter: it.formatter, format_bytes:
+            it.format_bytes}) %>
           <% } %>
           <% if (message.type === "file") { %>
-            <li class="p-2 max-w-md w-fit text-white flex space-x-2 items-center rounded-lg overflow-hidden <%= message.is_own_message ? "ml-auto bg-primary-600" : "bg-gray-100 dark:bg-zinc-800 mr-auto text-gray-900 dark:text-white" %>">
-              <div class="relative group flex items-center justify-center w-12 h-12 flex-shrink-0 h-full">
-                <a href="<%= message.attachments[0]?.url %>" download="<%= message.attachments[0]?.name %>" class="w-full opacity-0 group-hover:opacity-100 duration-200 absolute flex items-center justify-center w-full h-full text-white bg-black/50 rounded-lg js-file-download-btn">
-                  <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 4V20M12 20L18 14M12 20L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </a>
-                <span class="flex w-full h-full items-center justify-center flex-shrink-0 rounded-lg
-                  <%= message.is_own_message ? "bg-gray-100 text-gray-600 dark:bg-white dark:text-primary-600" : "dark:bg-zinc-700" %>">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2.26946V6.4C14 6.96005 14 7.24008 14.109 7.45399C14.2049 7.64215 14.3578 7.79513 14.546 7.89101C14.7599 8 15.0399 8 15.6 8H19.7305M20 9.98822V17.2C20 18.8802 20 19.7202 19.673 20.362C19.3854 20.9265 18.9265 21.3854 18.362 21.673C17.7202 22 16.8802 22 15.2 22H8.8C7.11984 22 6.27976 22 5.63803 21.673C5.07354 21.3854 4.6146 20.9265 4.32698 20.362C4 19.7202 4 18.8802 4 17.2V6.8C4 5.11984 4 4.27976 4.32698 3.63803C4.6146 3.07354 5.07354 2.6146 5.63803 2.32698C6.27976 2 7.11984 2 8.8 2H12.0118C12.7455 2 13.1124 2 13.4577 2.08289C13.7638 2.15638 14.0564 2.27759 14.3249 2.44208C14.6276 2.6276 14.887 2.88703 15.4059 3.40589L18.5941 6.59411C19.113 7.11297 19.3724 7.3724 19.5579 7.67515C19.7224 7.94356 19.8436 8.2362 19.9171 8.5423C20 8.88757 20 9.25445 20 9.98822Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-              </div>
-              <div class="overflow-hidden">
-                <a href="<%= message.attachments[0]?.url %>" class="underline decoration-transparent
-                         hover:decoration-white duration-300 block font-meidum text-gray-700
-                         dark:text-gray-200 truncate"><%= message.attachments[0]?.name %></a>
-                <div class="flex justify-between text-xs space-x-4 mt-0.5 text-primary-50">
-                  <span><%= it.format_bytes(message.attachments[0]?.size) %></span>
-                  <div class="flex items-center space-x-1">
-                    <span><%= it.formatter.format(new Date(message.created_at)) %></span>
-                    <% if (message.is_own_message) { %>
-                      <% if (message.read_by.length > 0) {%>
-                        <span class="flex">
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                          <svg class="w-3.5 h-3.5 -ml-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                        </span>
-                      <% } else { %>
-                        <span>
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                          </svg>
-                        </span>
-                      <% } %>
-                    <% } %>
-                  </div>
-                </div>
-              </div>
-            </li>
+            <%~ include('./file-message.html', {message, formatter: it.formatter, format_bytes:
+            it.format_bytes}) %>
           <% } %>
         <% }) %>
       </ul>

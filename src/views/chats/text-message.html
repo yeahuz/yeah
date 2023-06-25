@@ -1,0 +1,28 @@
+<li class="p-2 rounded-lg block relative max-w-md w-fit <%= it.message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
+  <p>
+    <%= it.message.content %>
+  </p>
+  <div class="flex items-center justify-end text-xs mt-0.5 space-x-1 <%= it.message.is_own_message ? "text-primary-50" : "text-gray-500 dark:text-gray-300" %>">
+    <span>
+      <%= it.formatter.format(new Date(it.message.created_at)) %>
+    </span>
+    <% if (it.message.is_own_message) { %>
+      <% if (it.message.read_by.length > 0) {%>
+        <span class="flex">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg class="w-3.5 h-3.5 -ml-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      <% } else { %>
+        <span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      <% } %>
+    <% } %>
+  </div>
+</li>
