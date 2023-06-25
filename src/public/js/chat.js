@@ -148,6 +148,12 @@ function on_new_chat(payload) {
 function on_file_done(file, url) {
   return () => {
     const message = document.getElementById(file.msg_id);
+    const item = document.getElementById(file.temp_id);
+    if (item) {
+      const progress = item.querySelector(".js-progress");
+      if (progress) progress.remove();
+    }
+
     if (message) {
       const links = message.querySelectorAll("a");
       for (const link of links) {
@@ -158,7 +164,18 @@ function on_file_done(file, url) {
 }
 
 function on_file_progress(file) {
+  const item = document.getElementById(file.temp_id);
+  const overlay = span(
+    attrs({
+      class: "absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg js-progress"
+    }),
+    text("0")
+  )
+
+  if (item) item.append(overlay)
+
   return (progress) => {
+    overlay.textContent = `${Math.floor(progress.percent)}%`
   };
 }
 
