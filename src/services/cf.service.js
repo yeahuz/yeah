@@ -5,7 +5,7 @@ export async function get_upload_urls(files = []) {
   const images = []
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    if (/(image\/*)/.test(file.type)) {
+    if (file.is_image) {
       images.push(file)
       files.splice(i, 1)
     }

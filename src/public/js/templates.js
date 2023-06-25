@@ -102,6 +102,7 @@ export function file_message_tmpl(message, is_own_file = true) {
     const download_link = a(
       attrs({
         href: "#",
+        download: file.meta.name,
         class:
           "w-full opacity-0 group-hover:opacity-100 duration-200 absolute flex items-center justify-center w-full h-full text-white bg-black/50 rounded-lg js-file-download-btn",
       }),
@@ -127,6 +128,8 @@ export function file_message_tmpl(message, is_own_file = true) {
 
     const file_name = a(
       attrs({
+        href: "#",
+        download: file.meta.name,
         class:
           "underline decoration-transparent hover:decoration-white duration-300 block font-meidum text-gray-700 dark:text-gray-200 truncate",
       }),

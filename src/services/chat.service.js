@@ -43,17 +43,18 @@ export async function get_one({ id, current_user_id }) {
     );
 }
 
-export async function create_message({ chat_id, content, reply_to, sender_id, created_at }) {
+export async function create_message({ chat_id, content, reply_to, sender_id, created_at, type, attachments = [] } = {}) {
   const message = await MessageService.create_one({
     chat_id,
     content,
     reply_to,
     sender_id,
-    type: "text",
-    created_at
+    type,
+    created_at,
+    attachments
   });
 
-  return Object.assign(message, { attachments: [] });
+  return message;
 }
 
 export async function link_photos({ chat_id, photos = [], sender_id, reply_to, created_at }) {

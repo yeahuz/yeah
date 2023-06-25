@@ -107,7 +107,7 @@
           <% if (message.type === "file") { %>
             <li class="p-2 max-w-md w-fit text-white flex space-x-2 items-center rounded-lg overflow-hidden <%= message.is_own_message ? "ml-auto bg-primary-600" : "bg-gray-100 dark:bg-zinc-800 mr-auto text-gray-900 dark:text-white" %>">
               <div class="relative group flex items-center justify-center w-12 h-12 flex-shrink-0 h-full">
-                <a href="<%= message.attachments[0].url %>" download="<%= message.attachments[0].name %>" class="w-full opacity-0 group-hover:opacity-100 duration-200 absolute flex items-center justify-center w-full h-full text-white bg-black/50 rounded-lg js-file-download-btn">
+                <a href="<%= message.attachments[0]?.url %>" download="<%= message.attachments[0]?.name %>" class="w-full opacity-0 group-hover:opacity-100 duration-200 absolute flex items-center justify-center w-full h-full text-white bg-black/50 rounded-lg js-file-download-btn">
                   <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 4V20M12 20L18 14M12 20L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
@@ -120,9 +120,11 @@
                 </span>
               </div>
               <div class="overflow-hidden">
-                <a href="<%= message.attachments[0].url %>" class="underline decoration-transparent hover:decoration-white duration-300 block font-meidum text-gray-700 dark:text-gray-200 truncate"><%= message.attachments[0].name %></a>
+                <a href="<%= message.attachments[0]?.url %>" class="underline decoration-transparent
+                         hover:decoration-white duration-300 block font-meidum text-gray-700
+                         dark:text-gray-200 truncate"><%= message.attachments[0]?.name %></a>
                 <div class="flex justify-between text-xs space-x-4 mt-0.5 text-primary-50">
-                  <span><%= it.format_bytes(message.attachments[0].size) %></span>
+                  <span><%= it.format_bytes(message.attachments[0]?.size) %></span>
                   <div class="flex items-center space-x-1">
                     <span><%= it.formatter.format(new Date(message.created_at)) %></span>
                     <% if (message.is_own_message) { %>

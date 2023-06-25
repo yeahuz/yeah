@@ -16,8 +16,6 @@ import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 
 const files_input = document.querySelector(".js-files");
 const messages = document.querySelector(".js-messages");
-const photos_link_form = document.querySelector(".js-photos-link-form");
-const files_link_form = document.querySelector(".js-files-link-form");
 const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 const message_form = document.querySelector(".js-message-form");
@@ -87,10 +85,12 @@ function on_send_message(e) {
       chat_id: data.get("chat_id"),
       content: data.get("content"),
       created_at: Date.now(),
-      temp_id: gen_id()
+      temp_id: gen_id(),
+      attachments: [],
+      type: "text"
     };
 
-    ws.send(encoder.encode("publish_message", payload));
+    ws.send(encoder.encode("new_message", payload));
     if (messages) messages.append(text_message_tmpl(payload, true));
 
     textarea.focus();
@@ -153,11 +153,7 @@ function on_new_chat(payload) {
   ws.send(encoder.encode("subscribe", String(payload.id)))
 }
 
-on("new_message", on_new_message);
-on("message_sent", on_message_sent);
-on("new_chat", on_new_chat)
-
-function on_file_done(file, url, is_image) {
+function on_file_done(file, url) {
   return () => {
     const message = document.getElementById(file.msg_id);
     if (message) {
@@ -169,20 +165,22 @@ function on_file_done(file, url, is_image) {
   }
 }
 
-function on_file_progress(file, is_image) {
+function on_file_progress(file) {
   return (progress) => {
   };
 }
 
 async function on_files_change(e) {
+  const data = new FormData(e.target.form);
   const files = e.target.files;
   if (!files.length) return;
-  const media_msg = { temp_id: gen_id("message"), files: [] }
-  const files_msg = { temp_id: gen_id("message"), files: [] }
+  const media_msg = { type: "photo", chat_id: data.get("chat_id"), content: "", temp_id: gen_id("message"), files: [], attachments: [] }
+  const files_msg = { type: "file", chat_id: data.get("chat_id"), content: "", temp_id: gen_id("message"), files: [], attachments: [] }
 
   for (const file of files) {
-    const obj = /(image\/*)/.test(file.type) ? media_msg : files_msg;
-    obj.files.push({ temp_id: gen_id("attachment"), msg_id: obj.temp_id, raw: file, meta: { name: file.name, size: file.size, type: file.type } })
+    const is_image = /(image\/*)/.test(file.type)
+    const obj = is_image ? media_msg : files_msg;
+    obj.files.push({ temp_id: gen_id("attachment"), msg_id: obj.temp_id, raw: file, meta: { is_image, name: file.name, size: file.size, type: file.type } })
   }
 
   if (messages) {
@@ -202,12 +200,12 @@ function upload_to(urls) {
     const fd = new FormData();
     fd.append("file", file.raw, file.meta.name);
 
-    const [_, err] = await option(
+    const [result, err] = await option(
       upload_request(url.upload_url, {
         data: fd,
         method: is_image ? "POST" : "PUT",
-        on_progress: on_file_progress(file, is_image),
-        on_done: on_file_done(file, url, is_image),
+        on_progress: on_file_progress(file),
+        on_done: on_file_done(file, url),
         ...(!is_image && {
           headers: {
             "Content-Type": file.meta.type
@@ -216,12 +214,9 @@ function upload_to(urls) {
       })
     );
 
-    if (err) {
-      console.error(err)
-      return
-    }
+    if (err) return [result, err]
 
-    return Object.assign(file.meta, { url: url.public_url, id: url.id })
+    return Object.assign(file.meta, { url: url.public_url, resource_id: url.id })
   }
 }
 
@@ -239,7 +234,13 @@ async function upload_all({ media_msg, files_msg }) {
   }
 
   for await (const result of async_pool(10, files, upload_to(urls))) {
-    console.log(result)
+    if (result.is_image) media_msg.attachments.push(result)
+    else files_msg.attachments.push(result)
+  }
+
+  if (ws) {
+    if (media_msg.attachments.length) ws.send(encoder.encode("new_message", media_msg))
+    if (files_msg.attachments.length) ws.send(encoder.encode("new_message", files_msg))
   }
 }
 
@@ -265,6 +266,7 @@ async function on_file_download(e) {
   a.remove();
 }
 
+
 function scroll_to_bottom(element) {
   element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
 }
@@ -280,5 +282,9 @@ add_listeners(file_download_btns, {
 add_listeners(photo_download_btns, {
   click: on_photo_download,
 });
+
+on("new_message", on_new_message);
+on("message_sent", on_message_sent);
+on("new_chat", on_new_chat)
 
 connect();
