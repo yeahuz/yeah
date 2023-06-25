@@ -1,6 +1,6 @@
 import { add_listeners, attrs, span, text, html, classes } from "./dom.js";
 import { check_icon } from "./icons.js";
-import { media_message_tmpl, file_message_tmpl, text_message_tmpl, chat_list_item_tmpl } from "./templates.js";
+import { media_message_tmpl, text_message_tmpl, chat_list_item_tmpl, file_message_tmpl } from "./templates.js";
 import {
   option,
   request,
@@ -81,17 +81,17 @@ function on_send_message(e) {
   const textarea = form.querySelector("textarea[name='content']");
 
   if (ws) {
-    const payload = {
+    const message = {
       chat_id: data.get("chat_id"),
       content: data.get("content"),
-      created_at: Date.now(),
       temp_id: gen_id(),
       attachments: [],
-      type: "text"
+      type: "text",
+      created_at: Date.now(),
     };
 
-    ws.send(encoder.encode("new_message", payload));
-    if (messages) messages.append(text_message_tmpl(payload, true));
+    ws.send(encoder.encode("new_message", message));
+    if (messages) messages.append(text_message_tmpl(message, true));
 
     textarea.focus();
     form.reset();
@@ -103,24 +103,15 @@ function on_message_sent(message) {
   if (!messages) return
   const item = messages.querySelector("#" + message.temp_id)
   if (!item) return
-  item.classList.remove("pointer-events-none");
-
-  const upload_progresses = item.querySelectorAll(".upload-progress");
-  upload_progresses.forEach((progress) => progress.remove());
-
-  const date_infos = item.querySelectorAll(".js-date-info");
-  for (const info of date_infos) {
-    const clock = info.querySelector(".js-date-info-clock");
-    if (clock) clock.remove();
-    const check = span(html(check_icon({ size: 14 })));
-    info.append(check);
-  }
+  const clock = item.querySelector(".js-date-info-clock");
+  if (clock) clock.replaceWith(span(html(check_icon({ size: 14 }))))
 
   item.setAttribute("id", message.id)
   update_latest_message(message, true)
 }
 
 function on_new_message(payload) {
+  console.log({ payload })
   update_latest_message(payload)
   if (!messages) return
   switch (payload.type) {
@@ -143,14 +134,15 @@ async function update_latest_message(payload, you) {
   if (item) {
     const latest_date = item.querySelector(".js-latest-date");
     const latest_message = item.querySelector(".js-latest-message");
-    if (latest_message) latest_message.textContent = you ? `${t("you", { ns: "chats" })}: ` + payload.content : payload.content
-    if (latest_date) latest_date.textContent = format_relative(new Date(payload.created_at), new Date())
+    const content = payload.content ? payload.content : payload.attachments[payload.attachments.length - 1]?.name;
+    if (latest_message) latest_message.textContent = you ? `${t("you", { ns: "chats" })}: ` + content : content;
+    if (latest_date) latest_date.textContent = format_relative(new Date(payload.created_at), new Date());
   }
 }
 
 function on_new_chat(payload) {
   if (chats_list) chats_list.append(chat_list_item_tmpl(payload))
-  ws.send(encoder.encode("subscribe", String(payload.id)))
+  ws.send(encoder.encode("subscribe", `chats/${payload.id}`))
 }
 
 function on_file_done(file, url) {
@@ -174,13 +166,39 @@ async function on_files_change(e) {
   const data = new FormData(e.target.form);
   const files = e.target.files;
   if (!files.length) return;
-  const media_msg = { type: "photo", chat_id: data.get("chat_id"), content: "", temp_id: gen_id("message"), files: [], attachments: [] }
-  const files_msg = { type: "file", chat_id: data.get("chat_id"), content: "", temp_id: gen_id("message"), files: [], attachments: [] }
+
+  const media_msg = {
+    type: "photo",
+    chat_id: data.get("chat_id"),
+    content: "",
+    temp_id: gen_id("message"),
+    files: [],
+    attachments: [],
+    created_at: Date.now(),
+  }
+
+  const files_msg = {
+    type: "file",
+    chat_id: data.get("chat_id"),
+    content: "",
+    temp_id: gen_id("message"),
+    files: [],
+    attachments: [],
+    created_at: Date.now(),
+  }
 
   for (const file of files) {
     const is_image = /(image\/*)/.test(file.type)
     const obj = is_image ? media_msg : files_msg;
-    obj.files.push({ temp_id: gen_id("attachment"), msg_id: obj.temp_id, raw: file, meta: { is_image, name: file.name, size: file.size, type: file.type } })
+    obj.files.push({
+      temp_id: gen_id("attachment"),
+      msg_id: obj.temp_id,
+      raw: file,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      is_image,
+    })
   }
 
   if (messages) {
@@ -193,30 +211,39 @@ async function on_files_change(e) {
 
 function upload_to(urls) {
   return async function upload(file) {
-    const is_image = /(image\/*)/.test(file.meta.type)
-    const key = is_image ? "images" : "files"
+    const key = file.is_image ? "images" : "files"
     const url = urls[key].pop()
     if (!url) return
     const fd = new FormData();
-    fd.append("file", file.raw, file.meta.name);
+    fd.append("file", file.raw, file.name);
 
-    const [result, err] = await option(
+    const [_, err] = await option(
       upload_request(url.upload_url, {
         data: fd,
-        method: is_image ? "POST" : "PUT",
+        method: file.is_image ? "POST" : "PUT",
         on_progress: on_file_progress(file),
         on_done: on_file_done(file, url),
-        ...(!is_image && {
+        ...(!file.is_image && {
           headers: {
-            "Content-Type": file.meta.type
+            "Content-Type": file.type
           }
         })
       })
     );
 
-    if (err) return [result, err]
+    if (err) {
+      console.error("Something went wrong uploading file: ", err)
+      return
+    }
 
-    return Object.assign(file.meta, { url: url.public_url, resource_id: url.id })
+    return {
+      url: url.public_url,
+      resource_id: url.id,
+      size: file.size,
+      type: file.type,
+      name: file.name,
+      is_image: file.is_image
+    }
   }
 }
 
@@ -224,9 +251,9 @@ async function upload_all({ media_msg, files_msg }) {
   const files = media_msg.files.concat(files_msg.files);
   const [urls, err] = await option(
     request("/cf/direct_upload", {
-      body: { files: files.map(f => f.meta) }
+      body: { files: files.map(({ type, size, name, is_image }) => ({ type, size, name, is_image })) }
     })
-  );
+  )
 
   if (err) {
     toast("Unable to create direct creator upload urls. Please try again", "err");
@@ -234,13 +261,14 @@ async function upload_all({ media_msg, files_msg }) {
   }
 
   for await (const result of async_pool(10, files, upload_to(urls))) {
-    if (result.is_image) media_msg.attachments.push(result)
-    else files_msg.attachments.push(result)
+    if (!result) continue;
+    if (result.is_image) media_msg.attachments.push(result);
+    else files_msg.attachments.push(result);
   }
 
   if (ws) {
-    if (media_msg.attachments.length) ws.send(encoder.encode("new_message", media_msg))
-    if (files_msg.attachments.length) ws.send(encoder.encode("new_message", files_msg))
+    if (media_msg.attachments.length) ws.send(encoder.encode("new_message", media_msg));
+    if (files_msg.attachments.length) ws.send(encoder.encode("new_message", files_msg));
   }
 }
 

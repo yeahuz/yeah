@@ -17,9 +17,9 @@ sub.on("message", async (channel, message) => {
           content: item.content,
           sender_id: item.sender_id,
           reply_to: item.reply_to,
-          created_at: item.created_at,
           type: item.type,
           attachments: item.attachments,
+          created_at: item.created_at
         }))
 
         if (err) {

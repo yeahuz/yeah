@@ -1,4 +1,4 @@
-<li class="w-full max-w-md ml-auto relative <%= it.message.is_own_message ? "ml-auto" : "mr-auto" %>">
+<li class="w-full max-w-md relative <%= it.message.is_own_message ? "ml-auto" : "mr-auto" %>">
   <ul class="flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg js-image-viewer">
     <% it.message.attachments.forEach(function (attachment) { %>
       <li class="basis-40 flex-1 max-h-64 relative">
