@@ -26,9 +26,4 @@ export const home = async (fastify) => {
     url: "/clock",
     handler: HomeController.get_time,
   });
-  // fastify.route({
-  //   method: "GET",
-  //   url: "/:username",
-  //   handler: HomeController.get_profile,
-  // });
 };

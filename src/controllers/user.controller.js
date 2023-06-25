@@ -4,8 +4,52 @@ import * as jwt from "../utils/jwt.js";
 import * as CFImageService from "../services/cfimg.service.js";
 import config from "../config/index.js";
 import { events } from "../utils/events.js";
-import { option, add_t, transform_object } from "../utils/index.js";
+import { option, add_t, transform_object, generate_srcset } from "../utils/index.js";
 import { render_file } from "../utils/eta.js";
+
+export async function get_one(req, reply) {
+  const { username } = req.params;
+  const { ps = "active" } = req.query;
+  const stream = reply.init_stream();
+  const current_user = req.user;
+  const t = req.t;
+
+  const profile = current_user.username === username ? current_user : UserService.get_by_username(username);
+
+  if (!req.partial) {
+    const top = await render_file("/partials/top.html", {
+      meta: { title: (await profile)?.name, lang: req.language },
+      t,
+    })
+
+    stream.push(top)
+  }
+
+  if (!profile) {
+    const not_found = await render_file("/partials/404.html", { t });
+    stream.push(not_found);
+  } else {
+    const profile_html = await render_file("/profile.html", {
+      t,
+      profile: await profile,
+      current_user,
+      ps,
+      generate_srcset,
+    });
+    stream.push(profile_html);
+  }
+
+  if (!req.partial) {
+    const bottom = await render_file("/partials/bottom.html", {
+      t,
+      user: current_user
+    });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
 
 export async function update_one(req, reply) {
   const t = req.i18n.t;

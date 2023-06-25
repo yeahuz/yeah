@@ -126,7 +126,7 @@ export class User extends BaseModel {
   }
 
   generate_url() {
-    this.profile_url = `${config.origin}/${this.username}`;
+    this.profile_url = `${config.origin}/u/${this.username}`;
   }
 
   async hash_password() {

@@ -3365,6 +3365,10 @@ j [data-tooltip][data-flow="right"]::before {
   text-decoration-color: #fff;
 }
 
+.hover\:decoration-gray-900:hover {
+  text-decoration-color: rgb(var(--gray-900));
+}
+
 .hover\:shadow-xs:hover {
   --tw-shadow: 0 1px 2px rgb(16 24 40 / 0.05);
   --tw-shadow-colored: 0 1px 2px var(--tw-shadow-color);
@@ -3715,6 +3719,18 @@ j [data-tooltip][data-flow="right"]::before {
 :is(.dark .dark\:hover\:text-white:hover) {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+:is(.dark .dark\:hover\:decoration-gray-900:hover) {
+  text-decoration-color: rgb(var(--gray-900));
+}
+
+:is(.dark .hover\:dark\:decoration-gray-900):hover {
+  text-decoration-color: rgb(var(--gray-900));
+}
+
+:is(.dark .dark\:hover\:decoration-white:hover) {
+  text-decoration-color: #fff;
 }
 
 :is(.dark .peer:checked ~ .dark\:peer-checked\:bg-zinc-800) {

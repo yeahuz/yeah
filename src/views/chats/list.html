@@ -4,7 +4,8 @@
   </div>
   <ul class="overflow-y-auto max-h-[42rem] js-chats-list">
     <% it.chats && it.chats.forEach(function (chat) { %>
-    <li id="chat-<%= chat.id %>" class="flex flex-col hover:bg-gray-100 dark:hover:bg-zinc-800 duration-200 p-4 relative <%= String(chat.id) === it.current_chat_id ? "bg-zinc-800" : "" %>">
+    <li id="chat-<%= chat.id %>" class="flex flex-col hover:bg-gray-100 dark:hover:bg-zinc-800
+      duration-200 p-4 relative <%= String(chat.id) === it.current_chat_id ? "bg-gray-100 dark:bg-zinc-800" : "" %>">
         <a href="/chats/<%= chat.id %>#<%= chat.id %>" class="after:absolute after:top-0 after:left-0 after:right-0 after:bottom-0"></a>
         <div class="flex items-start justify-between">
           <div class="flex items-center">

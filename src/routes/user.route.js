@@ -62,4 +62,9 @@ export const user = async (fastify) => {
     handler: UserController.update_one,
     onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
   });
+  fastify.route({
+    method: "GET",
+    url: "/:username",
+    handler: UserController.get_one,
+  })
 };

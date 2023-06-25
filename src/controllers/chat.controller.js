@@ -107,33 +107,3 @@ export async function create_message(req, reply) {
   reply.send(message);
   return reply;
 }
-
-export async function link_photos(req, reply) {
-  const user = req.user;
-  const { id } = req.params;
-  const { photos = [], reply_to } = req.body;
-  const result = await ChatService.link_photos({
-    chat_id: id,
-    photos,
-    reply_to,
-    sender_id: user.id,
-  });
-
-  reply.send(result);
-  return reply;
-}
-
-export async function link_file(req, reply) {
-  const user = req.user;
-  const { id } = req.params;
-  const { file, reply_to } = req.body;
-  const result = await ChatService.link_file({
-    chat_id: id,
-    file,
-    reply_to,
-    sender_id: user.id,
-  });
-
-  reply.send(result);
-  return reply;
-}

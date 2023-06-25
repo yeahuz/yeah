@@ -48,7 +48,9 @@ export const routes = async (fastify) => {
   fastify.register(auth, { prefix: "/auth" });
   fastify.register(settings, { prefix: "/settings" });
   fastify.register(user, { prefix: "/users" });
+  fastify.register(user, { prefix: "/u" });
   fastify.register(posting, { prefix: "/postings" });
+  fastify.register(posting, { prefix: "/p" });
   fastify.register(attachment, { prefix: "/attachments" });
   fastify.register(geo, { prefix: "/geo" });
   fastify.register(search, { prefix: "/search" });

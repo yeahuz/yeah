@@ -5,7 +5,7 @@
       <input type="hidden" name="chat_id" value="<%= it.chat.id %>" />
     </form>
     <form method="post" action="/chats/<%= it.chat.id %>/files" class="js-files-link-form">
-    <input type="hidden" name="chat_id" value="<%= it.chat.id %>" />
+      <input type="hidden" name="chat_id" value="<%= it.chat.id %>" />
     </form>
     <header class="flex justify-between w-full dark:bg-zinc-900 p-4 shadow-lg dark:drop-shadow-lg">
       <div class="flex space-x-2 items-center">
@@ -18,7 +18,7 @@
         </div>
       </div>
       <div>
-        <a href="/users/user-id" class="btn btn-md btn-primary">View profile</a>
+        <a href="<%= it.chat.posting.creator.profile_url %>" class="btn btn-md btn-primary">View profile</a>
       </div>
     </header>
     <div class="flex flex-col space-y-6">
@@ -59,7 +59,7 @@
             <input type="file" name="files" id="files" value="" class="hidden js-files" multiple />
           </div>
           <elastic-textarea style="display: inline-flex"><textarea required autofocus placeholder="<%= it.t("your_message", { ns: "chats" })%>" class="form-control" name="content" id="" rows="1" cols="100" tabindex=""></textarea></elastic-textarea>
-          <button class="btn btn-primary btn-lg"><%= it.t("send", { ns: "chats" })%></button>
+          <button class="btn btn-primary btn-lg flex-shrink-0"><%= it.t("send", { ns: "chats" })%></button>
         </form>
       </div>
     </div>
