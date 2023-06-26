@@ -161,11 +161,23 @@ export function file_message_tmpl(message, is_own_file = true) {
 }
 
 export function media_message_tmpl(message, is_own_media = true) {
-  const time = span(text(formatter.format(new Date(message.created_at))));
-  const clock = span(
-    attrs({ class: "js-date-info-clock" }),
-    html(clock_icon({ size: 14 }))
+  const date = span(text(formatter.format(new Date(message.created_at))));
+
+  const info = div(
+    attrs({
+      class:
+        "js-date-info inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50",
+    }),
+    children(date)
   );
+
+  if (is_own_media) {
+    const clock = span(
+      attrs({ class: "js-date-info-clock" }),
+      html(clock_icon({ size: 14 }))
+    );
+    info.append(clock);
+  }
 
   const list = ul(
     attrs({
@@ -173,29 +185,24 @@ export function media_message_tmpl(message, is_own_media = true) {
     })
   );
 
-  const date_info = div(
-    attrs({
-      class:
-        "js-date-info inline-flex items-center space-x-1 py-0.5 px-2 rounded-lg text-xs text-white absolute bottom-2 right-2 bg-black/50",
-    }),
-    children(time, clock)
-  );
 
   const msg = li(
     attrs({ id: message.temp_id }),
-    classes("w-full max-w-md ml-auto relative", {
+    classes("w-full max-w-md relative", {
       "ml-auto": is_own_media,
       "mr-auto": !is_own_media,
     }),
-    children(list, date_info)
+    children(list, info)
   );
 
   for (const file of message.files || message.attachments) {
-    const src = URL.createObjectURL(file.raw);
+    const src = file.url ? `${file.url}/width=10` : URL.createObjectURL(file.raw);
     const photo = img(attrs({ class: "w-full h-full object-cover align-middle rounded-lg", src }));
+    const file_size = span(classes("absolute left-1 top-1 inline-block bg-black/50 rounded-lg py-0.5 px-2 text-white text-xs"), text(format_bytes(file.size)))
+
     const item = li(
       attrs({ class: "basis-40 flex-1 max-h-64 relative", id: file.temp_id }),
-      children(photo)
+      children(file_size, photo)
     );
     list.append(item);
   }

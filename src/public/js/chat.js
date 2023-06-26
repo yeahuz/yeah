@@ -121,6 +121,9 @@ function on_new_message(payload) {
     case "file":
       messages.append(file_message_tmpl(payload, false));
       break;
+    case "photo":
+      messages.append(media_message_tmpl(payload, false));
+      break;
     default:
       break;
   }
