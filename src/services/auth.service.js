@@ -127,14 +127,15 @@ export async function google_auth(payload) {
       return { session, user: existing_user }
     }
 
-    const uploaded = await CFImageService.upload_url(picture);
-
     const [user, err] = await option(UserService.create_one_trx(trx)({
       email,
       name: name || given_name,
-      profile_photo_url: CFImageService.get_cf_image_url(uploaded.id),
       email_verified: true,
     }));
+
+    // To speed up the process of login, update profile picture after upload. Until picture is patched, profile_photo_url
+    // will be gravatar;
+    CFImageService.upload_url(picture).then(({ id }) => user.$query().patch({ profile_photo_url: CFImageService.get_cf_image_url(id) }));
 
     const session = await SessionService.create_one_trx(trx)({
       user_agent,
@@ -192,14 +193,11 @@ export async function telegram_auth(payload) {
   const trx = await UserService.start_transaction();
 
   try {
-    const { url } = CFImageService.get_cf_image_url(
-      await CFImageService.upload_url(tg_user.photo_url)
-    );
-
     const user = await UserService.create_one_trx(trx)({
       name: tg_user.first_name || tg_user.username,
-      profile_photo_url: url,
     });
+
+    CFImageService.upload_url(tg_user.photo_url).then(({ id }) => user.$query().patch({ profile_photo_url: CFImageService.get_cf_image_url(id) }))
 
     const session = await SessionService.create_one_trx(trx)({
       user_agent,

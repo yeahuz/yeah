@@ -1,4 +1,5 @@
 import * as HomeController from "../controllers/home.controller.js";
+import { authenticated_user } from "../utils/roles.js";
 
 export const home = async (fastify) => {
   fastify.route({
@@ -15,6 +16,7 @@ export const home = async (fastify) => {
     method: "GET",
     url: "/me",
     handler: HomeController.get_me,
+    onRequest: fastify.can([authenticated_user])
   });
   fastify.route({
     method: "GET",
