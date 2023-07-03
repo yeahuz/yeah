@@ -17,8 +17,8 @@ export class SMSClient {
     return new SMSClient(token);
   }
 
-  static async get_token() {
-    if (config.sms_api_token) return config.sms_api_token;
+  static async get_token(force) {
+    if (config.sms_api_token && !force) return config.sms_api_token;
 
     const fd = new FormData();
     fd.append("email", config.sms_api_email);
@@ -28,7 +28,7 @@ export class SMSClient {
       body: fd,
     });
 
-    const json = await response.json().catch(() => {});
+    const json = await response.json().catch(() => { });
 
     if (!response.ok) {
       return Promise.reject(json);
@@ -40,7 +40,7 @@ export class SMSClient {
 
   async refresh_token() {
     await update_env({ SMS_API_TOKEN: '' });
-    const token = await SMSClient.get_token().catch((err) => console.log({ err }));
+    const token = await SMSClient.get_token(true).catch((err) => console.log({ err }));
     this.token = token;
   }
 
@@ -53,7 +53,7 @@ export class SMSClient {
       },
     });
 
-    const json = await response.json().catch(() => {});
+    const json = await response.json().catch(() => { });
 
     if (response.status === 401) {
       if (!this.refresh_token_promise) {

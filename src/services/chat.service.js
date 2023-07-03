@@ -1,15 +1,14 @@
 import * as MessageService from "./message.service.js";
-import * as AttachmentService from "./attachment.service.js";
 import * as UserService from "./user.service.js";
-import * as PostingService from "./posting.service.js";
-import { BadRequestError, InternalError } from "../utils/errors.js";
-import { Chat, User } from "../models/index.js";
-import objection from "objection";
+import * as PostingService from "./posting.service.js"; import { BadRequestError, InternalError } from "../utils/errors.js";
+import { Chat, User } from "../models/index.js"; import objection from "objection";
 
 const { raw, UniqueViolationError } = objection;
 
 export const create_one_trx = (trx) => create_one_impl(trx);
 export const create_one = create_one_impl();
+export const update_one_trx = (trx) => update_one_impl(trx);
+export const update_one = update_one_impl();
 
 export async function get_many({ user_id }) {
   return await User.relatedQuery("chats")
@@ -44,66 +43,26 @@ export async function get_one({ id, current_user_id }) {
 }
 
 export async function create_message({ chat_id, content, reply_to, sender_id, created_at, type, attachments = [] } = {}) {
-  const message = await MessageService.create_one({
-    chat_id,
-    content,
-    reply_to,
-    sender_id,
-    type,
-    created_at,
-    attachments
-  });
-
-  return message;
-}
-
-export async function link_photos({ chat_id, photos = [], sender_id, reply_to, created_at }) {
   const trx = await MessageService.start_transaction();
   try {
     const message = await MessageService.create_one_trx(trx)({
       chat_id,
-      sender_id,
+      content,
       reply_to,
-      type: "photo",
-      created_at
-    });
-    const attachments = await Promise.all(
-      photos.map((resource_id) => AttachmentService.create_one_trx(trx)({ resource_id }))
-    );
-    await message.$relatedQuery("attachments", trx).relate(attachments);
-    await trx.commit();
-    return Object.assign(message, { attachments });
-  } catch (err) {
-    console.log({ err });
-    trx.rollback();
-    throw new InternalError();
-  }
-}
-
-export async function link_file({ chat_id, file, sender_id, reply_to, created_at, content = "" } = {}) {
-  const trx = await MessageService.start_transaction();
-  try {
-    const attachment = await AttachmentService.create_one_trx(trx)({
-      resource_id: file.id,
-      service: "CF_R2",
-    });
-
-    const message = await MessageService.create_one_trx(trx)({
-      chat_id,
       sender_id,
-      reply_to,
-      type: "file",
-      attachments: [attachment],
+      type,
       created_at,
-      content
+      attachments
     });
+
+    await update_one_trx(trx)(chat_id, { last_message_id: message.id });
 
     await trx.commit();
     return message;
   } catch (err) {
-    console.log({ err });
+    console.error({ err })
     trx.rollback();
-    throw new InternalError();
+    throw new InternalError()
   }
 }
 
@@ -150,4 +109,10 @@ function create_one_impl(trx) {
 
     return chat
   };
+}
+
+function update_one_impl(trx) {
+  return async (id, update = {}) => {
+    return await Chat.query(trx).findById(id).patch(update)
+  }
 }

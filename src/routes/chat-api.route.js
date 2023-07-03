@@ -8,16 +8,4 @@ export const chat_api = async (fastify) => {
     handler: ChatApiController.create_message,
     onRequest: fastify.can_api([external_client, chat_member]),
   });
-  fastify.route({
-    method: "POST",
-    url: "/:id/files",
-    handler: ChatApiController.link_file,
-    onRequest: fastify.can_api([external_client, chat_member]),
-  });
-  fastify.route({
-    method: "POST",
-    url: "/:id/photos",
-    handler: ChatApiController.link_photos,
-    onRequest: fastify.can_api([external_client, chat_member]),
-  });
 };

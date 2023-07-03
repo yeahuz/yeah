@@ -937,6 +937,7 @@ export async function seed(knex) {
 
   await knex("users").insert([
     {
+      id: 1,
       email: "yeah-admin@needs.uz",
       password: await argon2.hash(
         "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15"
@@ -945,6 +946,7 @@ export async function seed(knex) {
       name: "Yeah Admin",
     },
     {
+      id: 2,
       email: "yeah-socket@needs.uz",
       password: await argon2.hash(
         "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860"
@@ -954,16 +956,12 @@ export async function seed(knex) {
     },
   ]);
 
-  // await knex("user_roles").insert([
-  //   {
-  //     user_id: 1,
-  //     role_id: 3,
-  //   },
-  //   {
-  //     user_id: 2,
-  //     role_id: 3,
-  //   },
-  // ]);
+  await knex("user_roles").insert([
+    {
+      user_id: 2,
+      role_id: 3
+    }
+  ]);
 
   await insert_regions();
 

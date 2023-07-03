@@ -129,12 +129,12 @@ export async function google_auth(payload) {
 
     const uploaded = await CFImageService.upload_url(picture);
 
-    const [user, err] = await UserService.create_one_trx(trx)({
+    const [user, err] = await option(UserService.create_one_trx(trx)({
       email,
       name: name || given_name,
       profile_photo_url: CFImageService.get_cf_image_url(uploaded.id),
       email_verified: true,
-    });
+    }));
 
     const session = await SessionService.create_one_trx(trx)({
       user_agent,
@@ -151,6 +151,7 @@ export async function google_auth(payload) {
 
     return { session, user };
   } catch (err) {
+    console.log({ err })
     trx.rollback();
     if (err instanceof UniqueViolationError) {
       throw new ConflictError({ key: "user_exists", params: { user: email } });
