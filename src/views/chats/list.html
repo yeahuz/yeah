@@ -17,13 +17,19 @@
               </a>
             </div>
           </div>
-          <% if (chat.latest_message) { %>
-            <span class="text-gray-500 dark:text-gray-300 text-sm js-latest-date"><%= it.format_relative(chat.latest_message.created_at, new Date()) %></span>
-          <% } %>
+          <div class="flex flex-col items-end space-y-2">
+            <% if (chat.latest_message) { %>
+              <span class="text-gray-500 dark:text-gray-300 text-sm js-latest-date"><%= it.format_relative(chat.latest_message.created_at, new Date()) %></span>
+            <% } %>
+            <div class="inline-flex text-xs p-1 min-w-[1.2rem] leading-[0] min-h-[1.2rem] bg-primary-500 text-white
+              items-center justify-center rounded-full">
+              <%= chat.unread_count %>
+            </div>
+          </div>
         </div>
         <% if (chat.latest_message) {%>
           <p class="text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message">
-            <%= chat.latest_message.sender.id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
+            <%= chat.latest_message.sender_id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
             <% if (chat.latest_message.type === "text") { %>
               <%= chat.latest_message.content %>
             <% } else { %>

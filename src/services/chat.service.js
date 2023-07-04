@@ -11,13 +11,38 @@ export const update_one_trx = (trx) => update_one_impl(trx);
 export const update_one = update_one_impl();
 
 export async function get_many({ user_id }) {
-  return await User.relatedQuery("chats")
-    .for(user_id)
-    .withGraphFetched("[latest_message.[sender, attachments], members, posting]")
-    .modifyGraph("attachments", (builder) => builder.select("name"))
-    .modifyGraph("members", (builder) => {
-      builder.whereNot("user_id", user_id);
-    });
+  const knex = Chat.knex();
+  const { rows } = await knex.raw(`
+    select 
+    c.id, c.created_by, c.url,
+    count(m2.id) as unread_count,
+    cm.last_read_message_id,
+    json_build_object(
+      'id', p.id,
+      'title', p.title,
+      'cover_url', p.cover_url,
+      'url', p.url
+    ) as posting,
+    json_build_object(
+      'type', m.type,
+      'content', m.content,
+      'attachments', coalesce(json_agg(json_build_object('id', a.id)) filter (where a.id is not null), '[]'::json),
+      'created_at', m.created_at,
+      'sender_id', m.sender_id
+    ) as latest_message,
+    json_agg(json_build_object('name', u.name)) as members
+    from chats c
+    join chat_members cm on cm.chat_id = c.id and cm.user_id = ?
+    join users u on u.id = cm.user_id
+    join messages m on m.id = c.last_message_id
+    join messages m2 on m2.chat_id = cm.chat_id and m2.sender_id != ? and (m2.id > cm.last_read_message_id or cm.last_read_message_id is null)
+    left join message_attachments ma on ma.message_id = c.last_message_id
+    left join attachments a on a.id = ma.attachment_id
+    join postings p on p.id = c.posting_id
+    group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, cm.last_read_message_id
+  `, [user_id, user_id])
+
+  return rows
 }
 
 export async function get_posting_chats(posting_id) {

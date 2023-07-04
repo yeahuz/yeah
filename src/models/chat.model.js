@@ -50,10 +50,9 @@ export class Chat extends BaseModel {
       latest_message: {
         modelClass: Message,
         relation: BaseModel.HasOneRelation,
-        filter: (builder) => builder.orderBy("created_at", "desc").limit(1),
         join: {
-          from: "chats.id",
-          to: "messages.chat_id",
+          from: "chats.last_message_id",
+          to: "messages.id",
         },
       },
     };

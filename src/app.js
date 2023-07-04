@@ -40,6 +40,7 @@ export async function start() {
       parser: (str) => qs.parse(str, { allowDots: true })
     });
     app.register(multipart);
+    app.register(i18next_plugin);
     app.register(fastify_rate_limit, {
       global: false,
       max: 100,
@@ -53,8 +54,6 @@ export async function start() {
         });
       },
     });
-
-    app.register(i18next_plugin);
 
     app.register(fastify_session, {
       secret: config.session_cookie_secret,

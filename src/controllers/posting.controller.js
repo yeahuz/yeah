@@ -372,6 +372,7 @@ export async function contact(req, reply) {
       chat_id: chat.id,
       content,
       sender_id: user.id,
+      created_at: new Date().toISOString()
     })
   );
 
