@@ -127,11 +127,11 @@ export async function google_auth(payload) {
       return { session, user: existing_user }
     }
 
-    const [user, err] = await option(UserService.create_one_trx(trx)({
+    const user = await UserService.create_one_trx(trx)({
       email,
       name: name || given_name,
       email_verified: true,
-    }));
+    });
 
     // To speed up the process of login, update profile picture after upload. Until picture is patched, profile_photo_url
     // will be gravatar;
