@@ -3,9 +3,26 @@ import fp from "fastify-plugin";
 import i18n_http_middleware from "i18next-http-middleware";
 import i18n_backend from "i18next-fs-backend";
 
+const subdomain_detector = {
+  name: "subdomain",
+  lookup: (req) => {
+    const host = req.headers["host"];
+    const parts = host.split(".");
+    let lang
+    if (parts.length > 2) {
+      lang = parts[0];
+    }
+
+    return lang;
+  }
+}
+
+const detector = new i18n_http_middleware.LanguageDetector();
+detector.addDetector(subdomain_detector);
+
 i18next
   .use(i18n_backend)
-  .use(i18n_http_middleware.LanguageDetector)
+  .use(detector)
   .init({
     preload: ["uz", "ru", "en"],
     ns: [
@@ -40,7 +57,7 @@ i18next
       ignoreCase: true,
       lookupQuerystring: "lang",
       lookupHeader: "accept-language",
-      order: ["querystring", "header"],
+      order: ["subdomain", "querystring", "header"],
     },
   });
 

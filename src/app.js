@@ -65,6 +65,7 @@ export async function start() {
         sameSite: "lax",
         path: "/",
         maxAge: 31556926,
+        domain: new URL(config.origin).hostname
       },
     });
 
