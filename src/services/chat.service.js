@@ -17,20 +17,20 @@ export async function get_many({ user_id }) {
     c.id, c.created_by, c.url,
     count(m2.id) as unread_count,
     cm.last_read_message_id,
-    json_build_object(
+    jsonb_build_object(
       'id', p.id,
       'title', p.title,
       'cover_url', p.cover_url,
       'url', p.url
     ) as posting,
-    json_build_object(
+    jsonb_build_object(
       'type', m.type,
       'content', m.content,
-      'attachments', coalesce(json_agg(json_build_object('id', a.id)) filter (where a.id is not null), '[]'::json),
+      'attachments', coalesce(jsonb_agg(jsonb_build_object('id', a.id)) filter (where a.id is not null), '[]'::jsonb),
       'created_at', m.created_at,
       'sender_id', m.sender_id
     ) as latest_message,
-    json_agg(json_build_object('name', u.name)) as members
+    jsonb_agg(distinct jsonb_build_object('name', u.name)) as members
     from chats c
     join chat_members cm on cm.chat_id = c.id and cm.user_id = ?
     join users u on u.id = cm.user_id
@@ -54,17 +54,48 @@ export async function get_chat_ids({ user_id }) {
 }
 
 export async function get_one({ id, current_user_id }) {
-  return await Chat.query()
-    .findOne({ id })
-    .withGraphFetched("[messages.[sender, attachments, read_by], posting.[creator]]")
-    .modifyGraph("messages", (builder) =>
-      builder.select(
-        "content",
-        "created_at",
-        "type",
-        raw("case when sender_id = ? then 1 else 0 end as is_own_message", [current_user_id])
-      )
-    );
+  const knex = Chat.knex();
+
+  const { rows } = await knex.raw(`
+    select sub.id,
+    sub.posting,
+    jsonb_agg(jsonb_build_object(
+      'read_by', sub.read_by,
+      'content', sub.content,
+      'type', sub.type,
+      'created_at', sub.msg_created_at,
+      'attachments', sub.attachments,
+      'is_own_message', sub.is_own_message
+    )) as messages from (
+      select c.id,
+      m.content,
+      m.type,
+      m.created_at as msg_created_at,
+      case when sender_id = ? then 1 else 0 end as is_own_message,
+      coalesce(jsonb_agg(jsonb_build_object('name', u.name)) filter (where u.id is not null), '[]'::jsonb) as read_by,
+      coalesce(jsonb_agg(jsonb_build_object('id', a.id)) filter (where a.id is not null), '[]'::jsonb) as attachments,
+      jsonb_build_object(
+        'id', p.id,
+        'title', p.title,
+        'url', p.url,
+        'cover_url', p.cover_url,
+        'creator', jsonb_build_object('profile_url', u2.profile_url)
+      ) as posting
+      from chats c
+      join messages m on m.chat_id = c.id
+      join postings p on p.id = c.posting_id
+      join users u2 on u2.id = p.created_by
+      left join read_messages rm on rm.message_id = m.id
+      left join users u on u.id = rm.user_id
+      left join message_attachments ma on m.id = ma.message_id
+      left join attachments a on a.id = ma.attachment_id
+      where c.id = ?
+      group by c.id, m.content, m.type, msg_created_at, p.title, p.id, u2.profile_url, m.sender_id
+    ) sub
+    group by sub.id, sub.posting
+  `, [current_user_id, id])
+
+  return rows[0]
 }
 
 export async function create_message({ chat_id, content, reply_to, sender_id, created_at, type, attachments = [] } = {}) {

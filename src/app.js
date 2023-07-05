@@ -26,7 +26,6 @@ import cors from "@fastify/cors";
 export async function start() {
   const app = fastify({
     maxParamLength: 1000,
-    logger: true,
     ignoreTrailingSlash: true,
     trustProxy: true,
     ajv: {
