@@ -133,6 +133,13 @@ export function create_fragment(fns = []) {
   return fragment;
 }
 
+export function add_class(el, ...cls) {
+  el.classList.add(...cls)
+  return function remove() {
+    el.classList.remove(...cls)
+  }
+}
+
 export function html(str) {
   return (node) => {
     node.innerHTML = str;

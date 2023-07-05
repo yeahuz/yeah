@@ -1,4 +1,4 @@
-import { add_listeners, attrs, span, text, html, classes } from "./dom.js";
+import { add_listeners, attrs, span, text, html, add_class } from "./dom.js";
 import { check_icon } from "./icons.js";
 import { media_message_tmpl, text_message_tmpl, chat_list_item_tmpl, file_message_tmpl } from "./templates.js";
 import {
@@ -22,8 +22,26 @@ const message_form = document.querySelector(".js-message-form");
 const chats_list = document.querySelector(".js-chats-list")
 // const message_textarea = message_form.querySelector("textarea[name='content']");
 
-const top = window.localStorage.getItem(window.location.pathname);
-if (top && messages) messages.scrollTop = parseInt(top, 10);
+const params = new URLSearchParams(window.location.search);
+const last_read_messsage_id = params.get("m");
+const chat_id = params.get("c");
+if (chat_id) {
+  const el = document.getElementById(chat_id);
+  if (el) el.scrollIntoView()
+}
+
+if (last_read_messsage_id) {
+  const el = document.getElementById(last_read_messsage_id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "end" });
+    const restore = add_class(el, "animate-pulse");
+    setTimeout(restore, 3000)
+  }
+} else {
+  const top = window.localStorage.getItem(window.location.pathname);
+  if (top && messages) messages.scrollTop = parseInt(top, 10);
+}
+
 
 window.addEventListener("beforeunload", () => {
   const pathname = window.location.pathname;
@@ -84,7 +102,7 @@ function on_send_message(e) {
     const message = {
       chat_id: data.get("chat_id"),
       content: data.get("content"),
-      temp_id: gen_id(),
+      temp_id: gen_id("message"),
       attachments: [],
       type: "text",
       created_at: Date.now(),
@@ -111,7 +129,6 @@ function on_message_sent(message) {
 }
 
 function on_new_message(payload) {
-  console.log({ payload })
   update_latest_message(payload)
   if (!messages) return
   switch (payload.type) {

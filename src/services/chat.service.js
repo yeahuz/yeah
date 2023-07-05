@@ -15,7 +15,7 @@ export async function get_many({ user_id }) {
   const { rows } = await knex.raw(`
     select 
     c.id, c.created_by, c.url,
-    count(m2.id) as unread_count,
+    count(m2.id)::int as unread_count,
     cm.last_read_message_id,
     jsonb_build_object(
       'id', p.id,
@@ -35,7 +35,7 @@ export async function get_many({ user_id }) {
     join chat_members cm on cm.chat_id = c.id and cm.user_id = ?
     join users u on u.id = cm.user_id
     join messages m on m.id = c.last_message_id
-    join messages m2 on m2.chat_id = cm.chat_id and m2.sender_id != ? and (m2.id > cm.last_read_message_id or cm.last_read_message_id is null)
+    left join messages m2 on m2.chat_id = cm.chat_id and m2.sender_id != ? and (m2.id > cm.last_read_message_id or cm.last_read_message_id is null)
     left join message_attachments ma on ma.message_id = c.last_message_id
     left join attachments a on a.id = ma.attachment_id
     join postings p on p.id = c.posting_id
@@ -60,6 +60,7 @@ export async function get_one({ id, current_user_id }) {
     select sub.id,
     sub.posting,
     jsonb_agg(jsonb_build_object(
+      'id', sub.msg_id,
       'read_by', sub.read_by,
       'content', sub.content,
       'type', sub.type,
@@ -71,6 +72,7 @@ export async function get_one({ id, current_user_id }) {
       m.content,
       m.type,
       m.created_at as msg_created_at,
+      m.id as msg_id,
       case when sender_id = ? then 1 else 0 end as is_own_message,
       coalesce(jsonb_agg(jsonb_build_object('name', u.name)) filter (where u.id is not null), '[]'::jsonb) as read_by,
       coalesce(jsonb_agg(jsonb_build_object('id', a.id)) filter (where a.id is not null), '[]'::jsonb) as attachments,
@@ -90,7 +92,8 @@ export async function get_one({ id, current_user_id }) {
       left join message_attachments ma on m.id = ma.message_id
       left join attachments a on a.id = ma.attachment_id
       where c.id = ?
-      group by c.id, m.content, m.type, msg_created_at, p.title, p.id, u2.profile_url, m.sender_id
+      group by c.id, m.content, m.type, m.created_at, p.title, p.id, u2.profile_url, m.sender_id, m.id
+      order by m.created_at desc
     ) sub
     group by sub.id, sub.posting
   `, [current_user_id, id])

@@ -66,6 +66,9 @@ module.exports = {
           700: "rgb(var(--error-700))",
           800: "rgb(var(--error-800))",
         },
+        warning: {
+          500: "rgb(var(--yellow-500))"
+        }
       },
     },
   },
