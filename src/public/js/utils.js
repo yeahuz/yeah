@@ -1,4 +1,4 @@
-const noop = () => { };
+const noop = () => {};
 
 export function upload_request(
   url,
@@ -72,7 +72,7 @@ export async function request(
 
     switch (accept) {
       case "application/json": {
-        data = await response.json().catch(() => { });
+        data = await response.json().catch(() => {});
         break;
       }
       case "text/html": {
@@ -215,9 +215,13 @@ export function pipe(...fns) {
 
 export function gen_id(prefix = "temp") {
   let rand = Math.random().toString(32).slice(2);
-  if (prefix) rand = prefix + "-" + rand;
-  return rand;
+  return add_prefix(prefix, rand);
 }
+
+export function add_prefix(prefix, value) {
+  return prefix + "-" + value;
+}
+
 export function get_locale() {
   return navigator.languages && navigator.languages.length
     ? navigator.languages[0]

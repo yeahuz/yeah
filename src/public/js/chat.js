@@ -9,7 +9,8 @@ import {
   generate_srcset,
   wait,
   gen_id,
-  format_relative
+  format_relative,
+  add_prefix
 } from "./utils.js";
 import { toast } from "./toast.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
@@ -124,7 +125,7 @@ function on_message_sent(message) {
   const clock = item.querySelector(".js-date-info-clock");
   if (clock) clock.replaceWith(span(html(check_icon({ size: 14 }))))
 
-  item.setAttribute("id", message.id)
+  item.setAttribute("id", add_prefix("message", message.id))
   update_latest_message(message, true)
 }
 

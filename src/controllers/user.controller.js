@@ -14,7 +14,7 @@ export async function get_one(req, reply) {
   const current_user = req.user;
   const t = req.t;
 
-  const profile = current_user.username === username ? current_user : UserService.get_by_username(username);
+  const profile = current_user?.username === username ? current_user : UserService.get_by_username(username);
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
