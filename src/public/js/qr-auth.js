@@ -9,7 +9,7 @@ const qr_container = document.querySelector(".js-qr-container");
 
 let ws = new WS("/qr-auth");
 
-ws.on_ready = () => ws.send("auth_init")
+ws.send("auth_init")
 
 async function on_auth_pending(url) {
   qr_container.innerHTML = "";

@@ -7,8 +7,9 @@ export class WS {
     this.encoder = null;
     this.path = path;
     this.listeners = new Map();
-    this.base_uri = WS_URI_PUBLIC
-    this.connect()
+    this.base_uri = WS_URI_PUBLIC;
+    this.buffer = []
+    this.connect();
   }
 
   connect() {
@@ -53,10 +54,15 @@ export class WS {
   }
 
   send(key, data) {
-    return this.conn.send(this.encoder.encode(key, data))
+    if (!this.connected()) this.buffer.push(key, data);
+    else return this.conn.send(this.encoder.encode(key, data))
   }
 
   on_ready() {
-    console.log("Websocket and encoder ready")
+    while (this.buffer.length) {
+      let data = this.buffer.pop();
+      let key = this.buffer.pop();
+      this.send(key, data)
+    }
   }
 }
