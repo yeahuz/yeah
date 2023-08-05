@@ -1,50 +1,15 @@
 import { toDataURL } from "/node_modules/qrcode-esm/build/qrcode.esm.js";
-import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 import { add_listeners } from "./dom.js";
 import { qr_code_tmpl, scan_profile_tmpl } from "./templates.js";
-import { option, request, wait, message_sw } from "./utils.js";
+import { option, request, message_sw } from "./utils.js";
 import { toast } from "./toast.js";
+import { WS } from "./ws.js";
 
 const qr_container = document.querySelector(".js-qr-container");
 
-const listeners = {};
-let encoder = null;
-let ws = null;
+let ws = new WS("/qr-auth");
 
-function on(op, callback) {
-  listeners[op] = callback;
-}
-
-function connect() {
-  ws = new WebSocket(`${WS_URI_PUBLIC}/qr-auth`);
-
-  ws.binaryType = "arraybuffer";
-
-  ws.addEventListener("close", async (e) => {
-    console.error("Websocket connection closed: ", e)
-    await wait(1000)
-    connect();
-  });
-
-  ws.addEventListener("error", async (e) => {
-    console.error("Websocket connection error: ", e)
-    if (ws) ws.close()
-    ws = null
-  });
-
-  ws.addEventListener("message", (e) => {
-    if (e.data instanceof ArrayBuffer && encoder) {
-      const [op, payload] = encoder.decode(e.data);
-      if (listeners[op]) listeners[op](payload);
-      return;
-    }
-
-    if (!encoder) {
-      encoder = new PackBytes(e.data);
-    }
-    ws.send(encoder.encode("auth_init"));
-  });
-}
+ws.on_ready = () => ws.send("auth_init")
 
 async function on_auth_pending(url) {
   qr_container.innerHTML = "";
@@ -80,20 +45,18 @@ function is_tab_in_focus() {
 }
 
 function on_visibility_change() {
-  if (is_tab_in_focus() && ws && ws.readState === 3) connect()
+  if (is_tab_in_focus() && ws.connected() && ws.conn.readState === 3) ws.connect()
 }
 
 function on_auth_denied() {
-  if (ws) ws.close();
+  if (ws.connected()) ws.close();
 }
 
-on("auth_pending", on_auth_pending);
-on("auth_scan", on_auth_scan);
-on("auth_confirmed", on_auth_confirm);
-on("auth_denied", on_auth_denied);
+ws.on("auth_pending", on_auth_pending);
+ws.on("auth_scan", on_auth_scan);
+ws.on("auth_confirmed", on_auth_confirm);
+ws.on("auth_denied", on_auth_denied);
 
 add_listeners(document, {
   visibilitychange: on_visibility_change,
 });
-
-connect();

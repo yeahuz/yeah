@@ -7,14 +7,13 @@ import {
   async_pool,
   upload_request,
   generate_srcset,
-  wait,
   gen_id,
   format_relative,
   add_prefix
 } from "./utils.js";
 import { toast } from "./toast.js";
-import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
 import "./components/text-message.js";
+import { WS } from "./ws.js";
 
 const files_input = document.querySelector(".js-files");
 const messages = document.querySelector(".js-messages");
@@ -52,43 +51,7 @@ window.addEventListener("beforeunload", () => {
   }
 });
 
-let ws = null;
-let encoder = null;
-const listeners = {};
-
-function on(op, callback) {
-  listeners[op] = callback;
-}
-
-function connect() {
-  ws = new WebSocket(`${WS_URI_PUBLIC}/chat`);
-
-  ws.binaryType = "arraybuffer";
-
-  ws.addEventListener("close", async (event) => {
-    console.error("Websocket connection closed: ", event)
-    await wait(3000);
-    connect();
-  });
-
-  ws.addEventListener("error", (event) => {
-    console.error("ERROR: Websocket connection error: ", event)
-    ws.close();
-    ws = null;
-  });
-
-  ws.addEventListener("message", (e) => {
-    if (e.data instanceof ArrayBuffer && encoder) {
-      const [op, payload] = encoder.decode(e.data);
-      if (listeners[op]) listeners[op](payload);
-      return;
-    }
-
-    if (!encoder) {
-      encoder = new PackBytes(e.data);
-    }
-  });
-}
+let ws = new WS("/chat");
 
 add_listeners(message_form, {
   submit: on_send_message,
@@ -100,7 +63,7 @@ function on_send_message(e) {
   const data = new FormData(form);
   const textarea = form.querySelector("textarea[name='content']");
 
-  if (ws) {
+  if (ws.connected()) {
     const message = {
       chat_id: data.get("chat_id"),
       content: data.get("content"),
@@ -110,7 +73,7 @@ function on_send_message(e) {
       created_at: Date.now(),
     };
 
-    ws.send(encoder.encode("new_message", message));
+    ws.send("new_message", message);
     if (messages) messages.append(text_message_tmpl(message, true));
 
     textarea.focus();
@@ -164,7 +127,7 @@ async function update_latest_message(payload, you) {
 
 function on_new_chat(payload) {
   if (chats_list) chats_list.append(chat_list_item_tmpl(payload))
-  ws.send(encoder.encode("subscribe", `chats/${payload.id}`))
+  ws.send("subscribe", `chats/${payload.id}`);
 }
 
 function on_file_done(file, url) {
@@ -305,9 +268,9 @@ async function upload_all({ media_msg, files_msg }) {
     else files_msg.attachments.push(result);
   }
 
-  if (ws) {
-    if (media_msg.attachments.length) ws.send(encoder.encode("new_message", media_msg));
-    if (files_msg.attachments.length) ws.send(encoder.encode("new_message", files_msg));
+  if (ws.connected()) {
+    if (media_msg.attachments.length) ws.send("new_message", media_msg);
+    if (files_msg.attachments.length) ws.send("new_message", files_msg);
   }
 }
 
@@ -350,8 +313,6 @@ add_listeners(photo_download_btns, {
   click: on_photo_download,
 });
 
-on("new_message", on_new_message);
-on("message_sent", on_message_sent);
-on("new_chat", on_new_chat)
-
-connect();
+ws.on("new_message", on_new_message);
+ws.on("message_sent", on_message_sent);
+ws.on("new_chat", on_new_chat)
