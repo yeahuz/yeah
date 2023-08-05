@@ -33,9 +33,13 @@ export function disable_element(element) {
     element.removeAttribute("disabled");
   };
 }
-export function create_node(tag, fns = []) {
+
+export function create_node(tag, args = []) {
   const node = document.createElement(tag);
-  for (const fn of fns) fn(node);
+  for (let arg of args) {
+    if (arg.nodeType) node.append(arg)
+    else arg(node)
+  }
   return node;
 }
 

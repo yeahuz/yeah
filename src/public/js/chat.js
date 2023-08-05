@@ -14,6 +14,7 @@ import {
 } from "./utils.js";
 import { toast } from "./toast.js";
 import { PackBytes } from "/node_modules/packbytes/packbytes.mjs";
+import "./components/text-message.js";
 
 const files_input = document.querySelector(".js-files");
 const messages = document.querySelector(".js-messages");
