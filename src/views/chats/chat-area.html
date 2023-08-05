@@ -23,7 +23,7 @@
     </header>
     <div class="flex flex-col space-y-6">
       <ul class="overflow-y-auto space-y-1 flex-1 max-h-[42rem] p-4 js-messages">
-        <% it.chat.messages.reverse().forEach(function (message) { %>
+        <% it.chat.messages.forEach(function (message) { %>
           <% const yyyymmdd = new Date(message.created_at).toISOString().split("T")[0] %>
           <% const existing = distinct_dates.has(yyyymmdd) %>
           <% if (!existing) distinct_dates.set(yyyymmdd, 1) %>
@@ -35,7 +35,7 @@
             </div>
           <% } %>
           <% if (message.type === "text") { %>
-            <%~ include('./text-message.html', {message, formatter: it.formatter}) %>
+            <%~ include('./text-message.html', {message, formatter: it.formatter, user: it.user}) %>
           <% } %>
           <% if (message.type === "photo") { %>
             <%~ include('./photo-message.html', {message, formatter: it.formatter, format_bytes:
@@ -78,7 +78,7 @@
 	{
 		"imports": {
 			"dom": "/node_modules/dom/index.js",
-      "state": "/node_modules/.pnpm/node_modules/state/index.js"
+      "state": "/node_modules/state/index.js"
 		}
 	}
 </script>

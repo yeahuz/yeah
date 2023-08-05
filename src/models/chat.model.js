@@ -44,6 +44,7 @@ export class Chat extends BaseModel {
             from: "chat_members.chat_id",
             to: "chat_members.user_id",
           },
+          extra: ["unread_count"],
           to: "users.id",
         },
       },

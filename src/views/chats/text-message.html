@@ -1,4 +1,5 @@
-<li id="message-<%= it.message.id %>" class="p-2 rounded-lg block relative max-w-md w-fit <%= it.message.is_own_message ? "ml-auto text-white bg-primary-600" : "mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800" %>">
+<li id="message-<%= it.message.id %>" data-id="<%= it.message.id %>" data-chat_id="<%= it.message.chat_id %>"
+  class="p-2 rounded-lg block relative max-w-md w-fit <%= it.message.is_own_message ? "ml-auto text-white bg-primary-600" : `mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800 ${!it.message.is_read ? "js-unread" : ""}` %>">
   <p>
     <%= it.message.content %>
   </p>

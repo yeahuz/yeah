@@ -154,6 +154,9 @@ dependencies:
   qs:
     specifier: ^6.11.2
     version: 6.11.2
+  state:
+    specifier: github:jcbbb/state
+    version: github.com/jcbbb/state/d43858bb359e73f932e706c892419972f1dc2ee4
   ua-parser-js:
     specifier: ^1.0.35
     version: 1.0.35

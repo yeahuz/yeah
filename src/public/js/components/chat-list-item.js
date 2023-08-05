@@ -23,17 +23,21 @@ export class ChatListItem {
           div({ class: "flex flex-col max-w-[200px]" },
             span(
               { class: "text-gray-500 dark:text-gray-300 text-sm truncate" },
-              payload.members.map(m => m.name).join(", ")
+              data.members.map(m => m.name).join(", ")
             ),
             a({
-              href: payload.posting.url,
+              href: data.posting.url,
               class: "relative underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium truncate"
-            }, payload.posting.title)
+            }, data.posting.title)
           )
         ),
         span({ class: "text-gray-500 dark:text-gray-300 text-sm js-latest-date" }, Date.now())
       ),
       p({ class: "text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message" })
     )
+  }
+
+  static from(data) {
+    return new ChatListItem(data).el
   }
 }

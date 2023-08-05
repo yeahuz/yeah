@@ -12,7 +12,6 @@ import {
   add_prefix
 } from "./utils.js";
 import { toast } from "./toast.js";
-import "./components/text-message.js";
 import { WS } from "./ws.js";
 
 const files_input = document.querySelector(".js-files");
@@ -21,7 +20,27 @@ const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 const message_form = document.querySelector(".js-message-form");
 const chats_list = document.querySelector(".js-chats-list")
-// const message_textarea = message_form.querySelector("textarea[name='content']");
+const unread_messages = messages.querySelectorAll(".js-unread")
+
+let ws = new WS("/chat");
+
+function on_observe(entries, observer) {
+  for (let entry of entries) {
+    if (entry.intersectionRatio > 0) {
+      let { id, chat_id } = entry.target.dataset;
+      ws.send("read_message", { id, chat_id })
+      observer.unobserve(entry.target)
+    }
+  }
+}
+
+const observer = new IntersectionObserver(on_observe, {
+  root: messages,
+  rootMargin: "0px",
+  threshold: 1.0,
+})
+
+for (let message of unread_messages) observer.observe(message)
 
 const params = new URLSearchParams(window.location.search);
 const last_read_messsage_id = params.get("m");
@@ -51,7 +70,6 @@ window.addEventListener("beforeunload", () => {
   }
 });
 
-let ws = new WS("/chat");
 
 add_listeners(message_form, {
   submit: on_send_message,
@@ -74,6 +92,7 @@ function on_send_message(e) {
     };
 
     ws.send("new_message", message);
+
     if (messages) messages.append(text_message_tmpl(message, true));
 
     textarea.focus();

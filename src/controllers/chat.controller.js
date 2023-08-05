@@ -81,6 +81,7 @@ export async function get_one(req, reply) {
     chat,
     formatter: new Intl.DateTimeFormat(req.language, { hour: "numeric", minute: "numeric" }),
     format_bytes,
+    user
   });
   stream.push(chat_area);
 
