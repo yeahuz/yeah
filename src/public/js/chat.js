@@ -88,7 +88,7 @@ function on_send_message(e) {
       temp_id: gen_id("message"),
       attachments: [],
       type: "text",
-      created_at: Date.now(),
+      created_at: new Date().toISOString()
     };
 
     ws.send("new_message", message);
@@ -195,7 +195,7 @@ async function on_files_change(e) {
     temp_id: gen_id("message"),
     files: [],
     attachments: [],
-    created_at: Date.now(),
+    created_at: new Date().toISOString()
   }
 
   const files_msg = {
@@ -205,7 +205,7 @@ async function on_files_change(e) {
     temp_id: gen_id("message"),
     files: [],
     attachments: [],
-    created_at: Date.now(),
+    created_at: new Date().toISOString()
   }
 
   for (const file of files) {

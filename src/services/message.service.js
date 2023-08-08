@@ -10,7 +10,7 @@ export const create_one = create_one_impl();
 function create_one_impl(trx) {
   return async ({ sender_id, content, reply_to, chat_id, type = "text", created_at, attachments = [] } = {}) => {
     let { rows: [message] } = await trx.query(`insert into messages (content, sender_id, reply_to, chat_id, type, created_at) values($1, $2, $3, $4, $5, $6) returning id, created_at`,
-      [content, sender_id, reply_to, chat_id, type, new Date(created_at).toISOString()])
+      [content, sender_id, reply_to, chat_id, type, created_at])
 
     await Promise.all([
       trx.query("update chat_members set unread_count = unread_count + 1 where chat_id = $1 and user_id != $2", [chat_id, sender_id]),
