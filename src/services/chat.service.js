@@ -85,7 +85,7 @@ export async function get_one({ id, current_user_id }) {
         'title', p.title,
         'url', p.url,
         'cover_url', p.cover_url,
-        'creator', jsonb_build_object('profile_url', u2.profile_url)
+        'creator', jsonb_build_object('profile_url', u2.profile_url, 'username', u2.username)
       ) as posting
       from chats c
       join chat_members cm on cm.chat_id = c.id and cm.user_id = $1
@@ -97,7 +97,7 @@ export async function get_one({ id, current_user_id }) {
       left join message_attachments ma on m.id = ma.message_id
       left join attachments a on a.id = ma.attachment_id
       where c.id = $2
-      group by c.id, m.content, m.type, m.created_at, p.title, p.id, u2.profile_url, m.sender_id, m.id, rm.message_id
+      group by c.id, m.content, m.type, m.created_at, p.title, p.id, u2.profile_url, m.sender_id, m.id, rm.message_id, u2.username
       order by m.created_at asc
     ) sub
     group by sub.id, sub.posting

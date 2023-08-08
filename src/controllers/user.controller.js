@@ -20,6 +20,7 @@ export async function get_one(req, reply) {
     const top = await render_file("/partials/top.html", {
       meta: { title: (await profile)?.name, lang: req.language },
       t,
+      user: current_user
     })
 
     stream.push(top)
