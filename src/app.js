@@ -156,7 +156,7 @@ export async function start() {
 
     const accept_strategy = {
       name: "accept",
-      storage: function () {
+      storage: function() {
         let handlers = {};
         return {
           get: (type) => {

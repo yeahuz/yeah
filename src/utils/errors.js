@@ -51,19 +51,19 @@ export class DomainError extends Error {
 }
 
 export class ValidationError extends DomainError {
-  constructor({ key = "generic_validation_error", errors, params } = {}) {
+  constructor({ key = "generic_validation_error", errors = [], params = {} } = {}) {
     super({ key, errors, status_code: 422, params });
   }
 }
 
 export class ConflictError extends DomainError {
-  constructor({ key = "generic_conflict", params } = {}) {
+  constructor({ key = "generic_conflict", params = {} } = {}) {
     super({ key, params, status_code: 409 });
   }
 }
 
 export class BadRequestError extends DomainError {
-  constructor({ key = "generic_bad_request", params } = {}) {
+  constructor({ key = "generic_bad_request", params = {} } = {}) {
     super({ key, status_code: 400, params });
   }
 }
@@ -104,7 +104,7 @@ export class GoneError extends DomainError {
 }
 
 export class FloodError extends DomainError {
-  constructor({ key = "generic_flood", params } = {}) {
+  constructor({ key = "generic_flood", params = {} } = {}) {
     super({ key, status_code: 429, params });
   }
 }

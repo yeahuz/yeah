@@ -267,7 +267,7 @@ export function chat_list_item_tmpl(payload) {
 
   const members = span(attrs({
     class: "text-gray-500 dark:text-gray-300 text-sm truncate"
-  }), text(payload.members.map(m => m.name).join(", ")));
+  }), text(payload.posting.creator));
 
   const members_container = div(
     classes("flex flex-col max-w-[200px]"),

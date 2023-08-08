@@ -6,6 +6,8 @@ import { Chat, User } from "../models/index.js";
 import objection from "objection";
 import { commit_trx, query, rollback_trx, start_trx } from "./db.service.js";
 import { option } from "../utils/index.js";
+import { join } from "path";
+import config from "../config/index.js";
 
 const { UniqueViolationError } = objection;
 
@@ -23,7 +25,8 @@ export async function get_many({ user_id }) {
       'id', p.id,
       'title', p.title,
       'cover_url', p.cover_url,
-      'url', p.url
+      'url', p.url,
+      'creator', jsonb_build_object('name', u.name)
     ) as posting,
     jsonb_build_object(
       'type', m.type,
@@ -31,16 +34,15 @@ export async function get_many({ user_id }) {
       'attachments', coalesce(jsonb_agg(jsonb_build_object('id', a.id)) filter (where a.id is not null), '[]'::jsonb),
       'created_at', m.created_at,
       'sender_id', m.sender_id
-    ) as latest_message,
-    jsonb_agg(distinct jsonb_build_object('name', u.name)) as members
+    ) as latest_message
     from chats c
     join chat_members cm on cm.chat_id = c.id and cm.user_id = $1
-    join users u on u.id = cm.user_id
     join messages m on m.chat_id = c.id and m.id = c.last_message_id
     left join message_attachments ma on ma.message_id = c.last_message_id
     left join attachments a on a.id = ma.attachment_id
     join postings p on p.id = c.posting_id
-    group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, cm.last_read_message_id
+    join users u on u.id = p.created_by
+    group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name
   `, [user_id])
 
   return rows
@@ -122,19 +124,33 @@ export async function create_message({ chat_id, content, reply_to, sender_id, cr
   } catch (err) {
     console.error({ err })
     rollback_trx(trx)
-    //trx.rollback();
     throw new InternalError()
   }
 }
 
 export async function create_chat({ created_by, posting_id, members = [] }) {
-  const trx = await Chat.startTransaction();
+  let trx = await start_trx()
   try {
-    const chat = await create_one_trx(trx)({ created_by, posting_id, members });
-    await trx.commit();
+    let { rows: [chat] } = await trx.query("insert into chats (created_by, posting_id) values ($1, $2) returning id", [created_by, posting_id]);
+    let url = join(config.origin, "chats", String(chat.id));
+    await trx.query("update chats set url = $1 where id = $2", [url, chat.id])
+    await Promise.all(members.map(m => trx.query("insert into chat_members (chat_id, user_id) values ($1, $2)", [chat.id, m])))
+    await commit_trx(trx)
+
+    let { rows: [posting] } = await query(`
+      select p.id, cover_url, url, title, u.name as creator
+      from postings p
+      join users u on u.id = p.created_by
+      where p.id = $1`,
+      [posting_id]);
+
+    chat.url = url;
+    chat.posting = posting;
+    chat.members = members;
     return chat;
   } catch (err) {
-    trx.rollback();
+    console.error({ err })
+    rollback_trx(trx)
     if (err instanceof UniqueViolationError) {
       throw new BadRequestError({ key: "chat_exists" });
     }

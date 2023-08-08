@@ -350,6 +350,7 @@ export async function contact(req, reply) {
   const { content } = req.body;
   const chats = await ChatService.get_posting_chats(posting_id);
   let chat = await ChatService.get_member_chat(user.id, chats)
+
   if (!chat) {
     const [new_chat, err] = await option(ChatService.create_chat({
       created_by: user.id,
