@@ -20,7 +20,7 @@ const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 const message_form = document.querySelector(".js-message-form");
 const chats_list = document.querySelector(".js-chats-list")
-const unread_messages = messages.querySelectorAll(".js-unread")
+const unread_messages = messages?.querySelectorAll(".js-unread")
 
 let ws = new WS("/chat");
 

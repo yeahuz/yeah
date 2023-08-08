@@ -7,45 +7,27 @@ export async function start_transaction() {
 export const create_one_trx = (trx) => create_one_impl(trx);
 export const create_one = create_one_impl();
 
-function expand(rowCount, columnCount, startAt = 1) {
-  var index = startAt
-  return Array(rowCount).fill(0).map(v => `(${Array(columnCount).fill(0).map(v => `$${index++}`).join(", ")})`).join(", ")
-}
-
-export function flatten_obj_array(arr, cb) {
-  let flat = []
-  for (let item of arr) {
-    for (let key in item) {
-      if (cb) cb(key, item[key], flat)
-      else flat.push(item[key])
-    }
-  }
-
-  return flat;
-}
-
 function create_one_impl(trx) {
   return async ({ sender_id, content, reply_to, chat_id, type, created_at, attachments = [] } = {}) => {
-    let { rows } = await trx.query(`insert into messages (content, sender_id, reply_to, chat_id, type, created_at) values($1, $2, $3, $4, $5, $6) returning id, created_at`,
+    let { rows: message } = await trx.query(`insert into messages (content, sender_id, reply_to, chat_id, type, created_at) values($1, $2, $3, $4, $5, $6) returning id, created_at`,
       [content, sender_id, reply_to, chat_id, type, new Date(created_at).toISOString()])
 
-    let inserted = []
-    if (attachments.length) {
-      let { rows: inserted_attachments } = await trx.query(`
-      insert into attachments (size, resource_id, name, type, url)
-      values ${expand(attachments.length, 5)} returning id, resource_id, name, size, type, url
-    `, flatten_obj_array(attachments))
+    await Promise.all([
+      trx.query("update chat_members set unread_count = unread_count + 1 where chat_id = $1 and user_id != $2", [chat_id, sender_id]),
+      trx.query("update chats set last_message_id = $1 where id = $2", [message[0].id, chat_id])
+    ])
 
-      if (inserted_attachments.length) {
-        await trx.query(`insert into message_attachments (attachment_id, message_id) values ${expand(inserted_attachments.length, 2)}`,
-          flatten_obj_array(inserted_attachments, (key, value, flat) => {
-            if (key === "id") flat.push(value, rows[0].id)
-          }))
-      }
+    let inserted = await Promise.all(attachments.map(a => {
+      return trx.query(`
+        insert into attachments (size, resource_id, name, type, url)
+        values ($1, $2, $3, $4, $5) returning id, resource_id, name, size, type, url
+      `, [a.size, a.resource_id, a.name, a.type, a.url])
+    }));
 
-      inserted = inserted_attachments;
-    }
+    await Promise.all(inserted.map(a => {
+      return trx.query(`insert into message_attachments (attachment_id, message_id) values ($1, $2)`, [a.id, message[0].id])
+    }));
 
-    return { content, id: rows[0], created_at: rows[0].created_at, sender_id, reply_to, chat_id, type, attachments: inserted }
+    return { content, id: message[0], created_at: message[0].created_at, sender_id, reply_to, chat_id, type, attachments: inserted }
   };
 }
