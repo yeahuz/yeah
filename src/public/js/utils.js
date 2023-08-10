@@ -1,4 +1,4 @@
-const noop = () => {};
+const noop = () => { };
 
 export function upload_request(
   url,
@@ -41,38 +41,38 @@ export async function request(
   { body, query, method, timeout = 60000, state = {}, ...custom_config } = {}
 ) {
   if (query) {
-    const params = new URLSearchParams();
-    for (const key in query) {
+    let params = new URLSearchParams();
+    for (let key in query) {
       if (query[key]) params.append(key, query[key]);
     }
 
     url += "?" + params.toString();
   }
 
-  const isFormData = body instanceof FormData;
-  const controller = new AbortController();
-  const timerId = setTimeout(controller.abort, timeout);
-  const config = {
+  let is_form = body instanceof FormData || body instanceof URLSearchParams;
+  let controller = new AbortController();
+  let timer_id = setTimeout(controller.abort, timeout);
+  let config = {
     signal: controller.signal,
     method: method || (body ? "POST" : "GET"),
-    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
+    body: body ? (is_form ? body : JSON.stringify(body)) : undefined,
     ...custom_config,
     headers: {
       "X-Requested-With": "XMLHttpRequest",
       Accept: "application/json",
-      ...(!isFormData && body && { "Content-Type": "application/json" }),
+      ...(!is_form && body && { "Content-Type": "application/json" }),
       ...custom_config.headers,
     },
   };
 
   return window.fetch(url, config).then(async (response) => {
-    clearTimeout(timerId);
-    const accept = config.headers["Accept"];
+    clearTimeout(timer_id);
+    let accept = config.headers["Accept"];
     let data = response;
 
     switch (accept) {
       case "application/json": {
-        data = await response.json().catch(() => {});
+        data = await response.json().catch(() => { });
         break;
       }
       case "text/html": {
@@ -225,7 +225,7 @@ export function add_prefix(prefix, value) {
 export function get_locale() {
   return navigator.languages && navigator.languages.length
     ? navigator.languages[0]
-    : navigator.language
+    : navigator.language;
 }
 
 export function create_date_formatter(locale = get_locale(), options = {}) {

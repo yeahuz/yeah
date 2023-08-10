@@ -222,6 +222,7 @@ export function text_message_tmpl(payload, is_own_message) {
   const msg = li(
     attrs({
       id: payload.temp_id,
+      "data-chat_id": payload.chat_id
     }),
     classes("p-2 rounded-lg block relative max-w-md w-fit", {
       "ml-auto text-white bg-primary-600": is_own_message,

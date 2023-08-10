@@ -103,11 +103,11 @@ export async function get_one({ id, current_user_id }) {
     group by sub.id, sub.posting
   `, [current_user_id, id]);
 
-  return rows[0]
+  return rows[0];
 }
 
-export async function create_message({ chat_id, content, reply_to, sender_id, created_at, type, attachments = [] } = {}) {
-  let trx = await start_trx()
+export async function create_message({ chat_id, content, reply_to, sender_id, type, attachments = [] } = {}) {
+  let trx = await start_trx();
   try {
     const message = await MessageService.create_one_trx(trx)({
       chat_id,
@@ -115,16 +115,15 @@ export async function create_message({ chat_id, content, reply_to, sender_id, cr
       reply_to,
       sender_id,
       type,
-      created_at,
       attachments
     });
 
-    await commit_trx(trx)
+    await commit_trx(trx);
     return message;
   } catch (err) {
-    console.error({ err })
-    rollback_trx(trx)
-    throw new InternalError()
+    console.error({ err });
+    rollback_trx(trx);
+    throw new InternalError();
   }
 }
 

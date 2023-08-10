@@ -98,12 +98,14 @@ export async function get_one(req, reply) {
 export async function create_message(req, reply) {
   const user = req.user;
   const { id } = req.params;
-  const { content, reply_to } = req.body;
+  const { content, reply_to, attachments = [], type } = req.body;
   const message = await ChatService.create_message({
     chat_id: id,
     content,
     reply_to,
     sender_id: user.id,
+    attachments,
+    type,
   });
   reply.send(message);
   return reply;

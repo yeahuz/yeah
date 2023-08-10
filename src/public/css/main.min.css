@@ -3464,6 +3464,10 @@ j [data-tooltip][data-flow="right"]::before {
   opacity: 1;
 }
 
+.group.read .group-\[\.read\]\:block {
+  display: block;
+}
+
 .peer:checked ~ .peer-checked\:visible {
   visibility: visible;
 }

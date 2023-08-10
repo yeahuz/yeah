@@ -13,14 +13,17 @@ import {
 } from "./utils.js";
 import { toast } from "./toast.js";
 import { WS } from "./ws.js";
+import { reactive, effect } from "state";
+import { TextMessage } from "./components/text-message.js";
 
 const files_input = document.querySelector(".js-files");
 const messages = document.querySelector(".js-messages");
 const photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
 const file_download_btns = document.querySelectorAll(".js-file-download-btn");
 const message_form = document.querySelector(".js-message-form");
-const chats_list = document.querySelector(".js-chats-list")
-const unread_messages = messages?.querySelectorAll(".js-unread") || []
+const chats_list = document.querySelector(".js-chats-list");
+const unread_messages = messages?.querySelectorAll(".js-unread") || [];
+let textarea = message_form.querySelector("textarea[name='content']");
 
 let ws = new WS("/chat");
 
@@ -28,8 +31,8 @@ function on_observe(entries, observer) {
   for (let entry of entries) {
     if (entry.intersectionRatio > 0) {
       let { id, chat_id } = entry.target.dataset;
-      ws.send("read_message", { id, chat_id })
-      observer.unobserve(entry.target)
+      ws.send("read_message", { id, chat_id });
+      observer.unobserve(entry.target);
     }
   }
 }
@@ -38,16 +41,16 @@ const observer = new IntersectionObserver(on_observe, {
   root: messages,
   rootMargin: "0px",
   threshold: 1.0,
-})
+});
 
-for (let message of unread_messages) observer.observe(message)
+for (let message of unread_messages) observer.observe(message);
 
 const params = new URLSearchParams(window.location.search);
 const last_read_messsage_id = params.get("m");
 const chat_id = params.get("c");
 if (chat_id) {
   const el = document.getElementById(chat_id);
-  if (el) el.scrollIntoView()
+  if (el) el.scrollIntoView();
 }
 
 if (last_read_messsage_id) {
@@ -55,7 +58,7 @@ if (last_read_messsage_id) {
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "end" });
     const restore = add_class(el, "animate-pulse");
-    setTimeout(restore, 3000)
+    setTimeout(restore, 3000);
   }
 } else {
   const top = window.localStorage.getItem(window.location.pathname);
@@ -75,60 +78,66 @@ add_listeners(message_form, {
   submit: on_send_message,
 });
 
-function on_send_message(e) {
+async function on_send_message(e) {
   e.preventDefault();
-  const form = e.target;
-  const data = new FormData(form);
-  const textarea = form.querySelector("textarea[name='content']");
+  let form = e.target;
+  let data = new FormData(form);
+  let [message, setMessage] = reactive({
+    chat_id: data.get("chat_id"),
+    content: data.get("content"),
+    attachments: [],
+    type: "text",
+    created_at: new Date().toISOString(),
+    delivered: false,
+    is_own: true
+  });
 
-  if (ws.connected()) {
-    const message = {
-      chat_id: data.get("chat_id"),
-      content: data.get("content"),
-      temp_id: gen_id("message"),
-      attachments: [],
-      type: "text",
-      created_at: new Date().toISOString()
-    };
+  if (messages) messages.append(new TextMessage(message));
+  if (textarea) textarea.focus();
+  form.reset();
+  scroll_to_bottom(messages);
 
-    ws.send("new_message", message);
-
-    if (messages) messages.append(text_message_tmpl(message, true));
-
-    textarea.focus();
-    form.reset();
-    scroll_to_bottom(messages);
+  let [result, err] = await option(request(form.action, { body: message() }));
+  if (!err) {
+    setMessage((prev) => ({ ...prev, delivered: true, id: result.id }));
+    ws.send("new_message", result);
   }
 }
 
 function on_message_sent(message) {
-  if (!messages) return
-  const item = messages.querySelector("#" + message.temp_id)
-  if (!item) return
+  if (!messages) return;
+  const item = messages.querySelector("#" + message.temp_id);
+  if (!item) return;
   const clock = item.querySelector(".js-date-info-clock");
-  if (clock) clock.replaceWith(span(html(check_icon({ size: 14 }))))
+  if (clock) clock.replaceWith(span(html(check_icon({ size: 14 }))));
 
-  item.setAttribute("id", add_prefix("message", message.id))
-  update_latest_message(message, true)
+  item.setAttribute("id", add_prefix("message", message.id));
+  item.setAttribute("data-id", message.id);
+  update_latest_message(message, true);
 }
 
 function on_new_message(payload) {
-  update_latest_message(payload)
-  if (!messages) return
+  update_latest_message(payload);
+  if (!messages) return;
+  let node;
   switch (payload.type) {
     case "text":
-      messages.append(text_message_tmpl(payload, false));
+      node = new TextMessage((mod = (m) => m) => mod(payload));
+      messages.append(node);
       break;
     case "file":
-      messages.append(file_message_tmpl(payload, false));
+      node = file_message_tmpl(payload, false);
+      messages.append(node);
       break;
     case "photo":
-      messages.append(media_message_tmpl(payload, false));
+      node = media_message_tmpl(payload, false);
+      messages.append(node);
       break;
     default:
       break;
   }
 
+  //observer.observe(node);
   scroll_to_bottom(messages);
 }
 
@@ -145,7 +154,7 @@ async function update_latest_message(payload, you) {
 }
 
 function on_new_chat(payload) {
-  if (chats_list) chats_list.append(chat_list_item_tmpl(payload))
+  if (chats_list) chats_list.append(chat_list_item_tmpl(payload));
   ws.send("subscribe", `chats/${payload.id}`);
 }
 
@@ -164,7 +173,7 @@ function on_file_done(file, url) {
         link.setAttribute("href", url.public_url);
       }
     }
-  }
+  };
 }
 
 function on_file_progress(file) {
@@ -174,12 +183,12 @@ function on_file_progress(file) {
       class: "absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg js-progress"
     }),
     text("0")
-  )
+  );
 
-  if (item) item.append(overlay)
+  if (item) item.append(overlay);
 
   return (progress) => {
-    overlay.textContent = `${Math.floor(progress.percent)}%`
+    overlay.textContent = `${Math.floor(progress.percent)}%`;
   };
 }
 
@@ -196,7 +205,7 @@ async function on_files_change(e) {
     files: [],
     attachments: [],
     created_at: new Date().toISOString()
-  }
+  };
 
   const files_msg = {
     type: "file",
@@ -206,10 +215,10 @@ async function on_files_change(e) {
     files: [],
     attachments: [],
     created_at: new Date().toISOString()
-  }
+  };
 
   for (const file of files) {
-    const is_image = /(image\/*)/.test(file.type)
+    const is_image = /(image\/*)/.test(file.type);
     const obj = is_image ? media_msg : files_msg;
     obj.files.push({
       temp_id: gen_id("attachment"),
@@ -219,22 +228,22 @@ async function on_files_change(e) {
       size: file.size,
       type: file.type,
       is_image,
-    })
+    });
   }
 
   if (messages) {
-    if (media_msg.files.length) messages.append(media_message_tmpl(media_msg, true))
-    if (files_msg.files.length) messages.append(file_message_tmpl(files_msg, true))
+    if (media_msg.files.length) messages.append(media_message_tmpl(media_msg, true));
+    if (files_msg.files.length) messages.append(file_message_tmpl(files_msg, true));
   }
 
-  upload_all({ media_msg, files_msg })
+  upload_all({ media_msg, files_msg });
 }
 
 function upload_to(urls) {
   return async function upload(file) {
-    const key = file.is_image ? "images" : "files"
-    const url = urls[key].pop()
-    if (!url) return
+    const key = file.is_image ? "images" : "files";
+    const url = urls[key].pop();
+    if (!url) return;
     const fd = new FormData();
     fd.append("file", file.raw, file.name);
 
@@ -253,8 +262,8 @@ function upload_to(urls) {
     );
 
     if (err) {
-      console.error("Something went wrong uploading file: ", err)
-      return
+      console.error("Something went wrong uploading file: ", err);
+      return;
     }
 
     return {
@@ -264,8 +273,8 @@ function upload_to(urls) {
       type: file.type,
       name: file.name,
       is_image: file.is_image
-    }
-  }
+    };
+  };
 }
 
 async function upload_all({ media_msg, files_msg }) {
@@ -274,7 +283,7 @@ async function upload_all({ media_msg, files_msg }) {
     request("/cf/direct_upload", {
       body: { files: files.map(({ type, size, name, is_image }) => ({ type, size, name, is_image })) }
     })
-  )
+  );
 
   if (err) {
     toast("Unable to create direct creator upload urls. Please try again", "err");
@@ -332,6 +341,12 @@ add_listeners(photo_download_btns, {
   click: on_photo_download,
 });
 
+function on_read_message(payload) {
+  let item = document.getElementById(add_prefix("message", payload.id));
+  if (item) item.classList.add("read");
+}
+
 ws.on("new_message", on_new_message);
 ws.on("message_sent", on_message_sent);
-ws.on("new_chat", on_new_chat)
+ws.on("new_chat", on_new_chat);
+ws.on("read_message", on_read_message);

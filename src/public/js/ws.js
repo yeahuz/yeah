@@ -8,7 +8,7 @@ export class WS {
     this.path = path;
     this.listeners = new Map();
     this.base_uri = WS_URI_PUBLIC;
-    this.buffer = []
+    this.buffer = [];
     this.connect();
   }
 
@@ -18,22 +18,22 @@ export class WS {
     this.conn.binaryType = "arraybuffer";
 
     this.conn.addEventListener("close", async (event) => {
-      console.error("Websocket connection closed: ", event)
+      console.error("Websocket connection closed: ", event);
       await wait(3000);
       this.connect();
     });
 
     this.conn.addEventListener("error", (event) => {
-      console.error("ERROR: Websocket connection error: ", event)
+      console.error("ERROR: Websocket connection error: ", event);
       this.conn.close();
       this.conn = null;
     });
 
     this.conn.addEventListener("message", (e) => {
       if (e.data instanceof ArrayBuffer && this.encoder) {
-        const [op, payload] = this.encoder.decode(e.data);
+        let [op, payload] = this.encoder.decode(e.data);
         let cb = this.listeners.get(op);
-        if (cb) cb(payload)
+        if (cb) cb(payload);
         return;
       }
 
@@ -41,12 +41,12 @@ export class WS {
         this.encoder = new PackBytes(e.data);
       }
 
-      this.on_ready(this.ws)
+      this.on_ready(this.ws);
     });
   }
 
   on(op, cb) {
-    this.listeners.set(op, cb)
+    this.listeners.set(op, cb);
   }
 
   connected() {
@@ -55,14 +55,14 @@ export class WS {
 
   send(key, data) {
     if (!this.connected()) this.buffer.push(key, data);
-    else return this.conn.send(this.encoder.encode(key, data))
+    else return this.conn.send(this.encoder.encode(key, data));
   }
 
   on_ready() {
     while (this.buffer.length) {
       let data = this.buffer.pop();
       let key = this.buffer.pop();
-      this.send(key, data)
+      this.send(key, data);
     }
   }
 }
