@@ -95,6 +95,7 @@ export async function get_one(req, reply) {
   return reply;
 }
 
+// TODO: Should return html or redirect
 export async function create_message(req, reply) {
   const user = req.user;
   const { id } = req.params;

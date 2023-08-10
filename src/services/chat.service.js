@@ -148,8 +148,8 @@ export async function create_chat({ created_by, posting_id, members = [] }) {
     chat.members = members;
     return chat;
   } catch (err) {
-    console.error({ err })
-    rollback_trx(trx)
+    console.error({ err });
+    rollback_trx(trx);
     if (err instanceof UniqueViolationError) {
       throw new BadRequestError({ key: "chat_exists" });
     }
@@ -174,34 +174,34 @@ export async function get_member_chat(user_id, chats = []) {
 }
 
 export async function read_message({ id, chat_id, user_id }) {
-  let trx = await start_trx()
+  let trx = await start_trx();
   try {
     let [_, err] = await option(trx.query("insert into read_messages (message_id, user_id) values ($1, $2)", [id, user_id]));
     if (!err) await trx.query("update chat_members set unread_count = unread_count - 1 where chat_id = $1 and user_id = $2", [chat_id, user_id]);
-    await commit_trx(trx)
+    await commit_trx(trx);
   } catch (err) {
-    console.error({ err })
-    rollback_trx(trx)
-    throw new InternalError()
+    console.error({ err });
+    rollback_trx(trx);
+    throw new InternalError();
   }
 }
 
 function create_one_impl(trx) {
   return async ({ created_by, posting_id, members = [] }) => {
     const actual_members = await UserService.get_by_ids({ ids: members, modify: "minimum" });
-    const posting = await PostingService.get_one({ id: posting_id, modify: "minimum" })
+    const posting = await PostingService.get_one({ id: posting_id, modify: "minimum" });
     const chat = await Chat.query(trx).insertGraph({
       created_by,
       posting,
       members: actual_members
-    }, { relate: true })
+    }, { relate: true });
 
-    return chat
+    return chat;
   };
 }
 
 function update_one_impl(trx) {
   return async (id, update = {}) => {
-    return await Chat.query(trx).findById(id).patch(update)
-  }
+    return await Chat.query(trx).findById(id).patch(update);
+  };
 }

@@ -1,5 +1,10 @@
 <li id="message-<%= it.message.id %>" data-id="<%= it.message.id %>" data-chat_id="<%= it.message.chat_id %>"
-                                                                     class="group p-2 rounded-lg block relative max-w-md w-fit <%= it.message.is_own_message ? `ml-auto text-white bg-primary-600 ${it.message.read_by.length > 0 ? "read" : ""}` : `mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800 ${!it.message.is_read ? "js-unread" : ""}` %>">
+    class="group p-2 rounded-lg block relative max-w-md w-fit <%= it.message.is_own_message ? `ml-auto text-white bg-primary-600 ${it.message.read_by.length > 0 ? "read" : ""}` : `mr-auto text-gray-900 bg-gray-100 dark:text-white dark:bg-zinc-800 ${!it.message.is_read ? "js-unread" : ""}` %>">
+  <form api_action="/api/chats/<%= it.message.chat_id %>/messages/<%= it.message.id %>" api_method="PATCH">
+    <input type="hidden" name="chat_id" value="<%= it.message.chat_id %>" />
+    <input type="hidden" name="id" value="<%= it.message.id %>" />
+    <input type="hidden" name="_action" value="read" />
+  </form>
   <p>
     <%= it.message.content %>
   </p>
