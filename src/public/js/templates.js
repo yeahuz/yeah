@@ -198,7 +198,7 @@ export function media_message_tmpl(message, is_own_media = true) {
   for (const file of message.files || message.attachments) {
     const src = file.url ? `${file.url}/width=10` : URL.createObjectURL(file.raw);
     const photo = img(attrs({ class: "w-full h-full object-cover align-middle rounded-lg", src }));
-    const file_size = span(classes("absolute left-1 top-1 inline-block bg-black/50 rounded-lg py-0.5 px-2 text-white text-xs"), text(format_bytes(file.size)))
+    const file_size = span(classes("absolute left-1 top-1 inline-block bg-black/50 rounded-lg py-0.5 px-2 text-white text-xs"), text(format_bytes(file.size)));
 
     const item = li(
       attrs({ class: "basis-40 flex-1 max-h-64 relative", id: file.temp_id }),

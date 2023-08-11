@@ -43,9 +43,9 @@ export async function get_many({ user_id }) {
     join postings p on p.id = c.posting_id
     join users u on u.id = p.created_by
     group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name
-  `, [user_id])
+  `, [user_id]);
 
-  return rows
+  return rows;
 }
 
 export async function get_posting_chats(posting_id) {
@@ -79,7 +79,16 @@ export async function get_one({ id, current_user_id }) {
       case when m.sender_id != $1 and m.id = rm.message_id then 1 else 0 end as is_read,
       case when sender_id = $1 then 1 else 0 end as is_own_message,
       coalesce(jsonb_agg(jsonb_build_object('name', u.name)) filter (where u.id is not null), '[]'::jsonb) as read_by,
-      coalesce(jsonb_agg(jsonb_build_object('id', a.id)) filter (where a.id is not null), '[]'::jsonb) as attachments,
+      coalesce(jsonb_agg(
+        jsonb_build_object(
+          'id', a.id,
+          'name', a.name,
+          'size', a.size,
+          'url', a.url,
+          'type', a.type
+          )
+        ) filter (where a.id is not null), '[]'::jsonb
+      ) as attachments,
       jsonb_build_object(
         'id', p.id,
         'title', p.title,
@@ -128,7 +137,7 @@ export async function create_message({ chat_id, content, reply_to, sender_id, ty
 }
 
 export async function create_chat({ created_by, posting_id, members = [] }) {
-  let trx = await start_trx()
+  let trx = await start_trx();
   try {
     let { rows: [chat] } = await trx.query("insert into chats (created_by, posting_id) values ($1, $2) returning id", [created_by, posting_id]);
     let url = join(config.origin, "chats", String(chat.id));

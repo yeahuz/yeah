@@ -1,5 +1,4 @@
 import { add_listeners, attrs, span, text, html, add_class } from "./dom.js";
-import { check_icon } from "./icons.js";
 import { media_message_tmpl, chat_list_item_tmpl, file_message_tmpl } from "./templates.js";
 import {
   option,
@@ -15,6 +14,7 @@ import { toast } from "./toast.js";
 import { WS } from "./ws.js";
 import { reactive } from "state";
 import { TextMessage } from "./components/text-message.js";
+import { FileMessage } from "./components/file-message.js";
 
 let files_input = document.querySelector(".js-files");
 let messages = document.querySelector(".js-messages");
@@ -84,7 +84,7 @@ async function on_send_message(e) {
   e.preventDefault();
   let form = e.target;
   let data = new FormData(form);
-  let [message, setMessage] = reactive({
+  let [message, set_message] = reactive({
     chat_id: data.get("chat_id"),
     content: data.get("content"),
     attachments: [],
@@ -103,8 +103,9 @@ async function on_send_message(e) {
   let [result, err] = await option(request(action, { body: message() }));
   // TODO: handle errors
   if (!err) {
-    setMessage((prev) => ({ ...prev, delivered: true, id: result.id }));
+    set_message((prev) => ({ ...prev, delivered: true, id: result.id }));
     ws.send("message", result);
+    update_latest_message(result, true);
   }
 }
 
@@ -119,18 +120,6 @@ export async function read_message(form) {
   }
 }
 
-function on_message_sent(message) {
-  if (!messages) return;
-  let item = messages.querySelector("#" + message.temp_id);
-  if (!item) return;
-  let clock = item.querySelector(".js-date-info-clock");
-  if (clock) clock.replaceWith(span(html(check_icon({ size: 14 }))));
-
-  item.setAttribute("id", add_prefix("message", message.id));
-  item.setAttribute("data-id", message.id);
-  update_latest_message(message, true);
-}
-
 function on_message_received(payload) {
   update_latest_message(payload);
   if (!messages) return;
@@ -141,7 +130,7 @@ function on_message_received(payload) {
       messages.append(node);
       break;
     case "file":
-      node = file_message_tmpl(payload, false);
+      node = new FileMessage((mod = (m) => m) => mod(payload));
       messages.append(node);
       break;
     case "photo":
@@ -153,6 +142,7 @@ function on_message_received(payload) {
   }
 
   observer.observe(node);
+  // TODO: don't scroll to the bottom if user scrolled up. That's fucking annoying.
   scroll_to_bottom(messages);
 }
 
@@ -229,7 +219,9 @@ async function on_files_change(e) {
     temp_id: gen_id("message"),
     files: [],
     attachments: [],
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    is_own: true,
+    delivered: false
   };
 
   for (let file of files) {
@@ -246,12 +238,14 @@ async function on_files_change(e) {
     });
   }
 
+  let [files_msg_rct, set_files_msg] = reactive(files_msg);
+
   if (messages) {
     if (media_msg.files.length) messages.append(media_message_tmpl(media_msg, true));
-    if (files_msg.files.length) messages.append(file_message_tmpl(files_msg, true));
+    if (files_msg.files.length) messages.append(new FileMessage(files_msg_rct));
   }
 
-  upload_all({ media_msg, files_msg });
+  upload_all({ media_msg, files_msg, set_files_msg });
 }
 
 function upload_to(urls) {
@@ -292,7 +286,7 @@ function upload_to(urls) {
   };
 }
 
-async function upload_all({ media_msg, files_msg }) {
+async function upload_all({ media_msg, files_msg, set_files_msg }) {
   let files = media_msg.files.concat(files_msg.files);
   let [urls, err] = await option(
     request("/cf/direct_upload", {
@@ -311,8 +305,16 @@ async function upload_all({ media_msg, files_msg }) {
     else files_msg.attachments.push(result);
   }
 
+  let action = message_form.getAttribute("api_action") || message_form.action;
+
   if (media_msg.attachments.length) ws.send("message", media_msg);
-  if (files_msg.attachments.length) ws.send("message", files_msg);
+  if (files_msg.attachments.length) {
+    let [result, err] = await option(request(action, { body: files_msg }));
+    if (!err) {
+      set_files_msg((prev) => ({ ...prev, delivered: true }));
+      ws.send("message", result);
+    }
+  }
 }
 
 async function on_photo_download(e) {

@@ -21,7 +21,7 @@ function create_one_impl(trx) {
       return trx.query(`
         insert into attachments (size, resource_id, name, type, url)
         values ($1, $2, $3, $4, $5) returning id, resource_id, name, size, type, url
-      `, [a.size, a.resource_id, a.name, a.type, a.url]);
+      `, [a.size, a.resource_id, a.name, a.type, a.url]).then((result) => result.rows[0]);
     }));
 
     await Promise.all(inserted.map(a => {
