@@ -19,7 +19,7 @@ function Attachments(message) {
       img({
         class: "cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable",
         src,
-        crossorigin: true,
+        crossorigin: "anonymous",
         referrerpolicy: "no-referrer"
       })
     );

@@ -252,8 +252,8 @@ export function chat_list_item_tmpl(payload) {
     class: "after:absolute after:top-0 after:left-0 after:right-0 after:bottom-0",
   }));
 
-  const latest_message_date = span(classes("text-gray-500 dark:text-gray-300 text-sm js-latest-date"), text(Date.now()))
-  const latest_message = p(classes("text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message"))
+  const latest_message_date = span(classes("text-gray-500 dark:text-gray-300 text-sm js-latest-date"), text(Date.now()));
+  const latest_message = p(classes("text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message"));
 
   const posting_cover = img(attrs({
     src: payload.posting.cover_url + "/width=80",
@@ -281,7 +281,7 @@ export function chat_list_item_tmpl(payload) {
       posting_cover,
       members_container,
     )
-  )
+  );
 
   const container = div(
     classes("flex items-start justify-between"),
@@ -289,7 +289,7 @@ export function chat_list_item_tmpl(payload) {
       container_left,
       latest_message_date
     )
-  )
+  );
 
   const item = li(
     attrs({
@@ -302,5 +302,5 @@ export function chat_list_item_tmpl(payload) {
       latest_message
     ));
 
-  return item
+  return item;
 }
