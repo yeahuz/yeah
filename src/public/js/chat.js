@@ -1,5 +1,5 @@
 import { add_listeners, attrs, span, text, html, add_class } from "./dom.js";
-import { media_message_tmpl, chat_list_item_tmpl, file_message_tmpl } from "./templates.js";
+import { chat_list_item_tmpl } from "./templates.js";
 import {
   option,
   request,
@@ -15,6 +15,7 @@ import { WS } from "./ws.js";
 import { reactive } from "state";
 import { TextMessage } from "./components/text-message.js";
 import { FileMessage } from "./components/file-message.js";
+import { MediaMessage } from "./components/media-message.js";
 
 let files_input = document.querySelector(".js-files");
 let messages = document.querySelector(".js-messages");
@@ -134,7 +135,7 @@ function on_message_received(payload) {
       messages.append(node);
       break;
     case "photo":
-      node = media_message_tmpl(payload, false);
+      node = new MediaMessage((mod = (m) => m) => mod(payload));
       messages.append(node);
       break;
     default:
@@ -209,7 +210,9 @@ async function on_files_change(e) {
     temp_id: gen_id("message"),
     files: [],
     attachments: [],
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    is_own: true,
+    delivered: false
   };
 
   let files_msg = {
@@ -239,9 +242,10 @@ async function on_files_change(e) {
   }
 
   let [files_msg_rct, set_files_msg] = reactive(files_msg);
+  let [media_msg_rct, set_media_msg] = reactive(media_msg);
 
   if (messages) {
-    if (media_msg.files.length) messages.append(media_message_tmpl(media_msg, true));
+    if (media_msg.files.length) messages.append(new MediaMessage(media_msg_rct));
     if (files_msg.files.length) messages.append(new FileMessage(files_msg_rct));
   }
 

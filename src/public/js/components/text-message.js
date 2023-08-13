@@ -30,7 +30,7 @@ export function TextMessage(message) {
         "js-date-info flex items-center justify-end text-xs mt-0.5 space-x-1",
         message(m => m.is_own) ? "text-primary-50" : "text-gray-500 dark:text-gray-300"
       ]),
-      span(formatter.format(new Date())),
+      span(formatter.format(new Date(message(m => m.created_at) || Date.now()))),
       message(m => m.is_own) && condition(() => message(m => m.delivered),
                                          span({ class: "flex" }, html(check_icon({ size: 14 })), span({ class: "-ml-2.5 hidden group-[.read]:block" }, html(check_icon({ size: 14 })))),
                                          span({ class: "js-date-info-clock" }, html(clock_icon({ size: 14 }))))
