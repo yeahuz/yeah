@@ -12,12 +12,33 @@ class ImageViewer {
     this.viewer = undefined;
     this.next_control = undefined;
     this.prev_control = undefined;
+    this.observer = new MutationObserver(this.on_change.bind(this))
 
     this.init();
   }
 
   static from(items) {
     return new ImageViewer(items);
+  }
+
+  on_change(mutations) {
+    for (let mutation of mutations) {
+      for (let node of mutation.addedNodes) {
+        if (!(node instanceof HTMLElement)) continue;
+        let zoomables = node.querySelectorAll(".js-zoomable");
+        if (zoomables.length) {
+          let previous_len = this.items.length;
+          this.items = document.querySelectorAll(".js-zoomable");
+          for (let i = previous_len; i < zoomables.length + previous_len; i++) {
+            this.items[i].addEventListener("click", () => {
+              this.current_index = i;
+              this.toggle_viewer();
+              this.display_current();
+            })
+          }
+        }
+      }
+    }
   }
 
   listen() {
@@ -64,11 +85,13 @@ class ImageViewer {
     this.create_controls();
     this.create_viewer();
     this.listen();
+    this.observer.observe(document.querySelector(".js-messages"), { childList: true });
   }
 
   next() {
     const current = this.items[this.current_index];
     const is_at_end = this.items[this.items.length - 1] === current;
+    console.log("NEXT", { is_at_end });
     if (is_at_end) return;
     this.current_index += 1;
     this.display_current();
@@ -84,12 +107,19 @@ class ImageViewer {
 
   display_current() {
     const current = this.items[this.current_index];
-    const { photo_url } = current.dataset;
-    const srcset = generate_srcset(photo_url, "fit=scale-down", 12);
-    this.viewer.setAttribute("src", `${photo_url}/public`);
-    this.viewer.setAttribute("srcset", srcset);
-    this.viewer.setAttribute("crossorigin", "anonymous");
-    this.viewer.setAttribute("referrerpolicy", "no-referrer");
+    const { photo_url, object_url } = current.dataset;
+    if (object_url) {
+      this.viewer.removeAttribute("srcset");
+      this.viewer.removeAttribute("crossorigin");
+      this.viewer.removeAttribute("referrerpolicy");
+      this.viewer.setAttribute("src", object_url);
+    } else {
+      let srcset = generate_srcset(photo_url, "fit=scale-down", 12);
+      this.viewer.setAttribute("src", `${photo_url}/public`);
+      this.viewer.setAttribute("srcset", srcset);
+      this.viewer.setAttribute("crossorigin", "anonymous");
+      this.viewer.setAttribute("referrerpolicy", "no-referrer");
+    }
     this.update_controls();
   }
 

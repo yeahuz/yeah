@@ -249,7 +249,7 @@ async function on_files_change(e) {
     if (files_msg.files.length) messages.append(new FileMessage(files_msg_rct));
   }
 
-  upload_all({ media_msg, files_msg, set_files_msg });
+  upload_all({ media_msg, files_msg, set_files_msg, set_media_msg });
 }
 
 function upload_to(urls) {
@@ -290,7 +290,7 @@ function upload_to(urls) {
   };
 }
 
-async function upload_all({ media_msg, files_msg, set_files_msg }) {
+async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }) {
   let files = media_msg.files.concat(files_msg.files);
   let [urls, err] = await option(
     request("/cf/direct_upload", {
@@ -311,11 +311,17 @@ async function upload_all({ media_msg, files_msg, set_files_msg }) {
 
   let action = message_form.getAttribute("api_action") || message_form.action;
 
-  if (media_msg.attachments.length) ws.send("message", media_msg);
+  if (media_msg.attachments.length) {
+    let [result, err] = await option(request(action, { body: media_msg }));
+    if (!err) {
+      set_media_msg((prev) => ({ ...prev, delivered: true, id: result.id }));
+      ws.send("message", result)
+    }
+  }
   if (files_msg.attachments.length) {
     let [result, err] = await option(request(action, { body: files_msg }));
     if (!err) {
-      set_files_msg((prev) => ({ ...prev, delivered: true }));
+      set_files_msg((prev) => ({ ...prev, delivered: true, id: result.id }));
       ws.send("message", result);
     }
   }

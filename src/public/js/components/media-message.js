@@ -20,7 +20,9 @@ function Attachments(message) {
         class: "cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable",
         src,
         crossorigin: "anonymous",
-        referrerpolicy: "no-referrer"
+        referrerpolicy: "no-referrer",
+        "data-photo_url": a.url,
+        "data-object_url": a.raw ? src : "",
       })
     );
 
@@ -38,7 +40,7 @@ export function MediaMessage(message) {
       "data-chat_id": message(m => m.chat_id),
     },
     classes([
-      "w-full max-w-md relative",
+      "group w-full max-w-md relative",
       message(m => m.is_own) ? "ml-auto" : "mr-auto"
     ]),
     message(m => !m.is_own) && form(
@@ -54,8 +56,8 @@ export function MediaMessage(message) {
       ]),
       span(formatter.format(new Date(message(m => m.created_at) || Date.now()))),
       message(m => m.is_own) && condition(() => message(m => m.delivered),
-                                         span({ class: "flex" }, html(check_icon({ size: 14 })), span({ class: "-ml-2.5 hidden group-[.read]:block" }, html(check_icon({ size: 14 })))),
-                                         span({ class: "js-date-info-clock" }, html(clock_icon({ size: 14 }))))
+        span({ class: "flex" }, html(check_icon({ size: 14 })), span({ class: "-ml-2.5 hidden group-[.read]:block" }, html(check_icon({ size: 14 })))),
+        span({ class: "js-date-info-clock" }, html(clock_icon({ size: 14 }))))
     )
   );
 
