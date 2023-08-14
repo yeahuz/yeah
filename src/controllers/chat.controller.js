@@ -1,4 +1,5 @@
 import * as ChatService from "../services/chat.service.js";
+import * as MessageService from "../services/message.service.js";
 import config from "../config/index.js";
 import { render_file } from "../utils/eta.js";
 import { generate_srcset, format_bytes } from "../utils/index.js";
@@ -75,13 +76,18 @@ export async function get_one(req, reply) {
   });
   stream.push(chat_list);
 
-  const chat = await ChatService.get_one({ id, current_user_id: user.id });
+  let [chat, messages] = await Promise.all([
+    ChatService.get_one({ id }),
+    MessageService.get_many({ chat_id: id, user_id: user.id }),
+  ]);
+
   const chat_area = await render_file("/chats/chat-area.html", {
     t,
     chat,
     formatter: new Intl.DateTimeFormat(req.language, { hour: "numeric", minute: "numeric" }),
     format_bytes,
-    user
+    user,
+    messages
   });
   stream.push(chat_area);
 

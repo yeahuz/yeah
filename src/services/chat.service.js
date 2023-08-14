@@ -56,63 +56,24 @@ export async function get_chat_ids({ user_id }) {
   return await User.relatedQuery("chats").select("id").for(user_id);
 }
 
-export async function get_one({ id, current_user_id }) {
+export async function get_one({ id }) {
   let { rows } = await query(`
-    select sub.id,
-    sub.posting,
-    jsonb_agg(jsonb_build_object(
-      'id', sub.msg_id,
-      'read_by', sub.read_by,
-      'content', sub.content,
-      'type', sub.type,
-      'created_at', sub.msg_created_at,
-      'attachments', sub.attachments,
-      'is_own_message', sub.is_own_message,
-      'chat_id', sub.id,
-      'is_read', sub.is_read
-    )) as messages from (
-      select c.id,
-      m.content,
-      m.type,
-      m.created_at as msg_created_at,
-      m.id as msg_id,
-      case when m.sender_id != $1 and m.id = rm.message_id then 1 else 0 end as is_read,
-      case when sender_id = $1 then 1 else 0 end as is_own_message,
-      coalesce(jsonb_agg(jsonb_build_object('name', u.name)) filter (where u.id is not null), '[]'::jsonb) as read_by,
-      coalesce(jsonb_agg(
-        jsonb_build_object(
-          'id', a.id,
-          'name', a.name,
-          'size', a.size,
-          'url', a.url,
-          'type', a.type
-          )
-        ) filter (where a.id is not null), '[]'::jsonb
-      ) as attachments,
-      jsonb_build_object(
-        'id', p.id,
-        'title', p.title,
-        'url', p.url,
-        'cover_url', p.cover_url,
-        'creator', jsonb_build_object('profile_url', u2.profile_url, 'username', u2.username)
-      ) as posting
-      from chats c
-      join chat_members cm on cm.chat_id = c.id and cm.user_id = $1
-      join messages m on m.chat_id = c.id
-      join postings p on p.id = c.posting_id
-      join users u2 on u2.id = p.created_by
-      left join read_messages rm on rm.message_id = m.id
-      left join users u on u.id = rm.user_id
-      left join message_attachments ma on m.id = ma.message_id
-      left join attachments a on a.id = ma.attachment_id
-      where c.id = $2
-      group by c.id, m.content, m.type, m.created_at, p.title, p.id, u2.profile_url, m.sender_id, m.id, rm.message_id, u2.username
-      order by m.created_at asc
-    ) sub
-    group by sub.id, sub.posting
-  `, [current_user_id, id]);
+    select c.id,
+    json_build_object(
+    'id', p.id,
+    'title', p.title,
+    'url', p.url,
+    'cover_url', p.cover_url,
+    'creator', json_build_object('profile_url', u.profile_url, 'username', u.username)
+    ) as posting
+    from chats c
+    join postings p on p.id = c.posting_id
+    join users u on u.id = p.created_by
+    where c.id = $1
+    group by p.*, c.id, p.id, u.profile_url, u.username
+  `, [id])
 
-  return rows[0];
+  if (rows.length) return rows[0];
 }
 
 export async function create_message({ chat_id, content, reply_to, sender_id, type, attachments = [] } = {}) {

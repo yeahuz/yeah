@@ -23,8 +23,7 @@ class ImageViewer {
 
   on_change(mutations) {
     for (let mutation of mutations) {
-      for (let node of mutation.addedNodes) {
-        if (!(node instanceof HTMLElement)) continue;
+      if (mutation.addedNodes.length) {
         let zoomables = node.querySelectorAll(".js-zoomable");
         if (zoomables.length) {
           let previous_len = this.items.length;

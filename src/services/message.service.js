@@ -1,4 +1,5 @@
 import { Message } from "../models/index.js";
+import { query } from "./db.service.js";
 
 export async function start_transaction() {
   return await Message.startTransaction();
@@ -10,7 +11,7 @@ export const create_one = create_one_impl();
 function create_one_impl(trx) {
   return async ({ sender_id, content, reply_to, chat_id, type = "text", created_at, attachments = [] } = {}) => {
     let { rows: [message] } = await trx.query(`insert into messages (content, sender_id, reply_to, chat_id, type) values($1, $2, $3, $4, $5) returning id, created_at`,
-                                              [content, sender_id, reply_to, chat_id, type]);
+      [content, sender_id, reply_to, chat_id, type]);
 
     await Promise.all([
       trx.query("update chat_members set unread_count = unread_count + 1 where chat_id = $1 and user_id != $2", [chat_id, sender_id]),
@@ -30,4 +31,23 @@ function create_one_impl(trx) {
 
     return { content, id: message.id, created_at: message.created_at, sender_id, reply_to, chat_id, type, attachments: inserted };
   };
+}
+
+export async function get_many({ chat_id, user_id }) {
+  let { rows } = await query(`
+    select  m.id, m.content, m.type, m.created_at, m.chat_id,
+    case when m.sender_id != $1 and m.id = rm.message_id then 1 else 0 end as is_read,
+    case when m.sender_id = $1 then 1 else 0 end as is_own_message,
+    greatest(0, (select count(*) from read_messages rm where rm.message_id = m.id)) as read_by_count,
+    coalesce(array_agg(row_to_json(a)) filter (where a.id is not null), '{}') as attachments
+    from messages m
+    left join message_attachments ma on m.id = ma.message_id
+    left join attachments a on a.id = ma.attachment_id
+    left join read_messages rm on rm.message_id = m.id
+    where chat_id = $2
+    group by m.id, rm.message_id
+    order by m.created_at asc;`,
+    [user_id, chat_id]);
+
+  return rows;
 }
