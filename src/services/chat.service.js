@@ -28,16 +28,18 @@ export async function get_many({ user_id }) {
       'url', p.url,
       'creator', json_build_object('name', u.name)
     ) as posting,
-    json_build_object(
-      'type', m.type,
-      'content', m.content,
-      'attachments', coalesce(json_agg(json_build_object('id', a.id, 'name', a.name)) filter (where a.id is not null), '[]'::json),
-      'created_at', m.created_at,
-      'sender_id', m.sender_id
-    ) as latest_message
+    case
+      when m.type is null then null
+      else json_build_object(
+        'type', m.type,
+        'content', m.content,
+        'attachments', coalesce(json_agg(json_build_object('id', a.id, 'name', a.name)) filter (where a.id is not null), '[]'::json),
+        'created_at', m.created_at,
+        'sender_id', m.sender_id
+      ) end as latest_message
     from chats c
     join chat_members cm on cm.chat_id = c.id and cm.user_id = $1
-    join messages m on m.chat_id = c.id and m.id = c.last_message_id
+    left join messages m on m.chat_id = c.id and m.id = c.last_message_id
     left join message_attachments ma on ma.message_id = c.last_message_id
     left join attachments a on a.id = ma.attachment_id
     join postings p on p.id = c.posting_id

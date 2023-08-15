@@ -16,9 +16,11 @@
           </div>
         </div>
         <div class="flex flex-col items-end space-y-2">
-          <% if (chat.latest_message) { %>
-            <span class="text-gray-500 dark:text-gray-300 text-sm js-latest-date"><%= it.format_relative(chat.latest_message.created_at, new Date()) %></span>
-          <% } %>
+          <span class="text-gray-500 dark:text-gray-300 text-sm js-latest-date">
+            <% if (chat.latest_message) { %>
+              <%= it.format_relative(chat.latest_message.created_at, new Date()) %>
+            <% } %>
+          </span>
           <% if (chat.unread_count) { %>
             <div class="inline-flex text-xs p-1 min-w-[1.2rem] leading-[0] min-h-[1.2rem] bg-primary-500 text-white
               items-center justify-center rounded-full">
@@ -27,26 +29,26 @@
           <% } %>
         </div>
       </div>
-      <% if (chat.latest_message) {%>
-        <p class="text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message">
-          <%= chat.latest_message.sender_id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
-          <% if (chat.latest_message.type === "text") { %>
-            <%= chat.latest_message.content %>
-          <% } else if (chat.latest_message.type === "file") { %>
-            <% if (chat.latest_message.attachments.length > 1) { %>
-              <%= it.t("files_count", { ns: "chats", count: chat.latest_message.attachments.length }) %>
-            <% } else {%>
-              <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
-            <% }%>
-          <% } else if (chat.latest_message.type === "photo") { %>
-            <% if (chat.latest_message.attachments.length > 1) { %>
-              <%= it.t("photos_count", { ns: "chats", count: chat.latest_message.attachments.length })%>
-            <% } else { %>
-              <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
+      <p class="text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message">
+        <% if (chat.latest_message) {%>
+            <%= chat.latest_message.sender_id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
+            <% if (chat.latest_message.type === "text") { %>
+              <%= chat.latest_message.content %>
+            <% } else if (chat.latest_message.type === "file") { %>
+              <% if (chat.latest_message.attachments.length > 1) { %>
+                <%= it.t("files_count", { ns: "chats", count: chat.latest_message.attachments.length }) %>
+              <% } else {%>
+                <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
+              <% }%>
+            <% } else if (chat.latest_message.type === "photo") { %>
+              <% if (chat.latest_message.attachments.length > 1) { %>
+                <%= it.t("photos_count", { ns: "chats", count: chat.latest_message.attachments.length })%>
+              <% } else { %>
+                <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
+              <% } %>
             <% } %>
-          <% } %>
-        </p>
-      <% } %>
+        <% } %>
+      </p>
     </li>
     <% }) %>
   </ul>
