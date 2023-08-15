@@ -5,5 +5,9 @@
   "send_message": "Send message",
   "send": "Send",
   "your_message": "Your message",
-  "write_to": "Write something to {{name}}"
+  "write_to": "Write something to {{name}}",
+  "files_count_one": "{{count}} file",
+  "files_count_other": "{{count}} files",
+  "photos_count_one": "{{count}} photo",
+  "photos_count_other": "{{count}} photos"
 }

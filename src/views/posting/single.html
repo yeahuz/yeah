@@ -105,4 +105,7 @@
  document.title = "<%= it.posting.title %> | Needs"
 </script>
 <script src="/public/js/carousel.js" type="module" async defer></script>
-<script src="/public/js/image-viewer.js" type="module" async defer></script>
+<script type="module" defer async>
+import { ImageViewer } from "/public/js/image-viewer.js";
+ImageViewer.from(".js-zoomable");
+</script>

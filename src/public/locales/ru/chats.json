@@ -5,5 +5,10 @@
   "send_message": "Отправить сообщение",
   "send": "Отправить",
   "your_message": "Ваше сообщение",
-  "write_to": "Напишите что-нибудь {{name}}"
+  "write_to": "Напишите что-нибудь {{name}}",
+  "files_count_one": "{{count}} файл",
+  "files_count_few": "{{count}} файла",
+  "files_count_many": "{{count}} файлов",
+  "files_count": "{{count}} файлов",
+  "photos_count": "{{count}} фото"
 }

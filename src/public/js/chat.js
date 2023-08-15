@@ -16,7 +16,9 @@ import { reactive } from "state";
 import { TextMessage } from "./components/text-message.js";
 import { FileMessage } from "./components/file-message.js";
 import { MediaMessage } from "./components/media-message.js";
+import { ImageViewer } from "./image-viewer.js";
 
+let image_viewer = ImageViewer.from(".js-zoomable");
 let files_input = document.querySelector(".js-files");
 let messages = document.querySelector(".js-messages");
 let photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
@@ -137,6 +139,7 @@ function on_message_received(payload) {
     case "photo":
       node = new MediaMessage((mod = (m) => m) => mod(payload));
       messages.append(node);
+      image_viewer.reselect();
       break;
     default:
       break;
@@ -245,7 +248,10 @@ async function on_files_change(e) {
   let [media_msg_rct, set_media_msg] = reactive(media_msg);
 
   if (messages) {
-    if (media_msg.files.length) messages.append(new MediaMessage(media_msg_rct));
+    if (media_msg.files.length) {
+      messages.append(new MediaMessage(media_msg_rct))
+      image_viewer.reselect();
+    }
     if (files_msg.files.length) messages.append(new FileMessage(files_msg_rct));
   }
 
@@ -321,7 +327,7 @@ async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }
   if (files_msg.attachments.length) {
     let [result, err] = await option(request(action, { body: files_msg }));
     if (!err) {
-      set_files_msg((prev) => ({ ...prev, delivered: true, id: result.id }));
+      set_files_msg((prev) => ({ ...prev, delivered: true, id: result.id, files: result.attachments }));
       ws.send("message", result);
     }
   }
@@ -336,19 +342,6 @@ async function on_photo_download(e) {
   e.target.remove();
 }
 
-async function on_file_download(e) {
-  let { file_url, file_name } = e.target.dataset;
-  let response = await fetch(file_url);
-  let blob = await response.blob();
-  let url = URL.createObjectURL(blob);
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = file_name;
-  document.body.append(a);
-  a.click();
-  a.remove();
-}
-
 
 function scroll_to_bottom(element) {
   element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
@@ -356,10 +349,6 @@ function scroll_to_bottom(element) {
 
 add_listeners(files_input, {
   change: on_files_change,
-});
-
-add_listeners(file_download_btns, {
-  click: on_file_download,
 });
 
 add_listeners(photo_download_btns, {

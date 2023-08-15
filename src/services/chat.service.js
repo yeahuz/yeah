@@ -21,17 +21,17 @@ export async function get_many({ user_id }) {
     select 
     c.id, c.created_by, c.url,
     cm.unread_count,
-    jsonb_build_object(
+    json_build_object(
       'id', p.id,
       'title', p.title,
       'cover_url', p.cover_url,
       'url', p.url,
-      'creator', jsonb_build_object('name', u.name)
+      'creator', json_build_object('name', u.name)
     ) as posting,
-    jsonb_build_object(
+    json_build_object(
       'type', m.type,
       'content', m.content,
-      'attachments', coalesce(jsonb_agg(jsonb_build_object('id', a.id)) filter (where a.id is not null), '[]'::jsonb),
+      'attachments', coalesce(json_agg(json_build_object('id', a.id, 'name', a.name)) filter (where a.id is not null), '[]'::json),
       'created_at', m.created_at,
       'sender_id', m.sender_id
     ) as latest_message

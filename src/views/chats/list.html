@@ -32,8 +32,18 @@
           <%= chat.latest_message.sender_id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
           <% if (chat.latest_message.type === "text") { %>
             <%= chat.latest_message.content %>
-          <% } else { %>
-            <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
+          <% } else if (chat.latest_message.type === "file") { %>
+            <% if (chat.latest_message.attachments.length > 1) { %>
+              <%= it.t("files_count", { ns: "chats", count: chat.latest_message.attachments.length }) %>
+            <% } else {%>
+              <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
+            <% }%>
+          <% } else if (chat.latest_message.type === "photo") { %>
+            <% if (chat.latest_message.attachments.length > 1) { %>
+              <%= it.t("photos_count", { ns: "chats", count: chat.latest_message.attachments.length })%>
+            <% } else { %>
+              <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
+            <% } %>
           <% } %>
         </p>
       <% } %>

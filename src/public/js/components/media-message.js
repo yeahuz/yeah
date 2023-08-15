@@ -11,6 +11,7 @@ function Attachments(message) {
   let list = ul({
     class: "flex flex-wrap justify-end gap-0.5 bg-primary-600 p-0.5 rounded-lg js-image-viewer"
   });
+
   for (let a of message(m => m.files || m.attachments)) {
     let src = a.url ? `${a.url}/width=10` : URL.createObjectURL(a.raw);
     let item = li(

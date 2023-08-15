@@ -1,18 +1,17 @@
-import { div, classes, attrs, img, children, button, svg, path } from "./dom.js";
+import { div, img, button, svg, path } from "dom";
 import { generate_srcset } from "./utils.js";
 
-const zoomables = document.querySelectorAll(".js-zoomable");
-
-class ImageViewer {
-  constructor(items) {
-    this.items = items;
+export class ImageViewer {
+  constructor(selector) {
+    this.selector = selector;
+    this.items = document.querySelectorAll(selector);
     this.current_index = 0;
 
     this.container = undefined;
     this.viewer = undefined;
     this.next_control = undefined;
     this.prev_control = undefined;
-    this.observer = new MutationObserver(this.on_change.bind(this))
+    this.scrollbar_width = window.innerWidth - document.documentElement.clientWidth;
 
     this.init();
   }
@@ -21,27 +20,20 @@ class ImageViewer {
     return new ImageViewer(items);
   }
 
-  on_change(mutations) {
-    for (let mutation of mutations) {
-      if (mutation.addedNodes.length) {
-        let zoomables = node.querySelectorAll(".js-zoomable");
-        if (zoomables.length) {
-          let previous_len = this.items.length;
-          this.items = document.querySelectorAll(".js-zoomable");
-          for (let i = previous_len; i < zoomables.length + previous_len; i++) {
-            this.items[i].addEventListener("click", () => {
-              this.current_index = i;
-              this.toggle_viewer();
-              this.display_current();
-            })
-          }
-        }
-      }
+  reselect() {
+    let previous_len = this.items.length;
+    this.items = document.querySelectorAll(this.selector);
+    for (let i = previous_len, len = previous_len + (this.items.length - previous_len); i < len; i++) {
+      this.items[i].addEventListener("click", () => {
+        this.current_index = i;
+        this.toggle_viewer();
+        this.display_current();
+      })
     }
   }
 
   listen() {
-    const self = this;
+    let self = this;
     for (let i = 0; i < this.items.length; i++) {
       this.items[i].addEventListener("click", () => {
         self.current_index = i;
@@ -84,29 +76,27 @@ class ImageViewer {
     this.create_controls();
     this.create_viewer();
     this.listen();
-    this.observer.observe(document.querySelector(".js-messages"), { childList: true });
   }
 
   next() {
-    const current = this.items[this.current_index];
-    const is_at_end = this.items[this.items.length - 1] === current;
-    console.log("NEXT", { is_at_end });
+    let current = this.items[this.current_index];
+    let is_at_end = this.items[this.items.length - 1] === current;
     if (is_at_end) return;
     this.current_index += 1;
     this.display_current();
   }
 
   prev() {
-    const current = this.items[this.current_index];
-    const is_at_start = this.items[0] === current;
+    let current = this.items[this.current_index];
+    let is_at_start = this.items[0] === current;
     if (is_at_start) return;
     this.current_index -= 1;
     this.display_current();
   }
 
   display_current() {
-    const current = this.items[this.current_index];
-    const { photo_url, object_url } = current.dataset;
+    let current = this.items[this.current_index];
+    let { photo_url, object_url } = current.dataset;
     if (object_url) {
       this.viewer.removeAttribute("srcset");
       this.viewer.removeAttribute("crossorigin");
@@ -125,46 +115,45 @@ class ImageViewer {
   toggle_viewer() {
     this.container.classList.toggle("-z-10");
     this.container.classList.toggle("z-50");
-    this.container.classList.toggle("scale-90");
     this.container.classList.toggle("opacity-0");
+    this.container.classList.toggle("scale-90");
 
-    const is_open = this.container.classList.contains("z-50");
-    if (is_open) {
-      document.body.style.overflow = is_open ? "hidden" : "auto";
-      this.container.focus();
-    }
+    let is_open = this.container.classList.contains("z-50");
+    document.body.style.overflow = is_open ? "hidden" : "auto";
+    document.body.style.paddingRight = is_open ? this.scrollbar_width + "px" : 0;
+    if (is_open) this.container.focus();
   }
 
   create_container() {
-    const container = div(
-      classes("flex items-center justify-center fixed top-0 left-0 w-screen h-screen bg-black/60 duration-300 will-change-transform -z-10 opacity-0 scale-90 text-white outline-none"),
-      attrs({ tabindex: "-1" })
-    );
+    let container = div({
+      class: "flex items-center justify-center fixed top-0 left-0 w-screen h-screen bg-black/60 duration-300 will-change-transform -z-10 opacity-0 scale-90 text-white outline-none",
+      tabindex: "-1"
+    });
     this.container = container;
     document.body.append(container);
   }
 
   create_viewer() {
-    const viewer = img(classes("max-w-full max-h-full object-cover"));
-    const viewer_container = div(classes("max-w-2xl w-full"), children(viewer));
+    let viewer = img({ class: "max-w-full max-h-full object-cover" })
+    let viewer_container = div({ class: "max-w-2xl w-full" }, viewer);
     this.viewer = viewer;
     this.container.append(viewer_container);
   }
 
   update_controls() {
-    const current = this.items[this.current_index];
-    const is_at_end = this.items[this.items.length - 1] === current;
-    const is_at_start = this.items[0] === current;
+    let current = this.items[this.current_index];
+    let is_at_end = this.items[this.items.length - 1] === current;
+    let is_at_start = this.items[0] === current;
 
     this.next_control.toggleAttribute("disabled", is_at_end);
     this.prev_control.toggleAttribute("disabled", is_at_start);
   }
 
   create_controls() {
-    const controls = div(classes("absolute flex justify-between left-0 top-1/2 -translate-y-1/2 w-full px-8"));
+    let controls = div({ class: "absolute flex justify-between left-0 top-1/2 -translate-y-1/2 w-full px-8" });
 
-    const next_control = this.create_control("next");
-    const prev_control = this.create_control("prev");
+    let next_control = this.create_control("next");
+    let prev_control = this.create_control("prev");
 
     next_control.addEventListener("click", this.next.bind(this));
     prev_control.addEventListener("click", this.prev.bind(this));
@@ -176,29 +165,24 @@ class ImageViewer {
   }
 
   create_control(type) {
-    const control = button(classes("p-3 rounded-full duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed"));
-    const icon = svg(attrs({
-      viewBox: "0 0 24 24",
-      fill: "none",
-      class: "w-5 h-5 pointer-events-none"
-    }));
-
-    const p = path(attrs({
+    let prev_path = "M20 12H4M4 12L10 18M4 12L10 6";
+    let next_path = "M4 12H20M20 12L14 6M20 12L14 18";
+    let p = path({
       "stroke-width": "1.5",
       "stroke-linecap": "round",
       "stroke-linejoin": "round",
-      "stroke": "currentColor"
-    }));
+      "stroke": "currentColor",
+      "d": type === "next" ? next_path : prev_path
+    });
 
-    const prev_path = "M20 12H4M4 12L10 18M4 12L10 6";
-    const next_path = "M4 12H20M20 12L14 6M20 12L14 18";
+    let icon = svg({
+      viewBox: "0 0 24 24",
+      fill: "none",
+      class: "w-5 h-5 pointer-events-none"
+    }, p);
 
-    p.setAttribute("d", type === "next" ? next_path : prev_path);
-
-    icon.append(p);
-    control.append(icon);
-    return control;
+    return button({ class: "p-3 rounded-full duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed" }, icon);
   }
 }
 
-ImageViewer.from(zoomables);
+//ImageViewer.from(".js-zoomable");

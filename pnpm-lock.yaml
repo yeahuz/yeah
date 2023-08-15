@@ -81,7 +81,7 @@ dependencies:
     version: 9.0.0
   dom:
     specifier: github:jcbbb/dom
-    version: github.com/jcbbb/dom/9180874fc5184d769b28bb8305b63049a0cdf02d
+    version: github.com/jcbbb/dom/46171820166b3b8b6b8731583b1feee2f5c7afc1
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
@@ -5447,8 +5447,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  github.com/jcbbb/dom/9180874fc5184d769b28bb8305b63049a0cdf02d:
-    resolution: {tarball: https://codeload.github.com/jcbbb/dom/tar.gz/9180874fc5184d769b28bb8305b63049a0cdf02d}
+  github.com/jcbbb/dom/46171820166b3b8b6b8731583b1feee2f5c7afc1:
+    resolution: {tarball: https://codeload.github.com/jcbbb/dom/tar.gz/46171820166b3b8b6b8731583b1feee2f5c7afc1}
     name: dom
     version: 1.0.0
     dependencies:

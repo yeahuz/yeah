@@ -1,6 +1,7 @@
 import { li, a, ul, div, classes, html, span, form, input, condition } from "dom";
 import { check_icon, clock_icon, file_icon } from "../icons.js";
 import { add_prefix, format_bytes } from "../utils.js";
+import { effect } from "state";
 
 let formatter = new Intl.DateTimeFormat(navigator.language, {
   hour: "numeric",
@@ -9,35 +10,39 @@ let formatter = new Intl.DateTimeFormat(navigator.language, {
 
 export function FileItems(message) {
   let list = ul({ class: "flex flex-col space-y-2" });
-  for (let file of message(m => m.files || m.attachments)) {
-    let item = li(
-      { class: "flex items-start space-x-2" },
-      div(
-        classes([
-          "rounded-lg h-8 w-8 flex items-center justify-center",
-          message(m => m.is_own)
-            ? "bg-gray-100 text-gray-600 dark:bg-white dark:text-primary-600"
-            : "bg-gray-200 dark:bg-zinc-700"
-        ]),
-        html(file_icon({ size: 20 }))
-      ),
-      div(
-        { class: "flex flex-col" },
-        a({ href: file.url || "#" },
-          file.name,
-          classes([
-            "underline decoration-transparent duration-300",
-            message(m => m.is_own)
-              ? "hover:decoration-white"
-              : "hover:decoration-gray-900 dark:hover:decoration-white"
-            ])
-         ),
-        span({ class: "text-xs" }, format_bytes(file.size))
-      )
-    );
 
-    list.append(item);
-  }
+  effect(() => {
+    list.innerHTML = "";
+    for (let file of message(m => m.files || m.attachments)) {
+      let item = li(
+        { class: "flex items-start space-x-2" },
+        div(
+          classes([
+            "rounded-lg h-8 w-8 flex items-center justify-center",
+            message(m => m.is_own)
+              ? "bg-gray-100 text-gray-600 dark:bg-white dark:text-primary-600"
+              : "bg-gray-200 dark:bg-zinc-700"
+          ]),
+          html(file_icon({ size: 20 }))
+        ),
+        div(
+          { class: "flex flex-col" },
+          a({ href: file.url || "#" },
+            file.name,
+            classes([
+              "underline decoration-transparent duration-300",
+              message(m => m.is_own)
+                ? "hover:decoration-white"
+                : "hover:decoration-gray-900 dark:hover:decoration-white"
+            ])
+          ),
+          span({ class: "text-xs" }, format_bytes(file.size))
+        )
+      );
+
+      list.append(item);
+    }
+  });
 
   return list;
 }
@@ -67,8 +72,8 @@ export function FileMessage(message) {
       ]),
       span(formatter.format(new Date())),
       message(m => m.is_own) && condition(() => message(m => m.delivered),
-                                         span({ class: "flex" }, html(check_icon({ size: 14 })), span({ class: "-ml-2.5 hidden group-[.read]:block" }, html(check_icon({ size: 14 })))),
-                                         span({ class: "js-date-info-clock" }, html(clock_icon({ size: 14 }))))
+        span({ class: "flex" }, html(check_icon({ size: 14 })), span({ class: "-ml-2.5 hidden group-[.read]:block" }, html(check_icon({ size: 14 })))),
+        span({ class: "js-date-info-clock" }, html(clock_icon({ size: 14 }))))
     )
   );
 
