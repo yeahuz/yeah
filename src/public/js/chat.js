@@ -87,7 +87,7 @@ async function on_send_message(e) {
   let form = e.target;
   let data = new FormData(form);
   let [message, set_message] = reactive({
-    chat_id: data.get("chat_id"),
+    chat_id: Number(data.get("chat_id")),
     content: data.get("content"),
     attachments: [],
     type: "text",
@@ -207,7 +207,7 @@ async function on_files_change(e) {
 
   let media_msg = {
     type: "media",
-    chat_id: data.get("chat_id"),
+    chat_id: Number(data.get("chat_id")),
     content: "",
     temp_id: gen_id("message"),
     files: [],
@@ -219,7 +219,7 @@ async function on_files_change(e) {
 
   let files_msg = {
     type: "file",
-    chat_id: data.get("chat_id"),
+    chat_id: Number(data.get("chat_id")),
     content: "",
     temp_id: gen_id("message"),
     files: [],
