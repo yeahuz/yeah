@@ -37,7 +37,7 @@
           <% if (message.type === "text") { %>
             <%~ include('./text-message.html', {message, formatter: it.formatter, user: it.user}) %>
           <% } %>
-          <% if (message.type === "photo") { %>
+          <% if (message.type === "media") { %>
             <%~ include('./photo-message.html', {message, formatter: it.formatter, format_bytes:
             it.format_bytes}) %>
           <% } %>

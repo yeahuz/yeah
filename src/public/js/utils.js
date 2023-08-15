@@ -1,4 +1,4 @@
-const noop = () => { };
+const noop = () => {};
 
 export function upload_request(
   url,
@@ -72,7 +72,7 @@ export async function request(
 
     switch (accept) {
       case "application/json": {
-        data = await response.json().catch(() => { });
+        data = await response.json().catch(() => {});
         break;
       }
       case "text/html": {

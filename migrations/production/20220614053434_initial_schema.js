@@ -762,7 +762,7 @@ export function up(knex) {
     .createTable("messages", (t) => {
       t.increments("id");
       t.text("content").defaultTo("");
-      t.enu("type", ["photo", "file", "video", "text"]).defaultTo("text");
+      t.enu("type", ["photo", "file", "video", "text", "media"]).defaultTo("text");
       t.integer("reply_to").index().references("id").inTable("messages");
       t.integer("sender_id")
         .index()
@@ -947,7 +947,7 @@ export function up(knex) {
 }
 
 export async function down(knex) {
-  await knex.raw(`DROP TABLE 
+  await knex.raw(`DROP TABLE
     users, chats, accounts,
     attachments, attributes, attribute_translations,
     auth_providers, billing_accounts, categories, category_translations,
@@ -968,4 +968,3 @@ export async function down(knex) {
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)
 }
-

@@ -22,11 +22,10 @@ let image_viewer = ImageViewer.from(".js-zoomable");
 let files_input = document.querySelector(".js-files");
 let messages = document.querySelector(".js-messages");
 let photo_download_btns = document.querySelectorAll(".js-photo-download-btn");
-let file_download_btns = document.querySelectorAll(".js-file-download-btn");
 let message_form = document.querySelector(".js-message-form");
 let chats_list = document.querySelector(".js-chats-list");
 let unread_messages = messages?.querySelectorAll(".js-unread") || [];
-let textarea = message_form.querySelector("textarea[name='content']");
+let textarea = message_form?.querySelector("textarea[name='content']");
 
 let ws = new WS("/chat");
 
@@ -207,7 +206,7 @@ async function on_files_change(e) {
   if (!files.length) return;
 
   let media_msg = {
-    type: "photo",
+    type: "media",
     chat_id: data.get("chat_id"),
     content: "",
     temp_id: gen_id("message"),
@@ -232,7 +231,8 @@ async function on_files_change(e) {
 
   for (let file of files) {
     let is_image = /(image\/*)/.test(file.type);
-    let obj = is_image ? media_msg : files_msg;
+    let is_video = /(video\/*)/.test(file.type);
+    let obj = (is_image || is_video) ? media_msg : files_msg;
     obj.files.push({
       temp_id: gen_id("attachment"),
       msg_id: obj.temp_id,
@@ -241,9 +241,9 @@ async function on_files_change(e) {
       size: file.size,
       type: file.type,
       is_image,
+      is_video
     });
   }
-
   let [files_msg_rct, set_files_msg] = reactive(files_msg);
   let [media_msg_rct, set_media_msg] = reactive(media_msg);
 
@@ -258,17 +258,18 @@ async function on_files_change(e) {
   upload_all({ media_msg, files_msg, set_files_msg, set_media_msg });
 }
 
+
+// TODO: associate file with specific url so that content-types match;
 function upload_to(urls) {
   return async function upload(file) {
-    let key = file.is_image ? "images" : "files";
-    let url = urls[key].pop();
+    let url = urls[file.temp_id];
     if (!url) return;
     let fd = new FormData();
     fd.append("file", file.raw, file.name);
 
     let [_, err] = await option(
       upload_request(url.upload_url, {
-        data: fd,
+        data: file.is_image ? fd : fd.get("file"),
         method: file.is_image ? "POST" : "PUT",
         on_progress: on_file_progress(file),
         on_done: on_file_done(file, url),
@@ -291,7 +292,8 @@ function upload_to(urls) {
       size: file.size,
       type: file.type,
       name: file.name,
-      is_image: file.is_image
+      is_image: file.is_image,
+      is_video: file.is_video
     };
   };
 }
@@ -300,7 +302,7 @@ async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }
   let files = media_msg.files.concat(files_msg.files);
   let [urls, err] = await option(
     request("/cf/direct_upload", {
-      body: { files: files.map(({ type, size, name, is_image }) => ({ type, size, name, is_image })) }
+      body: { files: files.map(({ type, size, name, is_image, is_video, temp_id }) => ({ type, size, name, is_image, is_video, temp_id })) }
     })
   );
 
@@ -311,7 +313,7 @@ async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }
 
   for await (let result of async_pool(10, files, upload_to(urls))) {
     if (!result) continue;
-    if (result.is_image) media_msg.attachments.push(result);
+    if (result.is_image || result.is_video) media_msg.attachments.push(result);
     else files_msg.attachments.push(result);
   }
 

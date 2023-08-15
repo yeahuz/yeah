@@ -762,7 +762,7 @@ export function up(knex) {
     .createTable("messages", (t) => {
       t.increments("id");
       t.text("content").defaultTo("");
-      t.enu("type", ["photo", "file", "video", "text"]).defaultTo("text");
+      t.enu("type", ["photo", "file", "video", "text", "media"]).defaultTo("text");
       t.integer("reply_to").index().references("id").inTable("messages");
       t.integer("sender_id")
         .index()

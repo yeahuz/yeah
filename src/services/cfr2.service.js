@@ -1,13 +1,16 @@
 import config from "../config/index.js";
-import S3 from "aws-sdk/clients/s3.js";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { async_pool } from "../utils/async-pool.js";
 import { randomUUID } from "crypto";
 
-const client = new S3({
+let client = new S3Client({
   endpoint: `https://${config.cf_account_id}.r2.cloudflarestorage.com`,
-  accessKeyId: config.cf_r2_access_key,
-  secretAccessKey: config.cf_r2_secret_key,
-  signatureVersion: "v4",
+  credentials: {
+    accessKeyId: config.cf_r2_access_key,
+    secretAccessKey: config.cf_r2_secret_key,
+  },
+  region: "auto"
 });
 
 export async function update_bucket_cors() {
@@ -18,14 +21,16 @@ export async function update_bucket_cors() {
         CORSRules: [
           {
             AllowedMethods: ["PUT", "POST", "GET"],
-            AllowedOrigins: ["http://localhost:3000"],
+            AllowedOrigins: ["http://localhost:3000", "http://localhost:3001"],
             AllowedHeaders: [
               "content-type",
               "Content-Type",
               "Cotent-Disposition",
               "content-disposition",
+              "content-length",
+              "Content-Length"
             ],
-            ExposeHeaders: ["Content-Disposition"],
+            ExposeHeaders: ["Content-Disposition", "Content-Length"],
           },
         ],
       },
@@ -42,13 +47,14 @@ export function get_public_url(id) {
 }
 
 export async function get_direct_upload_url(file) {
-  let id = `${randomUUID()}/${file.name}`;
-  let upload_url = await client.getSignedUrlPromise("putObject", {
+  let id = `${randomUUID()}/${file.name}`
+  let command = new PutObjectCommand({
     Bucket: "s3-needs-uz",
     Key: id,
-    Expires: 3600,
-    ContentType: file.type,
+    ContentType: file.type
   });
+
+  let upload_url = await getSignedUrl(client, command, { expiresIn: 3600 });
 
   return { id, upload_url, public_url: get_public_url(id) };
 }

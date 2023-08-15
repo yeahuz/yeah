@@ -1,6 +1,11 @@
 <li id="message-<%= it.message.id %>" class="p-2 rounded-lg flex flex-col relative max-w-md w-fit <%=
-  it.message.is_own_message ? `bg-primary-600 ml-auto text-white` : `mr-auto bg-gray-100 dark:bg-zinc-800
-  text-gray-900 dark:text-white js-received` %>">
+  it.message.is_own_message ? `bg-primary-600 ml-auto text-white ${it.message.read_by_count > 0 ? "read" : ""}` : `mr-auto bg-gray-100 dark:bg-zinc-800
+  text-gray-900 dark:text-white ${!it.message.is_read ? "js-unread" : ""}` %>">
+  <form api_action="/api/chats/<%= it.message.chat_id %>/messages/<%= it.message.id %>" api_method="PATCH">
+    <input type="hidden" name="chat_id" value="<%= it.message.chat_id %>" />
+    <input type="hidden" name="id" value="<%= it.message.id %>" />
+    <input type="hidden" name="_action" value="read" />
+  </form>
   <ul class="flex flex-col space-y-2">
     <% it.message.attachments.forEach(function (attachment) {%>
       <li class="flex items-start space-x-2">

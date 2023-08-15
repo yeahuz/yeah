@@ -2,19 +2,15 @@ import * as CFR2Service from "./cfr2.service.js";
 import * as CFImageService from "./cfimg.service.js";
 
 export async function get_upload_urls(files = []) {
-  const images_arr = [];
-  const files_arr = [];
-  for (let i = 0, len = files.length; i < len; i++) {
-    const file = files[i]
-    if (file.is_image) {
-      images_arr.push(file)
-    } else files_arr.push(file)
-  }
+  let urls = {}
+  let promises = files.map(async file => {
+    let get_url = !file.is_image ? CFR2Service.get_direct_upload_url : CFImageService.get_direct_upload_url;
+    let result = await get_url(file);
+    urls[file.temp_id] = result;
+    return result;
+  })
 
-  const [image_urls, file_urls] = await Promise.all([
-    CFImageService.get_direct_upload_urls(images_arr),
-    CFR2Service.get_direct_upload_urls(files_arr)
-  ])
+  await Promise.all(promises);
 
-  return { images: image_urls, files: file_urls }
+  return urls;
 }
