@@ -1,4 +1,5 @@
-import { add_listeners, attrs, span, text, html, add_class } from "./dom.js";
+import { attrs, span, text, add_class } from "./dom.js";
+import { add_listeners } from "dom";
 import { chat_list_item_tmpl } from "./templates.js";
 import {
   option,
@@ -124,6 +125,16 @@ export async function read_message(form) {
   let data = Object.fromEntries(new FormData(form));
   let action = form.getAttribute("api_action") || form.action;
   let method = form.getAttribute("api_method") || form.method;
+  let chat = document.getElementById(add_prefix("chat", data.chat_id));
+  if (chat) {
+    let unread_count = chat.querySelector(".js-unread-count");
+    let new_count = Number(unread_count.textContent) - 1;
+    if (new_count < 1) {
+      unread_count.classList.add("hidden");
+      unread_count.classList.remove("inline-flex");
+    } else unread_count.textContent = new_count;
+  }
+
   let [_, err] = await option(request(action, { body: data, method }));
   // TODO: handle errors
   if (!err) {
@@ -334,6 +345,7 @@ async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }
       ws.send("message", result)
     }
   }
+
   if (files_msg.attachments.length) {
     let [result, err] = await option(request(action, { body: files_msg }));
     if (!err) {
@@ -351,7 +363,6 @@ async function on_photo_download(e) {
   img.setAttribute("srcset", srcset);
   e.target.remove();
 }
-
 
 function scroll_to_bottom(element) {
   element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
@@ -376,7 +387,7 @@ add_listeners(scroll_down_btn, {
 
 add_listeners(messages, {
   scroll: on_scroll
-})
+}, { scroll: { passive: true } })
 
 function on_message_read(payload) {
   let item = document.getElementById(add_prefix("message", payload.id));

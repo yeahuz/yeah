@@ -99,18 +99,18 @@ export function get_siblings(node) {
   return [...node.parentElement.children].filter((c) => c !== node);
 }
 
-function add_listener(node, events) {
+function add_listener(node, events, opts) {
   const types = Object.keys(events);
-  types.forEach((type) => node.addEventListener(type, events[type]));
+  types.forEach((type) => node.addEventListener(type, events[type], opts?.[type]));
 }
 
-export function add_listeners(nodeOrNodes, events) {
+export function add_listeners(nodeOrNodes, events, opts) {
   if (nodeOrNodes instanceof NodeList) {
-    nodeOrNodes.forEach((node) => add_listener(node, events));
+    nodeOrNodes.forEach((node) => add_listener(node, events, opts));
   }
 
   if (nodeOrNodes instanceof Node) {
-    add_listener(nodeOrNodes, events);
+    add_listener(nodeOrNodes, events, opts);
   }
 }
 

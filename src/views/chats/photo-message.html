@@ -18,7 +18,7 @@
               </svg>
             </span>
           </button>
-          <img class="cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable" data-photo_url="<%= attachment.url %>" src="<%= attachment.url %>/width=10" crossorigin referrerpolicy="no-referrer">
+          <img loading="lazy" class="cursor-zoom-in w-full h-full object-cover align-middle rounded-lg js-zoomable" data-photo_url="<%= attachment.url %>" src="<%= attachment.url %>/width=10" crossorigin referrerpolicy="no-referrer">
         <% } %>
       </li>
     <% }) %>

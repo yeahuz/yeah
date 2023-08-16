@@ -21,12 +21,10 @@
               <%= it.format_relative(chat.latest_message.created_at, new Date()) %>
             <% } %>
           </span>
-          <% if (chat.unread_count) { %>
-            <div class="inline-flex text-xs p-1 min-w-[1.2rem] leading-[0] min-h-[1.2rem] bg-primary-500 text-white
-              items-center justify-center rounded-full">
-              <%= chat.unread_count %>
-            </div>
-          <% } %>
+          <div class="text-xs p-1 min-w-[1.2rem] leading-[0] min-h-[1.2rem] bg-primary-500 text-white
+            items-center justify-center rounded-full js-unread-count <%= chat.unread_count > 0 ? "inline-flex" : "hidden"%>">
+            <%= chat.unread_count %>
+          </div>
         </div>
       </div>
       <p class="text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message">
@@ -39,8 +37,8 @@
                 <%= it.t("files_count", { ns: "chats", count: chat.latest_message.attachments.length }) %>
               <% } else {%>
                 <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
-              <% }%>
-            <% } else if (chat.latest_message.type === "photo") { %>
+              <% } %>
+            <% } else if (chat.latest_message.type === "media") { %>
               <% if (chat.latest_message.attachments.length > 1) { %>
                 <%= it.t("photos_count", { ns: "chats", count: chat.latest_message.attachments.length })%>
               <% } else { %>
