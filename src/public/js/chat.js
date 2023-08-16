@@ -18,6 +18,7 @@ import { FileMessage } from "./components/file-message.js";
 import { MediaMessage } from "./components/media-message.js";
 import { ImageViewer } from "./image-viewer.js";
 
+let scroll_down_btn = document.querySelector(".js-scroll-down-btn");
 let image_viewer = ImageViewer.from(".js-zoomable");
 let files_input = document.querySelector(".js-files");
 let messages = document.querySelector(".js-messages");
@@ -78,9 +79,17 @@ window.addEventListener("beforeunload", () => {
 });
 
 
-add_listeners(message_form, {
-  submit: on_send_message,
-});
+let last_scroll;
+let is_at_end;
+function on_scroll(e) {
+  let scroll_top = e.target.scrollTop;
+  is_at_end = scroll_top === e.target.scrollHeight - e.target.offsetHeight;
+  if (last_scroll && scroll_top > last_scroll && !is_at_end) {
+    scroll_down_btn.classList.remove("scale-0");
+  } else scroll_down_btn.classList.add("scale-0");
+
+  last_scroll = scroll_top;
+}
 
 async function on_send_message(e) {
   e.preventDefault();
@@ -144,9 +153,8 @@ function on_message_received(payload) {
       break;
   }
 
+  if (is_at_end) scroll_to_bottom(messages);
   observer.observe(node);
-  // TODO: don't scroll to the bottom if user scrolled up. That's fucking annoying.
-  scroll_to_bottom(messages);
 }
 
 async function update_latest_message(payload, you) {
@@ -356,6 +364,19 @@ add_listeners(files_input, {
 add_listeners(photo_download_btns, {
   click: on_photo_download,
 });
+
+
+add_listeners(message_form, {
+  submit: on_send_message,
+});
+
+add_listeners(scroll_down_btn, {
+  click: () => scroll_to_bottom(messages)
+})
+
+add_listeners(messages, {
+  scroll: on_scroll
+})
 
 function on_message_read(payload) {
   let item = document.getElementById(add_prefix("message", payload.id));

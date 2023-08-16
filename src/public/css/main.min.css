@@ -614,6 +614,10 @@ video {
   position: fixed;
 }
 
+.\!fixed {
+  position: fixed !important;
+}
+
 .\!absolute {
   position: absolute !important;
 }
@@ -624,6 +628,10 @@ video {
 
 .relative {
   position: relative;
+}
+
+.\!sticky {
+  position: sticky !important;
 }
 
 .sticky {
@@ -688,6 +696,50 @@ video {
 
 .top-1\/2 {
   top: 50%;
+}
+
+.top-full {
+  top: 100%;
+}
+
+.end-5 {
+  inset-inline-end: 1.25rem;
+}
+
+.start-full {
+  inset-inline-start: 100%;
+}
+
+.end-full {
+  inset-inline-end: 100%;
+}
+
+.top-2\/3 {
+  top: 66.666667%;
+}
+
+.top-\[95\%\] {
+  top: 95%;
+}
+
+.top-\[90\%\] {
+  top: 90%;
+}
+
+.bottom-12 {
+  bottom: 3rem;
+}
+
+.right-4 {
+  right: 1rem;
+}
+
+.bottom-24 {
+  bottom: 6rem;
+}
+
+.right-8 {
+  right: 2rem;
 }
 
 .\!z-10 {
@@ -1296,6 +1348,12 @@ video {
 .scale-90 {
   --tw-scale-x: .9;
   --tw-scale-y: .9;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-50 {
+  --tw-scale-x: .5;
+  --tw-scale-y: .5;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -2000,6 +2058,22 @@ video {
   opacity: 0;
 }
 
+.opacity-80 {
+  opacity: 0.8;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-10 {
+  opacity: 0.1;
+}
+
+.\!opacity-0 {
+  opacity: 0 !important;
+}
+
 .shadow-\[0px_-12px_16px_-4px_rgba\(0\2c 0\2c 0\2c 0\.04\)\] {
   --tw-shadow: 0px -12px 16px -4px rgba(0,0,0,0.04);
   --tw-shadow-colored: 0px -12px 16px -4px var(--tw-shadow-color);
@@ -2097,6 +2171,7 @@ html {
   /* Base */
   --white: 255, 255, 255;
   --black: 0, 0, 0;
+  --transparent: 0, 0, 0, 0;
   /* Zinc */
   --zinc-50: 250, 250, 250;
   --zinc-100: 244, 244, 245;
@@ -2168,17 +2243,17 @@ html {
   /* Default button */
   --color-btn-bg: var(--white);
   --color-btn-text: var(--gray-500);
-  --color-btn-border: transparent;
+  --color-btn-border: var(--transparent);
   --color-btn-hover: var(--gray-50);
   --color-btn-text-hover: var(--gray-600);
   --color-btn-ring: var(--gray-100);
   --color-btn-ripple-bg: var(--gray-400);
   --shadow-btn: none;
   /* Text button */
-  --color-text-btn-bg: transparent;
+  --color-text-btn-bg: var(--transparent);
   --color-text-btn-text: var(--primary-600);
-  --color-text-border: transparent;
-  --color-text-btn-hover: transparent;
+  --color-text-border: var(--transparent);
+  --color-text-btn-hover: var(--transparent);
   --color-text-btn-text-hover: var(--primary-700);
   --color-text-btn-ripple-bg: var(--white);
   --color-text-btn-ring: var(--primary-100);
@@ -2200,25 +2275,25 @@ html {
   --color-secondary-btn-hover: var(--gray-50);
   --shadow-secondary-btn: var(--shadow-xs);
   /* Tertiary button color */
-  --color-tertiary-cr-btn-bg: transparent;
+  --color-tertiary-cr-btn-bg: var(--transparent);
   --color-tertiary-cr-btn-text: var(--gray-500);
   --color-tertiary-cr-btn-text-hover: var(--primary-700);
   --color-tertiary-cr-btn-hover: var(--primary-50);
   --color-tertiary-cr-btn-ring: var(--primary-100);
   --color-tertiary-cr-btn-ripple-bg: var(--primary-400);
-  --shadow-tertiary-cr-btn: transparent;
+  --shadow-tertiary-cr-btn: var(--transparent);
   /* Tertiary button danger */
-  --color-tertiary-danger-btn-bg: transparent;
+  --color-tertiary-danger-btn-bg: var(--transparent);
   --color-tertiary-danger-btn-text: var(--error-700);
   --color-tertiary-danger-btn-hover: var(--error-50);
   --color-tertiary-danger-btn-text-hover: var(--error-800);
   --color-tertiary-danger-btn-ring: var(--error-50);
   --color-tertiary-danger-btn-ripple-bg: var(--error-400);
-  --shadow-tertiary-danger-btn: transparent;
+  --shadow-tertiary-danger-btn: var(--transparent);
   /* Secondary button color */
   --color-secondary-cr-btn-bg: var(--primary-50);
   --color-secondary-cr-btn-text: var(--primary-700);
-  --color-secondary-cr-btn-border: transparent;
+  --color-secondary-cr-btn-border: var(--transparent);
   --color-secondary-cr-btn-hover: var(--primary-100);
   --color-secondary-cr-btn-text-hover: var(--primary-700);
   --color-secondary-cr-btn-ring: var(--primary-100);
@@ -2255,17 +2330,17 @@ html.light {
   /* Default button */
   --color-btn-bg: var(--white);
   --color-btn-text: var(--gray-500);
-  --color-btn-border: transparent;
+  --color-btn-border: var(--transparent);
   --color-btn-hover: var(--gray-50);
   --color-btn-text-hover: var(--gray-600);
   --color-btn-ring: var(--gray-100);
   --color-btn-ripple-bg: var(--gray-400);
   --shadow-btn: none;
   /* Text button */
-  --color-text-btn-bg: transparent;
+  --color-text-btn-bg: var(--transparent);
   --color-text-btn-text: var(--primary-600);
-  --color-text-border: transparent;
-  --color-text-btn-hover: transparent;
+  --color-text-border: var(--transparent);
+  --color-text-btn-hover: var(--transparent);
   --color-text-btn-text-hover: var(--primary-700);
   --color-text-btn-ripple-bg: var(--white);
   --color-text-btn-ring: var(--primary-100);
@@ -2287,25 +2362,25 @@ html.light {
   --color-secondary-btn-hover: var(--gray-50);
   --shadow-secondary-btn: var(--shadow-xs);
   /* Tertiary button color */
-  --color-tertiary-cr-btn-bg: transparent;
+  --color-tertiary-cr-btn-bg: var(--transparent);
   --color-tertiary-cr-btn-text: var(--gray-500);
   --color-tertiary-cr-btn-text-hover: var(--primary-700);
   --color-tertiary-cr-btn-hover: var(--primary-50);
   --color-tertiary-cr-btn-ring: var(--primary-100);
   --color-tertiary-cr-btn-ripple-bg: var(--primary-400);
-  --shadow-tertiary-cr-btn: transparent;
+  --shadow-tertiary-cr-btn: var(--transparent);
   /* Tertiary button danger */
-  --color-tertiary-danger-btn-bg: transparent;
+  --color-tertiary-danger-btn-bg: var(--transparent);
   --color-tertiary-danger-btn-text: var(--error-700);
   --color-tertiary-danger-btn-hover: var(--error-50);
   --color-tertiary-danger-btn-text-hover: var(--error-800);
   --color-tertiary-danger-btn-ring: var(--error-50);
   --color-tertiary-danger-btn-ripple-bg: var(--error-400);
-  --shadow-tertiary-danger-btn: transparent;
+  --shadow-tertiary-danger-btn: var(--transparent);
   /* Secondary button color */
   --color-secondary-cr-btn-bg: var(--primary-50);
   --color-secondary-cr-btn-text: var(--primary-700);
-  --color-secondary-cr-btn-border: transparent;
+  --color-secondary-cr-btn-border: var(--transparent);
   --color-secondary-cr-btn-hover: var(--primary-100);
   --color-secondary-cr-btn-text-hover: var(--primary-700);
   --color-secondary-cr-btn-ring: var(--primary-100);
@@ -2345,7 +2420,7 @@ html.dark {
   /* Primary button */
   --color-primary-btn-ring: var(--primary-400);
   /* Secondary button */
-  --color-secondary-btn-bg: transparent;
+  --color-secondary-btn-bg: var(--zinc-900);
   --color-secondary-btn-border: var(--zinc-700);
   --color-secondary-btn-text: var(--gray-300);
   --color-secondary-btn-hover: var(--zinc-800);
@@ -2445,6 +2520,8 @@ details[open] summary::before {
 .btn {
   --text-color: var(--color-btn-text);
   --bg-color: var(--color-btn-bg);
+  --size-x: 1.25rem;
+  --size-y: 0.75rem;
   --size: 0.75rem 1.25rem;
   --border-color: var(--color-btn-border);
   --shadow: var(--shadow-btn);
@@ -2457,13 +2534,14 @@ details[open] summary::before {
   --font-size: 1rem;
   --align: center;
   --justify: center;
+  --radius: 0.5rem;
   background: rgb(var(--bg-color));
   color: rgb(var(--text-color));
-  padding: var(--size);
+  padding: var(--size-y) var(--size-x);
   border: 1px solid rgb(var(--border-color));
   box-shadow: var(--shadow);
   transition-duration: 200ms;
-  border-radius: 0.5rem;
+  border-radius: var(--radius);
   display: flex;
   justify-content: var(--justify);
   align-items: var(--align);
@@ -2567,24 +2645,38 @@ button:disabled {
 }
 
 .btn-0 {
-  --size: 0;
+  --size-x: 0;
+  --size-y: 0;
+}
+
+.btn-square {
+  --size-x: var(--size-y) !important;
+}
+
+.btn-rounded {
+  --radius: 50%;
+  --size-x: var(--size-y);
 }
 
 .btn-xl {
-  --size: 0.75rem 1.25rem;
+  --size-x: 1.25rem;
+  --size-y: 0.75rem;
 }
 
 .btn-lg {
-  --size: 0.625rem 1.25rem;
+  --size-x: 1.25rem;
+  --size-y: 0.625rem;
 }
 
 .btn-md {
-  --size: 0.625rem 1.25rem;
+  --size-x: 1.25rem;
+  --size-y: 0.625rem;
   --font-size: 0.875rem;
 }
 
 .btn-xs {
-  --size: 0.5rem 1rem;
+  --size-x: 1rem;
+  --size-y: 0.5rem;
   --font-size: 0.75rem;
 }
 
