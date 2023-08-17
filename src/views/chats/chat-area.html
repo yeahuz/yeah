@@ -80,4 +80,10 @@
  document.title = "<%= it.t("title", { ns: "chats" }) %> | Needs"
 </script>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
-<script defer async type="module" src="/public/js/chat.js"></script>
+<script type="module" async defer>
+import { setup_chat } from "/public/js/chat.js";
+let chat = `<%~ JSON.stringify(it.chat) %>`;
+let chats = `<%~ JSON.stringify(it.chats) %>`;
+setup_chat(JSON.parse(chat), JSON.parse(chats));
+</script>
+<!-- <script defer async type="module" src="/public/js/chat.js"></script> -->

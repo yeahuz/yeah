@@ -36,18 +36,18 @@ function Attachments(message) {
 export function MediaMessage(message) {
   let component = li(
     {
-      id: () => add_prefix("message", message(m => m.id)),
-      "data-id": message(m => m.id),
-      "data-chat_id": message(m => m.chat_id),
+      id: () => add_prefix("message", message().id),
+      "data-id": message().id,
+      "data-chat_id": message().chat_id
     },
     classes([
       "group w-full max-w-md relative",
-      message(m => m.is_own) ? "ml-auto" : "mr-auto"
+      message().is_own ? "ml-auto" : "mr-auto"
     ]),
-    message(m => !m.is_own) && form(
-      { api_action: `/api/chats/${message(m => m.chat_id)}/messages/${message(m => m.id)}`, api_method: "PATCH" },
-      input({ type: "hidden", name: "chat_id", value: message(m => m.chat_id) }),
-      input({ type: "hidden", name: "id", value: message(m => m.id) }),
+    !message().is_own && form(
+      { api_action: `/api/chats/${message().chat_id}/messages/${message().id}`, api_method: "PATCH" },
+      input({ type: "hidden", name: "chat_id", value: message().chat_id }),
+      input({ type: "hidden", name: "id", value: message().id }),
       input({ type: "hidden", name: "_action", value: "read" })
     ),
     Attachments(message),

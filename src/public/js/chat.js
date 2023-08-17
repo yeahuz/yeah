@@ -13,7 +13,7 @@ import {
 } from "./utils.js";
 import { toast } from "./toast.js";
 import { WS } from "./ws.js";
-import { reactive } from "state";
+import { signal, effect } from "state";
 import { TextMessage } from "./components/text-message.js";
 import { FileMessage } from "./components/file-message.js";
 import { MediaMessage } from "./components/media-message.js";
@@ -96,7 +96,7 @@ async function on_send_message(e) {
   e.preventDefault();
   let form = e.target;
   let data = new FormData(form);
-  let [message, set_message] = reactive({
+  let message = signal({
     chat_id: Number(data.get("chat_id")),
     content: data.get("content"),
     attachments: [],
@@ -104,7 +104,7 @@ async function on_send_message(e) {
     created_at: new Date().toISOString(),
     delivered: false,
     is_own: true
-  });
+  })
 
   if (messages) messages.append(new TextMessage(message));
   if (textarea) textarea.focus();
@@ -115,7 +115,10 @@ async function on_send_message(e) {
   let [result, err] = await option(request(action, { body: message() }));
   // TODO: handle errors
   if (!err) {
-    set_message((prev) => ({ ...prev, delivered: true, id: result.id }));
+    message.mutate((message) => {
+      message.delivered = true;
+      message.id = result.id;
+    });
     ws.send("message", result);
     update_latest_message(result, true);
   }
@@ -224,7 +227,7 @@ async function on_files_change(e) {
   let files = e.target.files;
   if (!files.length) return;
 
-  let media_msg = {
+  let media_msg = signal({
     type: "media",
     chat_id: Number(data.get("chat_id")),
     content: "",
@@ -234,9 +237,9 @@ async function on_files_change(e) {
     created_at: new Date().toISOString(),
     is_own: true,
     delivered: false
-  };
+  });
 
-  let files_msg = {
+  let files_msg = signal({
     type: "file",
     chat_id: Number(data.get("chat_id")),
     content: "",
@@ -246,35 +249,35 @@ async function on_files_change(e) {
     created_at: new Date().toISOString(),
     is_own: true,
     delivered: false
-  };
+  });
 
   for (let file of files) {
     let is_image = /(image\/*)/.test(file.type);
     let is_video = /(video\/*)/.test(file.type);
     let obj = (is_image || is_video) ? media_msg : files_msg;
-    obj.files.push({
-      temp_id: gen_id("attachment"),
-      msg_id: obj.temp_id,
-      raw: file,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      is_image,
-      is_video
-    });
+    obj.mutate((message) => {
+      message.files.push({
+        temp_id: gen_id("attachment"),
+        msg_id: obj.temp_id,
+        raw: file,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        is_image,
+        is_video
+      })
+    })
   }
-  let [files_msg_rct, set_files_msg] = reactive(files_msg);
-  let [media_msg_rct, set_media_msg] = reactive(media_msg);
 
   if (messages) {
     if (media_msg.files.length) {
-      messages.append(new MediaMessage(media_msg_rct))
+      messages.append(new MediaMessage(media_msg))
       image_viewer.reselect();
     }
-    if (files_msg.files.length) messages.append(new FileMessage(files_msg_rct));
+    if (files_msg.files.length) messages.append(new FileMessage(files_msg));
   }
 
-  upload_all({ media_msg, files_msg, set_files_msg, set_media_msg });
+  upload_all({ media_msg, files_msg });
 }
 
 
@@ -317,7 +320,7 @@ function upload_to(urls) {
   };
 }
 
-async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }) {
+async function upload_all({ media_msg, files_msg }) {
   let files = media_msg.files.concat(files_msg.files);
   let [urls, err] = await option(
     request("/cf/direct_upload", {
@@ -341,7 +344,10 @@ async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }
   if (media_msg.attachments.length) {
     let [result, err] = await option(request(action, { body: media_msg }));
     if (!err) {
-      set_media_msg((prev) => ({ ...prev, delivered: true, id: result.id }));
+      media_msg.mutate((message) => {
+        message.delivered = true;
+        message.id = result.id;
+      });
       ws.send("message", result)
     }
   }
@@ -349,7 +355,11 @@ async function upload_all({ media_msg, files_msg, set_files_msg, set_media_msg }
   if (files_msg.attachments.length) {
     let [result, err] = await option(request(action, { body: files_msg }));
     if (!err) {
-      set_files_msg((prev) => ({ ...prev, delivered: true, id: result.id, files: result.attachments }));
+      files_msg.mutate((message) => {
+        message.delivered = true;
+        message.id = result.id;
+        message.files = result.attachments
+      });
       ws.send("message", result);
     }
   }
@@ -393,6 +403,44 @@ function on_message_read(payload) {
   let item = document.getElementById(add_prefix("message", payload.id));
   if (item) item.classList.add("read");
 }
+
+export function setup_chat(chat, chats) {
+  let c = signal(chats.map(c => {
+    return { id: c.id, unread_count: signal(c.unread_count), latest_message: signal(c.latest_message) }
+  }));
+
+  for (let chat of c()) {
+    let item = document.getElementById(add_prefix("chat", chat.id));
+    let unread_count = item.querySelector(".js-unread-count");
+    let latest_message = item.querySelector(".js-latest-message");
+    let latest_date = item.querySelector(".js-latest-date");
+
+    effect(() => {
+      let latest = chat.latest_message();
+      latest_message.textContent = latest.content;
+      latest_date.textContent = latest.created_at;
+      setInterval(() => {
+        chat.latest_message.update((m) => ({ ...m, content: Math.random().toString(32).slice(2), created_at: new Date().toISOString() }));
+      }, 2000)
+    });
+
+    effect(() => {
+      let count = chat.unread_count();
+      if (count > 0) {
+        unread_count.classList.remove("hidden");
+        unread_count.classList.add("inline-flex")
+      }
+      unread_count.textContent = count;
+    });
+
+    setInterval(() => {
+      chat.unread_count.update(c => c + 1);
+    }, 2000)
+  }
+
+  console.log({ chat, chats });
+}
+
 
 ws.on("message", on_message_received);
 ws.on("new_chat", on_new_chat);
