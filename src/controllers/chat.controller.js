@@ -33,7 +33,7 @@ export async function get_many(req, reply) {
   });
   stream.push(chat_list);
 
-  const chat_area = await render_file("/chats/chat-area.html", { t });
+  const chat_area = await render_file("/chats/chat-area.html", { t, chats });
   stream.push(chat_area);
 
   if (!req.partial) {

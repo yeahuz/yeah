@@ -12,6 +12,10 @@ export class WS {
     this.connect();
   }
 
+  static from(path) {
+    return new WS(path)
+  }
+
   connect() {
     this.conn = new WebSocket(this.base_uri + this.path);
 

@@ -81,7 +81,7 @@ dependencies:
     version: 9.0.0
   dom:
     specifier: github:jcbbb/dom
-    version: github.com/jcbbb/dom/b09852395859e48e4902a1d32306171ea7df61a4
+    version: github.com/jcbbb/dom/b3144613d40578691b150e9e58a1700da81f69ba
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
@@ -156,7 +156,7 @@ dependencies:
     version: 6.11.2
   state:
     specifier: github:jcbbb/state
-    version: github.com/jcbbb/state/a84e10c83a6544941bcf668665cd8738063dcb10
+    version: github.com/jcbbb/state/5e450998c78a9315729fc30f669269cc68b67f51
   ua-parser-js:
     specifier: ^1.0.35
     version: 1.0.35
@@ -5447,16 +5447,16 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  github.com/jcbbb/dom/b09852395859e48e4902a1d32306171ea7df61a4:
-    resolution: {tarball: https://codeload.github.com/jcbbb/dom/tar.gz/b09852395859e48e4902a1d32306171ea7df61a4}
+  github.com/jcbbb/dom/b3144613d40578691b150e9e58a1700da81f69ba:
+    resolution: {tarball: https://codeload.github.com/jcbbb/dom/tar.gz/b3144613d40578691b150e9e58a1700da81f69ba}
     name: dom
     version: 1.0.0
     dependencies:
-      state: github.com/jcbbb/state/a84e10c83a6544941bcf668665cd8738063dcb10
+      state: github.com/jcbbb/state/5e450998c78a9315729fc30f669269cc68b67f51
     dev: false
 
-  github.com/jcbbb/state/a84e10c83a6544941bcf668665cd8738063dcb10:
-    resolution: {tarball: https://codeload.github.com/jcbbb/state/tar.gz/a84e10c83a6544941bcf668665cd8738063dcb10}
+  github.com/jcbbb/state/5e450998c78a9315729fc30f669269cc68b67f51:
+    resolution: {tarball: https://codeload.github.com/jcbbb/state/tar.gz/5e450998c78a9315729fc30f669269cc68b67f51}
     name: state
     version: 1.0.0
     dev: false

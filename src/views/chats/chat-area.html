@@ -81,9 +81,7 @@
 </script>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
 <script type="module" async defer>
-import { setup_chat } from "/public/js/chat.js";
-let chat = `<%~ JSON.stringify(it.chat) %>`;
+import { Chat } from "/public/js/chat.js";
 let chats = `<%~ JSON.stringify(it.chats) %>`;
-setup_chat(JSON.parse(chat), JSON.parse(chats));
+Chat.from({ chats: JSON.parse(chats) });
 </script>
-<!-- <script defer async type="module" src="/public/js/chat.js"></script> -->

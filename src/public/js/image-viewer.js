@@ -16,8 +16,8 @@ export class ImageViewer {
     this.init();
   }
 
-  static from(items) {
-    return new ImageViewer(items);
+  static from(selector) {
+    return new ImageViewer(selector);
   }
 
   reselect() {
@@ -184,5 +184,3 @@ export class ImageViewer {
     return button({ class: "p-3 rounded-full duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed" }, icon);
   }
 }
-
-//ImageViewer.from(".js-zoomable");

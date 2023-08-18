@@ -22,28 +22,19 @@
             <% } %>
           </span>
           <div class="text-xs p-1 min-w-[1.2rem] leading-[0] min-h-[1.2rem] bg-primary-500 text-white
-            items-center justify-center rounded-full js-unread-count <%= chat.unread_count > 0 ? "inline-flex" : "hidden"%>">
+            items-center justify-center rounded-full js-unread-count inline-flex <%= chat.unread_count > 0 ? "" : "hidden"%>">
             <%= chat.unread_count %>
           </div>
         </div>
       </div>
       <p class="text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message">
-        <% if (chat.latest_message) {%>
-            <%= chat.latest_message.sender_id === it.user.id ? `${it.t("you", { ns: "chats" })}:` : ""%>
+        <% if (chat.latest_message) { %>
+            <%= chat.latest_message.is_own ? `${it.t("you", { ns: "chats" })}:` : ""%>
             <% if (chat.latest_message.type === "text") { %>
               <%= chat.latest_message.content %>
-            <% } else if (chat.latest_message.type === "file") { %>
-              <% if (chat.latest_message.attachments.length > 1) { %>
-                <%= it.t("files_count", { ns: "chats", count: chat.latest_message.attachments.length }) %>
-              <% } else {%>
-                <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
-              <% } %>
-            <% } else if (chat.latest_message.type === "media") { %>
-              <% if (chat.latest_message.attachments.length > 1) { %>
-                <%= it.t("photos_count", { ns: "chats", count: chat.latest_message.attachments.length })%>
-              <% } else { %>
-                <%= chat.latest_message.attachments[chat.latest_message.attachments.length - 1]?.name %>
-              <% } %>
+            <% } else { %>
+            <% let key = chat.latest_message.type === "file" ? "files_count" : "photos_count" %>
+              <%= it.t(key, { ns: "chats", count: chat.latest_message.attachments.length, first: chat.latest_message.attachments[0]?.name })%>
             <% } %>
         <% } %>
       </p>

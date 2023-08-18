@@ -35,7 +35,8 @@ export async function get_many({ user_id }) {
         'content', m.content,
         'attachments', coalesce(json_agg(json_build_object('id', a.id, 'name', a.name)) filter (where a.id is not null), '[]'::json),
         'created_at', m.created_at,
-        'sender_id', m.sender_id
+        'sender_id', m.sender_id,
+        'is_own', case when m.sender_id = $1 then 1 else 0 end
       ) end as latest_message
     from chats c
     join chat_members cm on cm.chat_id = c.id and cm.user_id = $1
