@@ -9,7 +9,6 @@ import {
   gen_id,
   format_relative,
   add_prefix,
-  debounce
 } from "./utils.js";
 import { toast } from "./toast.js";
 import { WS } from "./ws.js";
@@ -83,6 +82,18 @@ export class Chat {
     return new Chat({ chats });
   }
 
+  classlist(cond, truthy, falsey) {
+    return (node) => {
+      if (cond()) {
+        node.classList.add(...truthy)
+        node.classList
+      } else {
+        node.classList.remove(...truthy)
+        node.classList.add(...falsey)
+      }
+    }
+  }
+
   async setup() {
     await this.tpromise;
     for (let item of this.props.chats) {
@@ -110,9 +121,11 @@ export class Chat {
       text(() => latest.created_at() ? format_relative(new Date(latest.created_at()), new Date()) : "")(latest_date);
       text(chat.unread_count)(unread_count);
 
+      //TODO: how to improve?
       effect(() => {
-        if (chat.unread_count < 1) unread_count.classList.add("hidden");
-        else unread_count.classList.remove("hidden");
+        let count = chat.unread_count();
+        unread_count.classList.toggle("inline-flex", count > 0);
+        unread_count.classList.toggle("hidden", count < 1);
       })
     }
 
@@ -171,7 +184,7 @@ export class Chat {
     })
 
     add_listeners(this.elements.messages, {
-      scroll: debounce(this.on_scroll.bind(this), 100),
+      scroll: this.on_scroll.bind(this),
     }, { scroll: { passive: true } })
 
     add_listeners(window, {
@@ -211,7 +224,7 @@ export class Chat {
 
   on_scroll(e) {
     let scroll_top = e.target.scrollTop;
-    this.is_at_end = scroll_top === e.target.scrollHeight - e.target.offsetHeight;
+    this.is_at_end = scroll_top > e.target.scrollHeight - e.target.offsetHeight - 60; // some arbitrary offset from bottom;
     if (this.last_scroll && scroll_top > this.last_scroll && !this.is_at_end) {
       this.elements.scroll_down_btn.classList.remove("scale-0");
     } else this.elements.scroll_down_btn.classList.add("scale-0");
@@ -453,8 +466,15 @@ export class Chat {
   }
 
   on_message_received(payload) {
-    if (!this.elements.messages) return;
+    this.update_chat(payload.chat_id, (chat) => {
+      chat.unread_count.update(c => c + 1);
+      chat.latest_message.content.set(payload.content);
+      chat.latest_message.created_at.set(payload.created_at);
+      chat.latest_message.attachments.set(payload.attachments);
+      chat.latest_message.is_own.set(false);
+    });
 
+    if (!this.elements.messages) return;
     Object.assign(payload, {
       delivered: signal(false),
       id: signal(payload.id),
@@ -477,15 +497,6 @@ export class Chat {
         break;
     }
 
-    this.update_chat(payload.chat_id, (chat) => {
-      chat.unread_count.update(c => c + 1);
-      chat.latest_message.content.set(payload.content);
-      chat.latest_message.created_at.set(payload.created_at);
-      chat.latest_message.attachments.set(payload.attachments);
-      chat.latest_message.is_own.set(false);
-    });
-
-
     if (node) {
       this.elements.messages.append(node)
       this.observer.observe(node);
@@ -495,9 +506,9 @@ export class Chat {
   }
 
   on_new_chat(payload) {
-    this.ws.send("subscribe", `/chats/${payload.id}`);
+    this.ws.send("subscribe", `chats/${payload.id}`);
     let chat = Object.assign(payload, {
-      unread_count: signal(1),
+      unread_count: signal(0),
       latest_message: {
         is_own: signal(false),
         content: signal(""),
@@ -505,7 +516,7 @@ export class Chat {
         attachments: signal([]),
         type: signal(undefined)
       },
-    })
+    });
 
     if (this.elements.chats) this.elements.chats.append(new ChatListItem(chat));
     this.chats_map.set(payload.id, chat)

@@ -1,5 +1,5 @@
-import { div, img, li, a, span } from "dom";
-import { add_prefix } from "../utils.js";
+import { div, img, li, a, span, text, p, classes } from "dom";
+import { add_prefix, format_relative } from "../utils.js";
 
 export function ChatListItem(chat) {
   let component = li(
@@ -27,8 +27,19 @@ export function ChatListItem(chat) {
         ),
       ),
       div({ class: "flex flex-col items-end space-y-2" },
-        span({ class: "text-gray-500 dark:text-gray-300 text-sm js-latest-date" })
-      )
+        span(
+          { class: "text-gray-500 dark:text-gray-300 text-sm js-latest-date" },
+          text(() => chat.latest_message.created_at() ? format_relative(new Date(chat.latest_message.created_at()), new Date()) : "")
+        ),
+        div(classes(() => [
+          "text-xs p-1 min-w-[1.2rem] leading-[0] min-h-[1.2rem] bg-primary-500 text-white items-center justify-center rounded-full js-unread-count",
+          chat.unread_count() > 0 ? "inline-flex" : "hidden"
+        ]), text(chat.unread_count)),
+      ),
+    ),
+    p(
+      { class: "text-gray-500 dark:text-gray-300 text-sm truncate mt-2 js-latest-message" },
+      text(chat.latest_message.content)
     )
   );
 
