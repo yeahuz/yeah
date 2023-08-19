@@ -21,6 +21,7 @@ export async function get_many({ user_id }) {
     select 
     c.id, c.created_by, c.url,
     cm.unread_count,
+    cm.last_read_message_id,
     json_build_object(
       'id', p.id,
       'title', p.title,
@@ -45,7 +46,7 @@ export async function get_many({ user_id }) {
     left join attachments a on a.id = ma.attachment_id
     join postings p on p.id = c.posting_id
     join users u on u.id = p.created_by
-    group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name
+    group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name, cm.last_read_message_id
   `, [user_id]);
 
   return rows;
@@ -150,7 +151,7 @@ export async function read_message({ id, chat_id, user_id }) {
   let trx = await start_trx();
   try {
     let [_, err] = await option(trx.query("insert into read_messages (message_id, user_id) values ($1, $2)", [id, user_id]));
-    if (!err) await trx.query("update chat_members set unread_count = unread_count - 1 where chat_id = $1 and user_id = $2", [chat_id, user_id]);
+    if (!err) await trx.query("update chat_members set unread_count = unread_count - 1, last_read_message_id = case when $1 > coalesce(last_read_message_id, 0) then $1 else last_read_message_id end where chat_id = $2 and user_id = $3", [id, chat_id, user_id]);
     await commit_trx(trx);
   } catch (err) {
     console.error({ err });
