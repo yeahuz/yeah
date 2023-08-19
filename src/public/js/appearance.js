@@ -1,5 +1,5 @@
 import { request, option, message_sw } from "./utils.js";
-import { add_listeners } from "./dom.js";
+import { add_listeners } from "dom";
 import { toast } from "./toast.js";
 
 const theme_inputs = document.querySelectorAll(".js-theme-input");

@@ -15,11 +15,11 @@ import {
 import { request, option, upload_request, async_pool } from "./utils.js";
 import { close_icon } from "./icons.js";
 
-const photos_area = document.querySelector(".js-photos-area");
-const photos_input = document.querySelector(".js-photos-input");
-const preview_delete_forms = document.querySelectorAll(".js-preview-delete-form");
-const attachment_sync_form = document.querySelector(".js-attachment-sync-form");
-const posting_form = document.querySelector(".js-posting-form");
+let photos_area = document.querySelector(".js-photos-area");
+let photos_input = document.querySelector(".js-photos-input");
+let preview_delete_forms = document.querySelectorAll(".js-preview-delete-form");
+let attachment_sync_form = document.querySelector(".js-attachment-sync-form");
+let posting_form = document.querySelector(".js-posting-form");
 
 function on_drag_over(e) {
   e.stopPropagation();
@@ -28,9 +28,9 @@ function on_drag_over(e) {
 }
 
 function get_photos_preview(photos_area) {
-  const existing = document.querySelector(".js-photos-preview");
+  let existing = document.querySelector(".js-photos-preview");
   if (existing) return existing;
-  const photos_preview = ul(classes("js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6"));
+  let photos_preview = ul(classes("js-photos-preview grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6"));
   photos_area.insertAdjacentElement("beforebegin", photos_preview);
   return photos_preview;
 }
@@ -40,16 +40,16 @@ function get_file_id(file) {
 }
 
 async function generate_previews(files = []) {
-  const { t } = await import("./i18n.js");
-  const container = get_photos_preview(photos_area);
-  const children_length = container.children.length;
+  let { t } = await import("./i18n.js");
+  let container = get_photos_preview(photos_area);
+  let children_length = container.children.length;
   for (let i = 0, len = files.length; i < len; i++) {
-    const i_children = i + children_length;
-    const file = files[i];
-    const url = URL.createObjectURL(file);
-    const item = li(attrs({ class: "relative group rounded-lg", "data-file_id": get_file_id(file) }));
-    const pic = img(attrs({ src: url, class: "rounded-lg h-36 object-cover w-full" }));
-    const close_btn = button(attrs({
+    let i_children = i + children_length;
+    let file = files[i];
+    let url = URL.createObjectURL(file);
+    let item = li(attrs({ class: "relative group rounded-lg", "data-file_id": get_file_id(file) }));
+    let pic = img(attrs({ src: url, class: "rounded-lg h-36 object-cover w-full" }));
+    let close_btn = button(attrs({
       type: "button",
       tabindex: "0",
       class: `outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
@@ -57,7 +57,7 @@ async function generate_previews(files = []) {
                                           absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white rounded-full p-0.5`
     }), html(close_icon({ size: 20 })));
 
-    const radio_input = input(attrs({
+    let radio_input = input(attrs({
       type: "radio",
       value: i_children,
       name: "cover_index",
@@ -66,7 +66,7 @@ async function generate_previews(files = []) {
       ...(i_children === 0 && { checked: true }),
     }));
 
-    const main_label = label(attrs({
+    let main_label = label(attrs({
       for: `cover-${i_children}`,
       "data-choose_cover_text": t("form.photos.choose_as_cover", { ns: "new-posting" }),
       "data-cover_text": t("form.photos.cover", { ns: "new-posting" }),
@@ -90,7 +90,7 @@ async function generate_previews(files = []) {
 async function on_drop(e) {
   e.stopPropagation();
   e.preventDefault();
-  const files = e.dataTransfer.files;
+  let files = e.dataTransfer.files;
 
   if (e.currentTarget.classList.contains("js-photos-area")) {
     photos_area.classList.remove("!border-primary-600");
@@ -114,7 +114,7 @@ function on_drag_leave(e) {
 
 function on_progress(item) {
   item.classList.add("pointer-events-none");
-  const upload_progress = span(attrs({
+  let upload_progress = span(attrs({
     class: "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg"
   }));
 
@@ -128,19 +128,19 @@ function on_progress(item) {
 function on_done(item) {
   return () => {
     item.classList.remove("pointer-events-none");
-    const upload_progress = item.querySelector(".upload-progress");
+    let upload_progress = item.querySelector(".upload-progress");
     if (upload_progress) upload_progress.remove();
   };
 }
 
 function upload_to(urls) {
-  const container = get_photos_preview(photos_area);
+  let container = get_photos_preview(photos_area);
   return async function upload(file) {
-    const item = container.querySelector(`[data-file_id="${get_file_id(file)}"]`);
-    const url = urls.shift();
-    const fd = new FormData();
+    let item = container.querySelector(`[data-file_id="${get_file_id(file)}"]`);
+    let url = urls.shift();
+    let fd = new FormData();
     fd.append("file", file);
-    const [result, err] = await option(
+    let [result, err] = await option(
       upload_request(url.upload_url, {
         data: fd,
         on_progress: on_progress(item),
@@ -149,23 +149,23 @@ function upload_to(urls) {
     );
 
     if (result) {
-      const close_btn = item.querySelector("button");
+      let close_btn = item.querySelector("button");
       add_listeners(close_btn, {
         click: async () => {
-          const li = item;
-          const radio_input = li.querySelector("input[type=radio]");
-          const photo_input = posting_form.querySelector(`#photos-${result.result.id}`);
+          let li = item;
+          let radio_input = li.querySelector("input[type=radio]");
+          let photo_input = posting_form.querySelector(`#photos-${result.result.id}`);
 
-          const restore_li = remove_node(li);
-          const restore_photo_input = remove_node(photo_input);
+          let restore_li = remove_node(li);
+          let restore_photo_input = remove_node(photo_input);
 
-          const container = get_photos_preview(photos_area);
+          let container = get_photos_preview(photos_area);
           if (radio_input.checked) {
-            const first_radio_input = container.querySelector("input[type=radio]");
+            let first_radio_input = container.querySelector("input[type=radio]");
             if (first_radio_input) first_radio_input.checked = true;
           }
 
-          const [_, err] = await option(
+          let [_, err] = await option(
             request(new URL(window.location.href).pathname + "/attachments/" + result.result.id, {
               method: "DELETE",
             })
@@ -185,14 +185,14 @@ function upload_to(urls) {
 }
 
 async function upload_files(files = []) {
-  const [urls, err] = await option(
+  let [urls, err] = await option(
     request("/cloudflare/images/direct_upload", {
       body: { files: Array.from(files).map((file) => ({ size: file.size, type: file.type })) },
     })
   );
 
-  for await (const result of async_pool(10, files, upload_to(urls))) {
-    const photo_input = input(attrs({
+  for await (let result of async_pool(10, files, upload_to(urls))) {
+    let photo_input = input(attrs({
       type: "hidden",
       name: "photos",
       value: result.result.id,
@@ -201,7 +201,7 @@ async function upload_files(files = []) {
 
     posting_form.prepend(photo_input);
 
-    const [_, err] = await option(
+    let [_, err] = await option(
       request(attachment_sync_form.action, {
         method: "PATCH",
         body: { photo_id: result.result.id },
@@ -215,7 +215,7 @@ async function upload_files(files = []) {
 }
 
 async function on_photos_change(e) {
-  const files = e.target.files;
+  let files = e.target.files;
   if (!files.length) return;
   await generate_previews(files);
   await upload_files(files);
@@ -223,22 +223,22 @@ async function on_photos_change(e) {
 
 async function on_existing_delete(e) {
   e.preventDefault();
-  const form = e.target;
-  const data = new FormData(form);
-  const li = e.submitter.closest("li");
-  const radio_input = li.querySelector("input[type=radio]");
-  const photo_input = posting_form.querySelector(`#photos-${data.get("photo_id")}`);
+  let form = e.target;
+  let data = new FormData(form);
+  let li = e.submitter.closest("li");
+  let radio_input = li.querySelector("input[type=radio]");
+  let photo_input = posting_form.querySelector(`#photos-${data.get("photo_id")}`);
 
-  const restore_photo_input = remove_node(photo_input);
-  const restore_li = remove_node(li);
+  let restore_photo_input = remove_node(photo_input);
+  let restore_li = remove_node(li);
 
-  const container = get_photos_preview(photos_area);
+  let container = get_photos_preview(photos_area);
   if (radio_input.checked) {
-    const first_radio_input = container.querySelector("input[type=radio]");
+    let first_radio_input = container.querySelector("input[type=radio]");
     if (first_radio_input) first_radio_input.checked = true;
   }
 
-  const [result, err] = await option(request(new URL(form.action), { method: "DELETE" }));
+  let [result, err] = await option(request(new URL(form.action), { method: "DELETE" }));
 
   if (err) {
     restore_li();

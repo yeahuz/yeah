@@ -1,18 +1,19 @@
-import { add_listeners, disable_element, label, input, div, attrs, text, li } from "./dom.js";
+import { disable_element } from "./dom.js";
+import { div, listeners, li, input, label, add_listeners } from "dom";
 import { request, option, debounce } from "./utils.js";
 import { maskit } from "./mask.js";
 
-const masked_input = document.querySelector(".js-masked-input");
-const geo_trigger = document.querySelector(".js-geo-trigger");
-const geo_input = document.querySelector(".js-geo-input");
-const predictions = document.querySelector(".js-suggestions");
-const location_input_container = document.querySelector(".js-location-input-container");
-const location_input = document.querySelector(".js-location");
+let masked_input = document.querySelector(".js-masked-input");
+let geo_trigger = document.querySelector(".js-geo-trigger");
+let geo_input = document.querySelector(".js-geo-input");
+let predictions = document.querySelector(".js-suggestions");
+let location_input_container = document.querySelector(".js-location-input-container");
+let location_input = document.querySelector(".js-location");
 
 function get_map_container() {
-  const map = document.getElementById("map");
+  let map = document.getElementById("map");
   if (map) return map;
-  const node = div(attrs({ class: "h-72 w-full", id: "map" }));
+  let node = div({ class: "h-72 w-full", id: "map" })
   location_input_container.insertAdjacentElement("afterend", node);
   return node;
 }
@@ -21,15 +22,15 @@ let map = null;
 let marker = null;
 
 async function init_map({ lat, lng }) {
-  const { Loader } = await import("/node_modules/@googlemaps/js-api-loader/dist/index.esm.js");
-  const loader = new Loader({
+  let { Loader } = await import("/node_modules/@googlemaps/js-api-loader/dist/index.esm.js");
+  let loader = new Loader({
     apiKey: "AIzaSyCOBscE5wKHhTlQBx20mKN5-abTzLzn3P4",
     version: "weekly",
     region: "uz",
   });
 
-  const google = await loader.load();
-  const pos = new google.maps.LatLng(lat, lng);
+  let google = await loader.load();
+  let pos = new google.maps.LatLng(lat, lng);
 
   map = new google.maps.Map(get_map_container(), {
     center: pos,
@@ -47,11 +48,11 @@ async function init_map({ lat, lng }) {
   });
 
   marker.addListener("dragend", async () => {
-    const lat = marker.getPosition().lat();
-    const lng = marker.getPosition().lng();
-    const [result, err] = await option(request(`/geo/geocode?lat=${lat}&lon=${lng}`));
+    let lat = marker.getPosition().lat();
+    let lng = marker.getPosition().lng();
+    let [result, err] = await option(request(`/geo/geocode?lat=${lat}&lon=${lng}`));
     if (err) return;
-    const pos = new google.maps.LatLng(result.coords.lat, result.coords.lon);
+    let pos = new google.maps.LatLng(result.coords.lat, result.coords.lon);
     marker.setPosition(pos);
     map.panTo(pos);
     map.setCenter(pos);
@@ -70,16 +71,16 @@ function on_geo_trigger(e) {
 
   async function on_success({ coords }) {
     if (!map) {
-      const enable = disable_element(e.target);
+      let enable = disable_element(e.target);
       await init_map({ lat: coords.latitude, lng: coords.longitude }).catch(() => enable());
       enable();
     } else {
-      const pos = { lat: coords.latitude, lng: coords.longitude };
+      let pos = { lat: coords.latitude, lng: coords.longitude };
       marker.setPosition(pos);
       map.panTo(pos);
       map.setCenter(pos);
     }
-    const [result, err] = await option(
+    let [result, err] = await option(
       request(`/geo/geocode?lat=${coords.latitude}&lon=${coords.longitude}`)
     );
     if (err) return;
@@ -94,51 +95,50 @@ function on_geo_trigger(e) {
 
 async function on_geo_input_change(e) {
   if (!e.target.checkValidity()) return;
-  const form = e.target.form;
-  const resource = new URL(form.action);
+  let form = e.target.form;
+  let resource = new URL(form.action);
   resource.search = new URLSearchParams(new FormData(form));
 
-  const [results, err] = await option(request(resource));
+  let [results, err] = await option(request(resource));
   predictions.innerHTML = "";
   predictions.classList.add("!opacity-100", "!translate-y-0", "!z-10");
-  for (const result of results) {
-    const item = li();
-    const radio_input = input(attrs({
-      type: "radio",
-      name: "loc",
-      id: `location-${result.district_id}`,
-      value: `${result.district_id},${result.region_id}`,
-      class: "absolute opacity-0 w-0 -z-10 peer",
-    }));
+  for (let result of results) {
+    let prediction = li(
+      input({
+        type: "radio",
+        name: "loc",
+        id: `location-${result.district_id}`,
+        value: `${result.district_id},${result.region_id}`,
+        class: "absolute opacity-0 w-0 -z-10 peer"
+      },
+        listeners({
+          change: async () => {
+            geo_input.value = result.formatted_address;
+            predictions.classList.remove("!opacity-100", "!translate-y-0", "!z-10");
+            if (!map) await init_map({ lat: result.coords.lat, lng: result.coords.lon });
+            else {
+              let pos = { lat: result.coords.lat, lng: result.coords.lon };
+              marker.setPosition(pos);
+              map.panTo(pos);
+              map.setCenter(pos);
+            }
 
-    const address_label = label(attrs({
-      for: `location-${result.district_id}`,
-      class:
-        "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 dark:text-gray-200 dark:hover:bg-zinc-800",
-    }), text(result.formatted_address));
-
-    radio_input.addEventListener("change", async () => {
-      geo_input.value = result.formatted_address;
-      predictions.classList.remove("!opacity-100", "!translate-y-0", "!z-10");
-      if (!map) await init_map({ lat: result.coords.lat, lng: result.coords.lon });
-      else {
-        const pos = { lat: result.coords.lat, lng: result.coords.lon };
-        marker.setPosition(pos);
-        map.panTo(pos);
-        map.setCenter(pos);
-      }
-
-      location_input.value = `${result.formatted_address}|${result.coords.lat}|${result.coords.lon}|${result.district_id}|${result.region_id}`;
-    });
-
-    item.append(radio_input, address_label);
-    predictions.append(item);
+            location_input.value = `${result.formatted_address}|${result.coords.lat}|${result.coords.lon}|${result.district_id}|${result.region_id}`;
+          }
+        })),
+      label({
+        for: `location-${result.district_id}`,
+        class:
+          "text-gray-900 block p-2.5 hover:bg-gray-50 duration-200 peer-checked:bg-gray-50 dark:text-gray-200 dark:hover:bg-zinc-800",
+      }, result.formatted_address)
+    )
+    predictions.append(prediction);
   }
 }
 
 function on_masked_input(e) {
-  const mask = e.target.dataset.mask;
-  const unmask = e.target.dataset.unmask;
+  let mask = e.target.dataset.mask;
+  let unmask = e.target.dataset.unmask;
   e.target.value = maskit(maskit(e.target.value, unmask), mask);
 }
 
@@ -155,12 +155,12 @@ add_listeners(masked_input, {
 });
 
 window.addEventListener("load", async () => {
-  const location = location_input.value;
+  let location = location_input.value;
   if (masked_input) {
     masked_input.value = maskit(masked_input.value, masked_input.dataset.mask);
   }
   if (location) {
-    const [formatted_address, lat, lng] = location.split("|");
+    let [formatted_address, lat, lng] = location.split("|");
     await init_map({ lat, lng });
   }
 });

@@ -1,5 +1,5 @@
 import { on_telegram_login } from "./auth.js";
-import { add_listeners } from "./dom.js";
+import { add_listeners } from "dom";
 import { maskit } from "./mask.js";
 
 const masked_input = document.querySelector(".js-masked-input");

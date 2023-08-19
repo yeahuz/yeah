@@ -1,22 +1,22 @@
-import { add_listeners } from "./dom.js";
+import { add_listeners } from "dom";
 import { debounce, option, request } from "./utils.js";
-import { search_suggestions_tmpl } from "./templates.js";
+import { SearchSuggestions } from "./components/search-suggestion.js";
 
-const search_inputs = document.querySelectorAll(".js-search-input");
-const suggestions = document.querySelector(".js-search-suggestions");
+let search_inputs = document.querySelectorAll(".js-search-input");
+let suggestions = document.querySelector(".js-search-suggestions");
 
 async function on_input(e) {
   if (!e.target.checkValidity()) return;
-  const form = e.target.form;
-  const resource = new URL(`${form.action}/completions`);
-  const data = new FormData(form);
+  let form = e.target.form;
+  let resource = new URL(`${form.action}/completions`);
+  let data = new FormData(form);
 
   resource.search = new URLSearchParams(data);
 
-  const [results, err] = await option(request(resource));
+  let [results, err] = await option(request(resource));
   suggestions.innerHTML = "";
   suggestions.classList.add("!opacity-100", "!translate-y-0", "!z-10");
-  suggestions.append(search_suggestions_tmpl(results, data.get("q")));
+  suggestions.append(SearchSuggestions(results, data.get("q")));
 }
 
 add_listeners(search_inputs, {

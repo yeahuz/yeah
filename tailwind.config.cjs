@@ -56,6 +56,7 @@ module.exports = {
           300: "rgb(var(--success-300))",
           600: "rgb(var(--success-600))",
           700: "rgb(var(--success-700))",
+          800: "rgb(var(--success-800))",
         },
         error: {
           25: "rgb(var(--error-25))",
@@ -67,7 +68,13 @@ module.exports = {
           800: "rgb(var(--error-800))",
         },
         warning: {
-          500: "rgb(var(--yellow-500))"
+          25: "rgb(var(--yellow-25))",
+          50: "rgb(var(--yellow-50))",
+          100: "rgb(var(--yellow-100))",
+          500: "rgb(var(--yellow-500))",
+          600: "rgb(var(--yellow-600))",
+          700: "rgb(var(--yellow-700))",
+          800: "rgb(var(--yellow-800))"
         }
       },
     },

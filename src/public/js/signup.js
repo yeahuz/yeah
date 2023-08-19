@@ -1,5 +1,5 @@
 import { on_telegram_login } from "./auth.js";
-import { add_listeners } from "./dom.js";
+import { add_listeners } from "dom";
 import { on_input, on_paste } from "./otp-input.js";
 import { option } from "./utils.js";
 

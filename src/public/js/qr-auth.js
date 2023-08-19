@@ -1,33 +1,32 @@
 import { toDataURL } from "/node_modules/qrcode-esm/build/qrcode.esm.js";
-import { add_listeners } from "./dom.js";
-import { qr_code_tmpl, scan_profile_tmpl } from "./templates.js";
+import { add_listeners } from "dom";
+import { ProfileScan } from "./components/profile-scan.js";
+import { QRCode } from "./components/qr-code.js";
 import { option, request, message_sw } from "./utils.js";
 import { toast } from "./toast.js";
 import { WS } from "./ws.js";
 
-const qr_container = document.querySelector(".js-qr-container");
+let qr_container = document.querySelector(".js-qr-container");
 
-let ws = new WS("/qr-auth");
-
+let ws = WS.from("/qr-auth");
 ws.send("auth_init")
 
 async function on_auth_pending(url) {
   qr_container.innerHTML = "";
-  const qr_url = await toDataURL(url, {
+  let qr_url = await toDataURL(url, {
     margin: 0,
     color: { dark: "#101828", light: "#fff" },
   });
-  const qr_code = await qr_code_tmpl(qr_url);
-  qr_container.append(qr_code);
+  qr_container.append(await QRCode(qr_url));
 }
 
 function on_auth_scan(data) {
   qr_container.innerHTML = "";
-  qr_container.append(scan_profile_tmpl(data));
+  qr_container.append(ProfileScan(data));
 }
 
 async function on_auth_confirm(data) {
-  const [_, err] = await option(
+  let [_, err] = await option(
     request("/auth/qr", { method: "POST", body: { token: data.token }, state: { replace: true } })
   );
 

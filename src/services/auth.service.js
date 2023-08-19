@@ -12,7 +12,6 @@ import {
 import config from "../config/index.js";
 import crypto from "crypto";
 import objection from "objection";
-import { option } from "../utils/index.js";
 
 const { UniqueViolationError } = objection;
 

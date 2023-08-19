@@ -2,10 +2,10 @@ import { option, request, message_sw } from "./utils.js";
 import { disable_form } from "./dom.js";
 import { toast } from "./toast.js";
 
-const BOT_ID = 5544485948;
+let BOT_ID = 5544485948;
 
 export function on_telegram_login(e) {
-  const form = e.target.closest("form");
+  let form = e.target.closest("form");
   return new Promise((resolve) => {
     window.Telegram.Login.auth(
       {
@@ -17,8 +17,8 @@ export function on_telegram_login(e) {
           toast("Telegram login failed", "err");
           return resolve();
         }
-        const enable_form = disable_form(form);
-        const [_, err] = await option(
+        let enable_form = disable_form(form);
+        let [_, err] = await option(
           request(`/auth/telegram${window.location.search}`, {
             body: { user },
             state: { reload: true, replace: true },
@@ -37,11 +37,11 @@ export function on_telegram_login(e) {
 
 export async function on_signup(e) {
   e.preventDefault();
-  const form = e.target;
-  const data = Object.fromEntries(new FormData(form));
-  const enable_form = disable_form(form);
+  let form = e.target;
+  let data = Object.fromEntries(new FormData(form));
+  let enable_form = disable_form(form);
 
-  const [_, err] = await option(
+  let [_, err] = await option(
     request(form.action, { body: data, method: form.method, state: { replace: true } })
   );
 
@@ -56,11 +56,11 @@ export async function on_signup(e) {
 
 export async function on_login(e) {
   e.preventDefault();
-  const form = e.target;
-  const data = Object.fromEntries(new FormData(form));
+  let form = e.target;
+  let data = Object.fromEntries(new FormData(form));
 
-  const enable_form = disable_form(form);
-  const [_, err] = await option(
+  let enable_form = disable_form(form);
+  let [_, err] = await option(
     request(form.action, { body: data, method: form.method, state: { replace: true } })
   );
 
@@ -75,12 +75,12 @@ export async function on_login(e) {
 
 export async function on_logout(e) {
   e.preventDefault();
-  const form = e.target;
-  const [_, err] = await option(
+  let form = e.target;
+  let [_, err] = await option(
     request(form.action, { method: form.method, state: { replace: true } })
   );
 
-  const enable_form = disable_form(form);
+  let enable_form = disable_form(form);
 
   if (!err) {
     await message_sw({ type: "expire_partials" });

@@ -1,7 +1,17 @@
-import { add_listeners, ul, classes, li } from './dom.js';
+import { ul, li, span, listeners, html } from "dom";
 
-const ICONS = {
-  info: ``,
+let ICONS = {
+  info: `<svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-5 h-5 flex-shrink-0 text-warning-600"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+    </svg>
+  `,
   success: `<svg
       viewBox="0 0 24 24"
       class="w-5 h-5 flex-shrink-0 text-success-600"
@@ -33,44 +43,43 @@ const ICONS = {
 };
 
 function init() {
-  const container = ul(classes("toast-group"));
+  let container = ul({ class: "toast-group" });
   document.firstElementChild.insertBefore(container, document.body);
   return container;
 }
 
-const Toaster = init();
+let Toaster = init();
 
 function add_toast(toast) {
   return Toaster.children.length ? flip_toast(toast) : Toaster.appendChild(toast);
 }
 
 function pause_animation(e) {
-  const animations = e.target.getAnimations();
+  let animations = e.target.getAnimations();
   animations.forEach((animation) => animation.pause());
 }
 
 function resume_animation(e) {
-  const animations = e.target.getAnimations();
+  let animations = e.target.getAnimations();
   animations.forEach((animation) => animation.play());
 }
 
 function create_toast(text, type) {
-  const toast = li(classes(`toast-item toast-item-${type}`));
-  const toast_text = span(classes("font-medium ml-2"));
-
-  toast_text.innerText = text;
-
-  toast.innerHTML = ICONS[type];
-  toast.append(toast_text);
-
-  add_listeners(toast, { mouseover: pause_animation, mouseleave: resume_animation });
-
+  let toast = li(
+    { class: `toast-item toast-item-${type}` },
+    html(ICONS[type]),
+    span({ class: "font-medium ml-2" }, text),
+    listeners({
+      mouseover: pause_animation,
+      mouseleave: resume_animation
+    })
+  )
   return toast;
 }
 
 
 export function toast(text, type = "info") {
-  const t = create_toast(text, type);
+  let t = create_toast(text, type);
   add_toast(t);
 
   return new Promise(async (resolve, reject) => {
@@ -81,14 +90,14 @@ export function toast(text, type = "info") {
 }
 
 function flip_toast(toast) {
-  const prev_height = Toaster.offsetHeight;
+  let prev_height = Toaster.offsetHeight;
 
   Toaster.appendChild(toast);
 
-  const current_height = Toaster.offsetHeight;
-  const delta_height = current_height - prev_height;
+  let current_height = Toaster.offsetHeight;
+  let delta_height = current_height - prev_height;
 
-  const animation = Toaster.animate(
+  let animation = Toaster.animate(
     [{ transform: `translateY(${delta_height}px)` }, { transform: `translateY(0)` }],
     { duration: 150, easing: "ease-out" });
 

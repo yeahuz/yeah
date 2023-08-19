@@ -1,59 +1,63 @@
 import { request, option, upload_request } from "./utils.js";
-import { add_listeners, create_node } from "./dom.js";
+import { add_listeners, text } from "dom";
+import { effect, signal } from "state";
+import { toast } from "./toast.js";
 
-const photo_input = document.querySelector(".js-photo-input");
-const profile_photo_container = document.querySelector(".js-profile-photo-container");
+let photo_input = document.querySelector(".js-photo-input");
+let profile_photo_container = document.querySelector(".js-profile-photo-container");
+let upload_progress = document.querySelector(".js-upload-progress");
 
 add_listeners(photo_input, {
   change: on_photo_change,
 });
 
-function on_progress(item) {
-  item.classList.add("pointer-events-none");
-  const span = create_node("span", {
-    class:
-      "upload-progress absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center rounded-lg",
-  });
-  span.textContent = "0";
-  item.append(span);
-  return (progress) => {
-    span.textContent = `${Math.floor(progress.percent)}%`;
-  };
-}
 
-function on_done(item) {
-  return () => {
-    item.classList.remove("pointer-events-none");
-    const upload_progress = item.querySelector(".upload-progress");
-    if (upload_progress) upload_progress.remove();
-  };
-}
+let progress = signal(0);
+let uploading = signal(false);
+
+effect(() => {
+  let loading = uploading();
+  text(() => `${progress()}%`)(upload_progress);
+  profile_photo_container.classList.toggle("uploading", loading);
+});
 
 async function on_photo_change(e) {
-  const file = e.target.files[0];
+  let file = e.target.files[0];
   if (!file) return;
-  const form = e.target.form;
-  const [[url], err] = await option(
-    request("/cloudflare/images/direct_upload", {
-      body: { files: [{ size: file.size, type: file.type }] },
-    })
-  );
+  let form = e.target.form;
 
-  const fd = new FormData();
+  // TODO: handle errors;
+  let [url, err] = await option(request("/cf/direct_upload", {
+    body: { file: { type: file.type, size: file.size, name: file.name, is_image: true } }
+  }))
+
+  let fd = new FormData();
   fd.append("file", file);
 
-  const [uploaded, upload_err] = await option(
+  uploading.set(true);
+  let [uploaded, upload_err] = await option(
     upload_request(url.upload_url, {
       data: fd,
-      on_progress: on_progress(profile_photo_container),
-      on_done: on_done(profile_photo_container),
+      on_progress: (p) => progress.set(Math.floor(p.percent)),
+      on_done: () => uploading.set(false)
     })
   );
 
-  const [result, update_err] = await option(
+  if (upload_err) {
+    toast("Something went wrong uploading the profile picture. Please, try again", "err")
+    return
+  }
+
+  let [result, update_err] = await option(
     request(form.action, {
       body: { photo_id: uploaded.result.id },
       state: { replace: true, reload: true },
     })
   );
+
+  if (update_err) {
+    toast(update_err.message, "err");
+  }
+
+  uploading.set(false);
 }
