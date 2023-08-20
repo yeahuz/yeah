@@ -8,8 +8,8 @@ export async function start_transaction() {
 export const create_one_trx = (trx) => create_one_impl(trx);
 export const create_one = create_one_impl();
 
-function create_one_impl(trx) {
-  return async ({ sender_id, content, reply_to, chat_id, type = "text", created_at, attachments = [] } = {}) => {
+function create_one_impl(trx = { query }) {
+  return async ({ sender_id, content, reply_to, chat_id, type = "text", attachments = [] } = {}) => {
     let { rows: [message] } = await trx.query(`insert into messages (content, sender_id, reply_to, chat_id, type) values($1, $2, $3, $4, $5) returning id, created_at`,
       [content, sender_id, reply_to, chat_id, type]);
 
@@ -18,11 +18,13 @@ function create_one_impl(trx) {
       trx.query("update chats set last_message_id = $1 where id = $2", [message.id, chat_id])
     ]);
 
-    let inserted = await Promise.all(attachments.map(a => {
-      return trx.query(`
+    let inserted = await Promise.all(attachments.map(async a => {
+      let { rows } = await trx.query(`
         insert into attachments (size, resource_id, name, type, url)
         values ($1, $2, $3, $4, $5) returning id, resource_id, name, size, type, url
-      `, [a.size, a.resource_id, a.name, a.type, a.url]).then((result) => result.rows[0]);
+      `, [a.size, a.resource_id, a.name, a.type, a.url]);
+
+      if (rows.length) return rows[0];
     }));
 
     await Promise.all(inserted.map(a => {

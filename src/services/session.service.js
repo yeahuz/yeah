@@ -1,16 +1,17 @@
 import { Session } from "../models/index.js";
 import { UAParser } from "ua-parser-js";
 import { add_minutes_to_now, format_relations } from "../utils/index.js";
+import { query } from "./db.service.js";
 import pkg from "objection";
 
-const { raw } = pkg;
+let { raw } = pkg;
 
 function create_one_impl(trx) {
   return async ({ ip, user_agent, user_id, exp_time = 43200 } = {}) => {
-    const expires_at = add_minutes_to_now(exp_time);
-    const session = await Session.query(trx).insert({ ip, user_id, expires_at });
-    const parser = new UAParser(user_agent);
-    const { browser, engine, device } = parser.getResult();
+    let expires_at = add_minutes_to_now(exp_time);
+    let session = await Session.query(trx).insert({ ip, user_id, expires_at });
+    let parser = new UAParser(user_agent);
+    let { browser, engine, device } = parser.getResult();
     await session.$relatedQuery("user_agent", trx).insert({
       browser_name: browser.name,
       browser_version: browser.version,
@@ -27,14 +28,21 @@ function create_one_impl(trx) {
 
 export async function get_one(id) {
   if (!id) return;
-  return await Session.query()
-    .select("*")
-    .select(raw("case when now() > expires_at then 1 else 0 end as expired"))
-    .findById(id);
+  let { rows } = query(`select *,
+      case when now() > expires_at then 1 else 0 end as expired
+      from sessions where id = $1`, [id]);
+
+  return rows[0];
 }
 
 export async function delete_one(id) {
-  return await Session.query().deleteById(id);
+  let { rowCount } = await query(`delete from sessions where id = $1`, [id]);
+  if (rowCount == 0) {
+    //TODO: session not found, throw some error or something??
+    console.log("session not found")
+  }
+
+  return id;
 }
 
 export async function update_one(id, update = {}) {
@@ -43,8 +51,8 @@ export async function update_one(id, update = {}) {
 
 export async function validate_one(id) {
   if (!id) return;
-  const session = await get_one(id);
-  return !session.expired && session?.active;
+  let session = await get_one(id);
+  return !session?.expired && session?.active;
 }
 
 export function get_many(query, relations = ["user_agent(browser_selects)"]) {
@@ -59,7 +67,8 @@ export function get_many(query, relations = ["user_agent(browser_selects)"]) {
 }
 
 export async function delete_many(ids) {
-  return await Session.query().delete().whereIn("id", ids);
+  await query(`delete from sessions where id = any($1)`, [ids]);
+  return ids;
 }
 
 export async function delete_many_for(user_id, exceptions = []) {
@@ -69,9 +78,10 @@ export async function delete_many_for(user_id, exceptions = []) {
 }
 
 export async function belongs_to(user_id, id) {
-  return await Session.query().findOne({ user_id, id });
+  let { rows } = await query(`select 1 from where user_id = $1 and id = $2`, [user_id, id]);
+  return rows;
 }
 
-export const create_one = create_one_impl();
+export let create_one = create_one_impl();
 
-export const create_one_trx = (trx) => create_one_impl(trx);
+export let create_one_trx = (trx) => create_one_impl(trx);
