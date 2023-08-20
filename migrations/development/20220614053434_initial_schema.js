@@ -34,8 +34,16 @@ export function up(knex) {
       t.string("hash_id").index();
       t.string("profile_url");
       t.boolean("verified").defaultTo(false);
-      t.timestamp("last_activity_date").defaultTo(knex.fn.now());
       t.timestamps(false, true);
+    })
+    .createTable("last_seen", (t) => {
+      t.timestamp("time").defaultTo(knex.fn.now());
+      t.integer("user_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE")
     })
     .createTable("user_preferences", (t) => {
       t.increments("id");
@@ -963,9 +971,8 @@ export async function down(knex) {
     postings, products, promotions, read_messages, regions, region_translations,
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
-    user_location, user_notifications, user_preferences, user_reviews, user_roles
+    user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)
 }
-
