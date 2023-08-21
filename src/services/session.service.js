@@ -2,33 +2,25 @@ import { Session } from "../models/index.js";
 import { UAParser } from "ua-parser-js";
 import { add_minutes_to_now, format_relations } from "../utils/index.js";
 import { query } from "./db.service.js";
-import pkg from "objection";
 
-let { raw } = pkg;
-
-function create_one_impl(trx) {
+function create_one_impl(trx = { query }) {
   return async ({ ip, user_agent, user_id, exp_time = 43200 } = {}) => {
     let expires_at = add_minutes_to_now(exp_time);
-    let session = await Session.query(trx).insert({ ip, user_id, expires_at });
+    let { rows: [session] } = await trx.query("insert into sessions (ip, user_id, expires_at) values ($1, $2, $3) returning id", [ip, user_id, expires_at]);
     let parser = new UAParser(user_agent);
     let { browser, engine, device } = parser.getResult();
-    await session.$relatedQuery("user_agent", trx).insert({
-      browser_name: browser.name,
-      browser_version: browser.version,
-      engine_name: engine.name,
-      engine_version: engine.version,
-      device_type: device.type,
-      device_model: device.model,
-      device_vendor: device.vendor,
-      raw: user_agent,
-    });
+
+    await trx.query(`insert into user_agents
+          (session_id, browser_name, browser_version, engine_name, engine_version, device_type, device_model, device_vendor, raw)
+          values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [session.id, browser.name, browser.version, engine.name, engine.version, device.type, device.model, device.vendor, user_agent]);
+
     return session;
   };
 }
 
 export async function get_one(id) {
   if (!id) return;
-  let { rows } = query(`select *,
+  let { rows } = await query(`select *,
       case when now() > expires_at then 1 else 0 end as expired
       from sessions where id = $1`, [id]);
 
@@ -46,7 +38,21 @@ export async function delete_one(id) {
 }
 
 export async function update_one(id, update = {}) {
-  return await Session.query().findById(id).patch(update)
+  let sql = '';
+  let keys = Object.keys(update);
+  for (let i = 0, len = keys.length; i < len; i++) {
+    sql += keys[i] + "=" + update[keys[i]];
+    let is_last = i === len - 1;
+    if (!is_last) sql += ", "
+  }
+
+  let { rows, rowCount } = await query(`update sessions set ${sql} where id = $1`, [id]);
+  if (rowCount === 0) {
+    console.log("Session not found")
+    // TODO: handle 404
+  }
+
+  return rows[0];
 }
 
 export async function validate_one(id) {
@@ -55,15 +61,9 @@ export async function validate_one(id) {
   return !session?.expired && session?.active;
 }
 
-export function get_many(query, relations = ["user_agent(browser_selects)"]) {
-  return {
-    async for(user_id, current_sid) {
-      return await Session.query()
-        .where({ user_id, active: true })
-        .withGraphFetched(format_relations(relations))
-        .orderByRaw(`(case when id = ? then 1 end) asc, created_at desc`, [current_sid]);
-    },
-  };
+export async function get_many({ user_id, current_sid, params = {} } = {}) {
+  let { rows } = await query(`select * from sessions where user_id = $1 and active is true order by (case when id = $2 then 1 end) asc, created_at desc`, [user_id, current_sid]);
+  return rows;
 }
 
 export async function delete_many(ids) {

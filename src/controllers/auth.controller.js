@@ -500,7 +500,7 @@ export async function generate_request(req, reply) {
       break;
     }
     case "get": {
-      const credentials = await CredentialService.get_many().for(user.id);
+      const credentials = await CredentialService.get_many({ user_id });
       request = AssertionRequest.from(credentials);
       break;
     }

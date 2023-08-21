@@ -3725,6 +3725,11 @@ j [data-tooltip][data-flow="right"]::before {
   border-color: rgb(63 63 70 / var(--tw-border-opacity));
 }
 
+:is(.dark .dark\:hover\:border-white:hover) {
+  --tw-border-opacity: 1;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity));
+}
+
 :is(.dark .dark\:hover\:bg-white:hover) {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -3746,6 +3751,11 @@ j [data-tooltip][data-flow="right"]::before {
 
 :is(.dark .dark\:hover\:decoration-white:hover) {
   text-decoration-color: #fff;
+}
+
+:is(.dark .dark\:active\:border-white:active) {
+  --tw-border-opacity: 1;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
 :is(.dark .dark\:active\:bg-white:active) {

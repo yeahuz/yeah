@@ -6,13 +6,13 @@ function create_one_impl(trx) {
   return async (payload) => Notification.query(trx).insert(payload);
 }
 
-export const create_one = create_one_impl();
+export let create_one = create_one_impl();
 
-export const create_one_trx = (trx) => create_one_impl(trx);
+export let create_one_trx = (trx) => create_one_impl(trx);
 
 export async function get_count({ user_id, read = false, limit = 10 } = {}) {
   if (!user_id) return 0;
-  const [result, err] = await option(pool.query(`select count(1)::int from user_notifications where user_id = $1 and read = $2`, [user_id, read]));
+  let [result, err] = await option(pool.query(`select count(1)::int from user_notifications where user_id = $1 and read = $2`, [user_id, read]));
 
   if (err) return 0;
   return result.rows[0].count;
@@ -20,7 +20,7 @@ export async function get_count({ user_id, read = false, limit = 10 } = {}) {
 
 export async function get_many({ user_id, lang = "en" } = {}) {
   if (!user_id) return [];
-  const [result, err] = await option(pool.query(`select n.id, n.created_at, n.href, type, read, title, content, 
+  let [result, err] = await option(pool.query(`select n.id, n.created_at, n.href, type, read, title, content,
                       json_build_object(
                         'name', u.name, 
                         'profile_url', u.profile_url,

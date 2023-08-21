@@ -36,7 +36,7 @@
         </div>
         <div class="flex space-x-1 mt-4 js-carousel-pagination">
           <% it.posting?.attachments?.forEach(function (photo, i) { %>
-            <button type="button" class="border rounded-lg p-0.5 border-transparent hover:border-gray-600 dark:hover:bg-white duration-200 active:border-gray-600 dark:active:bg-white">
+            <button type="button" class="border rounded-lg p-0.5 border-transparent hover:border-gray-600 dark:hover:border-white duration-200 active:border-gray-600 dark:active:border-white">
               <img
                 src="<%= photo.url %>/width=160"
                 srcset="<%= it.generate_srcset(photo.url, "fit=scale-down", 2) %>"

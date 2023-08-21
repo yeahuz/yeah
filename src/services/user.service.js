@@ -1,12 +1,9 @@
 import * as BillingService from "./billing.service.js";
 import { User } from "../models/index.js";
-import { InternalError, ValidationError } from "../utils/errors.js";
 import { createHash, randomBytes } from "crypto";
-import pkg from "objection";
 import { format_relations } from "../utils/index.js";
 import { query } from "./db.service.js";
 import * as argon2 from "argon2";
-let { UniqueViolationError } = pkg;
 
 let email_regex =
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
@@ -43,18 +40,21 @@ function create_one_impl(trx = { query }) {
   };
 }
 
-export async function update_one(id, update) {
-  try {
-    await User.query().findById(id).patch(update);
-  } catch (err) {
-    if (err instanceof UniqueViolationError) {
-      throw new ValidationError({
-        errors: [{ message: "user_exists", instancePath: err.columns[0] }],
-        params: { user: update[err.columns[0]] },
-      });
-    }
-    throw new InternalError();
+export async function update_one(id, update = {}) {
+  let sql = '';
+  let keys = Object.keys(update);
+  for (let i = 0, len = keys.length; i < len; i++) {
+    sql += keys[i] + "=" + update[keys[i]];
+    let is_last = i === len - 1;
+    if (!is_last) sql += ", "
   }
+
+  let { rows, rowCount } = await query(`update users set ${sql} where id = $1`, [id]);
+  if (rowCount == 0) {
+    // TODO: user does not exist.handle somehow ??
+  }
+
+  return rows[0];
 }
 
 export async function get_by_email_phone(identifier, params = {}) {

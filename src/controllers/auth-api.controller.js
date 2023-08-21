@@ -9,75 +9,75 @@ import { admin_user, external_client } from "../utils/roles.js";
 import { transform_object } from "../utils/index.js";
 
 export async function admin_login(req, reply) {
-  const { identifier, password } = req.body;
+  let { identifier, password } = req.body;
 
-  const user = await AuthService.verify_password({ identifier, password });
+  let user = await AuthService.verify_password({ identifier, password });
 
   if (!admin_user(user)) throw new AuthorizationError();
 
-  const has_credential = await CredentialService.exists_for(user.id);
+  let has_credential = await CredentialService.exists_for(user.id);
 
   if (!has_credential) {
     throw new ResourceNotFoundError({ key: "credential_not_found" });
   }
 
-  const token = jwt.sign({ id: user.id }, { expiresIn: 120 });
+  let token = jwt.sign({ id: user.id }, { expiresIn: 120 });
   reply.send({ token });
   return reply;
 }
 
 export async function external_client_login(req, reply) {
-  const user_agent = req.headers["user-agent"];
-  const ip = req.ip;
-  const { identifier, password } = req.body;
-  const user = await AuthService.verify_password({ identifier, password });
+  let user_agent = req.headers["user-agent"];
+  let ip = req.ip;
+  let { identifier, password } = req.body;
+  let user = await AuthService.verify_password({ identifier, password });
   if (!external_client(user)) throw new AuthorizationError();
-  const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
+  let session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
   reply.send(session);
   return reply;
 }
 
 export async function login(req, reply) {
-  const { identifier, password } = req.body;
-  const user_agent = req.headers["user-agent"];
-  const ip = req.ip;
+  let { identifier, password } = req.body;
+  let user_agent = req.headers["user-agent"];
+  let ip = req.ip;
 
-  const user = await AuthService.verify_password({ identifier, password });
+  let user = await AuthService.verify_password({ identifier, password });
 
-  const has_credential = await CredentialService.exists_for(user.id);
+  let has_credential = await CredentialService.exists_for(user.id);
 
   if (has_credential) {
-    const token = jwt.sign({ id: user.id }, { expiresIn: 120 });
+    let token = jwt.sign({ id: user.id }, { expiresIn: 120 });
     req.session.set("token", token);
     reply.send({ has_credential, token });
     return reply;
   }
 
-  const session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
+  let session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
   req.session.set("sid", session.id);
   reply.send({ session, user });
   return reply;
 }
 
 export async function verify_assertion(req, reply) {
-  const { token, assertion, challenge } = transform_object(req.body, {
+  let { token, assertion, challenge } = transform_object(req.body, {
     token: (v) => !v ? req.session.get("token") : v
   });
 
-  const decoded = await jwt.verify(token);
-  const user_agent = req.headers["user-agent"];
-  const ip = req.ip;
+  let decoded = await jwt.verify(token);
+  let user_agent = req.headers["user-agent"];
+  let ip = req.ip;
 
   AssertionRequest.validate_client_data(assertion, challenge);
 
-  const credential = await CredentialService.get_one(assertion.id);
+  let credential = await CredentialService.get_one(assertion.id);
 
-  const auth_data = AssertionRequest.validate_response(assertion, credential);
+  let auth_data = AssertionRequest.validate_response(assertion, credential);
 
   await credential.$query().patch({ counter: auth_data.counter });
 
-  const session = await SessionService.create_one({ user_id: decoded.id, user_agent, ip });
-  const user = await UserService.get_by_id(decoded.id, ["roles"]);
+  let session = await SessionService.create_one({ user_id: decoded.id, user_agent, ip });
+  let user = await UserService.get_by_id(decoded.id, ["roles"]);
   req.session.set("sid", session.id);
   req.session.set("token", null);
   req.session.set("challenge", null);
@@ -86,12 +86,12 @@ export async function verify_assertion(req, reply) {
 }
 
 export async function generate_request(req, reply) {
-  const { type, token } = transform_object(req.query, {
+  let { type, token } = transform_object(req.query, {
     token: (v) => !v ? req.session.get("token") : v
   });
 
-  const decoded = await jwt.verify(token);
-  const user = await UserService.get_by_id(decoded.id);
+  let decoded = await jwt.verify(token);
+  let user = await UserService.get_by_id(decoded.id);
 
   let request;
 
@@ -101,7 +101,7 @@ export async function generate_request(req, reply) {
       break;
     }
     case "get": {
-      const credentials = await CredentialService.get_many().for(user.id);
+      let credentials = await CredentialService.get_many({ user_id });
       request = AssertionRequest.from(credentials);
       break;
     }
@@ -115,27 +115,27 @@ export async function generate_request(req, reply) {
 }
 
 export async function get_session(req, reply) {
-  const { id } = req.params;
-  const session = await SessionService.get_one(id);
+  let { id } = req.params;
+  let session = await SessionService.get_one(id);
   reply.send(session);
   return reply;
 }
 
 export async function delete_session(req, reply) {
-  const { id } = req.params;
-  const result = await SessionService.delete_one(id);
+  let { id } = req.params;
+  let result = await SessionService.delete_one(id);
   reply.send(result);
   return reply;
 }
 
 export async function get_me(req, reply) {
-  const user = req.user;
+  let user = req.user;
   return user;
 }
 
 export async function logout(req, reply) {
-  const sid = req.session.get("sid");
-  const result = await AuthService.logout(sid);
+  let sid = req.session.get("sid");
+  let result = await AuthService.logout(sid);
   req.session.delete();
   reply.send(result);
   return reply;

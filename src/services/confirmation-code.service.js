@@ -1,35 +1,30 @@
 import * as UserService from "./user.service.js";
+import * as argon2 from "argon2";
 import { ConflictError } from "../utils/errors.js";
-import { ConfirmationCode } from "../models/index.js";
 import { add_minutes_to_now } from "../utils/index.js";
-import pkg from "objection";
+import { query } from "./db.service.js";
 import crypto from "crypto";
 
-const { raw } = pkg;
-
 export async function generate(identifier, exp_time = 15) {
-  const expires_at = add_minutes_to_now(exp_time);
-  const code = crypto.randomInt(100000, 999999);
-  await ConfirmationCode.query()
-    .insert({ code, identifier, expires_at })
-    .onConflict("identifier")
-    .merge();
+  let expires_at = add_minutes_to_now(exp_time);
+  let code = crypto.randomInt(100000, 999999);
+  let hash = await argon2.hash(code);
+  await query(`insert into confirmation_codes (code, identifier, expires_at) values ($1, $2, $3) on conflict (identifier) do nothing`, [hash, identifier, expires_at]);
 
   return code;
 }
 
 export async function has_expired_code(identifier) {
-  const code = await ConfirmationCode.query()
-    .select("id", raw("case when now() > expires_at then 1 else 0 end as expired"))
-    .findOne({ identifier });
+  let { rows: [code] } = await query(`select id, case when now() > expires_at then 1 else 0 end as expired from confirmation_codes where identifier = $1`, [identifier]);
 
-  if (code?.expired) await code.$query().delete();
+  // TODO: do I care if it gets deleted or not?
+  if (code?.expired) await query(`delete from confirmation_codes where identifier = $1`, [identifier]);
 
   return code?.expired || !code;
 }
 
 export async function generate_auth_code(identifier, mins = 15) {
-  const existing = await UserService.get_by_email_phone(identifier);
+  let existing = await UserService.get_by_email_phone(identifier);
   if (existing) {
     throw new ConflictError({
       key: "user_exists",
@@ -41,11 +36,10 @@ export async function generate_auth_code(identifier, mins = 15) {
 }
 
 export async function verify(identifier, code) {
-  const confirmation_code = await ConfirmationCode.query()
-    .select("id", "code", raw("case when now() > expires_at then 1 else 0 end as expired"))
-    .findOne({ identifier });
+  let { rows: [existing] } = await query(`select id, code, case when now() > expires_at then 1 else 0 end as expired from confirmation_codes where identifier = $1`, [identifier]);
+  // TODO: do I care if it gets deleted or not?
+  if (existing?.expired) await query(`delete from confirmation_codes where identifier = $1`, [identifier]);
 
-  if (confirmation_code?.expired) await confirmation_code.$query().delete();
-
-  return !confirmation_code?.expired && confirmation_code?.verify_code(code);
+  let is_valid = await argon2.verify(existing.code, code);
+  return !existing?.expired && is_valid;
 }
