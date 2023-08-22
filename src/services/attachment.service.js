@@ -1,47 +1,33 @@
-import * as CFImageService from "../services/cfimg.service.js";
-import * as CFR2Service from "../services/cfr2.service.js";
+import { query } from "./db.service.js";
 
-import { Attachment } from "../models/index.js";
-
-export const create_one = create_one_impl();
-export const create_one_trx = (trx) => create_one_impl(trx);
+export let create_one = create_one_impl();
+export let create_one_trx = (trx) => create_one_impl(trx);
 
 export async function delete_one(id) {
-  return await Attachment.query().deleteById(id);
-}
+  let { rowCount } = await query(`delete from attachments where id = $1`, [id]);
+  if (rowCount === 0) {
+    //TODO: handle
+  }
 
+  return id;
+}
 export async function delete_by_resource_id(resource_id) {
-  return await Attachment.query().findOne({ resource_id }).delete();
+  let { rowCount } = await query(`delete from attachments where resource_id = $1`, [resource_id]);
+  if (rowCount === 0) {
+    //TODO: handle
+  }
+
+  return resource_id;
 }
 
 export async function get_by_resource_id(resource_id, service = "CF_IMAGES") {
-  return await Attachment.query().findOne({ resource_id, service });
+  let { rows } = await query(`select * from attachments where service = $1 and resource_id = $2`, [service, resource_id]);
+  return rows;
 }
 
-function create_one_impl(trx) {
-  return async ({ service = "CF_IMAGES", resource_id } = {}) => {
-    let resource;
-    switch (service) {
-      case "CF_IMAGES": {
-        resource = await CFImageService.get_one(resource_id);
-        break;
-      }
-      case "CF_R2": {
-        resource = await CFR2Service.head_object(resource_id);
-        break;
-      }
-      default:
-        break;
-    }
-
-    if (resource) {
-      return await Attachment.query(trx).insert({
-        resource_id: resource.id,
-        name: resource.name,
-        service,
-        ...resource.meta,
-      });
-    }
-
+function create_one_impl(trx = { query }) {
+  return async ({ size, resource_id, name, type, url } = {}) => {
+    let { rows } = await trx.query(`insert into attachments (size, resource_id, name, type, url) values ($1, $2, $3, $4, $5)`, [size, resource_id, name, type, url]);
+    return rows[0];
   };
 }

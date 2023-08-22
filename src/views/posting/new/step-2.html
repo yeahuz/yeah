@@ -110,41 +110,41 @@
       </div>
     <% } %>
     <% if (field.type === "radio") { %>
-      <input type="hidden" name="params[<%= field.key %>].parent" value="<%= field.translation.name %>|<%= field.id %>" />
+      <input type="hidden" name="params[<%= field.key %>].parent" value="<%= field.name %>|<%= field.id %>" />
       <div class="space-y-2 mt-5">
         <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
-          <%= field.translation.name %>
+          <%= field.name %>
         </span>
         <% field.children.forEach(function (val, index) { %>
           <div class="flex items-center">
-            <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.translation.name}|${val.id}`) ? "checked" : ""%> type="radio" name="params[<%= field.key %>].value[]" value="<%= val.translation.name %>|<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+            <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.name}|${val.id}`) ? "checked" : ""%> type="radio" name="params[<%= field.key %>].value[]" value="<%= val.name %>|<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
                         font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                         checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
-            <label for="<%= field.key %>-<%= val.id %>" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white"><%= val.translation.name %></label>
+            <label for="<%= field.key %>-<%= val.id %>" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white"><%= val.name %></label>
           </div>
         <% }) %>
       </div>
     <% } %>
     <% if (field.type === "checkbox") { %>
-      <input type="hidden" name="params[<%= field.key %>].parent" value="<%= field.translation.name %>|<%= field.id %>" />
+      <input type="hidden" name="params[<%= field.key %>].parent" value="<%= field.name %>|<%= field.id %>" />
       <div class="space-y-2 mt-5">
           <div class="text-sm block">
             <span class="font-medium text-gray-700 dark:text-gray-200">
-              <%= field.translation.name %>
+              <%= field.name %>
             </span>
           </div>
           <% field.children.forEach(function (val) { %>
             <div class="flex items-center">
-              <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.translation.name}|${val.id}`) ? "checked" : "" %> type="<%= field.type %>" name="params[<%= field.key %>].value[]" id="<%= field.key %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.translation.name %>|<%= val.id %>"/>
-              <label for="<%= field.translation.name %>-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+              <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.name}|${val.id}`) ? "checked" : "" %> type="<%= field.type %>" name="params[<%= field.key %>].value[]" id="<%= field.key %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.name %>|<%= val.id %>"/>
+              <label for="<%= field.name %>-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </label>
-              <% if (val.translation?.name) { %>
+              <% if (val?.name) { %>
                 <label for="<%= field.key %>-<%= val.id %>" class="checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
-                  <%= val.translation.name %>
+                  <%= val.name %>
                 </label>
               <% } %>
             </div>

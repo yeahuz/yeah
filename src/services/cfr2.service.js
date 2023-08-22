@@ -60,8 +60,8 @@ export async function get_direct_upload_url(file) {
 }
 
 export async function head_object(key) {
-  const [filename] = key.match(/(\w+)[^-]*$/);
-  const result = await client.headObject({ Key: key, Bucket: "s3-needs-uz" }).promise();
+  let [filename] = key.match(/(\w+)[^-]*$/);
+  let result = await client.headObject({ Key: key, Bucket: "s3-needs-uz" }).promise();
 
   if (result) {
     return {
@@ -73,8 +73,8 @@ export async function head_object(key) {
 }
 
 export async function get_direct_upload_urls(files = []) {
-  const urls = [];
-  for await (const url of async_pool(16, files, get_direct_upload_url)) {
+  let urls = [];
+  for await (let url of async_pool(16, files, get_direct_upload_url)) {
     urls.push(url);
   }
   return urls;

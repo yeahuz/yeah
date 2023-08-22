@@ -1,12 +1,8 @@
-import { Message } from "../models/index.js";
+import * as AttachmentService from "./attachment.service.js";
 import { query } from "./db.service.js";
 
-export async function start_transaction() {
-  return await Message.startTransaction();
-}
-
-export const create_one_trx = (trx) => create_one_impl(trx);
-export const create_one = create_one_impl();
+export let create_one_trx = (trx) => create_one_impl(trx);
+export let create_one = create_one_impl();
 
 function create_one_impl(trx = { query }) {
   return async ({ sender_id, content, reply_to, chat_id, type = "text", attachments = [] } = {}) => {
@@ -18,15 +14,7 @@ function create_one_impl(trx = { query }) {
       trx.query("update chats set last_message_id = $1 where id = $2", [message.id, chat_id])
     ]);
 
-    let inserted = await Promise.all(attachments.map(async a => {
-      let { rows } = await trx.query(`
-        insert into attachments (size, resource_id, name, type, url)
-        values ($1, $2, $3, $4, $5) returning id, resource_id, name, size, type, url
-      `, [a.size, a.resource_id, a.name, a.type, a.url]);
-
-      if (rows.length) return rows[0];
-    }));
-
+    let inserted = await Promise.all(attachments.map(AttachmentService.create_one_trx(trx)));
     await Promise.all(inserted.map(a => {
       return trx.query(`insert into message_attachments (attachment_id, message_id) values ($1, $2)`, [a.id, message.id]);
     }));

@@ -1,6 +1,5 @@
-import { Session } from "../models/index.js";
 import { UAParser } from "ua-parser-js";
-import { add_minutes_to_now, format_relations } from "../utils/index.js";
+import { add_minutes_to_now } from "../utils/index.js";
 import { query } from "./db.service.js";
 
 function create_one_impl(trx = { query }) {
@@ -62,7 +61,13 @@ export async function validate_one(id) {
 }
 
 export async function get_many({ user_id, current_sid, params = {} } = {}) {
-  let { rows } = await query(`select * from sessions where user_id = $1 and active is true order by (case when id = $2 then 1 end) asc, created_at desc`, [user_id, current_sid]);
+  let sql = `select s.id, s.active, s.ip, s.expires_at,
+    case
+      when ua.id is null then null
+    else json_build_object('id', ua.id, 'browser_name', ua.browser_name, 'browser_version', ua.browser_version, 'created_at', ua.created_at, 'raw', ua.raw) end as user_agent
+    from sessions s ${params.user_agent ? `join user_agents ua on ua.session_id = s.id` : ''}
+    where s.user_id = $1 and active is true order by (case when s.id = $2 then 1 end) asc, s.created_at desc`;
+  let { rows } = await query(sql, [user_id, current_sid]);
   return rows;
 }
 
@@ -72,14 +77,13 @@ export async function delete_many(ids) {
 }
 
 export async function delete_many_for(user_id, exceptions = []) {
-  return await delete_many(
-    Session.query().select("id").where({ user_id }).whereNotIn("id", exceptions)
-  );
+  let { rows } = await query(`delete from sessions where user_id = $1 and id != any($2)`, [user_id, exceptions]);
+  return rows[0]
 }
 
 export async function belongs_to(user_id, id) {
-  let { rows } = await query(`select 1 from where user_id = $1 and id = $2`, [user_id, id]);
-  return rows;
+  let { rows } = await query(`select 1 from sessions where user_id = $1 and id = $2`, [user_id, id]);
+  return rows[0];
 }
 
 export let create_one = create_one_impl();

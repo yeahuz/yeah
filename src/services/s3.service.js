@@ -4,7 +4,7 @@ import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import { async_pool } from "../utils/async-pool.js";
 
-const s3 = new S3Client({
+let s3 = new S3Client({
   region: config.aws_s3_region,
   credentials: {
     accessKeyId: config.aws_access_key,
@@ -30,11 +30,11 @@ export async function delete_one(s3_key) {
 }
 
 export async function upload_url(url) {
-  const key = get_key();
-  const response = await fetch(url);
-  const content_type = response.headers.get("content-type");
+  let key = get_key();
+  let response = await fetch(url);
+  let content_type = response.headers.get("content-type");
 
-  const upload = new Upload({
+  let upload = new Upload({
     client: s3,
     params: {
       Bucket: config.aws_s3_bucket_name,
@@ -59,8 +59,8 @@ export async function upload_url(url) {
 
 export async function upload(data) {
   if (data.file.bytesRead > 0) {
-    const key = get_key(data.filename);
-    const upload = new Upload({
+    let key = get_key(data.filename);
+    let upload = new Upload({
       client: s3,
       params: {
         Bucket: config.aws_s3_bucket_name,
@@ -93,7 +93,7 @@ export async function upload(data) {
 }
 
 export async function* upload_multiple(files) {
-  for await (const result of async_pool(16, files, upload)) {
+  for await (let result of async_pool(16, files, upload)) {
     yield result;
   }
 }

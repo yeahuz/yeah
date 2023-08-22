@@ -120,8 +120,10 @@ export async function get_privacy(req, reply) {
   });
   stream.push(settings_tabs);
 
-  let sessions = await SessionService.get_many({ user_id: user.id, current_sid });
-  let credentials = await CredentialService.get_many({ user_id });
+  let [sessions, credentials] = await Promise.all([
+    SessionService.get_many({ user_id: user.id, current_sid, params: { user_agent: true } }),
+    CredentialService.get_many({ user_id: user.id })
+  ]);
 
   let privacy = await render_file("/settings/privacy.html", {
     user,
@@ -146,6 +148,7 @@ export async function get_billing(req, reply) {
   let flash = reply.flash();
   let stream = reply.init_stream();
   let user = req.user;
+  console.log({ user });
   let t = req.i18n.t;
 
   if (!req.partial) {

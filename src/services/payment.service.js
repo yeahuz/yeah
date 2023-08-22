@@ -1,6 +1,7 @@
 import config from "../config/index.js";
-import { PaymentProvider, Payment } from "../models/index.js";
 import { InternalError } from "../utils/errors.js";
+import { commit_trx, rollback_trx, start_trx } from "./db.service.js";
+import { query } from "./db.service.js";
 
 class Payme {
   constructor({ merchant_id, checkout_uri }) {
@@ -9,7 +10,7 @@ class Payme {
   }
 
   prepare_payment({ amount, params }) {
-    const query = Buffer.from(
+    let query = Buffer.from(
       `m=${config.payme_merchant_id}&a=${amount}&ac.payment_id=${params.payment.id}`
     ).toString("base64");
 
@@ -36,19 +37,19 @@ class Octo {
   }
 
   async request(url, { method, data } = {}) {
-    const response = await fetch(this.api_uri + url, {
+    let response = await fetch(this.api_uri + url, {
       method: method || (data ? "POST" : "GET"),
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    const json = await response.json();
+    let json = await response.json();
     return json;
   }
 
   async prepare_payment({ amount, params }) {
-    const now = new Date();
-    const init_time = `${now.getFullYear()}-${now.getMonth()}-${now.getDay()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-    const data = await this.request("/prepare_payment", {
+    let now = new Date();
+    let init_time = `${now.getFullYear()}-${now.getMonth()}-${now.getDay()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+    let data = await this.request("/prepare_payment", {
       data: {
         total_sum: amount,
         currency: "UZS",
@@ -101,46 +102,44 @@ class Providers {
   }
 }
 
-const providers = new Providers();
+let providers = new Providers();
 
 export function pay_with(provider) {
   return providers.pay_with(provider);
 }
 
 export async function get_providers() {
-  return await PaymentProvider.query().where({ active: true });
+  let { rows } = await query(`select * from payment_providers where active is true`);
+  return rows;
 }
 
 export async function create_payment(payload) {
-  const trx = await start_transaction();
+  let trx = await start_trx();
   try {
-    const { billing_account_id, debit_amount, status, provider_name } = payload;
-    const payment = await create_one_trx(trx)({
+    let { billing_account_id, debit_amount, status, provider_name } = payload;
+    let payment = await create_one_trx(trx)({
       debit_amount,
       billing_account_id,
       status,
       provider: provider_name,
     });
-    const provider = await pay_with(provider_name);
-    const url = await provider.prepare_payment({ amount: debit_amount, params: { payment } });
-    await trx.commit();
+    let provider = await pay_with(provider_name);
+    let url = await provider.prepare_payment({ amount: debit_amount, params: { payment } });
+    await commit_trx(trx);
     return { payment, url };
   } catch (err) {
     console.log(err);
-    trx.rollback();
+    rollback_trx(trx);
     throw new InternalError();
   }
 }
 
-export async function start_transaction() {
-  return await Payment.startTransaction();
-}
-
-function create_one_impl(trx) {
-  return async (payload) => {
-    return await Payment.query(trx).insert(payload);
+function create_one_impl(trx = { query }) {
+  return async ({ debit_amount, billing_account_id, status, provider }) => {
+    let { rows } = await trx.query(`insert into payments (debit_amount, billing_account_id, status, provider) values ($1, $2, $3, $4) returning id`, [debit_amount, billing_account_id, status, provider]);
+    return rows[0];
   };
 }
 
-export const create_one = create_one_impl();
-export const create_one_trx = (trx) => create_one_impl(trx);
+export let create_one = create_one_impl();
+export let create_one_trx = (trx) => create_one_impl(trx);

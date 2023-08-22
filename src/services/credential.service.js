@@ -1,4 +1,3 @@
-import { Credential } from "../models/index.js";
 import { query } from "./db.service.js";
 
 export async function get_many({ user_id } = {}) {
@@ -30,20 +29,16 @@ export async function delete_one(id) {
 }
 
 export async function exists_for(user_id) {
-  const credentials = await Credential.query()
-    .select(1)
-    .whereExists(Credential.query().select(1).where({ user_id }).limit(1));
-  return !!credentials.length;
+  let { rows } = await query(`select 1 from credentials where user_id = $1 limit 1`, [user_id]);
+  return rows.length > 0;
 }
 
 export async function belongs_to(user_id, id) {
-  return await Credential.query().findOne({ user_id, id });
+  let { rows } = await query(`select 1 from credentials where user_id = $1 and id = $2`, [user_id, id]);
+  return rows[0];
 }
 
-export function delete_many() {
-  return {
-    async for(user_id) {
-      return await Credential.query().where({ user_id }).delete();
-    },
-  };
+export async function delete_many(user_id) {
+  let { rowCount } = await query(`delete from credentials where user_id = $1`, [user_id]);
+  return rowCount;
 }

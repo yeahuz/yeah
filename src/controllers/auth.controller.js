@@ -523,7 +523,7 @@ export async function update_credentials(req, reply) {
 
   switch (_action) {
     case "delete_credentials":
-      await CredentialService.delete_many().for(user.id);
+      await CredentialService.delete_many(user.id)
       break;
     default:
       CredentialRequest.validate_client_data(credential, challenge);
@@ -599,7 +599,7 @@ export async function delete_credential(req, reply) {
 export async function delete_credentials(req, reply) {
   const user = req.user;
   const t = req.i18n.t;
-  const [result, err] = await option(CredentialService.delete_many().for(user.id));
+  const [result, err] = await option(CredentialService.delete_many(user.id));
 
   if (err) {
     reply.code(err.status_code).send(err.build(t));

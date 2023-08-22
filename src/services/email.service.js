@@ -2,7 +2,7 @@ import config from "../config/index.js";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { render_file } from "../utils/eta.js";
 
-const client = new SESClient({
+let client = new SESClient({
   region: "eu-north-1",
   credentials: {
     accessKeyId: config.aws_access_key,
@@ -10,7 +10,7 @@ const client = new SESClient({
   },
 });
 
-const TEMPLATES = {
+let TEMPLATES = {
   verify: {
     render: (vars) => render_file("/email-templates/verify.html", vars),
     subject: (vars) => {
@@ -31,10 +31,10 @@ const TEMPLATES = {
 };
 
 export async function send_email({ tmpl_name, to, vars }) {
-  const template = TEMPLATES[tmpl_name];
+  let template = TEMPLATES[tmpl_name];
   if (!template) throw new Error("Non-existent template");
 
-  const command = new SendEmailCommand({
+  let command = new SendEmailCommand({
     Destination: {
       ToAddresses: [to],
     },

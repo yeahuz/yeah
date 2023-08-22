@@ -1,20 +1,17 @@
 import * as MessageService from "./message.service.js";
-import * as UserService from "./user.service.js";
-import * as PostingService from "./posting.service.js";
 import { BadRequestError, InternalError } from "../utils/errors.js";
-import { Chat, User } from "../models/index.js";
-import objection from "objection";
 import { commit_trx, query, rollback_trx, start_trx } from "./db.service.js";
 import { option } from "../utils/index.js";
 import { join } from "path";
+import objection from "objection";
 import config from "../config/index.js";
 
-const { UniqueViolationError } = objection;
+let { UniqueViolationError } = objection;
 
-export const create_one_trx = (trx) => create_one_impl(trx);
-export const create_one = create_one_impl();
-export const update_one_trx = (trx) => update_one_impl(trx);
-export const update_one = update_one_impl();
+export let create_one_trx = (trx) => create_one_impl(trx);
+export let create_one = create_one_impl();
+export let update_one_trx = (trx) => update_one_impl(trx);
+export let update_one = update_one_impl();
 
 export async function get_many({ user_id }) {
   let { rows } = await query(`
@@ -53,11 +50,13 @@ export async function get_many({ user_id }) {
 }
 
 export async function get_posting_chats(posting_id) {
-  return await Chat.query().select("id").where({ posting_id });
+  let { rows } = await query(`select id from chats where posting_id = $1`, [posting_id]);
+  return rows;
 }
 
 export async function get_chat_ids({ user_id }) {
-  return await User.relatedQuery("chats").select("id").for(user_id);
+  let { rows } = await query(`select c.id from chats c join chat_members cm on cm.chat_id = c.id and cm.user_id = $1`, [user_id]);
+  return rows;
 }
 
 export async function get_one({ id }) {
@@ -83,7 +82,7 @@ export async function get_one({ id }) {
 export async function create_message({ chat_id, content, reply_to, sender_id, type, attachments = [] } = {}) {
   let trx = await start_trx();
   try {
-    const message = await MessageService.create_one_trx(trx)({
+    let message = await MessageService.create_one_trx(trx)({
       chat_id,
       content,
       reply_to,
@@ -127,24 +126,26 @@ export async function create_chat({ created_by, posting_id, members = [] }) {
     if (err instanceof UniqueViolationError) {
       throw new BadRequestError({ key: "chat_exists" });
     }
-
     throw new InternalError();
   }
 }
 
 export async function is_chat_member(user_id, id) {
-  return await Chat.relatedQuery("members").select(1).findOne({ user_id }).for(id);
+  let { rows } = await query(`select 1 from chat_members where chat_id = $1 and user_id = $2`, [id, user_id]);
+  return rows.length > 0;
 }
 
 export async function get_member_chat(user_id, chats = []) {
-  return await Chat.query()
-    .join("chat_members as cm", "cm.chat_id", "chats.id")
-    .where("cm.user_id", user_id)
-    .whereIn(
-      "cm.chat_id",
-      chats.map((c) => c.id)
-    )
-    .first();
+  let { rows } = await query(`select c.* from chats c join chat_members cm on cm.chat_id = c.id and cm.user_id = $1`, [user_id]);
+  return rows[0];
+  // return await Chat.query()
+  //   .join("chat_members as cm", "cm.chat_id", "chats.id")
+  //   .where("cm.user_id", user_id)
+  //   .whereIn(
+  //     "cm.chat_id",
+  //     chats.map((c) => c.id)
+  //   )
+  //   .first();
 }
 
 export async function read_message({ id, chat_id, user_id }) {
@@ -160,22 +161,29 @@ export async function read_message({ id, chat_id, user_id }) {
   }
 }
 
-function create_one_impl(trx) {
+function create_one_impl(trx = { query }) {
   return async ({ created_by, posting_id, members = [] }) => {
-    const actual_members = await UserService.get_by_ids({ ids: members, modify: "minimum" });
-    const posting = await PostingService.get_one({ id: posting_id, modify: "minimum" });
-    const chat = await Chat.query(trx).insertGraph({
-      created_by,
-      posting,
-      members: actual_members
-    }, { relate: true });
-
+    let chat = await trx.query(`insert into chats (created_by, posting_id, url) values ($1, $2, $3) returning id`, [created_by, posting_id, url]);
+    let url = join(config.origin, "chats", chat.id);
+    await Promise.all([
+      trx.query(`update chats set url = $1 where id = $2`, [url, chat.id]),
+      Promise.all(members.map(m => trx.query(`insert into chat_members (chat_id, user_id) values ($1, $2)`, [chat.id, m])))
+    ]);
     return chat;
   };
 }
 
-function update_one_impl(trx) {
+function update_one_impl(trx = { query }) {
   return async (id, update = {}) => {
-    return await Chat.query(trx).findById(id).patch(update);
+    let sql = '';
+    let keys = Object.keys(update);
+    for (let i = 0, len = keys.length; i < len; i++) {
+      sql += keys[i] + "=" + update[keys[i]];
+      let is_last = i === len - 1;
+      if (!is_last) sql += ", "
+    }
+
+    let { rows } = await trx.query(`update chats set ${sql} where id = $1`, [id]);
+    return rows[0];
   };
 }

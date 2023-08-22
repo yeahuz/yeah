@@ -3,11 +3,11 @@ import { InternalError } from "../utils/errors.js";
 import { Client } from "@googlemaps/google-maps-services-js";
 import { elastic_client } from "./es.service.js";
 
-const client = new Client();
+let client = new Client();
 
 export async function get_query_predictions({ q, lang = "en" }) {
   try {
-    const response = await elastic_client.search({
+    let response = await elastic_client.search({
       index: `regions_${lang}`,
       body: {
         query: {
@@ -22,7 +22,7 @@ export async function get_query_predictions({ q, lang = "en" }) {
       },
     });
 
-    const hits = response.hits.hits
+    let hits = response.hits.hits
     return hits.map((h) => h._source);
   } catch (err) {
     console.log(err);
@@ -32,20 +32,20 @@ export async function get_query_predictions({ q, lang = "en" }) {
 
 export async function geocode({ lat, lon, lang = "en" }) {
   try {
-    const { data } = await client.reverseGeocode({
+    let { data } = await client.reverseGeocode({
       params: { latlng: [lat, lon], language: lang, key: config.google_maps_api_key },
     });
     console.log(data);
-    const ret = { coords: { lat, lon } };
-    for (const result of data.results) {
+    let ret = { coords: { lat, lon } };
+    for (let result of data.results) {
       if (result.types.includes("street_address")) {
         ret.formatted_address = result.formatted_address;
       }
 
       if (result.types.includes("sublocality_level_1")) {
         ret.place_id = result.place_id;
-        const sublocality = result.address_components[0].short_name;
-        const response = await elastic_client.search({
+        let sublocality = result.address_components[0].short_name;
+        let response = await elastic_client.search({
           index: `regions_${lang}`,
           body: {
             query: {
@@ -61,7 +61,7 @@ export async function geocode({ lat, lon, lang = "en" }) {
           size: 1,
         });
 
-        const first = response.body.hits.hits[0]._source;
+        let first = response.body.hits.hits[0]._source;
         Object.assign(ret, first);
         if (!ret.formatted_address) ret.formatted_address = result.formatted_address;
       }

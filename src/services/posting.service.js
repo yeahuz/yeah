@@ -4,24 +4,26 @@ import objection from "objection";
 import { Posting, PostingStatus, Attribute } from "../models/index.js";
 import { InternalError } from "../utils/errors.js";
 import { format_relations } from "../utils/index.js";
+import { commit_trx, start_trx, rollback_trx } from "./db.service.js";
 
-const { raw } = objection;
+let { raw } = objection;
 
-function create_one_impl(trx) {
-  return async (payload) => await Posting.query(trx).insert(payload);
+function create_one_impl(trx = { query }) {
+  return async ({ title, description, cover_url, status_id, created_by, attribute_set }) => {
+    let { rows } = await trx.query(`insert into postings (title, description, cover_url, status_id, created_by, attribute_set)
+      values ($1, $2, $3, $4, $5, $6)`, [title, description, cover_url, status_id, created_by, attribute_set]);
+
+    return rows[0];
+  }
 }
 
-export async function start_transaction() {
-  return await Posting.startTransaction();
-}
-
-export const create_one = create_one_impl();
-export const create_one_trx = (trx) => create_one_impl(trx);
+export let create_one = create_one_impl();
+export let create_one_trx = (trx) => create_one_impl(trx);
 
 export async function create_posting(payload) {
-  const trx = await start_transaction();
+  let trx = start_trx();
   try {
-    const {
+    let {
       title,
       description,
       attachments,
@@ -38,12 +40,12 @@ export async function create_posting(payload) {
       params,
     } = payload;
 
-    const attribute_set = Object.values(params)
+    let attribute_set = Object.values(params)
       .flatMap((param) => [param.parent, ...param.value])
       .map((v) => v.split("|")[1]);
 
-    const cover = attachments[cover_index || 0];
-    const posting = await create_one_trx(trx)({
+    let cover = attachments[cover_index || 0];
+    let posting = await create_one_trx(trx)({
       title,
       description,
       cover_url: cover.url,
@@ -52,13 +54,13 @@ export async function create_posting(payload) {
       attribute_set,
     });
 
-    const att = await Promise.all(
+    let att = await Promise.all(
       attachments.map((a) =>
         AttachmentService.create_one_trx(trx)({ resource_id: a.id, service: "CF_IMAGES" })
       )
     );
 
-    const categories = await CategoryService.get_parents(category_id);
+    let categories = await CategoryService.get_parents(category_id);
     await posting.$relatedQuery("attachments", trx).relate(att);
     await posting.$relatedQuery("categories", trx).relate(
       categories.map((c) => ({
@@ -74,21 +76,21 @@ export async function create_posting(payload) {
     });
 
     await posting.$relatedQuery("price", trx).insert({ currency_code, price });
-    await trx.commit();
+    await commit_trx(trx);
   } catch (err) {
     console.log({ err });
-    trx.rollback();
+    rollback_trx(trx)
     throw new InternalError();
   }
 }
 
 async function cursor_paginate(model, list = [], excludes = []) {
-  const first = list[0];
-  const last = list[list.length - 1];
+  let first = list[0];
+  let last = list[list.length - 1];
 
-  const has_next =
+  let has_next =
     last && !!(await model.query().findOne("id", "<", last.id).whereNotIn("id", excludes));
-  const has_prev =
+  let has_prev =
     first && !!(await model.query().findOne("id", ">", first.id).whereNotIn("id", excludes));
 
   return { list, has_next, has_prev };
@@ -137,8 +139,8 @@ export async function get_many({
   cursor,
   direction
 } = {}) {
-  const knex = Posting.knex();
-  const list = await knex.with("t1",
+  let knex = Posting.knex();
+  let list = await knex.with("t1",
     knex()
       .from("postings")
       .join("posting_status_translations as pst", "postings.status_id", "pst.status_id")

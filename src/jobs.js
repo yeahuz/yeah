@@ -3,20 +3,20 @@ import { elastic_client } from "./services/es.service.js";
 import cron from "node-cron";
 import objection from "objection";
 
-const { raw } = objection;
+let { raw } = objection;
 
-export const pg_to_es = cron.schedule("*/5 * * * * *", pg_to_es_impl);
+export let pg_to_es = cron.schedule("*/5 * * * * *", pg_to_es_impl);
 
 function boosted_description(title, facets) {
   let description = title;
-  for (const prop in facets) {
+  for (let prop in facets) {
     if (prop === "checkbox_facets") {
-      const checkbox_facets = facets[prop];
+      let checkbox_facets = facets[prop];
       description += ` с ${checkbox_facets.map((facet) => facet.facet_value_name).join(", ")}.`;
     }
 
     if (prop === "radio_facets") {
-      const radio_facets = facets[prop];
+      let radio_facets = facets[prop];
       description += radio_facets
         .map((facet) => ` ${facet.facet_name} - ${facet.facet_value_name}`)
         .join(", ");
@@ -27,7 +27,7 @@ function boosted_description(title, facets) {
 }
 
 async function pg_to_es_impl() {
-  const postings = await Posting.query()
+  let postings = await Posting.query()
     .alias("p")
     .select(
       "p.id as id",
@@ -66,11 +66,11 @@ async function pg_to_es_impl() {
       builder.select("label").where({ language_code: "ru" })
     );
 
-  for (const posting of postings) {
-    const checkbox_facets = [];
-    const radio_facets = [];
-    const number_facets = [];
-    for (const attribute of posting.attributes) {
+  for (let posting of postings) {
+    let checkbox_facets = [];
+    let radio_facets = [];
+    let number_facets = [];
+    for (let attribute of posting.attributes) {
       if (attribute.field.type === "checkbox") {
         checkbox_facets.push({
           facet_id: attribute.category_field_id,

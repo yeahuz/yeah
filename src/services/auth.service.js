@@ -12,7 +12,7 @@ import {
 import config from "../config/index.js";
 import crypto from "crypto";
 import objection from "objection";
-import { start_trx } from "./db.service.js";
+import { commit_trx, rollback_trx, start_trx } from "./db.service.js";
 
 let { UniqueViolationError } = objection;
 
@@ -108,7 +108,7 @@ export async function google_auth(payload) {
     return { session, user: account };
   }
 
-  let trx = await UserService.start_transaction();
+  let trx = await start_trx();
   try {
     let existing_user = await UserService.get_by_email_phone(email)
     if (existing_user) {
@@ -123,7 +123,7 @@ export async function google_auth(payload) {
         provider_account_id: sub
       })
 
-      await trx.commit()
+      await commit_trx(trx);
       return { session, user: existing_user }
     }
 
@@ -148,12 +148,11 @@ export async function google_auth(payload) {
       provider_account_id: sub,
     });
 
-    await trx.commit();
-
+    await commit_trx(trx);
     return { session, user };
   } catch (err) {
     console.log({ err })
-    trx.rollback();
+    rollback_trx(trx);
     if (err instanceof UniqueViolationError) {
       throw new ConflictError({ key: "user_exists", params: { user: email } });
     }
@@ -190,8 +189,7 @@ export async function telegram_auth(payload) {
     return { session, user: account };
   }
 
-  let trx = await UserService.start_transaction();
-
+  let trx = await start_trx();
   try {
     let user = await UserService.create_one_trx(trx)({
       name: tg_user.first_name || tg_user.username,
@@ -210,10 +208,10 @@ export async function telegram_auth(payload) {
       provider_account_id: tg_user.id,
     });
 
-    await trx.commit();
+    await commit_trx(trx);
     return { session, user };
   } catch (err) {
-    trx.rollback();
+    rollback_trx(trx);
     throw new InternalError();
   }
 }
