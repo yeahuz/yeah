@@ -3933,6 +3933,15 @@ j [data-tooltip][data-flow="right"]::before {
     content: var(--tw-content);
     opacity: 0.5;
   }
+
+  :is(.dark .md\:dark\:bg-zinc-800) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(39 39 42 / var(--tw-bg-opacity));
+  }
+
+  :is(.dark .dark\:md\:bg-transparent) {
+    background-color: transparent;
+  }
 }
 
 @media (min-width: 1024px) {
