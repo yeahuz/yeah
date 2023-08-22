@@ -1,10 +1,9 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import objection from "objection";
-import { Posting, PostingStatus, Attribute } from "../models/index.js";
 import { InternalError } from "../utils/errors.js";
-import { format_relations } from "../utils/index.js";
 import { commit_trx, start_trx, rollback_trx } from "./db.service.js";
+import { query } from "./db.service.js";
 
 let { raw } = objection;
 
@@ -96,39 +95,49 @@ async function cursor_paginate(model, list = [], excludes = []) {
   return { list, has_next, has_prev };
 }
 
-export async function get_one({ id, relations = [], modify } = {}) {
-  if (!id) return;
-  return await Posting.query().findById(id).modify(modify).withGraphFetched(format_relations(relations));
+export async function get_one({ id, relation = {} } = {}) {
+  let { rows } = await query(`
+  select p.*
+  ${relation.location ? `, row_to_json(pl) as location` : ''}
+  ${relation.attachments ? `, array_agg(row_to_json(a)) as attachments` : ''}
+  from postings
+  ${relation.attachments ? `
+  left join posting_attachments pa on pa.posting_id = p.id
+  left join attachments a on a.id = pa.attachment_id` : ''}
+  ${relation.location ? `left join posting_location pl on pl.posting_id = p.id` : ''}
+  where id = $1
+  `, [id]);
+
+  return rows[0];
 }
 
-export async function get_by_hash_id(hash_id, relations = ["attachments", "location"]) {
-  if (!hash_id) return;
-  return await Posting.query()
-    .select(
-      "title",
-      "description",
-      "postings.created_at",
-      "postings.id",
-      "attribute_set",
-      "url",
-      "cover_url",
-      "er.to_currency as currency_code",
-      raw("round(price * rate) as price")
-    )
-    .findOne({ hash_id })
-    .join("posting_prices as pp", "postings.id", "pp.posting_id")
-    .join("exchange_rates as er", "er.from_currency", "pp.currency_code")
-    .where("er.to_currency", "=", "UZS")
-    .withGraphFetched(format_relations(relations));
-}
+export async function get_by_hash_id({ hash_id, relation = {} } = {}) {
+  //TODO: make this dynamic
+  let currency = "UZS"
 
-export async function get_attributes({ attribute_set = [], lang = "en" }) {
-  return await Attribute.query()
-    .whereIn("id", attribute_set)
-    .withGraphFetched("translation")
-    .modifyGraph("translation", (builder) =>
-      builder.where({ language_code: lang.substring(0, 2) })
-    );
+  let { rows } = await query(`
+    select p.*,
+    er.to_currency as currency,
+    round(pp.price * er.rate) as price
+    ${relation.attachments ? ', array_agg(row_to_json(a)) as attachments' : ''}
+    ${relation.creator ? `, json_build_object('name', u.name, 'id', u.id, 'profile_photo_url', u.profile_photo_url, 'profile_url', u.profile_url) as creator` : ''}
+    from postings p
+    join posting_prices pp on pp.posting_id  = p.id
+    join exchange_rates er on er.from_currency = pp.currency_code and er.to_currency = $1
+    ${relation.attachments ? `
+    left join posting_attachments pa on pa.posting_id = p.id
+    left join attachments a on a.id = pa.attachment_id
+    ` : ''}
+    ${relation.creator ? `
+    join users u on u.id = p.created_by
+    ` : ''}
+    where p.hash_id = $2
+    group by
+      p.id, pp.price, er.rate, er.to_currency
+      ${relation.creator ? ', u.id, u.name' : ''}
+  `, [currency, hash_id])
+
+  return rows[0];
 }
 
 export async function get_many({
@@ -139,56 +148,38 @@ export async function get_many({
   cursor,
   direction
 } = {}) {
-  let knex = Posting.knex();
-  let list = await knex.with("t1",
-    knex()
-      .from("postings")
-      .join("posting_status_translations as pst", "postings.status_id", "pst.status_id")
-      .join("posting_statuses as ps", "postings.status_id", "ps.id")
-      .where("pst.language_code", "=", lang.substring(0, 2))
-      .join("posting_prices as pp", "postings.id", "pp.posting_id")
-      .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
-      .join("posting_location", "postings.id", "posting_location.posting_id")
-      .where("exchange_rates.to_currency", "=", currency)
-      .select(
-        "title",
-        "description",
-        "postings.id",
-        "cover_url",
-        "url",
-        "postings.created_at as created_at",
-        "exchange_rates.to_currency as currency",
-        knex.raw("round(price * rate) as price"),
-        knex.raw("(json_build_object('id', ps.id, 'name', pst.name, 'code', ps.code, 'bg_hex', ps.bg_hex, 'fg_hex', ps.fg_hex)) as status"),
-        knex.raw("(json_agg(posting_location.*) ->> 0)::json as location")
-      )
-      .groupBy(["postings.id", "pst.id", "pp.price", "exchange_rates.rate", "ps.id", "exchange_rates.to_currency"])
-      .orderBy("postings.id", direction === "before" ? "asc" : direction === "after" ? "desc" : "desc")
-      .modify((qb) => {
-        if (direction === "after") {
-          qb.where("postings.id", "<", cursor);
-        } else if (direction === "before") {
-          qb.where("postings.id", ">", cursor);
-        }
-        if (status_id) {
-          qb.where("postings.status_id", "=", status_id);
-        }
-      })
-      .limit(limit)
-  ).select("*").from("t1").orderBy("id", "desc")
+  let { rows } = await query(`
+    select p.*, er.to_currency as currency, round(pp.price * er.rate) as price, row_to_json(pl) as location from postings p
+    join posting_prices pp on pp.posting_id = p.id
+    join exchange_rates er on er.from_currency = pp.currency_code and er.to_currency = $1
+    join posting_location pl on pl.posting_id = p.id
+    where status_id = $2 order by p.id limit $3`, [currency, status_id, limit]);
 
-  return await cursor_paginate(Posting, list);
+  // TODO: handle pagination
+  return { list: rows }
 }
 
-get_many({ limit: 2, direction: "before", cursor: 2 });
-
 export async function get_statuses({ lang = "en" }) {
-  return await PostingStatus.query()
-    .select("pst.name as name", "posting_statuses.id", "posting_statuses.code", "posting_statuses.bg_hex", "posting_statuses.fg_hex")
-    .join("posting_status_translations as pst", "pst.status_id", "posting_statuses.id")
-    .where({ language_code: lang.substring(0, 2) });
+  let { rows } = await query(`select ps.id, ps.code, ps.bg_hex, ps.fg_hex, pst.name from posting_statuses ps
+    join posting_status_translations pst on pst.status_id = ps.id and language_code = $1
+  `, [lang.substring(0, 2)])
+
+  return rows;
 }
 
 export async function update_one(id, update) {
-  return await Posting.query().findById(id).patch(update);
+  let sql = '';
+  let keys = Object.keys(update);
+  for (let i = 0, len = keys.length; i < len; i++) {
+    sql += keys[i] + "=" + update[keys[i]];
+    let is_last = i === len - 1;
+    if (!is_last) sql += ", "
+  }
+  let { rowCount, rows } = await query(`update postings set ${sql} where id = $1`, [id])
+
+  if (rowCount === 0) {
+    //TODO: does not exist
+  }
+
+  return rows[0];
 }

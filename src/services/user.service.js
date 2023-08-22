@@ -1,15 +1,10 @@
 import * as BillingService from "./billing.service.js";
-import { User } from "../models/index.js";
 import { createHash, randomBytes } from "crypto";
 import { query } from "./db.service.js";
 import * as argon2 from "argon2";
 
 let email_regex =
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
-
-export async function start_transaction() {
-  return await User.startTransaction();
-}
 
 function gravatar(email, url) {
   if (!email || url) return;
@@ -100,45 +95,60 @@ export async function get_many({
   limit,
   excludes,
 } = {}) {
-  let query = User.query().orderBy("id", "desc").limit(limit);
+  let sql = `select * from users`
+  let params = [];
 
   let excluded_ids = [excludes].flat().filter(Boolean);
 
   if (excludes) {
-    query.whereNotIn("id", excluded_ids);
+    params.push(excluded_ids);
+    sql += ` where id != any($${params.length})`;
   }
 
   if (id) {
-    let list = await query.where({ id });
-    return { list, has_next: false, has_prev: false };
+    params.push(id);
+    sql += ` where id = $${params.length}`
+    let { rows } = await query(sql, params);
+    return { list: rows, has_next: false, has_prev: false };
   }
 
   if (username) {
-    let list = await query.where({ username });
-    return { list, has_next: false, has_prev: false };
+    params.push(username);
+    sql += ` where username = $${params.length}`
+    let { rows } = await query(sql, params);
+    return { list: rows, has_next: false, has_prev: false };
   }
 
   if (phone) {
-    let list = await query.where({ phone });
-    return { list, has_next: false, has_prev: false };
+    params.push(phone);
+    sql += ` where phone = $${params.length}`
+    let { rows } = await query(sql, params);
+    return { list: rows, has_next: false, has_prev: false };
   }
 
   if (email) {
-    let list = await query.where({ email });
-    return { list, has_next: false, has_prev: false };
+    params.push(phone);
+    sql += ` where email = $${params.length}`
+    let { rows } = await query(sql, params);
+    return { list: rows, has_next: false, has_prev: false };
   }
 
   if (after) {
-    query.where("id", "<", after);
+    params.push(after);
+    sql += ` where id < $${params.length}`;
   }
 
   if (before) {
-    query.where("id", ">", before);
+    params.push(before);
+    sql += ` where id > $${params.length}`;
   }
 
-  let list = await query;
+  params.push(limit);
+  sql += 'order by id desc limit $${params.length}'
 
-  return await cursor_paginate(User, list, excluded_ids);
+  let { rows } = await query(sql, params);
+
+  return { list: rows }
 }
 
 export async function get_by_username(username, relations = []) {

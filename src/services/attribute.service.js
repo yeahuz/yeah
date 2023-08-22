@@ -10,8 +10,14 @@ export async function get_category_attributes({ category_set = [], lang = "en" }
   return rows;
 }
 
-export async function get_many({ lang = "en", format = "tree" } = {}) {
-  let { rows } = await query(`select a.id, a.parent_id, a.type, a.category_set, at.name from attributes a join attribute_translations at on at.attribute_id = a.id and at.language_code = $1`, [lang.substring(0, 2)]);
+export async function get_many({ lang = "en", format = "tree", attribute_set = [] } = {}) {
+  let sql = `select a.id, a.parent_id, a.type, a.category_set, at.name from attributes a join attribute_translations at on at.attribute_id = a.id and at.language_code = $1`;
+  let params = [lang.substring(0, 2)];
+  if (attribute_set.length) {
+    sql += ' where a.id = any($2)'
+    params.push(attribute_set);
+  }
+  let { rows } = await query(sql, params);
   if (format === "tree") return array_to_tree(rows);
   return rows;
 }

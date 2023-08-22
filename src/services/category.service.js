@@ -1,9 +1,17 @@
-import { Category } from "../models/index.js";
+import { InternalError } from "../utils/errors.js";
 import { array_to_tree } from "../utils/index.js";
-import { query } from "./db.service.js";
+import { query, rollback_trx } from "./db.service.js";
 
 export async function create_one({ translation, parent_id }) {
-  return await Category.query().insertGraph({ parent_id, translation }, { relate: true });
+  let trx = await start_trx();
+  try {
+    let { rows: [category] } = await trx.query(`insert into categories (parent_id) values ($1) returning id`, [parent_id]);
+    await Promise.all(translation.map(t => trx.query(`insert into category_translations (category_id, title, description, language_code)`, [category.id, t.title, t.description, t.language_code])))
+    await commit_trx(trx);
+  } catch (err) {
+    rollback_trx(trx);
+    throw new InternalError();
+  }
 }
 
 export async function get_many({ lang = "en", format = "tree" } = {}) {
@@ -23,27 +31,22 @@ export async function get_by_parent({ lang = "en", parent_id = null } = {}) {
   return rows;
 }
 
+//TODO: why is taking ~200ms. It takes 1ms in dbeaver;
 export async function get_parents(category_id, include_itself = true) {
-  const knex = Category.knex();
-  const cte_query = knex
-    .withRecursive("category_parents", (qb) => {
-      qb.select("parent_id", "id")
-        .from("categories")
-        .where({ id: category_id })
-        .unionAll((qb) => {
-          qb.select("categories.parent_id", "categories.id")
-            .from("categories")
-            .join("category_parents", "category_parents.parent_id", "categories.id");
-        });
-    })
-    .select("id")
-    .from("category_parents");
+  let sql = `with recursive category_parents as (
+    select parent_id, id from categories c where id = $1
+    union all
+    select c.parent_id, c.id from categories c
+    join category_parents cp on cp.parent_id = c.id
+  ) select id from category_parents`
 
   if (!include_itself) {
-    cte_query.whereNot({ id: category_id });
+    sql += ' where id != $1'
   }
 
-  return await cte_query;
+  let { rows } = await query(sql, [category_id]);
+
+  return rows;
 }
 
 export async function delete_one(id) {

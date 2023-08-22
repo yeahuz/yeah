@@ -304,7 +304,7 @@ export async function get_contact(req, reply) {
   let t = req.i18n.t;
   let user = req.user;
 
-  let posting = PostingService.get_by_hash_id(hash_id, ["creator"]);
+  let posting = PostingService.get_by_hash_id({ hash_id, relation: { creator: true } });
 
   if (!req.partial) {
     let top = await render_file("/partials/top.html", {
@@ -397,7 +397,7 @@ export async function get_one(req, reply) {
   let t = req.i18n.t;
   let user = req.user;
 
-  let posting = PostingService.get_by_hash_id(hash_id, ["attachments", "location", "creator"]);
+  let posting = PostingService.get_by_hash_id({ hash_id, relation: { attachments: true, creator: true } });
 
   if (!req.partial) {
     let top = await render_file("/partials/top.html", {
@@ -422,12 +422,7 @@ export async function get_one(req, reply) {
     generate_srcset,
     lang: req.language,
     user,
-    attributes: array_to_tree(
-      await PostingService.get_attributes({
-        attribute_set: (await posting).attribute_set,
-        lang: req.language,
-      })
-    ),
+    attributes: await AttributeService.get_many({ attribute_set: (await posting).attribute_set, lang: req.language }),
   });
   stream.push(single);
 
