@@ -59,7 +59,7 @@ export async function signup({
 }
 
 export async function verify_password({ identifier, password }) {
-  let user = await UserService.get_by_email_phone(identifier, ["roles"]);
+  let user = await UserService.get_by_email_phone(identifier, { roles: true });
   if (!user)
     throw new ResourceNotFoundError({
       key: "!user_exists",

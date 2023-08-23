@@ -8,6 +8,7 @@ export class ImageViewer {
     this.current_index = 0;
 
     this.container = undefined;
+    this.current = undefined;
     this.viewer = undefined;
     this.next_control = undefined;
     this.prev_control = undefined;
@@ -47,6 +48,7 @@ export class ImageViewer {
   }
 
   close(e) {
+    if (!this.current) return;
     if (e.target === e.currentTarget) {
       this.toggle_viewer();
     }
@@ -79,24 +81,24 @@ export class ImageViewer {
   }
 
   next() {
-    let current = this.items[this.current_index];
-    let is_at_end = this.items[this.items.length - 1] === current;
+    this.current = this.items[this.current_index];
+    let is_at_end = this.items[this.items.length - 1] === this.current;
     if (is_at_end) return;
     this.current_index += 1;
     this.display_current();
   }
 
   prev() {
-    let current = this.items[this.current_index];
-    let is_at_start = this.items[0] === current;
+    this.current = this.items[this.current_index];
+    let is_at_start = this.items[0] === this.current;
     if (is_at_start) return;
     this.current_index -= 1;
     this.display_current();
   }
 
   display_current() {
-    let current = this.items[this.current_index];
-    let { photo_url, object_url } = current.dataset;
+    this.current = this.items[this.current_index];
+    let { photo_url, object_url } = this.current.dataset;
     if (object_url) {
       this.viewer.removeAttribute("srcset");
       this.viewer.removeAttribute("crossorigin");

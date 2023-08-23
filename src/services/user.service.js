@@ -57,12 +57,12 @@ export async function exists(identifier) {
   return rows.length > 0
 }
 
-export async function get_by_email_phone(identifier, params = {}) {
+export async function get_by_email_phone(identifier, relation = {}) {
   let field_name = email_regex.test(identifier) ? "email" : "phone";
-  let sql = `select u.id, u.name, u.password, u.username, u.profile_photo_url, u.email, u.profile_url${params.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
-      ${params.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
+  let sql = `select u.id, u.name, u.password, u.username, u.profile_photo_url, u.email, u.profile_url${relation.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
+      ${relation.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
       where ${field_name} = $1
-      ${params.roles ? 'group by u.id, ur.user_id, ur.role_id, r.id' : ''}`;
+      ${relation.roles ? 'group by u.id, ur.user_id, ur.role_id, r.id' : ''}`;
 
   let { rows } = await query(sql, [identifier]);
 
@@ -157,12 +157,12 @@ export async function get_many({
   return { list: rows }
 }
 
-export async function get_by_username(username, relations = []) {
+export async function get_by_username(username) {
   let { rows } = await query(`select * from users where username = $1`, [username]);
   return rows[0];
 }
 
-export async function get_by_hashid(hash_id, relations = []) {
+export async function get_by_hashid(hash_id) {
   let { rows } = await query(`select * from users where hash_id = $1`, [hash_id]);
   return rows[0];
 }
