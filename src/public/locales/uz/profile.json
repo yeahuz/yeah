@@ -4,5 +4,16 @@
   "active": "Faol",
   "show_phone": "Telefonni ko'rsatish",
   "verified_user": "Tasdiqlangan foydalanuvchi",
-  "contact_user": "{{name}} bilan bog'lanish"
+  "contact_user": "{{name}} bilan bog'lanish",
+  "my_profile": "Mening profilim",
+  "tabs": {
+    "overview": "Umumiy",
+    "recently_viewed": "Yaqinda ko'rilgan",
+    "watchlist": "Kuzatuv roʻyxati",
+    "purchases": "Xaridlar",
+    "selling": {
+      "title": "Sotish",
+      "children": []
+    }
+  }
 }

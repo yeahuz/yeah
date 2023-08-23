@@ -4,5 +4,16 @@
   "active": "Active",
   "show_phone": "Show phone",
   "verified_user": "Verified user",
-  "contact_user": "Contact {{name}}"
+  "contact_user": "Contact {{name}}",
+  "my_profile": "My profile",
+  "tabs": {
+    "overview": "Overview",
+    "recently_viewed": "Recently viewed",
+    "watchlist": "Watchlist",
+    "purchases": "Purchases",
+    "selling": {
+      "title": "Selling",
+      "children": []
+    }
+  }
 }

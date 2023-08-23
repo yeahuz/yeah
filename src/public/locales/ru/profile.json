@@ -4,5 +4,47 @@
   "active": "Активные",
   "show_phone": "Показать телефон",
   "verified_user": "Проверенный пользователь",
-  "contact_user": "Связаться с {{name}}"
+  "contact_user": "Связаться с {{name}}",
+  "my_profile": "Мой профиль",
+  "tabs2": [
+    {
+      "key": "overview",
+      "value": "Обзор"
+    },
+    {
+      "key": "rv",
+      "value": "Недавно просмотренные"
+    },
+    {
+      "key": "watchlist",
+      "value": "Наблюдаемые"
+    },
+    {
+      "key": "purchases",
+      "value": "Покупки"
+    },
+    {
+      "key": "s",
+      "value": "Продажа",
+      "children": [
+        {
+          "key": "overview",
+          "value": "Обзор"
+        },
+        {
+          "key": "active",
+          "value": "Активные"
+        }
+      ]
+    }
+  ],
+  "tabs": {
+    "overview": "Обзор",
+    "recently_viewed": "Недавно просмотренные",
+    "watchlist": "Наблюдаемые",
+    "purchases": "Покупки",
+    "selling": {
+      "title": "Продажа"
+    }
+  }
 }

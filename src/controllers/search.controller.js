@@ -4,7 +4,6 @@ import {
   cleanup_object,
   remove_query_value,
   append_query_value,
-  array_to_tree,
   generate_srcset,
 } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
@@ -12,21 +11,22 @@ import { render_file } from "../utils/eta.js";
 import * as ESService from "../services/es.service.js";
 
 export async function get_search(req, reply) {
-  const stream = reply.init_stream();
-  const user = req.user;
-  const t = req.i18n.t;
+  let stream = reply.init_stream();
+  let user = req.user;
+  let t = req.i18n.t;
 
-  const {
+  let {
     q = "",
     min_amount,
     max_amount,
     placement,
     region_id,
+    category_id,
     ...facets
   } = cleanup_object(req.query);
 
   if (!req.partial) {
-    const top = await render_file("/partials/top.html", {
+    let top = await render_file("/partials/top.html", {
       meta: { title: t("home", { ns: "common" }), lang: req.language },
       user,
       t,
@@ -35,19 +35,23 @@ export async function get_search(req, reply) {
     stream.push(top);
   }
 
-  const categories = !q ? await CategoryService.get_by_parent({ lang: req.language }) : [];
-  const regions = await RegionService.get_regions({ lang: req.language });
-  const search_top = await render_file("/search/top.html", {
+  let [categories, regions] = await Promise.all([
+    CategoryService.get_many({ lang: req.language, format: "tree" }),
+    RegionService.get_regions({ lang: req.language })
+  ]);
+
+  let search_top = await render_file("/search/top.html", {
     q: q.trim(),
     t,
     user,
-    categories: array_to_tree(categories),
+    categories,
     region_id,
     regions,
+    category_id
   });
   stream.push(search_top);
 
-  const result = await ESService.general_search("needs_ru", {
+  let result = await ESService.general_search("needs_ru", {
     region_id,
     facets,
     min_amount,
@@ -56,7 +60,7 @@ export async function get_search(req, reply) {
     placement,
   });
 
-  const filters = await render_file("/search/filters.html", {
+  let filters = await render_file("/search/filters.html", {
     filters: result.aggregations,
     min_amount,
     max_amount,
@@ -70,7 +74,7 @@ export async function get_search(req, reply) {
   });
   stream.push(filters);
 
-  const results = await render_file("/search/results.html", {
+  let results = await render_file("/search/results.html", {
     hits: result.hits,
     lang: req.language,
     t,
@@ -81,7 +85,7 @@ export async function get_search(req, reply) {
   stream.push(results);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { user, t });
+    let bottom = await render_file("/partials/bottom.html", { user, t });
     stream.push(bottom);
   }
 
@@ -90,11 +94,11 @@ export async function get_search(req, reply) {
 }
 
 export async function get_completions(req, reply) {
-  const { q } = req.query;
-  const words = q.split(" ").map((w) => w.toLowerCase());
-  const prefix = words[words.length - 1];
-  const term = words.slice(0, words.length - 1).join("");
-  const response = await ESService.elastic_client.search({
+  let { q } = req.query;
+  let words = q.split(" ").map((w) => w.toLowerCase());
+  let prefix = words[words.length - 1];
+  let term = words.slice(0, words.length - 1).join("");
+  let response = await ESService.elastic_client.search({
     index: "needs_ru",
     body: {
       query: {
@@ -109,11 +113,11 @@ export async function get_completions(req, reply) {
     },
   });
 
-  const results = response.hits.hits;
-  const suggestions = [];
-  for (const result of results) {
-    const title = result._source.result.title.toLowerCase();
-    const matches = title.match(new RegExp(`(?<=${q}).+`));
+  let results = response.hits.hits;
+  let suggestions = [];
+  for (let result of results) {
+    let title = result._source.result.title.toLowerCase();
+    let matches = title.match(new RegExp(`(?<=${q}).+`));
     if (matches) suggestions.push(matches[0]);
   }
 

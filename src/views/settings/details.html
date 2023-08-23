@@ -100,7 +100,7 @@
         <% if (it.user.phone) { %>
           <div class="flex flex-col space-y-2 mt-2 peer-checked:hidden">
             <span>
-              <%= it.user.formatted_phone ?? "" %>
+              <%= it.format_phone(it.user.phone) ?? "" %>
             </span>
             <div class="flex items-center">
               <% if (!it.user.phone_verified) { %>
@@ -152,7 +152,7 @@
           <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.username.label", { ns: "settings-details" }) %></span>
           <div class="flex mt-2">
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">needs.uz/</span>
-            <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.username.placeholder", { ns: "settings-details" }) %>" name="username" value="<%= it.user.username ?? "" %>">
+            <input type="text" class="form-control !rounded-l-none" spellcheck="false" placeholder="<%= it.t("general.username.placeholder", { ns: "settings-details" }) %>" name="username" value="<%= it.user.username ?? "" %>">
           </div>
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.username ?? ""%></small>
         </label>
@@ -160,7 +160,7 @@
           <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= it.t("general.website.label", { ns: "settings-details" }) %></span>
           <div class="flex mt-2">
             <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">https://</span>
-            <input type="text" class="form-control !rounded-l-none" placeholder="<%= it.t("general.website.placeholder", { ns: "settings-details" }) %>" name="website_url" value="<%= it.user.website_url ?? "" %>">
+            <input type="text" class="form-control !rounded-l-none" spellcheck="false" placeholder="<%= it.t("general.website.placeholder", { ns: "settings-details" }) %>" name="website_url" value="<%= it.user.website_url ?? "" %>">
           </div>
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors?.[0]?.website_url ?? ""%></small>
         </label>

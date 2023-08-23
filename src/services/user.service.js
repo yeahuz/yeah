@@ -36,14 +36,16 @@ function create_one_impl(trx = { query }) {
 
 export async function update_one(id, update = {}) {
   let sql = '';
+  let params = [id];
   let keys = Object.keys(update);
   for (let i = 0, len = keys.length; i < len; i++) {
-    sql += keys[i] + "=" + update[keys[i]];
+    params.push(update[keys[i]]);
+    sql += keys[i] + " = " + `$${params.length}`;
     let is_last = i === len - 1;
     if (!is_last) sql += ", "
   }
 
-  let { rows, rowCount } = await query(`update users set ${sql} where id = $1`, [id]);
+  let { rows, rowCount } = await query(`update users set ${sql} where id = $1`, params);
   if (rowCount == 0) {
     // TODO: user does not exist.handle somehow ??
   }
@@ -59,7 +61,9 @@ export async function exists(identifier) {
 
 export async function get_by_email_phone(identifier, relation = {}) {
   let field_name = email_regex.test(identifier) ? "email" : "phone";
-  let sql = `select u.id, u.name, u.password, u.username, u.profile_photo_url, u.email, u.profile_url${relation.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
+  let sql = `select
+      u.id, u.name, u.website_url, u.password, u.username, u.profile_photo_url, u.phone, u.phone_verified, u.email, u.email_verified, u.profile_url
+      ${relation.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
       ${relation.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
       where ${field_name} = $1
       ${relation.roles ? 'group by u.id, ur.user_id, ur.role_id, r.id' : ''}`;
@@ -72,7 +76,7 @@ export async function get_by_email_phone(identifier, relation = {}) {
 export async function get_by_id(id, params = {}) {
   //TODO: some API to select columns;
   if (!id) return;
-  let sql = `select u.id, u.name, u.username, u.profile_photo_url, u.email, u.profile_url${params.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
+  let sql = `select u.id, u.name, u.website_url, u.username, u.phone, u.phone_verified, u.email, u.email_verified, u.profile_photo_url, u.email, u.profile_url${params.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
       ${params.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
       where u.id = $1
       ${params.roles ? 'group by u.id, ur.user_id, ur.role_id, r.id' : ''}`;

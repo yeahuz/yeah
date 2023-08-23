@@ -15,6 +15,7 @@ import { cfimg } from "./cfimg.route.js";
 import { cfr2 } from "./cfr2.route.js";
 import { cf } from "./cf.route.js";
 import { chat } from "./chat.route.js";
+import { profile } from "./profile.route.js";
 import { i18next } from "../utils/i18n.js";
 
 // API routes
@@ -61,6 +62,7 @@ export const routes = async (fastify) => {
   fastify.register(cfr2, { prefix: "/cloudflare/r2" });
   fastify.register(cf, { prefix: "/cf" });
   fastify.register(billing, { prefix: "/billing" });
+  fastify.register(profile, { prefix: "/myp" });
   fastify.register(chat, { prefix: "/chats" });
 };
 

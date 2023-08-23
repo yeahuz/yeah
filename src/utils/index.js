@@ -4,7 +4,7 @@ import { DomainError, InternalError } from "./errors.js";
 
 export async function option(promise) {
   try {
-    const result = await promise;
+    let result = await promise;
     return [result, null];
   } catch (err) {
     console.log({ err });
@@ -17,8 +17,8 @@ export async function option(promise) {
 
 export function interpolate(str, params) {
   let s = str;
-  const flat_params = flatten_obj(params)
-  for (const prop in flat_params) {
+  let flat_params = flatten_obj(params)
+  for (let prop in flat_params) {
     s = s.replace(new RegExp("{{" + prop + "}}"), flat_params[prop])
   }
 
@@ -26,7 +26,7 @@ export function interpolate(str, params) {
 }
 
 export function flatten_obj(obj, parent, res = {}) {
-  for (const prop in obj) {
+  for (let prop in obj) {
     let key = parent ? parent + "." + prop : prop;
     if (typeof obj[prop] === "object") {
       flatten_obj(obj[prop], key, res)
@@ -39,8 +39,8 @@ export function flatten_obj(obj, parent, res = {}) {
 }
 
 export function format_relations(relations = []) {
-  const str = relations.toString();
-  const newRelations = str ? `[${str}]` : str;
+  let str = relations.toString();
+  let newRelations = str ? `[${str}]` : str;
   return newRelations;
 }
 
@@ -56,30 +56,30 @@ export function prop(key) {
   return (obj) => obj[key];
 }
 
-const IV_LENGTH = 16;
+let IV_LENGTH = 16;
 
 export function encrypt(text) {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(
+  let iv = crypto.randomBytes(IV_LENGTH);
+  let cipher = crypto.createCipheriv(
     "aes-256-cbc",
     Buffer.from(config.encryption_key, "hex"),
     iv
   );
 
-  const encrypted = Buffer.concat([iv, cipher.update(text), cipher.final()]);
+  let encrypted = Buffer.concat([iv, cipher.update(text), cipher.final()]);
 
   return encrypted.toString("hex");
 }
 
 export function decrypt(hash) {
-  const iv = Buffer.from(hash, "hex").slice(0, IV_LENGTH);
-  const decipher = crypto.createDecipheriv(
+  let iv = Buffer.from(hash, "hex").slice(0, IV_LENGTH);
+  let decipher = crypto.createDecipheriv(
     "aes-256-cbc",
     Buffer.from(config.encryption_key, "hex"),
     iv
   );
 
-  const decrypted = Buffer.concat([
+  let decrypted = Buffer.concat([
     decipher.update(Buffer.from(hash, "hex").slice(IV_LENGTH)),
     decipher.final(),
   ]);
@@ -115,7 +115,7 @@ export function verify_sha256(signature, data, public_key) {
 }
 
 export function get_domain_without_subdomain(url) {
-  const url_parts = new URL(url).hostname.split(".");
+  let url_parts = new URL(url).hostname.split(".");
 
   return url_parts
     .slice(0)
@@ -137,14 +137,14 @@ export function add_t(path) {
 }
 
 export function add_minutes_to_now(mins = 0) {
-  const now = new Date();
+  let now = new Date();
   return new Date(now.getTime() + mins * 60000);
 }
 
 export function group_by(key, root_id = "0") {
-  const result = {};
+  let result = {};
   return (arr) => {
-    for (const item of arr) {
+    for (let item of arr) {
       let parent_id = item[key];
       if (!parent_id) {
         parent_id = root_id;
@@ -159,11 +159,11 @@ export function group_by(key, root_id = "0") {
 export function create_tree(children_prop, root_id = "0", custom_id = "id") {
   return function t(grouped) {
     let tree = [];
-    const root_nodes = grouped[root_id];
+    let root_nodes = grouped[root_id];
 
-    for (const root_node in root_nodes) {
-      const node = root_nodes[root_node];
-      const child_node = grouped[node[custom_id]];
+    for (let root_node in root_nodes) {
+      let node = root_nodes[root_node];
+      let child_node = grouped[node[custom_id]];
 
       if (!node && !root_nodes.hasOwnProperty(root_node)) {
         continue;
@@ -207,14 +207,14 @@ export function create_tree2(array, rootNodes, customID, childrenProperty) {
 }
 
 export function cleanup_object(obj) {
-  for (const prop in obj) {
+  for (let prop in obj) {
     if (!obj[prop]) delete obj[prop];
   }
   return obj;
 }
 
 export function transform_object(obj, transformations) {
-  for (const prop in transformations) {
+  for (let prop in transformations) {
     if (obj[prop]) obj[prop] = transformations[prop](obj[prop]);
   }
 
@@ -231,12 +231,12 @@ export function generate_srcset(url, options, count = 20) {
 }
 
 export function remove_query_value(current, key, value_to_remove) {
-  const query_params = new URLSearchParams(current);
-  const values = query_params.getAll(key);
+  let query_params = new URLSearchParams(current);
+  let values = query_params.getAll(key);
 
   if (values.length) {
     query_params.delete(key);
-    for (const value of values) {
+    for (let value of values) {
       if (value !== value_to_remove) {
         query_params.append(key, value);
       }
@@ -247,7 +247,7 @@ export function remove_query_value(current, key, value_to_remove) {
 }
 
 export function append_query_value(current, key, value) {
-  const params = new URLSearchParams(current);
+  let params = new URLSearchParams(current);
   params.append(key, value);
   return decodeURIComponent(params.toString());
 }
@@ -256,10 +256,17 @@ export function append_query_value(current, key, value) {
 export function format_bytes(bytes, decimals = 2) {
   if (!+bytes) return "0 bytes";
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  let k = 1024;
+  let dm = decimals < 0 ? 0 : decimals;
+  let sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  let i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))}${sizes[i]}`;
+}
+
+export function format_phone(phone) {
+  return phone?.replace(
+    /^(33|55|77|88|90|91|93|94|95|97|98|99)(\d{3})(\d{2})(\d{2})$/,
+    "$1 $2 $3 $4"
+  );
 }

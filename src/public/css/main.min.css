@@ -785,6 +785,10 @@ video {
   margin-left: -0.75rem;
 }
 
+.-mr-2 {
+  margin-right: -0.5rem;
+}
+
 .-mt-6 {
   margin-top: -1.5rem;
 }
@@ -903,6 +907,14 @@ video {
 
 .mt-8 {
   margin-top: 2rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.ml-5 {
+  margin-left: 1.25rem;
 }
 
 .line-clamp-2 {
@@ -3403,6 +3415,11 @@ j [data-tooltip][data-flow="right"]::before {
 
 .disabled\:cursor-not-allowed:disabled {
   cursor: not-allowed;
+}
+
+.group[open] .group-open\:-rotate-180 {
+  --tw-rotate: -180deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .group:hover .group-hover\:scale-100 {

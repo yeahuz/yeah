@@ -21,13 +21,18 @@ export async function get_many({ lang = "en", format = "tree" } = {}) {
 }
 
 export async function get_by_parent({ lang = "en", parent_id = null } = {}) {
-  let { rows } = await query(`
-    select c.id, c.parent_id,
+  let params = [lang.substring(0, 2)];
+  let sql = `
+    select c.id, c.parent_id, ct.title,
     exists (select 1 from categories where parent_id = c.id and parent_id is not null limit 1) as has_children
     from categories c
-    join category_translations ct on ct.category_id = c.id and ct.language_code = $1
-    where parent_id = $2`, [lang.substring(0, 2), parent_id])
+    join category_translations ct on ct.category_id = c.id and ct.language_code = $1`;
+  if (parent_id != null) {
+    params.push(parent_id);
+    sql += ` where parent_id = $${params.length}`;
+  } else sql += ` where parent_id is null`;
 
+  let { rows } = await query(sql, params);
   return rows;
 }
 

@@ -8,16 +8,16 @@ import { option, add_t, transform_object, generate_srcset } from "../utils/index
 import { render_file } from "../utils/eta.js";
 
 export async function get_one(req, reply) {
-  const { username } = req.params;
-  const { ps = "active" } = req.query;
-  const stream = reply.init_stream();
-  const current_user = req.user;
-  const t = req.t;
+  let { username } = req.params;
+  let { ps = "active" } = req.query;
+  let stream = reply.init_stream();
+  let current_user = req.user;
+  let t = req.t;
 
-  const profile = current_user?.username === username ? current_user : UserService.get_by_username(username);
+  let profile = current_user?.username === username ? current_user : UserService.get_by_username(username);
 
   if (!req.partial) {
-    const top = await render_file("/partials/top.html", {
+    let top = await render_file("/partials/top.html", {
       meta: { title: (await profile)?.name, lang: req.language },
       t,
       user: current_user
@@ -27,10 +27,10 @@ export async function get_one(req, reply) {
   }
 
   if (!profile) {
-    const not_found = await render_file("/partials/404.html", { t });
+    let not_found = await render_file("/partials/404.html", { t });
     stream.push(not_found);
   } else {
-    const profile_html = await render_file("/profile.html", {
+    let profile_html = await render_file("/profile.html", {
       t,
       profile: await profile,
       current_user,
@@ -41,7 +41,7 @@ export async function get_one(req, reply) {
   }
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", {
+    let bottom = await render_file("/partials/bottom.html", {
       t,
       user: current_user
     });
@@ -53,13 +53,13 @@ export async function get_one(req, reply) {
 }
 
 export async function update_one(req, reply) {
-  const t = req.i18n.t;
-  const user = req.user;
-  const { id } = req.params;
-  const { return_to = "/", err_to = "/" } = req.query;
-  const { name, website_url, username, photo_id } = req.body;
+  let t = req.i18n.t;
+  let user = req.user;
+  let { id } = req.params;
+  let { return_to = "/", err_to = "/" } = req.query;
+  let { name, website_url, username, photo_id } = req.body;
 
-  const [result, err] = await option(
+  let [result, err] = await option(
     UserService.update_one(id, {
       name,
       website_url,
@@ -82,11 +82,11 @@ export async function update_one(req, reply) {
 }
 
 export async function send_phone_code(req, reply) {
-  const t = req.i18n.t;
-  const user = req.user;
-  const { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
-  const { id } = req.params;
-  const { phone, country_code = "998" } = transform_object(req.body, {
+  let t = req.i18n.t;
+  let user = req.user;
+  let { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
+  let { id } = req.params;
+  let { phone, country_code = "998" } = transform_object(req.body, {
     phone: (v) => v.replace(/\s/g, ""),
   });
 
@@ -95,7 +95,7 @@ export async function send_phone_code(req, reply) {
     return reply;
   }
 
-  const [result, update_err] = await option(
+  let [result, update_err] = await option(
     UserService.update_one(id, { phone, phone_verified: user.phone === phone })
   );
 
@@ -105,10 +105,10 @@ export async function send_phone_code(req, reply) {
     return reply;
   }
 
-  const has_expired_code = await ConfirmationCodeService.has_expired_code(phone);
+  let has_expired_code = await ConfirmationCodeService.has_expired_code(phone);
 
   if (has_expired_code) {
-    const [code, err] = await option(ConfirmationCodeService.generate(phone));
+    let [code, err] = await option(ConfirmationCodeService.generate(phone));
 
     if (err) {
       req.flash("err", err.build(t));
@@ -130,18 +130,18 @@ export async function send_phone_code(req, reply) {
 }
 
 export async function send_email_link(req, reply) {
-  const t = req.i18n.t;
-  const user = req.user;
-  const { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
-  const { id } = req.params;
-  const { email } = req.body;
+  let t = req.i18n.t;
+  let user = req.user;
+  let { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
+  let { id } = req.params;
+  let { email } = req.body;
 
   if (user.email === email) {
     reply.redirect(return_to);
     return reply;
   }
 
-  const [result, update_err] = await option(
+  let [result, update_err] = await option(
     UserService.update_one(id, { email, email_verified: user.email === email })
   );
 
@@ -151,11 +151,11 @@ export async function send_email_link(req, reply) {
     return reply;
   }
 
-  const token = jwt.sign(
+  let token = jwt.sign(
     { new_email: email, old_email: user.email },
     { expiresIn: 1000 * 60 * 60 }
   ); // 60 minutes;
-  const verification_link = `${config.origin}/users/${id}/emails?token=${token}&return_to=${return_to}`;
+  let verification_link = `${config.origin}/users/${id}/emails?token=${token}&return_to=${return_to}`;
 
   events.emit("send_email", {
     tmpl_name: !user.email ? "new_email" : "update_email",
@@ -172,11 +172,11 @@ export async function send_email_link(req, reply) {
 }
 
 export async function update_email(req, reply) {
-  const t = req.i18n.t;
-  const { return_to = "/settings/details", token, err_to = "/settings/details" } = req.query;
-  const { id } = req.params;
+  let t = req.i18n.t;
+  let { return_to = "/settings/details", token, err_to = "/settings/details" } = req.query;
+  let { id } = req.params;
 
-  const [decoded, err] = await option(jwt.verify(token));
+  let [decoded, err] = await option(jwt.verify(token));
 
   if (err) {
     req.flash("err", err.build(t));
@@ -184,7 +184,7 @@ export async function update_email(req, reply) {
     return reply;
   }
 
-  const [result, update_err] = await option(UserService.update_one(id, { email_verified: true }));
+  let [result, update_err] = await option(UserService.update_one(id, { email_verified: true }));
 
   if (update_err) {
     req.flash("err", err.build(t));
@@ -197,14 +197,14 @@ export async function update_email(req, reply) {
 }
 
 export async function update_phone(req, reply) {
-  const t = req.i18n.t;
-  const { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
-  const { id } = req.params;
-  const { phone, otp } = transform_object(req.body, {
+  let t = req.i18n.t;
+  let { return_to = "/settings/details", err_to = "/settings/details" } = req.query;
+  let { id } = req.params;
+  let { phone, otp } = transform_object(req.body, {
     phone: (v) => v.replace(/\s/g, ""),
   });
 
-  const is_valid = await ConfirmationCodeService.verify(phone, otp);
+  let is_valid = await ConfirmationCodeService.verify(phone, otp);
 
   if (!is_valid) {
     req.flash("err", new GoneError({ key: "otp_expired" }).build(t));
@@ -212,7 +212,7 @@ export async function update_phone(req, reply) {
     return reply;
   }
 
-  const [result, err] = await option(UserService.update_one(id, { phone_verified: is_valid }));
+  let [result, err] = await option(UserService.update_one(id, { phone_verified: is_valid }));
 
   if (err) {
     req.flash("err", err.build(t));
@@ -226,21 +226,21 @@ export async function update_phone(req, reply) {
 }
 
 export async function get_email_form(req, reply) {
-  const stream = reply.init_stream();
-  const t = req.i18n.t;
-  const { tmpl_name = "new-email-form", token } = req.query;
+  let stream = reply.init_stream();
+  let t = req.i18n.t;
+  let { tmpl_name = "new-email-form", token } = req.query;
 
   if (!req.partial) {
-    const top = await render_file("/partials/top.html", {
+    let top = await render_file("/partials/top.html", {
       meta: { title: t("title", { ns: "2fa" }), lang: req.language },
       t,
     });
     stream.push(top);
   }
 
-  const [decoded, err] = await option(jwt.verify(token));
+  let [decoded, err] = await option(jwt.verify(token));
 
-  const email_form = await render_file(`/users/${tmpl_name}`, {
+  let email_form = await render_file(`/users/${tmpl_name}`, {
     t,
     action: req.url,
     old_email: decoded?.old_email,
@@ -251,7 +251,7 @@ export async function get_email_form(req, reply) {
   stream.push(email_form);
 
   if (!req.partial) {
-    const bottom = await render_file("/partials/bottom.html", { t });
+    let bottom = await render_file("/partials/bottom.html", { t });
     stream.push(bottom);
   }
 

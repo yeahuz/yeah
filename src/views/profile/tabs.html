@@ -1,0 +1,30 @@
+<ul class="flex-col space-y-2 <%= !it.tab ? "" : "hidden lg:flex" %> lg:max-w-[14rem] w-full">
+<% it.t("tabs2", { ns: "profile", returnObjects: true }).forEach(function render(tab, i, a, url = "/myp", depth = 0) { %>
+  <li>
+    <% if (tab.children) {%>
+      <details class="group">
+        <summary class="btn btn-md btn-left btn-tertiary-color no-hover">
+          <%= it.t("tabs.selling.title", { ns: "profile" })%>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-auto -mr-2 duration-200 group-open:-rotate-180">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </summary>
+        <ul class="mt-2 ml-4">
+          <% tab.children.forEach((child, i, a) => render(child, i, a, url + "/" + tab.key, depth + 1)) %>
+        </ul>
+      </details>
+    <% } else { %>
+      <% let href = url + "/" + tab.key %>
+      <a
+        class="btn btn-md btn-left <%= it.url === href ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+        href="<%= href %>"
+        ><%= tab.value %></a>
+    <% } %>
+  </li>
+<% }) %>
+</ul>
+<% if (!it.url) { %>
+</div>
+</div>
+</main>
+<% } %>

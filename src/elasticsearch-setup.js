@@ -1,12 +1,12 @@
 import { elastic_client } from "./services/es.service.js";
 import * as RegionService from "./services/region.service.js";
 
-const SUPPORTED_LANGS = ["en", "uz", "ru"];
+let SUPPORTED_LANGS = ["en", "uz", "ru"];
 
 async function create_index(name) {
   console.log(`Creating index ${name}`)
-  const response = await elastic_client.indices.exists({ index: name });
-  if (response.body) {
+  let exists = await elastic_client.indices.exists({ index: name });
+  if (exists) {
     console.log(`Index ${name} already exists. Skipping...`)
     return
   }
@@ -15,8 +15,8 @@ async function create_index(name) {
 }
 
 async function create_index_template({ name, body }) {
-  const response = await elastic_client.indices.existsIndexTemplate({ name });
-  if (response.body) {
+  let exists = await elastic_client.indices.existsIndexTemplate({ name });
+  if (exists) {
     console.log(`Index template ${name} already exists. Skipping...`);
     return false;
   }
@@ -25,19 +25,19 @@ async function create_index_template({ name, body }) {
 }
 
 async function insert_regions() {
-  const result = { en: 0, ru: 0, uz: 0 };
+  let result = { en: 0, ru: 0, uz: 0 };
 
-  for (const lang of SUPPORTED_LANGS) {
-    const regions = await RegionService.get_regions({ lang });
-    for (const region of regions) {
-      const other_langs = SUPPORTED_LANGS.filter((l) => l !== lang);
-      const districts = await RegionService.get_districts({ region_id: region.id, lang });
+  for (let lang of SUPPORTED_LANGS) {
+    let regions = await RegionService.get_regions({ lang });
+    for (let region of regions) {
+      let other_langs = SUPPORTED_LANGS.filter((l) => l !== lang);
+      let districts = await RegionService.get_districts({ region_id: region.id, lang });
 
-      for (const district of districts) {
+      for (let district of districts) {
         let combined = `${district.long_name}, ${region.long_name}`;
-        for (const other_lang of other_langs) {
-          const sibling = await RegionService.get_region({ id: region.id, lang: other_lang });
-          const sibling_district = await RegionService.get_district({
+        for (let other_lang of other_langs) {
+          let sibling = await RegionService.get_region({ id: region.id, lang: other_lang });
+          let sibling_district = await RegionService.get_district({
             id: district.id,
             lang: other_lang,
           });
@@ -281,7 +281,7 @@ async function insert_regions() {
   });
 
   console.log("Inserting regions to regions_*");
-  const inserted_regions = await insert_regions();
+  let inserted_regions = await insert_regions();
   console.log({ inserted_regions });
   process.exit(0)
 })();

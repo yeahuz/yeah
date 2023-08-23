@@ -31,8 +31,8 @@
             <% category.children?.forEach(function (child, i, a) { %>
               <% if (child.children?.length) { %>
                 <% render (child, i, a, depth + 1) %>
-              <% } else {%>
-                <option <%= it.posting_data?.category_id === String(child.id) ? "selected" : "" %> value="<%= child.id %>"><%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= child.title %></option>
+              <% } else { %>
+                <option <%= it.category_id === String(child.id) ? "selected" : "" %> value="<%= child.id %>"><%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= child.title %></option>
               <% } %>
             <% }) %>
           </optgroup>

@@ -2,8 +2,9 @@ import * as SessionService from "../services/session.service.js";
 import * as CredentialService from "../services/credential.service.js";
 import * as BillingService from "../services/billing.service.js";
 import { render_file } from "../utils/eta.js";
-import { add_t } from "../utils/index.js";
+import { add_t, format_phone } from "../utils/index.js";
 import { create_date_formatter } from "../utils/date.js";
+
 
 export async function get_tab(req, reply) {
   let { tab } = req.params;
@@ -83,6 +84,7 @@ export async function get_details(req, reply) {
     user,
     flash,
     t,
+    format_phone
   });
   stream.push(details);
 
