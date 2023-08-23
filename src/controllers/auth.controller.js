@@ -261,7 +261,6 @@ export async function confirm_otp(req, reply) {
   let identifier = req.session.get("identifier");
 
   let is_valid = await ConfirmationCodeService.verify(identifier, otp);
-  console.log({ is_valid });
 
   if (!is_valid) {
     req.flash("err", new GoneError({ key: "otp_expired" }).build(t));

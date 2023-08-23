@@ -51,7 +51,6 @@ export class SMSClient {
       },
     });
 
-    console.log(response);
     let json = await response.json().catch(() => {});
 
     if (response.status === 401) {

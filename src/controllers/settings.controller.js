@@ -150,7 +150,6 @@ export async function get_billing(req, reply) {
   let flash = reply.flash();
   let stream = reply.init_stream();
   let user = req.user;
-  console.log({ user });
   let t = req.i18n.t;
 
   if (!req.partial) {
