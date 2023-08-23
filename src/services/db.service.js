@@ -2,9 +2,9 @@ import config from "../config/index.js";
 import knex from "knex";
 import pkg from "pg";
 
-const { Pool } = pkg;
+let { Pool } = pkg;
 
-export let pool = new Pool({ connectionString: config.postgres_uri })
+export let pool = new Pool({ connectionString: config.postgres_uri, connectionTimeoutMillis: 1000 })
 
 export async function query(text, params) {
   let start = performance.now();

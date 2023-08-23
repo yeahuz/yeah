@@ -7,7 +7,7 @@ let email_regex =
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
 
 function gravatar(email, url) {
-  if (!email || url) return;
+  if (!email || url) return url;
   let hash = createHash("md5").update(email).digest("hex");
   return `https://gravatar.com/avatar/${hash}?d=retro`;
 }
@@ -23,9 +23,9 @@ function create_one_impl(trx = { query }) {
     email_verified,
   }) => {
     let hash = await argon2.hash(password);
-    let user = await trx.query(`insert into users
+    let { rows: [user] } = await trx.query(`insert into users
       (email, phone, password, name, profile_photo_url, phone_verified, email_verified)
-      values ($1, $2, $3, $4, $5, $6, $7)`,
+      values ($1, $2, $3, $4, $5, $6, $7) returning id`,
       [email, phone, hash, name, gravatar(email, profile_photo_url), phone_verified, email_verified]
     );
 
@@ -51,9 +51,15 @@ export async function update_one(id, update = {}) {
   return rows[0];
 }
 
+export async function exists(identifier) {
+  let field_name = email_regex.test(identifier) ? "email" : "phone";
+  let { rows } = await query(`select 1 from users where ${field_name} = $1`, [identifier]);
+  return rows.length > 0
+}
+
 export async function get_by_email_phone(identifier, params = {}) {
   let field_name = email_regex.test(identifier) ? "email" : "phone";
-  let sql = `select select u.id, u.name, u.username, u.profile_photo_url, u.email, u.profile_url${params.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
+  let sql = `select u.id, u.name, u.password, u.username, u.profile_photo_url, u.email, u.profile_url${params.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
       ${params.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
       where ${field_name} = $1
       ${params.roles ? 'group by u.id, ur.user_id, ur.role_id, r.id' : ''}`;

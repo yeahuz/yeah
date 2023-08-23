@@ -1,4 +1,4 @@
-const ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
+const UPDATE_FUNCTION = `
   CREATE OR REPLACE FUNCTION on_payment_status_update() RETURNS trigger AS $$
   BEGIN
     UPDATE billing_accounts
@@ -61,6 +61,7 @@ export function up(knex) {
       t.string("code");
       t.string("identifier").unique();
       t.timestamp("expires_at");
+      t.boolean("verified").defaultTo(false);
       t.timestamps(false, true);
     })
     .createTable("auth_providers", (t) => {

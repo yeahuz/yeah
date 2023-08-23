@@ -27,7 +27,7 @@ const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
 const SEARCH_ROUTE_REGEX = new RegExp("/search/?.*");
 const AUTH_ROUTE_REGEX = new RegExp("/auth/(signup|login)");
 const CHAT_ROUTE_REGEX = new RegExp("/chats/?.*");
-const GLOBAL_VERSION = 22;
+const GLOBAL_VERSION = 23;
 const CACHE_NAMES = Object.assign(workbox.core.cacheNames, {
   images: `images-${GLOBAL_VERSION}.1`,
   static_assets: `static_assets-${GLOBAL_VERSION}.6`,

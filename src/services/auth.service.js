@@ -11,10 +11,8 @@ import {
 } from "../utils/errors.js";
 import config from "../config/index.js";
 import crypto from "crypto";
-import objection from "objection";
 import { commit_trx, rollback_trx, start_trx } from "./db.service.js";
-
-let { UniqueViolationError } = objection;
+import * as argon2 from "argon2";
 
 let email_regex =
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
@@ -24,7 +22,7 @@ export async function signup({
   password,
   user_agent,
   name,
-  profile_photo_url = `${config.origin}/avatars?name=${name}`,
+  profile_photo_url = new URL(`avatars?name=${name}`, config.origin).href,
   ip,
 } = {}) {
   let trx = await start_trx();
@@ -44,17 +42,18 @@ export async function signup({
       ip,
     });
 
-    await trx.commit();
-
-    return { session, user: user.toJSON() };
+    await commit_trx(trx);
+    return { session, user };
   } catch (err) {
-    trx.rollback();
-    if (err instanceof UniqueViolationError) {
-      throw new ConflictError({
-        key: "user_exists",
-        params: { user: identifier },
-      });
-    }
+    rollback_trx(trx);
+    console.log({ err });
+    //TODO: handle unique violation err
+    // if (err instanceof UniqueViolationError) {
+    //   throw new ConflictError({
+    //     key: "user_exists",
+    //     params: { user: identifier },
+    //   });
+    // }
     throw new InternalError();
   }
 }
@@ -67,11 +66,12 @@ export async function verify_password({ identifier, password }) {
       params: { user: identifier },
     });
 
-  let is_valid = await user.verify_password(password);
+
+  let is_valid = await argon2.verify(user.password, password);
 
   if (!is_valid) throw new BadRequestError({ key: "invalid_password" });
 
-  return user.toJSON();
+  return user;
 }
 
 export async function login({ email_phone, password, user_agent, ip }) {
@@ -82,7 +82,7 @@ export async function login({ email_phone, password, user_agent, ip }) {
       params: { user: email_phone },
     });
 
-  let is_valid = await user.verify_password(password);
+  let is_valid = await argon2.verify(user.password, password);
 
   if (!is_valid) throw new BadRequestError({ key: "invalid_password" });
 
@@ -92,7 +92,7 @@ export async function login({ email_phone, password, user_agent, ip }) {
     ip,
   });
 
-  return { user: user.toJSON(), session };
+  return { user, session };
 }
 
 export async function google_auth(payload) {
@@ -153,9 +153,10 @@ export async function google_auth(payload) {
   } catch (err) {
     console.log({ err })
     rollback_trx(trx);
-    if (err instanceof UniqueViolationError) {
-      throw new ConflictError({ key: "user_exists", params: { user: email } });
-    }
+    //TODO: handle unique violation err
+    // if (err instanceof UniqueViolationError) {
+    //   throw new ConflictError({ key: "user_exists", params: { user: email } });
+    // }
     throw new InternalError();
   }
 }

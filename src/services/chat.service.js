@@ -2,11 +2,7 @@ import * as MessageService from "./message.service.js";
 import { BadRequestError, InternalError } from "../utils/errors.js";
 import { commit_trx, query, rollback_trx, start_trx } from "./db.service.js";
 import { option } from "../utils/index.js";
-import { join } from "path";
-import objection from "objection";
 import config from "../config/index.js";
-
-let { UniqueViolationError } = objection;
 
 export let create_one_trx = (trx) => create_one_impl(trx);
 export let create_one = create_one_impl();
@@ -104,7 +100,7 @@ export async function create_chat({ created_by, posting_id, members = [] }) {
   let trx = await start_trx();
   try {
     let { rows: [chat] } = await trx.query("insert into chats (created_by, posting_id) values ($1, $2) returning id", [created_by, posting_id]);
-    let url = join(config.origin, "chats", String(chat.id));
+    let url = new URL(`chats/${chat.id}`, config.origin).href;
     await trx.query("update chats set url = $1 where id = $2", [url, chat.id])
     await Promise.all(members.map(m => trx.query("insert into chat_members (chat_id, user_id) values ($1, $2)", [chat.id, m])))
     await commit_trx(trx)
@@ -123,9 +119,10 @@ export async function create_chat({ created_by, posting_id, members = [] }) {
   } catch (err) {
     console.error({ err });
     rollback_trx(trx);
-    if (err instanceof UniqueViolationError) {
-      throw new BadRequestError({ key: "chat_exists" });
-    }
+    //TODO: handle unique vialation err
+    // if (err instanceof UniqueViolationError) {
+    //   throw new BadRequestError({ key: "chat_exists" });
+    // }
     throw new InternalError();
   }
 }
@@ -164,7 +161,7 @@ export async function read_message({ id, chat_id, user_id }) {
 function create_one_impl(trx = { query }) {
   return async ({ created_by, posting_id, members = [] }) => {
     let chat = await trx.query(`insert into chats (created_by, posting_id, url) values ($1, $2, $3) returning id`, [created_by, posting_id, url]);
-    let url = join(config.origin, "chats", chat.id);
+    let url = new URL(`chats/${chat.id}`, config.origin).href;
     await Promise.all([
       trx.query(`update chats set url = $1 where id = $2`, [url, chat.id]),
       Promise.all(members.map(m => trx.query(`insert into chat_members (chat_id, user_id) values ($1, $2)`, [chat.id, m])))

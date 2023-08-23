@@ -7,6 +7,7 @@ export async function option(promise) {
     const result = await promise;
     return [result, null];
   } catch (err) {
+    console.log({ err });
     if (err instanceof DomainError) {
       return [null, err];
     }

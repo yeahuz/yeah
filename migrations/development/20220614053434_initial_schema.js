@@ -61,6 +61,7 @@ export function up(knex) {
       t.string("code");
       t.string("identifier").unique();
       t.timestamp("expires_at");
+      t.boolean("verified").defaultTo(false);
       t.timestamps(false, true);
     })
     .createTable("auth_providers", (t) => {
