@@ -1,4 +1,4 @@
-const UPDATE_FUNCTION = `
+const ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
   CREATE OR REPLACE FUNCTION on_payment_status_update() RETURNS trigger AS $$
   BEGIN
     UPDATE billing_accounts
