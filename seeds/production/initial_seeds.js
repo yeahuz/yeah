@@ -188,6 +188,8 @@ export async function seed(knex) {
     },
   ]);
 
+  await knex.raw("select setval('posting_statuses_id_seq', max(id)) from posting_statuses");
+
   await knex("posting_status_translations").insert([
     {
       status_id: 1,
@@ -274,6 +276,8 @@ export async function seed(knex) {
     },
   ]);
 
+  await knex.raw("select setval('categories_id_seq', max(id)) from categories");
+
   await knex("category_fields").insert([
     {
       id: 1,
@@ -295,6 +299,8 @@ export async function seed(knex) {
     //   input_mode: "numeric",
     // },
   ]);
+
+  await knex.raw("select setval('category_fields_id_seq', max(id)) from category_fields");
 
   await knex("category_field_values").insert([
     {
@@ -330,6 +336,8 @@ export async function seed(knex) {
       category_field_id: 2,
     },
   ]);
+
+  await knex.raw("select setval('category_field_values_id_seq', max(id)) from category_field_values");
 
   await knex("category_field_value_translations").insert([
     {
@@ -955,6 +963,8 @@ export async function seed(knex) {
       name: "Yeah Socket",
     },
   ]);
+
+  await knex.raw("select setval('users_id_seq', max(id)) from users");
 
   await knex("user_roles").insert([
     {
