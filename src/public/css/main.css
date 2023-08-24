@@ -339,7 +339,7 @@ form:invalid .btn:not(.btn-enabled) {
   --opacity: 0.7;
 }
 
-details[open] summary::before {
+details:not(.no-overlay)[open] summary::before {
   position: fixed;
   top: 0;
   left: 0;

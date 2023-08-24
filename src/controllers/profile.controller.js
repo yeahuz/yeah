@@ -1,5 +1,7 @@
 import { render_file } from "../utils/eta.js";
 
+let tab_active = (url) => (path) => url.startsWith(path);
+
 export async function get_overview(req, reply) {
   let flash = reply.flash();
   let stream = reply.init_stream();
@@ -8,7 +10,7 @@ export async function get_overview(req, reply) {
 
   if (!req.partial) {
     let top = await render_file("/partials/top.html", {
-      meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
+      meta: { title: t("tabs.overview", { ns: "profile" }), lang: req.language },
       t,
       user,
     });
@@ -18,8 +20,8 @@ export async function get_overview(req, reply) {
   let profile_top = await render_file("/profile/top.html", { t });
   stream.push(profile_top);
 
-  let profile_tabs = await render_file("/profile/tabs.html", {
-    url: req.url,
+  let profile_tabs = await render_file("/partials/profile-tabs.html", {
+    tab_active: tab_active(req.url),
     t,
   });
   stream.push(profile_tabs);
@@ -41,7 +43,7 @@ export async function get_recently_viewed(req, reply) {
 
   if (!req.partial) {
     let top = await render_file("/partials/top.html", {
-      meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
+      meta: { title: t("tabs.recently_viewed", { ns: "profile" }), lang: req.language },
       t,
       user,
     });
@@ -51,8 +53,8 @@ export async function get_recently_viewed(req, reply) {
   let profile_top = await render_file("/profile/top.html", { t });
   stream.push(profile_top);
 
-  let profile_tabs = await render_file("/profile/tabs.html", {
-    url: req.url,
+  let profile_tabs = await render_file("/partials/profile-tabs.html", {
+    tab_active: tab_active(req.url),
     t,
   });
   stream.push(profile_tabs);
@@ -74,7 +76,7 @@ export async function get_watchlist(req, reply) {
 
   if (!req.partial) {
     let top = await render_file("/partials/top.html", {
-      meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
+      meta: { title: t("tabs.watchlist", { ns: "profile" }), lang: req.language },
       t,
       user,
     });
@@ -84,8 +86,8 @@ export async function get_watchlist(req, reply) {
   let profile_top = await render_file("/profile/top.html", { t });
   stream.push(profile_top);
 
-  let profile_tabs = await render_file("/profile/tabs.html", {
-    url: req.url,
+  let profile_tabs = await render_file("/partials/profile-tabs.html", {
+    tab_active: tab_active(req.url),
     t,
   });
   stream.push(profile_tabs);
@@ -107,7 +109,7 @@ export async function get_purchases(req, reply) {
 
   if (!req.partial) {
     let top = await render_file("/partials/top.html", {
-      meta: { title: t("tabs.details", { ns: "settings" }), lang: req.language },
+      meta: { title: t("tabs.purchases", { ns: "profile" }), lang: req.language },
       t,
       user,
     });
@@ -117,8 +119,8 @@ export async function get_purchases(req, reply) {
   let profile_top = await render_file("/profile/top.html", { t });
   stream.push(profile_top);
 
-  let profile_tabs = await render_file("/profile/tabs.html", {
-    url: req.url,
+  let profile_tabs = await render_file("/partials/profile-tabs.html", {
+    tab_active: tab_active(req.url),
     t,
   });
   stream.push(profile_tabs);
@@ -150,7 +152,7 @@ export async function get_profile(req, reply) {
   let profile_top = await render_file("/profile/top.html", { t });
   stream.push(profile_top);
 
-  let profile_tabs = await render_file("/profile/tabs.html", {
+  let profile_tabs = await render_file("/partials/profile-tabs.html", {
     t,
   });
   stream.push(profile_tabs);

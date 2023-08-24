@@ -1,6 +1,5 @@
 import {
-  add_listeners,
-  remove_node,
+  add_listeners, remove_node,
   ul,
   classes,
   li,
@@ -12,14 +11,18 @@ import {
   html,
   span
 } from "./dom.js";
-import { request, option, upload_request, async_pool } from "./utils.js";
+import { request, option, upload_request, async_pool, gen_id } from "./utils.js";
 import { close_icon } from "./icons.js";
+import { ListingPhotoPreviews } from "./components/listing-photo-preview.js";
+import { effect, signal } from "state";
 
 let photos_area = document.querySelector(".js-photos-area");
 let photos_input = document.querySelector(".js-photos-input");
 let preview_delete_forms = document.querySelectorAll(".js-preview-delete-form");
 let attachment_sync_form = document.querySelector(".js-attachment-sync-form");
-let posting_form = document.querySelector(".js-posting-form");
+let listing_form = document.querySelector(".js-listing-form");
+
+let attachments = signal([]);
 
 function on_drag_over(e) {
   e.stopPropagation();
@@ -68,8 +71,8 @@ async function generate_previews(files = []) {
 
     let main_label = label(attrs({
       for: `cover-${i_children}`,
-      "data-choose_cover_text": t("form.photos.choose_as_cover", { ns: "new-posting" }),
-      "data-cover_text": t("form.photos.cover", { ns: "new-posting" }),
+      "data-choose_cover_text": t("form.photos.choose_as_cover", { ns: "new-listing" }),
+      "data-cover_text": t("form.photos.cover", { ns: "new-listing" }),
       class: `group-hover:after:scale-100 group-hover:after:opacity-100
                         peer-focus:after:scale-100 peer-focus:after:ring-2
                         peer-focus:after:ring-offset-2 peer-focus:after:ring-primary-600 group-focus:after:scale-100 group-focus:after:opacity-100
@@ -154,7 +157,7 @@ function upload_to(urls) {
         click: async () => {
           let li = item;
           let radio_input = li.querySelector("input[type=radio]");
-          let photo_input = posting_form.querySelector(`#photos-${result.result.id}`);
+          let photo_input = listing_form.querySelector(`#photos-${result.result.id}`);
 
           let restore_li = remove_node(li);
           let restore_photo_input = remove_node(photo_input);
@@ -199,7 +202,7 @@ async function upload_files(files = []) {
       id: `photos-${result.result.id}`,
     }));
 
-    posting_form.prepend(photo_input);
+    listing_form.prepend(photo_input);
 
     let [_, err] = await option(
       request(attachment_sync_form.action, {
@@ -217,9 +220,45 @@ async function upload_files(files = []) {
 async function on_photos_change(e) {
   let files = e.target.files;
   if (!files.length) return;
-  await generate_previews(files);
-  await upload_files(files);
+
+  let new_attachments = [];
+  for (let file of files) {
+    new_attachments.push({
+      temp_id: gen_id("attachment"),
+      raw: file,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      is_image: true,
+      uploading: signal(true),
+      progress: signal(0)
+    })
+  }
+
+  attachments.update(curr => curr.concat(new_attachments));
+
+  upload_all(new_attachments);
+  //ListingPhotoPreviews(() => files);
 }
+
+async function upload_all(attachments) {
+  let [urls, err] = await option(
+    request("/cf/direct_upload", {
+      body: { files: attachments }
+    })
+  )
+
+  if (err) {
+    console.log("ERR", err);
+    return
+  }
+
+  console.log({ urls })
+}
+
+effect(() => {
+  console.log(attachments());
+})
 
 async function on_existing_delete(e) {
   e.preventDefault();
@@ -227,7 +266,7 @@ async function on_existing_delete(e) {
   let data = new FormData(form);
   let li = e.submitter.closest("li");
   let radio_input = li.querySelector("input[type=radio]");
-  let photo_input = posting_form.querySelector(`#photos-${data.get("photo_id")}`);
+  let photo_input = listing_form.querySelector(`#photos-${data.get("photo_id")}`);
 
   let restore_photo_input = remove_node(photo_input);
   let restore_li = remove_node(li);
@@ -249,16 +288,16 @@ async function on_existing_delete(e) {
   if (!container.children.length) container.remove();
 }
 
-add_listeners(preview_delete_forms, {
-  submit: on_existing_delete,
-});
+// add_listeners(preview_delete_forms, {
+//   submit: on_existing_delete,
+// });
 
-add_listeners(photos_area, {
-  dragover: on_drag_over,
-  drop: on_drop,
-  dragenter: on_drag_enter,
-  dragleave: on_drag_leave,
-});
+// add_listeners(photos_area, {
+//   dragover: on_drag_over,
+//   drop: on_drop,
+//   dragenter: on_drag_enter,
+//   dragleave: on_drag_leave,
+// });
 
 add_listeners(photos_input, {
   change: on_photos_change,

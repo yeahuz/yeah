@@ -1,10 +1,10 @@
 <article class="rounded-lg overflow-hidden border border-gray-200 dark:border-zinc-800 p-2.5">
-  <a href="<%= it.posting.url %>">
+  <a href="<%= it.listing.url %>">
     <img
-      src="<%= it.posting.cover_url %>/thumbnail"
-      srcset="<%= it.generate_srcset(it.posting.cover_url,"fit=scale-down",6) %>"
+      src="<%= it.listing.cover_url %>/thumbnail"
+      srcset="<%= it.generate_srcset(it.listing.cover_url,"fit=scale-down",6) %>"
       sizes="(min-width: 640px) 50%, (min-width: 768px) calc(100% / 3), (min-width: 1280px) calc(100% / 4), 100vw"
-      alt="<%= it.posting.title %> cover"
+      alt="<%= it.listing.title %> cover"
       height="192"
       class="w-full sm:h-48 object-cover h-60 rounded-lg"
       crossorigin
@@ -12,17 +12,17 @@
   </a>
   <div class="mt-2">
     <h3>
-      <a href="<%= it.posting.url %>" class="underline decoration-transparent hover:decoration-white duration-200 text-gray-900 dark:text-white">
-        <%= it.posting.title %>
+      <a href="<%= it.listing.url %>" class="underline decoration-transparent hover:decoration-white duration-200 text-gray-900 dark:text-white">
+        <%= it.listing.title %>
       </a>
     </h3>
-    <span class="font-semibold block my-2 text-gray-900 dark:text-white"><%= new Intl.NumberFormat(it.lang, { currency: it.posting.currency, style: "currency", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(it.posting.price) %></span>
+    <span class="font-semibold block my-2 text-gray-900 dark:text-white"><%= new Intl.NumberFormat(it.lang, { currency: it.listing.currency, style: "currency", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(it.listing.price) %></span>
     <span class="text-xs text-gray-500 dark:text-gray-300 block truncate">
-      <%= it.posting.location.formatted_address %>
+      <%= it.listing.location.formatted_address %>
     </span>
     <div class="flex items-center justify-between">
       <span class="text-gray-500 text-xs dark:text-gray-300">
-        <%= it.format_relative(it.posting.created_at, new Date())%>
+        <%= it.format_relative(it.listing.created_at, new Date())%>
       </span>
       <form>
         <button class="text-primary-600 p-1 rounded-full hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-zinc-800 duration-200">

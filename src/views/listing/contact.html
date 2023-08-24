@@ -1,0 +1,30 @@
+<main class="px-4 xl:px-0 max-w-7xl mx-auto">
+  <%~ include('../partials/search-bar.html', it) %>
+  <div class="grid grid-cols-12 items-start w-full space-x-4 py-12">
+    <section class="col-span-8 space-y-4">
+      <h1 class="font-semibold text-2xl text-gray-900 dark:text-white"><%= it.t("contact_user", { ns: "profile", name: it.listing.creator.name })%> </h1>
+      <%~ include('../partials/flash.html', it) %>
+      <div class="flex space-x-4 items-start rounded-lg border dark:border-zinc-800 border-gray-300 p-4">
+        <div class="w-40">
+          <img src="<%= it.listing.cover_url %>/w=320" alt="" class="max-w-full object-contain" />
+        </div>
+        <div class="flex flex-col space-y-1">
+          <a href="<%= it.listing.url %>" class="text-lg underline decoration-transparent hover:decoration-gray-600 dark:hover:decoration-white duration-200 text-gray-900 dark:text-white"><%= it.listing.title %></a>
+          <span class="font-medium">
+            <%= new Intl.NumberFormat(it.lang, { currency: it.listing.currency_code, style: "currency", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(it.listing.price) %>
+          </span>
+        </div>
+      </div>
+      <form method="post" action="<%= it.listing.url %>/contact?listing_id=<%= it.listing.id %>&creator_id=<%= it.listing.creator.id %>">
+        <textarea name="content" rows="8" cols="" class="form-control" placeholder="<%= it.t("write_to", { ns: "chats", name: it.listing.creator.name })%>"  required></textarea>
+        <div class="flex space-x-2 mt-3">
+          <button class="btn btn-md btn-primary"><%= it.t("send_message", { ns: "chats" })%></button>
+          <a href="<%= it.listing.url %>" class="btn btn-md btn-secondary btn-enabled"><%= it.t("cancel", { ns: "common" })%></a>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+<script>
+  document.title = "<%= it.t("contact_user", { ns: "profile", name: it.listing.creator.name }) %>"
+</script>

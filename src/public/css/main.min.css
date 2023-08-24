@@ -833,6 +833,10 @@ video {
   margin-left: 0.5rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .ml-6 {
   margin-left: 1.5rem;
 }
@@ -907,14 +911,6 @@ video {
 
 .mt-8 {
   margin-top: 2rem;
-}
-
-.ml-4 {
-  margin-left: 1rem;
-}
-
-.ml-5 {
-  margin-left: 1.25rem;
 }
 
 .line-clamp-2 {
@@ -1711,6 +1707,11 @@ video {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
+.bg-zinc-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 39 42 / var(--tw-bg-opacity));
+}
+
 .object-contain {
   -o-object-fit: contain;
      object-fit: contain;
@@ -2390,7 +2391,7 @@ form:invalid .btn:not(.btn-enabled) {
   --opacity: 0.7;
 }
 
-details[open] summary::before {
+details:not(.no-overlay)[open] summary::before {
   position: fixed;
   top: 0;
   left: 0;

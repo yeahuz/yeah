@@ -37,7 +37,7 @@ i18next
       "settings-billing",
       "settings-appearance",
       "2fa",
-      "new-posting",
+      "new-listing",
       "offline",
       "profile",
       "payments",

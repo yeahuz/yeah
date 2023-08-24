@@ -1,5 +1,5 @@
 {
-  "title": "Create posting",
+  "title": "Create listing",
   "steps": {
     "first": {
       "title": "Important",
@@ -30,12 +30,12 @@
     },
     "description": {
       "label": "Description",
-      "placeholder": "Describe your posting in more detail",
+      "placeholder": "Describe your listing in more detail",
       "hint": "Minumum 80 characters"
     },
     "photos": {
       "label": "Photos",
-      "hint": "The first photo will be on the cover of the posting (max 50 photos)",
+      "hint": "The first photo will be on the cover of the listing (max 50 photos)",
       "click_to_upload": "Click to upload",
       "or_drag_drop": "or drag and drop",
       "choose_as_cover": "Choose as cover",

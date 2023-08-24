@@ -28,6 +28,7 @@ export async function start() {
     maxParamLength: 1000,
     ignoreTrailingSlash: true,
     trustProxy: true,
+    logger: true,
     ajv: {
       customOptions: { allErrors: true, messages: true, useDefaults: true },
       plugins: [ajv_errors],
@@ -156,7 +157,7 @@ export async function start() {
 
     const accept_strategy = {
       name: "accept",
-      storage: function() {
+      storage: function () {
         let handlers = {};
         return {
           get: (type) => {

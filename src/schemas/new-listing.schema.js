@@ -1,4 +1,4 @@
-export const new_posting_schema = {
+export let new_listing_schema = {
   essential: {
     body: {
       type: "object",
@@ -6,7 +6,7 @@ export const new_posting_schema = {
         title: {
           type: "string",
           minLength: 20,
-          errorMessage: { minLength: "!posting_title_minlength" },
+          errorMessage: { minLength: "!listing_title_minlength" },
         },
         category_id: { type: "string" },
       },
@@ -20,13 +20,13 @@ export const new_posting_schema = {
         title: {
           type: "string",
           minLength: 20,
-          errorMessage: { minLength: "!posting_title_minlength" },
+          errorMessage: { minLength: "!listing_title_minlength" },
         },
         category_id: { type: "string" },
         description: {
           type: "string",
           minLength: 80,
-          errorMessage: { minLength: "!posting_description_minlength" },
+          errorMessage: { minLength: "!listing_description_minlength" },
         },
         price: { type: "number" },
         currency_code: {
@@ -44,15 +44,15 @@ export const new_posting_schema = {
             type: "string",
           },
           errorMessage: {
-            minItems: "posting_min_photos",
-            maxItems: "posting_max_photos",
+            minItems: "listing_min_photos",
+            maxItems: "listing_max_photos",
           },
         },
       },
       required: ["title", "category_id", "description", "price", "currency_code", "photos"],
       errorMessage: {
         required: {
-          photos: "posting_min_photos",
+          photos: "listing_min_photos",
         },
       },
     },
@@ -64,7 +64,7 @@ export const new_posting_schema = {
         location: {
           type: "string",
           minLength: 1,
-          errorMessage: { minLength: "!posting_location_minlength" },
+          errorMessage: { minLength: "!listing_location_minlength" },
         },
         phone: {
           type: "string",

@@ -1,16 +1,16 @@
 <form method="post" class="max-w-md">
   <input type="hidden" name="step" value="1" />
   <label class="text-sm font-medium text-gray-700 block dark:text-gray-200">
-    <%= it.t("form.title.label", { ns: "new-posting" }) %>
-    <input type="text" value="<%= it.posting_data?.title ?? "" %>" autocomplete="off" class="form-control mt-2" placeholder="<%= it.t("form.title.placeholder", { ns: "new-posting" }) %>" name="title" />
+    <%= it.t("form.title.label", { ns: "new-listing" }) %>
+    <input type="text" value="<%= it.listing?.title || it.title || "" %>" autocomplete="off" class="form-control mt-2" placeholder="<%= it.t("form.title.placeholder", { ns: "new-listing" }) %>" name="title" />
     <small class="text-error-500 mt-1 text-sm block"><%= it.flash?.validation_errors?.[0]?.title ?? "" %></small>
   </label>
-  <span class="font-normal text-gray-500 text-sm block mt-1.5 dark:text-gray-400"><%= it.t("form.title.hint", { ns: "new-posting"}) %></span>
+  <span class="font-normal text-gray-500 text-sm block mt-1.5 dark:text-gray-400"><%= it.t("form.title.hint", { ns: "new-listing"}) %></span>
   <label class="text-sm font-medium text-gray-700 block mt-5 dark:text-gray-200">
-    <%= it.t("form.category.label", { ns: "new-posting" }) %>
+    <%= it.t("form.category.label", { ns: "new-listing" }) %>
     <div class="relative mt-2">
     <select name="category_id" class="form-control" required>
-      <option disabled selected value=""> <%= it.t("form.category.placeholder", { ns: "new-posting" }) %> </option>
+      <option disabled selected value=""> <%= it.t("form.category.placeholder", { ns: "new-listing" }) %> </option>
       <option disabled>&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;</option>
       <% it.categories.forEach(function render (category, i, a, depth = 0) { %>
         <optgroup label="<%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= category.title %>" class="ml-2">
@@ -18,7 +18,7 @@
             <% if (child.children?.length) { %>
               <% render (child, i, a, depth + 1) %>
             <% } else {%>
-              <option <%= it.posting_data?.category_id === String(child.id) ? "selected" : "" %> value="<%= child.id %>"><%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= child.title %></option>
+              <option <%= (it.listing?.category_id || Number(it.category_id)) === child.id ? "selected" : "" %> value="<%= child.id %>"><%~ Array.from({ length: depth * 4 }).map(() => '&nbsp;').join('') %><%= child.title %></option>
             <% } %>
           <% }) %>
         </optgroup>
@@ -44,5 +44,5 @@
 </form>
 </main>
 <script>
- document.title = "<%= it.t("title", { ns: "new-posting" })%> | Needs"
+ document.title = "<%= it.t("title", { ns: "new-listing" })%> | Needs"
 </script>

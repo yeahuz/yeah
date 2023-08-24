@@ -4,7 +4,7 @@ import { home } from "./home.route.js";
 import { auth } from "./auth.route.js";
 import { settings } from "./settings.route.js";
 import { user } from "./user.route.js";
-import { posting } from "./posting.route.js";
+import { listing } from "./listing.route.js";
 import { attachment } from "./attachment.route.js";
 import { geo } from "./geo.route.js";
 import { search } from "./search.route.js";
@@ -16,12 +16,13 @@ import { cfr2 } from "./cfr2.route.js";
 import { cf } from "./cf.route.js";
 import { chat } from "./chat.route.js";
 import { profile } from "./profile.route.js";
+import { selling } from "./selling.route.js";
 import { i18next } from "../utils/i18n.js";
 
 // API routes
 import { auth_api } from "./auth-api.route.js";
 import { user_api } from "./user-api.route.js";
-import { posting_api } from "./posting-api.route.js";
+import { listing_api } from "./listing-api.route.js";
 import { chat_api } from "./chat-api.route.js";
 import { category_api } from "./category-api.route.js";
 import { attribute_api } from "./attribute-api.route.js";
@@ -50,8 +51,8 @@ export const routes = async (fastify) => {
   fastify.register(settings, { prefix: "/settings" });
   fastify.register(user, { prefix: "/users" });
   fastify.register(user, { prefix: "/u" });
-  fastify.register(posting, { prefix: "/postings" });
-  fastify.register(posting, { prefix: "/p" });
+  fastify.register(listing, { prefix: "/listings" });
+  fastify.register(listing, { prefix: "/l" });
   fastify.register(attachment, { prefix: "/attachments" });
   fastify.register(geo, { prefix: "/geo" });
   fastify.register(search, { prefix: "/search" });
@@ -63,6 +64,7 @@ export const routes = async (fastify) => {
   fastify.register(cf, { prefix: "/cf" });
   fastify.register(billing, { prefix: "/billing" });
   fastify.register(profile, { prefix: "/myp" });
+  fastify.register(selling, { prefix: "/mys" });
   fastify.register(chat, { prefix: "/chats" });
 };
 
@@ -70,7 +72,7 @@ export const api_routes = async (fastify) => {
   fastify.register(attach_user);
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
-  fastify.register(posting_api, { prefix: "/postings" });
+  fastify.register(listing_api, { prefix: "/listings" });
   fastify.register(chat_api, { prefix: "/chats" });
   fastify.register(category_api, { prefix: "/categories" });
   fastify.register(attribute_api, { prefix: "/attributes" });

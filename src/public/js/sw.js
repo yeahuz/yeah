@@ -23,7 +23,7 @@ const { BackgroundSyncPlugin } = workbox.backgroundSync;
 
 const GOOGLE_GSTATIC_REGEX = new RegExp("https://maps\\.gstatic\\.com.*");
 const GOOGLE_APIS_REGEX = new RegExp("https://maps\\.googleapis\\.com.*");
-const POSTING_WIZARD_REGEX = new RegExp("/postings/wizard/.*");
+const LISTING_WIZARD_REGEX = new RegExp("/listings/wizard/.*");
 const SEARCH_ROUTE_REGEX = new RegExp("/search/?.*");
 const AUTH_ROUTE_REGEX = new RegExp("/auth/(signup|login)");
 const CHAT_ROUTE_REGEX = new RegExp("/chats/?.*");
@@ -214,17 +214,17 @@ const nf_content_handler = compose_strategies([
 ]);
 
 const swr_content_route = new Route(({ request, url }) => {
-  if (url.pathname === "/postings/new") return;
+  if (url.pathname === "/listings/new") return;
   else if (url.pathname === "/auth/google") return;
   else if (SEARCH_ROUTE_REGEX.test(url.pathname)) return;
   return request.mode === "navigate";
 }, swr_content_handler);
 
 const nf_content_route = new Route(({ request, url }) => {
-  if (url.pathname === "/postings/new") return;
+  if (url.pathname === "/listings/new") return;
   if (request.mode === "navigate") {
     return (
-      POSTING_WIZARD_REGEX.test(url.pathname) ||
+      LISTING_WIZARD_REGEX.test(url.pathname) ||
       AUTH_ROUTE_REGEX.test(url.pathname) ||
       CHAT_ROUTE_REGEX.test(url.pathname)
     );

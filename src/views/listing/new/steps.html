@@ -1,0 +1,50 @@
+<ul class="flex items-center justify-between my-12">
+  <li class="flex-1">
+    <a href="/listings/wizard/<%= it.listing_id || -1 %>?step=1" class="flex flex-col group relative after:absolute after:w-full after:h-1 <%= it.step >= 2 ? "after:bg-primary-600" : "after:bg-gray-200 dark:after:bg-zinc-800" %> after:top-3 after:-translate-y-1/2 after:-z-10">
+      <span class="border-[7px] bg-white dark:bg-zinc-900 w-6 h-6
+                    rounded-full relative <%= it.step >= 1 ? "border-primary-600 after:border-primary-100 dark:after:border-none" : "border-gray-100 dark:border-zinc-700 after:border-transparent" %>
+                    after:absolute after:w-8 after:h-8 after:block after:border-4
+                    after:rounded-full after:top-1/2 after:-translate-y-1/2 after:left-1/2 after:-translate-x-1/2"></span>
+      <div class="flex-col mt-3 text-sm hidden xs:flex">
+        <span class="font-medium <%= it.step === 1 ? "text-primary-700 dark:text-primary-600" : "text-gray-700 dark:text-gray-200"%>"><%= it.t("steps.first.title", { ns: "new-listing" }) %></span>
+        <span class="hidden lg:inline <%= it.step === 1 ? "text-primary-600 dark:text-primary-700" : "text-gray-500 dark:text-gray-400"%>"><%= it.t("steps.first.description", { ns: "new-listing" }) %></span>
+      </div>
+    </a>
+  </li>
+  <li class="flex-1">
+    <a href="/listings/wizard/<%= it.listing_id || -1 %>?step=2" class="flex flex-col group relative after:absolute after:w-full after:h-1 <%= it.step >= 3 ? "after:bg-primary-600" : "after:bg-gray-200 dark:after:bg-zinc-800" %> after:top-3 after:-translate-y-1/2 after:-z-10" noprefetch>
+      <span class="border-[7px] bg-white dark:bg-zinc-900 w-6 h-6
+                    rounded-full relative <%= it.step >= 2 ? "border-primary-600 after:border-primary-100 dark:after:border-none" : "border-gray-100 dark:border-zinc-700 after:border-transparent" %>
+                    after:absolute after:w-8 after:h-8 after:block after:border-4
+                    after:rounded-full after:top-1/2 after:-translate-y-1/2 after:left-1/2 after:-translate-x-1/2"></span>
+      <div class="flex-col mt-3 text-sm hidden xs:flex">
+        <span class="font-medium <%= it.step === 2 ? "text-primary-700 dark:text-primary-600" : "text-gray-700 dark:text-gray-200"%>"><%= it.t("steps.second.title", { ns: "new-listing" }) %></span>
+        <span class="hidden lg:inline <%= it.step === 2 ? "text-primary-600 dark:text-primary-700" : "text-gray-500 dark:text-gray-400"%>"><%= it.t("steps.second.description", { ns: "new-listing" }) %></span>
+      </div>
+    </a>
+  </li>
+  <li class="flex-1">
+    <a href="/listings/wizard/<%= it.listing_id || -1 %>?step=3" class="flex flex-col group relative after:absolute after:w-full after:h-1 <%= it.step >= 4 ? "after:bg-primary-600" : "after:bg-gray-200 dark:after:bg-zinc-800" %> after:top-3 after:-translate-y-1/2 after:-z-10" noprefetch>
+      <span class="border-[7px] bg-white dark:bg-zinc-900 w-6 h-6
+                    rounded-full relative <%= it.step >= 3 ? "border-primary-600 after:border-primary-100 dark:after:border-none" : "border-gray-100 dark:border-zinc-700 after:border-transparent" %>
+                    after:absolute after:w-8 after:h-8 after:block after:border-4
+                    after:rounded-full after:top-1/2 after:-translate-y-1/2 after:left-1/2 after:-translate-x-1/2"></span>
+      <div class="flex-col mt-3 text-sm hidden xs:flex">
+        <span class="font-medium <%= it.step === 3 ? "text-primary-700 dark:text-primary-600" : "text-gray-700 dark:text-gray-200"%>"><%= it.t("steps.third.title", { ns: "new-listing" }) %></span>
+        <span class="hidden lg:inline <%= it.step === 3 ? "text-primary-600 dark:text-primary-700" : "text-gray-500 dark:text-gray-400"%>"><%= it.t("steps.third.description", { ns: "new-listing" }) %></span>
+      </div>
+    </a>
+  </li>
+  <li class="flex-1">
+    <a href="/listings/wizard/<%= it.listing_id || -1 %>?step=4" class="flex flex-col group relative after:absolute after:w-full after:h-1 <%= it.step >= 5 ? "after:bg-primary-600" : "after:bg-gray-200 dark:after:bg-zinc-800" %> after:top-3 after:-translate-y-1/2 after:-z-10" noprefetch>
+      <span class="border-[7px] bg-white dark:bg-zinc-900 w-6 h-6
+                    rounded-full relative <%= it.step >= 4 ? "border-primary-600 after:border-primary-100 dark:after:border-none" : "border-gray-100 dark:border-zinc-700 after:border-transparent" %>
+                    after:absolute after:w-8 after:h-8 after:block after:border-4
+                    after:rounded-full after:top-1/2 after:-translate-y-1/2 after:left-1/2 after:-translate-x-1/2"></span>
+      <div class="flex-col mt-3 text-sm hidden xs:flex">
+        <span class="font-medium <%= it.step === 4 ? "text-primary-700 dark:text-primary-600" : "text-gray-700 dark:text-gray-200"%>"><%= it.t("steps.fourth.title", { ns: "new-listing" }) %></span>
+        <span class="hidden lg:inline <%= it.step === 4 ? "text-primary-600 dark:text-primary-700" : "text-gray-500 dark:text-gray-400"%>"><%= it.t("steps.fourth.description", { ns: "new-listing" }) %></span>
+      </div>
+    </a>
+  </li>
+</ul>

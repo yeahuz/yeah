@@ -74,7 +74,7 @@ export async function verify_assertion(req, reply) {
 
   let auth_data = AssertionRequest.validate_response(assertion, credential);
 
-  await credential.$query().patch({ counter: auth_data.counter });
+  await CredentialService.update_one(credential.id, { counter: auth_data.counter });
 
   let session = await SessionService.create_one({ user_id: decoded.id, user_agent, ip });
   let user = await UserService.get_by_id(decoded.id, ["roles"]);

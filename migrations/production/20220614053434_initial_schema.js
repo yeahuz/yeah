@@ -310,10 +310,9 @@ export function up(knex) {
       t.string("name");
       t.timestamps(false, true);
     })
-    .createTable("posting_statuses", (t) => {
-      t.increments("id");
+    .createTable("listing_statuses", (t) => {
+      t.enu("code", ["ACTIVE", "IN_MODERATION", "INDEXING", "ARCHIVED", "DRAFT"]).primary();
       t.boolean("active").defaultTo(false);
-      t.string("code").notNullable();
       t.string("fg_hex", 7);
       t.string("bg_hex", 7);
       t.timestamps(false, true);
@@ -355,7 +354,12 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.string("name");
     })
-    .createTable("postings", (t) => {
+    .createTable("categories", (t) => {
+      t.increments("id");
+      t.integer("parent_id").index().references("id").inTable("categories").onDelete("CASCADE");
+      t.timestamps(false, true);
+    })
+    .createTable("listings", (t) => {
       t.increments("id");
       t.string("title");
       t.text("description");
@@ -363,17 +367,23 @@ export function up(knex) {
       t.string("hash_id").index();
       t.string("url", 512);
       t.specificType("attribute_set", "INT[]").index(null, "GIN");
+      t.integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE")
       t.integer("created_by")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("status_id")
+      t.string("status")
         .index()
         .notNullable()
-        .references("id")
-        .inTable("posting_statuses")
+        .references("code")
+        .inTable("listing_statuses")
         .onDelete("CASCADE");
       t.timestamps(false, true);
     })
@@ -395,13 +405,13 @@ export function up(knex) {
       t.unique(["status_code", "language_code"]);
       t.timestamps(false, true);
     })
-    .createTable("posting_status_translations", (t) => {
+    .createTable("listing_status_translations", (t) => {
       t.increments("id");
-      t.integer("status_id")
+      t.string("status_code")
         .index()
         .notNullable()
-        .references("id")
-        .inTable("posting_statuses")
+        .references("code")
+        .inTable("listing_statuses")
         .onDelete("CASCADE");
       t.string("language_code")
         .index()
@@ -410,7 +420,7 @@ export function up(knex) {
         .inTable("languages")
         .onDelete("CASCADE");
       t.string("name");
-      t.unique(["status_id", "language_code"]);
+      t.unique(["status_code", "language_code"]);
       t.timestamps(false, true);
     })
     .createTable("roles", (t) => {
@@ -451,11 +461,6 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.unique(["user_id", "role_id"]);
     })
-    .createTable("categories", (t) => {
-      t.increments("id");
-      t.integer("parent_id").index().references("id").inTable("categories").onDelete("CASCADE");
-      t.timestamps(false, true);
-    })
     .createTable("category_translations", (t) => {
       t.increments("id");
       t.integer("category_id")
@@ -474,20 +479,20 @@ export function up(knex) {
       t.text("description");
       t.timestamps(false, true);
     })
-    .createTable("posting_bookmarks", (t) => {
+    .createTable("listing_bookmarks", (t) => {
       t.integer("user_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("posting_id")
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
-      t.unique(["user_id", "posting_id"]);
+      t.unique(["user_id", "listing_id"]);
     })
     .createTable("currencies", (t) => {
       t.increments("id");
@@ -512,7 +517,7 @@ export function up(knex) {
       t.unique(["from_currency", "to_currency"]);
       t.timestamps(false, true);
     })
-    .createTable("posting_prices", (t) => {
+    .createTable("listing_prices", (t) => {
       t.increments("id");
       t.string("currency_code")
         .index()
@@ -520,31 +525,30 @@ export function up(knex) {
         .references("code")
         .inTable("currencies")
         .onDelete("CASCADE");
-      t.integer("posting_id")
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
       t.integer("price");
-      t.unique(["posting_id", "currency_code"]);
+      t.unique(["listing_id", "currency_code"]);
       t.timestamps(false, true);
     })
-    .createTable("posting_categories", (t) => {
+    .createTable("listing_categories", (t) => {
       t.integer("category_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("categories")
         .onDelete("CASCADE");
-      t.integer("posting_id")
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
-      t.enu("relation", ["DIRECT", "PARENT"]);
-      t.unique(["category_id", "posting_id"]);
+      t.unique(["category_id", "listing_id"]);
     })
     .createTable("category_fields", (t) => {
       t.increments("id");
@@ -633,12 +637,12 @@ export function up(knex) {
       t.string("label");
       t.timestamps(false, true);
     })
-    .createTable("posting_attributes", (t) => {
-      t.integer("posting_id")
+    .createTable("listing_attributes", (t) => {
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
       t.integer("category_field_value_id")
         .index()
@@ -646,15 +650,15 @@ export function up(knex) {
         .references("id")
         .inTable("category_field_values")
         .onDelete("CASCADE");
-      t.unique(["posting_id", "category_field_value_id"]);
+      t.unique(["listing_id", "category_field_value_id"]);
     })
     .createTable("promotions", (t) => {
       t.increments("id");
-      t.integer("posting_id")
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
       t.smallint("boost_score");
       t.timestamp("expiration_date");
@@ -672,12 +676,12 @@ export function up(knex) {
       t.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
       t.timestamps(false, true);
     })
-    .createTable("posting_attachments", (t) => {
-      t.integer("posting_id")
+    .createTable("listing_attachments", (t) => {
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
       t.integer("attachment_id")
         .index()
@@ -735,11 +739,11 @@ export function up(knex) {
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("posting_id")
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
       t
         .integer("last_message_id")
@@ -903,15 +907,15 @@ export function up(knex) {
       t.string("long_name");
       t.timestamps(false, true);
     })
-    .createTable("posting_location", (t) => {
+    .createTable("listing_location", (t) => {
       t.increments("id");
       t.string("formatted_address");
       t.point("coords");
-      t.integer("posting_id")
+      t.integer("listing_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("postings")
+        .inTable("listings")
         .onDelete("CASCADE");
       t.integer("district_id")
         .index()
@@ -956,7 +960,7 @@ export function up(knex) {
 }
 
 export async function down(knex) {
-  await knex.raw(`DROP TABLE
+  await knex.raw(`DROP TABLE IF EXISTS
     users, chats, accounts,
     attachments, attributes, attribute_translations,
     auth_providers, billing_accounts, categories, category_translations,
@@ -966,10 +970,10 @@ export async function down(knex) {
     district_translations, exchange_rates, external_clients, invoices,
     invoice_lines, languages, message_attachments, messages, notifications,
     notification_types, notification_type_translations, payment_providers, payment_statuses,
-    payment_status_translations, payments, posting_attachments,
-    posting_attributes, posting_bookmarks, posting_categories, posting_prices,
-    posting_location, posting_status_translations, posting_statuses,
-    postings, products, promotions, read_messages, regions, region_translations,
+    payment_status_translations, payments, listing_attachments,
+    listing_attributes, listing_bookmarks, listing_categories, listing_prices,
+    listing_location, listing_status_translations, listing_statuses,
+    listings, products, promotions, read_messages, regions, region_translations,
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
     user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen

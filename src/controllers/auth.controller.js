@@ -119,6 +119,11 @@ export async function get_login(req, reply) {
     stream.push(top);
   }
 
+  let params = new URLSearchParams({
+    err_to: `/auth/login?${new URLSearchParams({ method, return_to })}`,
+    return_to,
+  });
+
   let login = await render_file("/auth/login.html", {
     t,
     flash,
@@ -127,8 +132,10 @@ export async function get_login(req, reply) {
     oauth_state,
     nonce,
     method,
-    return_to
+    action: `/auth/login?${params.toString()}`,
+    return_to: encodeURIComponent(return_to)
   });
+
   stream.push(login);
   redis_client.setex(nonce, 86400, 1);
 
@@ -168,6 +175,12 @@ export async function get_signup(req, reply) {
     stream.push(top);
   }
 
+  let params = new URLSearchParams({
+    err_to: `/auth/signup?${new URLSearchParams({ method, return_to, step })}`,
+    method,
+    return_to: `/auth/signup?${new URLSearchParams({ method, return_to, step: Number(step) + 1 })}`
+  });
+
   let rendered_step;
   switch (step) {
     case "1": {
@@ -179,29 +192,36 @@ export async function get_signup(req, reply) {
         oauth_state,
         nonce,
         method,
-        return_to
+        action: `/auth/otp?${params.toString()}`,
+        return_to: encodeURIComponent(return_to)
       });
-      break;
-    }
+    } break;
     case "2": {
       if (!identifier) {
         rendered_step = await render_file("/partials/404.html", { t });
         break;
       }
-      rendered_step = await render_file("/auth/signup/step-2.html", { t, flash, nonce, method, return_to });
-      break;
-    }
+      rendered_step = await render_file("/auth/signup/step-2.html", {
+        t,
+        flash,
+        nonce,
+        method,
+        action: `/auth/otp/confirmation?${params.toString()}`,
+        return_to: encodeURIComponent(return_to)
+      });
+    } break;
     case "3": {
+      params.set("return_to", return_to);
       rendered_step = await render_file("/auth/signup/step-3.html", {
         t,
         flash,
         nonce,
         method,
         identifier,
-        return_to
+        action: `/auth/signup?${params.toString()}`,
+        return_to: encodeURIComponent(return_to)
       });
-      break;
-    }
+    } break;
     default:
       break;
   }
@@ -555,7 +575,7 @@ export async function verify_assertion(req, reply) {
   let credential = await CredentialService.get_one(assertion.id);
   let auth_data = AssertionRequest.validate_response(assertion, credential);
 
-  await credential.$query().patch({ counter: auth_data.counter });
+  await CredentialService.update_one(credential.id, { counter: auth_data.counter });
 
   let session = await SessionService.create_one({ user_id, user_agent, ip });
 

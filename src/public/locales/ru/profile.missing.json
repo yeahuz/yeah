@@ -1,0 +1,9 @@
+{
+  "tabs": {
+    "selling": {
+      "title": "tabs.selling.title"
+    },
+    "selling_sell": "tabs.selling_sell",
+    "selling_archived": "tabs.selling_archived"
+  }
+}

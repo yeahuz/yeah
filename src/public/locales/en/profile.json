@@ -11,9 +11,12 @@
     "recently_viewed": "Recently viewed",
     "watchlist": "Watchlist",
     "purchases": "Purchases",
-    "selling": {
-      "title": "Selling",
-      "children": []
-    }
+    "selling": "Selling",
+    "selling_active": "Active",
+    "selling_overview": "Overview",
+    "selling_sold": "Sold",
+    "selling_sell": "Sell",
+    "selling_moderation": "In moderation",
+    "selling_archived": "Archived"
   }
 }

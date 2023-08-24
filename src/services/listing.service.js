@@ -1,23 +1,31 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import { InternalError } from "../utils/errors.js";
-import { commit_trx, start_trx, rollback_trx } from "./db.service.js";
-import { query } from "./db.service.js";
+import { commit_trx, start_trx, rollback_trx, query } from "./db.service.js";
 
-function create_one_impl(trx = { query }) {
-  return async ({ title, description, cover_url, status_id, created_by, attribute_set }) => {
-    let { rows } = await trx.query(`insert into postings (title, description, cover_url, status_id, created_by, attribute_set)
-      values ($1, $2, $3, $4, $5, $6)`, [title, description, cover_url, status_id, created_by, attribute_set]);
+export async function create_one({ title, description, cover_url, status, created_by, attribute_set, category_id }) {
+  let trx = await start_trx();
+  try {
+    let { rows: [listing] } = await trx.query(`insert into listings (title, description, cover_url, status, created_by, attribute_set, category_id)
+      values ($1, $2, $3, $4, $5, $6, $7) returning id`, [title, description, cover_url, status, created_by, attribute_set, category_id]);
 
-    return rows[0];
+    let categories = await CategoryService.get_parents(category_id);
+
+    await Promise.all(categories.map((category) => {
+      return trx.query(`insert into listing_categories (category_id, listing_id) values ($1, $2)`, [category.id, listing.id]);
+    }));
+
+    await commit_trx(trx)
+    return listing;
+  } catch (err) {
+    console.log({ err });
+    rollback_trx(trx);
+    throw new InternalError();
   }
 }
 
-export let create_one = create_one_impl();
-export let create_one_trx = (trx) => create_one_impl(trx);
-
-export async function create_posting(payload) {
-  //TODO: create posting impl
+export async function create_listing(payload) {
+  //TODO: create listing impl
   // let trx = start_trx();
   // try {
   //   let {
@@ -41,8 +49,7 @@ export async function create_posting(payload) {
   //     .flatMap((param) => [param.parent, ...param.value])
   //     .map((v) => v.split("|")[1]);
 
-  //   let cover = attachments[cover_index || 0];
-  //   let posting = await create_one_trx(trx)({
+  //   let cover = attachments[cover_index || 0]; let listing = await create_one_trx(trx)({
   //     title,
   //     description,
   //     cover_url: cover.url,
@@ -58,21 +65,21 @@ export async function create_posting(payload) {
   //   );
 
   //   let categories = await CategoryService.get_parents(category_id);
-  //   await posting.$relatedQuery("attachments", trx).relate(att);
-  //   await posting.$relatedQuery("categories", trx).relate(
+  //   await listing.$relatedQuery("attachments", trx).relate(att);
+  //   await listing.$relatedQuery("categories", trx).relate(
   //     categories.map((c) => ({
   //       ...c,
   //       relation: c.id === Number(category_id) ? "DIRECT" : "PARENT",
   //     }))
   //   );
-  //   await posting.$relatedQuery("location", trx).insert({
+  //   await listing.$relatedQuery("location", trx).insert({
   //     formatted_address,
   //     coords: raw(`point(${lat}, ${lon})`),
   //     district_id,
   //     region_id,
   //   });
 
-  //   await posting.$relatedQuery("price", trx).insert({ currency_code, price });
+  //   await listing.$relatedQuery("price", trx).insert({ currency_code, price });
   //   await commit_trx(trx);
   // } catch (err) {
   //   console.log({ err });
@@ -93,17 +100,20 @@ async function cursor_paginate(model, list = [], excludes = []) {
   return { list, has_next, has_prev };
 }
 
+
 export async function get_one({ id, relation = {} } = {}) {
+  if (!id) return;
   let { rows } = await query(`
-  select p.*
-  ${relation.location ? `, row_to_json(pl) as location` : ''}
-  ${relation.attachments ? `, array_agg(row_to_json(a)) as attachments` : ''}
-  from postings
+  select l.*
+  ${relation.location ? `, row_to_json(ll) as location` : ''}
+  ${relation.attachments ? `, coalesce(array_agg(row_to_json(a)) filter (where a.id is not null), '{}') as attachments` : ''}
+  from listings l
   ${relation.attachments ? `
-  left join posting_attachments pa on pa.posting_id = p.id
-  left join attachments a on a.id = pa.attachment_id` : ''}
-  ${relation.location ? `left join posting_location pl on pl.posting_id = p.id` : ''}
-  where id = $1
+  left join listing_attachments la on la.listing_id = l.id
+  left join attachments a on a.id = la.attachment_id` : ''}
+  ${relation.location ? `left join listing_location ll on ll.listing_id = l.id` : ''}
+  where l.id = $1
+  group by l.id
   `, [id]);
 
   return rows[0];
@@ -114,24 +124,24 @@ export async function get_by_hash_id({ hash_id, relation = {} } = {}) {
   let currency = "UZS"
 
   let { rows } = await query(`
-    select p.*,
+    select l.*,
     er.to_currency as currency,
-    round(pp.price * er.rate) as price
-    ${relation.attachments ? ', array_agg(row_to_json(a)) as attachments' : ''}
+    round(ll.price * er.rate) as price
+    ${relation.attachments ? `, coalesce(array_agg(row_to_json(a)) filter (where a.id is not null), '{}') as attachments` : ''}
     ${relation.creator ? `, json_build_object('name', u.name, 'id', u.id, 'profile_photo_url', u.profile_photo_url, 'profile_url', u.profile_url) as creator` : ''}
-    from postings p
-    join posting_prices pp on pp.posting_id  = p.id
-    join exchange_rates er on er.from_currency = pp.currency_code and er.to_currency = $1
+    from listings l
+    join listing_prices lp on lp.listing_id  = l.id
+    join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
     ${relation.attachments ? `
-    left join posting_attachments pa on pa.posting_id = p.id
-    left join attachments a on a.id = pa.attachment_id
+    left join listing_attachments la on la.listing_id = l.id
+    left join attachments a on a.id = la.attachment_id
     ` : ''}
     ${relation.creator ? `
     join users u on u.id = p.created_by
     ` : ''}
-    where p.hash_id = $2
+    where l.hash_id = $2
     group by
-      p.id, pp.price, er.rate, er.to_currency
+      l.id, lp.price, er.rate, er.to_currency
       ${relation.creator ? ', u.id, u.name' : ''}
   `, [currency, hash_id])
 
@@ -140,26 +150,26 @@ export async function get_by_hash_id({ hash_id, relation = {} } = {}) {
 
 export async function get_many({
   currency = "UZS",
-  status_id,
+  status,
   limit = 15,
   lang = "en",
   cursor,
   direction
 } = {}) {
   let { rows } = await query(`
-    select p.*, er.to_currency as currency, round(pp.price * er.rate) as price, row_to_json(pl) as location from postings p
-    join posting_prices pp on pp.posting_id = p.id
-    join exchange_rates er on er.from_currency = pp.currency_code and er.to_currency = $1
-    join posting_location pl on pl.posting_id = p.id
-    where status_id = $2 order by p.id limit $3`, [currency, status_id, limit]);
+    select l.*, er.to_currency as currency, round(lp.price * er.rate) as price, row_to_json(ll) as location from listings l
+    join listing_prices lp on lp.listing_id = l.id
+    join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
+    join listing_location ll on ll.listing_id = l.id
+    where l.status = $2 order by l.id limit $3`, [currency, status, limit]);
 
   // TODO: handle pagination
   return { list: rows }
 }
 
 export async function get_statuses({ lang = "en" }) {
-  let { rows } = await query(`select ps.id, ps.code, ps.bg_hex, ps.fg_hex, pst.name from posting_statuses ps
-    join posting_status_translations pst on pst.status_id = ps.id and language_code = $1
+  let { rows } = await query(`select ls.id, ls.code, ls.bg_hex, ls.fg_hex, lst.name from listing_statuses ls
+    join listing_status_translations lst on lst.status_code = ls.code and language_code = $1
   `, [lang.substring(0, 2)])
 
   return rows;
@@ -173,7 +183,7 @@ export async function update_one(id, update) {
     let is_last = i === len - 1;
     if (!is_last) sql += ", "
   }
-  let { rowCount, rows } = await query(`update postings set ${sql} where id = $1`, [id])
+  let { rowCount, rows } = await query(`update listings set ${sql} where id = $1`, [id])
 
   if (rowCount === 0) {
     //TODO: does not exist

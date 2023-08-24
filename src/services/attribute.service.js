@@ -2,10 +2,12 @@ import { InternalError } from "../utils/errors.js";
 import { array_to_tree } from "../utils/index.js";
 import { commit_trx, query, rollback_trx, start_trx } from "./db.service.js";
 
-export async function get_category_attributes({ category_set = [], lang = "en" }) {
+export async function get_category_attributes({ category_set = [], lang = "en", format }) {
   let { rows } = await query(`select a.id, a.type, a.parent_id, a.key, at.name from attributes a
     join attribute_translations at on at.attribute_id = a.id and at.language_code = $1
     where category_set @> ARRAY[$2]::int[]`, [lang.substring(0, 2), category_set.join(", ")])
+
+  if (format === "tree") return array_to_tree(rows);
 
   return rows;
 }

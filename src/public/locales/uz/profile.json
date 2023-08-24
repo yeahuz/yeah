@@ -11,9 +11,12 @@
     "recently_viewed": "Yaqinda ko'rilgan",
     "watchlist": "Kuzatuv roʻyxati",
     "purchases": "Xaridlar",
-    "selling": {
-      "title": "Sotish",
-      "children": []
-    }
+    "selling": "Sotish",
+    "selling_active": "Faol",
+    "selling_overview": "Umumiy",
+    "selling_sold": "Sotilgan",
+    "selling_sell": "Sotish",
+    "selling_moderation": "Tekshiruvda",
+    "selling_archived": "Arxivlangan"
   }
 }

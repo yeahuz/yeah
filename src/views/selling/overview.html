@@ -1,0 +1,23 @@
+<div class="w-full">
+  <section class="flex justify-between items-center bg-zinc-800 rounded-md p-6">
+    <ul class="flex">
+      <li class="flex flex-col text-center space-y-3">
+        <span class="text-4xl font-semibold">0</span>
+        <a class="btn btn-text btn-0 flex-shrink-0
+              underline decoration-transparent duration-300
+              hover:decoration-primary-500 group-peer-checked:hidden group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(209,224,255)]
+              dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]" href="/mys?status=ACTIVE"><%= it.t("tabs.selling_active", { ns: "profile" })%></a>
+      </li>
+    </ul>
+    <div class="flex flex-col text-center space-y-3">
+      <span class="text-4xl font-semibold">$0.00</span>
+      <span>Sales (31 days)</span>
+    </div>
+    <a href="/listings/wizard" class="btn btn-md btn-primary"><%= it.t("create_listing", { ns: "common" })%></a>
+  </section>
+</div>
+</div>
+</main>
+<script>
+  document.title = "<%= it.t("tabs.overview", { ns: "profile" })%> | Needs"
+</script>

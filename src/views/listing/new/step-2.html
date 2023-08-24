@@ -1,35 +1,35 @@
-<% it.posting_data?.attachments?.forEach(function (photo, i) { %>
-  <form class="js-preview-delete-form" action="/postings/wizard/<%= it.id %>/<%= it.step %>/attachments/<%= photo.id %>?return_to=/postings/wizard/<%= it.id %>/<%= it.step %>" method="POST" id="form-<%= photo.id %>">
+<% it.listing?.attachments?.forEach(function (photo, i) { %>
+  <form class="js-preview-delete-form" action="/listings/wizard/<%= it.listing.id %>/<%= it.step %>/attachments/<%= photo.id %>?return_to=/listings/wizard/<%= it.listing.id %>/<%= it.step %>" method="POST" id="form-<%= photo.id %>">
     <input type="hidden" name="photo_id" value="<%= photo.id %>" />
   </form>
 <% }) %>
-<form method="post" class="js-attachment-sync-form" action="/postings/wizard/<%= it.id %>/<%= it.step %>/attachments"></form>
-<form method="post" id="upload-form" enctype="multipart/form-data" action="/postings/wizard/<%= it.id %>/<%= it.step %>/attachments?return_to=/postings/wizard/<%= it.id %>/<%= it.step %>"></form>
-<form method="post" class="max-w-3xl js-posting-form">
+<form method="post" class="js-attachment-sync-form" action="/listings/wizard/<%= it.listing.id %>/<%= it.step %>/attachments"></form>
+<form method="post" id="upload-form" enctype="multipart/form-data" action="/listings/wizard/<%= it.listing.id %>/<%= it.step %>/attachments?return_to=/listings/wizard/<%= it.listing.id %>/<%= it.step %>"></form>
+<form method="post" class="max-w-3xl js-listing-form">
   <input type="hidden" name="step" value="2" />
-  <% if (it.posting_data?.attachments?.length) { %>
-    <% it.posting_data.attachments.forEach(function (photo) { %>
+  <% if (it.listing?.attachments?.length) { %>
+    <% it.listing.attachments.forEach(function (photo) { %>
       <input type="hidden" name="photos" value="<%= photo.id %>" id="photos-<%= photo.id %>" />
     <% })%>
   <% } %>
-  <% if (it.posting_data?.title) { %>
-    <input type="hidden" name="title" value="<%= it.posting_data.title %>" />
+  <% if (it.listing?.title) { %>
+    <input type="hidden" name="title" value="<%= it.listing.title %>" />
   <% } %>
-  <% if (it.posting_data?.category_id) { %>
-    <input type="hidden" name="category_id" value="<%= it.posting_data.category_id %>" />
+  <% if (it.listing?.category_id) { %>
+    <input type="hidden" name="category_id" value="<%= it.listing.category_id %>" />
   <% } %>
   <div>
     <div class="flex justify-between items-center mb-2">
       <span class="text-sm font-medium text-gray-700 inline-block relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
-        <%= it.t("form.photos.label", { ns: "new-posting" }) %>
+        <%= it.t("form.photos.label", { ns: "new-listing" }) %>
       </span>
       <noscript>
         <button class="btn btn-md btn-secondary-color" form="upload-form"><%= it.t("upload", { ns: "common" })%></button>
       </noscript>
     </div>
-    <% if (it.posting_data?.attachments?.length) { %>
+    <% if (it.listing?.attachments?.length) { %>
       <ul class="js-photos-preview grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-        <% it.posting_data?.attachments.forEach(function (photo, i) { %>
+        <% it.listing?.attachments.forEach(function (photo, i) { %>
           <li class="relative group rounded-lg">
             <img
                 src="<%= photo.url ?? "" %>/thumbnail"
@@ -47,9 +47,9 @@
                 <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
-            <input type="radio" name="cover_index" value="<%= i %>" id="cover-<%= i %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.posting_data?.cover_index === String(i) ? "checked" : "" %> />
-            <label for="cover-<%= i %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-posting" }) %>"
-                        data-cover_text="<%= it.t("form.photos.cover", { ns: "new-posting" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
+            <input type="radio" name="cover_index" value="<%= i %>" id="cover-<%= i %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_index === String(i) ? "checked" : "" %> />
+            <label for="cover-<%= i %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-listing" }) %>"
+                        data-cover_text="<%= it.t("form.photos.cover", { ns: "new-listing" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
                         peer-focus:after:scale-100 peer-focus:after:ring-2
                         peer-focus:after:ring-offset-2 peer-focus:after:ring-primary-600 group-focus:after:scale-100 group-focus:after:opacity-100
                         relative text-xs after:opacity-100 md:after:opacity-50 md:after:scale-0 after:duration-200 after:origin-bottom-left after:absolute after:rounded-bl-lg
@@ -70,10 +70,10 @@
         <p class="text-sm">
           <input type="file" name="files" accept="image/*" class="absolute -z-10 opacity-0 peer js-photos-input" id="photos-input" multiple form="upload-form" accept="image/png, image/jpeg, image/jpg, image/avif, image/webp" required />
           <label class="font-medium text-primary-700 cursor-pointer peer-focus:outline dark:text-primary-400" for="photos-input">
-            <%= it.t("form.photos.click_to_upload", { ns: "new-posting" }) %>
+            <%= it.t("form.photos.click_to_upload", { ns: "new-listing" }) %>
           </label>
           <span class="text-gray-500 dark:text-gray-400">
-            <%= it.t("form.photos.or_drag_drop", { ns: "new-posting" }) %>
+            <%= it.t("form.photos.or_drag_drop", { ns: "new-listing" }) %>
           </span>
         </p>
         <span class="text-gray-500 text-xs dark:text-gray-400">
@@ -84,21 +84,21 @@
     <% if (it.flash?.validation_errors?.[0]?.photos) {%>
       <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors[0].photos %></small>
     <% } %>
-    <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.photos.hint", { ns: "new-posting"}) %></span>
+    <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.photos.hint", { ns: "new-listing"}) %></span>
   </div>
   <div class="mt-5">
     <label>
       <span class="relative text-sm font-medium text-gray-700 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
-        <%= it.t("form.description.label", { ns: "new-posting" }) %>
+        <%= it.t("form.description.label", { ns: "new-listing" }) %>
       </span>
       <elastic-textarea>
-        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-posting" }) %>" rows="5" minlength="80" class="form-control mt-2" required><%= it.posting_data?.description ?? ""%></textarea>
+        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" minlength="80" class="form-control mt-2" required><%= it.listing?.description ?? ""%></textarea>
         <% if (it.flash?.validation_errors?.[0]?.description) { %>
           <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors[0].description %></small>
         <% } %>
       </elastic-textarea>
     </label/>
-    <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.description.hint", { ns: "new-posting"}) %></span>
+    <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.description.hint", { ns: "new-listing"}) %></span>
   </div>
   <% it.attributes?.forEach(function (field) { %>
     <% if (field.type === "input") { %>
@@ -117,7 +117,7 @@
         </span>
         <% field.children.forEach(function (val, index) { %>
           <div class="flex items-center">
-            <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.name}|${val.id}`) ? "checked" : ""%> type="radio" name="params[<%= field.key %>].value[]" value="<%= val.name %>|<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+            <input <%= it.listing?.params?.[field.key]?.value?.includes(`${val.name}|${val.id}`) ? "checked" : ""%> type="radio" name="params[<%= field.key %>].value[]" value="<%= val.name %>|<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                         bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
                         font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                         checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
@@ -136,7 +136,7 @@
           </div>
           <% field.children.forEach(function (val) { %>
             <div class="flex items-center">
-              <input <%= it.posting_data?.params?.[field.key]?.value?.includes(`${val.name}|${val.id}`) ? "checked" : "" %> type="<%= field.type %>" name="params[<%= field.key %>].value[]" id="<%= field.key %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.name %>|<%= val.id %>"/>
+              <input <%= it.listing?.params?.[field.key]?.value?.includes(`${val.name}|${val.id}`) ? "checked" : "" %> type="<%= field.type %>" name="params[<%= field.key %>].value[]" id="<%= field.key %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.name %>|<%= val.id %>"/>
               <label for="<%= field.name %>-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -154,14 +154,14 @@
   <% }) %>
   <label class="w-full block mt-5 max-w-md">
     <span class="text-sm font-medium text-gray-700 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
-      <%= it.t("form.price.label", { ns: "new-posting" }) %>
+      <%= it.t("form.price.label", { ns: "new-listing" }) %>
     </span>
     <div class="flex mt-2">
-      <input type="number" value="<%= it.posting_data?.price ?? "" %>" class="form-control !rounded-r-none" name="price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-posting" }) %>" required />
+      <input type="number" value="<%= it.listing?.price ?? "" %>" class="form-control !rounded-r-none" name="price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
       <div class="relative min-w-fit">
         <select name="currency_code" class="form-control !rounded-l-none mr-6">
-          <option value="USD" <%= it.posting_data?.currency_code === "USD" || !it.posting_data?.currency_code ? "selected" : "" %>>USD</option>
-          <option value="UZS" <%= it.posting_data?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
+          <option value="USD" <%= it.listing?.currency_code === "USD" || !it.listing?.currency_code ? "selected" : "" %>>USD</option>
+          <option value="UZS" <%= it.listing?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
         </select>
         <svg
           fill="none"
@@ -184,7 +184,7 @@
 </form>
 </main>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
-<script defer async type="module" src="/public/js/new-posting-step-2.js"></script>
+<script defer async type="module" src="/public/js/new-listing-step-2.js"></script>
 <script>
- document.title = "<%= it.t("title", { ns: "new-posting" })%> | Needs"
+ document.title = "<%= it.t("title", { ns: "new-listing" })%> | Needs"
 </script>

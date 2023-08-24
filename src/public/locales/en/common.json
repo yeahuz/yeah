@@ -1,7 +1,7 @@
 {
   "login": "Login",
   "logout": "Log out",
-  "create_poster": "Create a posting",
+  "create_listing": "Create listing",
   "create_account": "Create account",
   "save_changes": "Save changes",
   "saving_changes": "Saving changes",
@@ -25,5 +25,6 @@
   "verified": "Verified",
   "unverified": "Unverified",
   "verify": "Verify",
-  "add": "Add"
+  "add": "Add",
+  "sell": "Sell"
 }

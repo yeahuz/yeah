@@ -2,7 +2,7 @@
   <%~ include('../partials/search-bar.html', it) %>
   <div class="grid grid-cols-12 items-start w-full space-x-4 py-12">
     <section class="rounded-lg col-span-8 p-4 border dark:border-zinc-800 border-gray-300 overflow-hidden">
-      <h1 class="font-semibold text-gray-900 dark:text-gray-200 text-xl"> <%= it.posting.title %> </h1>
+      <h1 class="font-semibold text-gray-900 dark:text-gray-200 text-xl"> <%= it.listing.title %> </h1>
       <div class="js-carousel my-5 overflow-hidden">
         <div class="relative">
           <div class="justify-between items-center absolute z-10 top-1/2 -translate-y-1/2 w-full hidden lg:flex px-4">
@@ -18,7 +18,7 @@
             </button>
           </div>
           <div class="js-carousel-scroller hide-scroll" style="overscroll-behavior-x: contain; scroll-snap-type: x mandatory; display:grid; grid-column: 1/-1; grid-row: 1; grid-auto-columns: 100%; grid-auto-flow: column; align-items:center; overflow-x: auto;">
-            <% it.posting?.attachments?.forEach(function (photo, i) { %>
+            <% it.listing?.attachments?.forEach(function (photo, i) { %>
               <div class="js-carousel-snap overflow-hidden" style="scroll-snap-align: center;">
                 <img
                   <%= i > 0  ? 'loading="lazy"' : "" %>
@@ -35,7 +35,7 @@
           </div>
         </div>
         <div class="flex space-x-1 mt-4 js-carousel-pagination">
-          <% it.posting?.attachments?.forEach(function (photo, i) { %>
+          <% it.listing?.attachments?.forEach(function (photo, i) { %>
             <button type="button" class="border rounded-lg p-0.5 border-transparent hover:border-gray-600 dark:hover:border-white duration-200 active:border-gray-600 dark:active:border-white">
               <img
                 src="<%= photo.url %>/width=160"
@@ -62,14 +62,14 @@
     <section class="rounded-lg border col-span-4 border-gray-300 dark:border-zinc-800 overflow-hidden">
       <div class="p-4">
         <span class="font-semibold text-xl text-gray-900 dark:text-gray-200">
-          <%= new Intl.NumberFormat(it.lang, { currency: it.posting.currency, style: "currency", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(it.posting.price) %>
+          <%= new Intl.NumberFormat(it.lang, { currency: it.listing.currency, style: "currency", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(it.listing.price) %>
         </span>
       </div>
       <div class="bg-gray-100 dark:bg-zinc-800">
         <div class="flex space-x-3 p-4">
-          <img src="<%= it.posting.creator.profile_photo_url %>/128x128" alt="" class="flex-shrink-0 w-14 h-14 object-cover rounded-full" crossorigin referrerpolicy="no-referrer"/>
+          <img src="<%= it.listing.creator.profile_photo_url %>/128x128" alt="" class="flex-shrink-0 w-14 h-14 object-cover rounded-full" crossorigin referrerpolicy="no-referrer"/>
           <div class="flex flex-col space-y-1">
-            <a href="<%= it.posting.creator.profile_url %>" class="text-primary-500 font-medium underline decoration-transparent hover:decoration-primary-500 duration-200"> <%= it.posting.creator.name %> </a>
+            <a href="<%= it.listing.creator.profile_url %>" class="text-primary-500 font-medium underline decoration-transparent hover:decoration-primary-500 duration-200"> <%= it.listing.creator.name %> </a>
             <div class="flex items-center space-x-1">
               <span class="text-gray-900 dark:text-gray-200 font-medium">4.5</span>
               <svg class="w-5 h-5 text-amber-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -92,17 +92,17 @@
           </span>
         </div>
       </div>
-      <% if (it.posting.creator.id !== it.user?.id) { %>
+      <% if (it.listing.creator.id !== it.user?.id) { %>
         <div class="flex flex-col space-y-3 p-4">
           <button class="btn btn-primary w-full"><%= it.t("show_phone", { ns: "profile" })%></button>
-          <a class="btn btn-secondary w-full" href="<%= it.posting.url %>/contact"><%= it.t("send_message", { ns: "chats" })%></a>
+          <a class="btn btn-secondary w-full" href="<%= it.listing.url %>/contact"><%= it.t("send_message", { ns: "chats" })%></a>
         </div>
       <% } %>
     </section>
   </div>
 </main>
 <script>
- document.title = "<%= it.posting.title %> | Needs"
+ document.title = "<%= it.listing.title %> | Needs"
 </script>
 <script src="/public/js/carousel.js" type="module" async defer></script>
 <script type="module" defer async>

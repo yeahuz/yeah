@@ -24,20 +24,23 @@
   "background_color": "#0070f3",
   "lang": "en",
   "orientation": "any",
-  "description": "Search and create postings with ease.",
-  "categories": ["business", "shopping"],
+  "description": "Search and create listings with ease.",
+  "categories": [
+    "business",
+    "shopping"
+  ],
   "shortcuts": [
     {
-      "name": "Create new posting",
-      "short_name": "New posting",
-      "description": "Quickly create an amazing posting for free.",
-      "url": "/postings/new"
+      "name": "Create new listing",
+      "short_name": "New listing",
+      "description": "Quickly create an amazing listing for free.",
+      "url": "/listings/wizard"
     },
     {
-      "name": "Browse postings",
+      "name": "Browse listings",
       "short_name": "Browse",
-      "description": "Looking for something? Browse our postings",
-      "url": "/postings"
+      "description": "Looking for something? Browse our listings",
+      "url": "/listings"
     }
   ]
 }

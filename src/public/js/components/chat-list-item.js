@@ -14,15 +14,15 @@ export function ChatListItem(chat) {
     div({ class: "flex items-start justify-between" },
       div({ class: "flex items-center" },
         img({
-          src: chat.posting.cover_url + "/width=80",
+          src: chat.listing.cover_url + "/width=80",
           class: "w-12 h-12 object-cover rounded-full overflow-hidden mr-2 flex-shrink-0",
           crossorigin: "anonymous"
         }),
         div({ class: "flex flex-col max-w-[200px]" },
-          span({ class: "text-gray-500 dark:text-gray-300 text-sm truncate" }, chat.posting.creator),
+          span({ class: "text-gray-500 dark:text-gray-300 text-sm truncate" }, chat.listing.creator),
           a(
-            { href: chat.posting.url, class: "relative underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium truncate" },
-            chat.posting.title
+            { href: chat.listing.url, class: "relative underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium truncate" },
+            chat.listing.title
           )
         ),
       ),

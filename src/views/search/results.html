@@ -1,5 +1,5 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full auto-rows-min">
   <% it.hits.hits.forEach(function (hit) { %>
-    <%~ include("../partials/posting-card.html", Object.assign(it, { posting: hit._source.result })) %>
+    <%~ include("../partials/listing-card.html", Object.assign(it, { listing: hit._source.result })) %>
   <% }) %>
 </div>

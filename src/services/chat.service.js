@@ -21,7 +21,7 @@ export async function get_many({ user_id }) {
       'cover_url', p.cover_url,
       'url', p.url,
       'creator', json_build_object('name', u.name)
-    ) as posting,
+    ) as listing,
     case
       when m.type is null then null
       else json_build_object(
@@ -37,7 +37,7 @@ export async function get_many({ user_id }) {
     left join messages m on m.chat_id = c.id and m.id = c.last_message_id
     left join message_attachments ma on ma.message_id = c.last_message_id
     left join attachments a on a.id = ma.attachment_id
-    join postings p on p.id = c.posting_id
+    join listings p on p.id = c.listing_id
     join users u on u.id = p.created_by
     group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name, cm.last_read_message_id
   `, [user_id]);
@@ -45,8 +45,8 @@ export async function get_many({ user_id }) {
   return rows;
 }
 
-export async function get_posting_chats(posting_id) {
-  let { rows } = await query(`select id from chats where posting_id = $1`, [posting_id]);
+export async function get_listing_chats(listing_id) {
+  let { rows } = await query(`select id from chats where listing_id = $1`, [listing_id]);
   return rows;
 }
 
@@ -64,9 +64,9 @@ export async function get_one({ id }) {
     'url', p.url,
     'cover_url', p.cover_url,
     'creator', json_build_object('profile_url', u.profile_url, 'username', u.username)
-    ) as posting
+    ) as listing
     from chats c
-    join postings p on p.id = c.posting_id
+    join listings p on p.id = c.listing_id
     join users u on u.id = p.created_by
     where c.id = $1
     group by p.*, c.id, p.id, u.profile_url, u.username
@@ -96,24 +96,24 @@ export async function create_message({ chat_id, content, reply_to, sender_id, ty
   }
 }
 
-export async function create_chat({ created_by, posting_id, members = [] }) {
+export async function create_chat({ created_by, listing_id, members = [] }) {
   let trx = await start_trx();
   try {
-    let { rows: [chat] } = await trx.query("insert into chats (created_by, posting_id) values ($1, $2) returning id", [created_by, posting_id]);
+    let { rows: [chat] } = await trx.query("insert into chats (created_by, listing_id) values ($1, $2) returning id", [created_by, listing_id]);
     let url = new URL(`chats/${chat.id}`, config.origin).href;
     await trx.query("update chats set url = $1 where id = $2", [url, chat.id])
     await Promise.all(members.map(m => trx.query("insert into chat_members (chat_id, user_id) values ($1, $2)", [chat.id, m])))
     await commit_trx(trx)
 
-    let { rows: [posting] } = await query(`
+    let { rows: [listing] } = await query(`
       select p.id, cover_url, url, title, u.name as creator
-      from postings p
+      from listings p
       join users u on u.id = p.created_by
       where p.id = $1`,
-      [posting_id]);
+      [listing_id]);
 
     chat.url = url;
-    chat.posting = posting;
+    chat.listing = listing;
     chat.members = members;
     return chat;
   } catch (err) {
@@ -159,8 +159,8 @@ export async function read_message({ id, chat_id, user_id }) {
 }
 
 function create_one_impl(trx = { query }) {
-  return async ({ created_by, posting_id, members = [] }) => {
-    let chat = await trx.query(`insert into chats (created_by, posting_id, url) values ($1, $2, $3) returning id`, [created_by, posting_id, url]);
+  return async ({ created_by, listing_id, members = [] }) => {
+    let chat = await trx.query(`insert into chats (created_by, listing_id, url) values ($1, $2, $3) returning id`, [created_by, listing_id, url]);
     let url = new URL(`chats/${chat.id}`, config.origin).href;
     await Promise.all([
       trx.query(`update chats set url = $1 where id = $2`, [url, chat.id]),

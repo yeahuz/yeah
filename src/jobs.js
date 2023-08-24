@@ -28,7 +28,7 @@ async function pg_to_es_impl() {
   let currency = "USD";
   let lang = "ru"
 
-  // join posting_location pl on pl.posting_id = p.id
+  // join listing_location pl on pl.listing_id = p.id
   // join districts d on d.id = pl.district_id
   // join regions r on r.id = pl.region_id
   //
@@ -76,17 +76,17 @@ async function pg_to_es_impl() {
   //     'type', a.type,
   //     'key', a.key
   //   )) as attributes
-  //   from postings p
-  //   join posting_location pl on pl.posting_id = p.id
+  //   from listings p
+  //   join listing_location pl on pl.listing_id = p.id
   //   join districts d on d.id = pl.district_id
   //   join regions r on r.id = pl.region_id
   //   join region_translations rt on rt.region_id = r.id and rt.language_code = $2
   //   join district_translations dt on dt.district_id = d.id and dt.language_code = $2
-  //   join posting_prices pp on pp.posting_id = p.id
+  //   join listing_prices pp on pp.listing_id = p.id
   //   join exchange_rates er on er.from_currency = pp.currency_code and er.to_currency = $1
   //   left join attributes a on a.id = any(p.attribute_set)
   //   left join attribute_translations at on at.attribute_id = a.id and at.language_code = $2
-  //   left join posting_categories pc on pc.posting_id = p.id
+  //   left join listing_categories pc on pc.listing_id = p.id
   //   left join categories c on c.id = pc.category_id
   //   left join category_translations ct on ct.category_id = c.id and ct.language_code = $2
   //   where status_id = $3
@@ -95,7 +95,7 @@ async function pg_to_es_impl() {
   // `, [currency, lang, status]).catch(console.error);
 
 
-  // let postings = await Posting.query()
+  // let listings = await Listing.query()
   //   .alias("p")
   //   .select(
   //     "p.id as id",
@@ -114,10 +114,10 @@ async function pg_to_es_impl() {
   //   )
   //   .where({ status_id: 4 })
   //   .withGraphFetched("[attributes.[field.[translation], translation], categories.[translation]]")
-  //   .join("posting_location as pl", "p.id", "pl.posting_id")
+  //   .join("listing_location as pl", "p.id", "pl.listing_id")
   //   .join("districts as d", "pl.district_id", "d.id")
   //   .join("regions as r", "pl.region_id", "r.id")
-  //   .join("posting_prices as pp", "p.id", "pp.posting_id")
+  //   .join("listing_prices as pp", "p.id", "pp.listing_id")
   //   .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
   //   .where("exchange_rates.to_currency", "=", "USD")
   //   .modifyGraph("categories.translation", (builder) =>
@@ -134,11 +134,11 @@ async function pg_to_es_impl() {
   //     builder.select("label").where({ language_code: "ru" })
   //   );
 
-  // for (let posting of postings) {
+  // for (let listing of listings) {
   //   let checkbox_facets = [];
   //   let radio_facets = [];
   //   let number_facets = [];
-  //   for (let attribute of posting.attributes) {
+  //   for (let attribute of listing.attributes) {
   //     if (attribute.field.type === "checkbox") {
   //       checkbox_facets.push({
   //         facet_id: attribute.category_field_id,
@@ -166,40 +166,40 @@ async function pg_to_es_impl() {
   //   }
 
   //   await elastic_client.index({
-  //     id: posting.id,
+  //     id: listing.id,
   //     index: "needs_ru",
   //     body: {
   //       result: {
-  //         title: posting.title,
-  //         cover_url: posting.cover_url,
-  //         url: posting.url,
+  //         title: listing.title,
+  //         cover_url: listing.cover_url,
+  //         url: listing.url,
   //         location: {
-  //           formatted_address: posting.formatted_address,
+  //           formatted_address: listing.formatted_address,
   //         },
-  //         description: posting.description,
-  //         created_at: posting.created_at,
-  //         price: posting.price,
-  //         currency: posting.currency,
+  //         description: listing.description,
+  //         created_at: listing.created_at,
+  //         price: listing.price,
+  //         currency: listing.currency,
   //       },
   //       search_data: {
   //         checkbox_facets,
   //         radio_facets,
   //         number_facets,
-  //         categories: posting.categories.map((c) => c.translation.title),
-  //         category_id: posting.categories.find((c) => c.relation === "DIRECT")?.id,
-  //         title: posting.title,
-  //         full_text: posting.title + posting.description,
-  //         full_text_boosted: boosted_description(posting.title, { checkbox_facets, radio_facets }),
-  //         district_id: posting.district_id,
-  //         region_id: posting.region_id,
-  //         coords: { lat: posting.district_coords.x, lon: posting.district_coords.y },
-  //         price: posting.price,
-  //         created_at: posting.created_at,
+  //         categories: listing.categories.map((c) => c.translation.title),
+  //         category_id: listing.categories.find((c) => c.relation === "DIRECT")?.id,
+  //         title: listing.title,
+  //         full_text: listing.title + listing.description,
+  //         full_text_boosted: boosted_description(listing.title, { checkbox_facets, radio_facets }),
+  //         district_id: listing.district_id,
+  //         region_id: listing.region_id,
+  //         coords: { lat: listing.district_coords.x, lon: listing.district_coords.y },
+  //         price: listing.price,
+  //         created_at: listing.created_at,
   //         indexed_at: new Date(),
   //       },
   //     },
   //   });
 
-  //   await posting.$query().patch({ status_id: 1 });
+  //   await listing.$query().patch({ status_id: 1 });
   //}
 }

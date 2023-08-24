@@ -1,7 +1,7 @@
 {
   "login": "Kirish",
   "logout": "Chiqish",
-  "create_poster": "E'lon berish",
+  "create_listing": "E'lon berish",
   "create_account": "Akkaunt yaratish",
   "save_changes": "Saqlash",
   "saving_changes": "Saqlanmoqda",
@@ -26,5 +26,6 @@
   "verified": "Tasdiqlangan",
   "unverified": "Tasdiqlanmagan",
   "verify": "Tasdiqlash",
-  "add": "Qo'shish"
+  "add": "Qo'shish",
+  "sell": "Sotish"
 }

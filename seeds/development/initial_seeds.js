@@ -21,8 +21,8 @@ export async function seed(knex) {
   await knex("payment_statuses").del();
   await knex("payment_status_translations").del();
   await knex("district_translations").del();
-  await knex("posting_statuses").del();
-  await knex("posting_status_translations").del();
+  await knex("listing_statuses").del();
+  await knex("listing_status_translations").del();
   await knex("exchange_rates").del();
   await knex("currencies").del();
   await knex("notifications").del();
@@ -31,17 +31,17 @@ export async function seed(knex) {
   await knex("roles").del();
 
   async function insert_regions() {
-    const { cities: regions } = JSON.parse(
+    let { cities: regions } = JSON.parse(
       fs.readFileSync(process.cwd() + "/src/data/soato.json", "utf-8")
     );
 
     for (let i = 0; i < regions.length; i++) {
-      const region = regions[i];
-      const [ru_first, ru_second] = region.ru_name.split(" ");
-      const [uz_first] = region.name.split(" ");
-      const [en_first, en_second] = region.en_name.split(" ");
+      let region = regions[i];
+      let [ru_first, ru_second] = region.ru_name.split(" ");
+      let [uz_first] = region.name.split(" ");
+      let [en_first, en_second] = region.en_name.split(" ");
 
-      const [inserted_region] = await knex("regions")
+      let [inserted_region] = await knex("regions")
         .returning("id")
         .insert({
           country_code: "uz",
@@ -72,12 +72,12 @@ export async function seed(knex) {
       ]);
 
       for (let j = 0; j < region.districts.length; j++) {
-        const district = region.districts[j];
-        const [ru_first] = district.ru_name.split(" ");
-        const [uz_first] = district.name.split(" ");
-        const [en_first] = district.en_name.split(" ");
+        let district = region.districts[j];
+        let [ru_first] = district.ru_name.split(" ");
+        let [uz_first] = district.name.split(" ");
+        let [en_first] = district.en_name.split(" ");
 
-        const [inserted] = await knex("districts")
+        let [inserted] = await knex("districts")
           .returning("id")
           .insert({
             region_id: inserted_region.id,
@@ -157,100 +157,115 @@ export async function seed(knex) {
     },
   ]);
 
-  await knex("posting_statuses").insert([
+  await knex("listing_statuses").insert([
     {
-      id: 1,
       active: true,
-      code: "active",
+      code: "ACTIVE",
       bg_hex: "#ECFDF3",
       fg_hex: "#027A48"
     },
     {
-      id: 2,
       active: true,
-      code: "archived",
+      code: "ARCHIVED",
       bg_hex: "#F2F4F7",
       fg_hex: "#344054"
     },
     {
-      id: 3,
       active: true,
-      code: "in_moderation",
+      code: "IN_MODERATION",
       bg_hex: "#FFFAEB",
       fg_hex: "#B54708"
     },
     {
-      id: 4,
       active: true,
-      code: "indexing",
+      code: "DRAFT",
+      bg_hex: "#FFFAEB",
+      fg_hex: "#B54708"
+    },
+    {
+      active: true,
+      code: "INDEXING",
       bg_hex: "#eff4ff",
       fg_hex: "#0066e9"
     },
   ]);
 
-  await knex.raw("select setval('posting_statuses_id_seq', max(id)) from posting_statuses");
-
-  await knex("posting_status_translations").insert([
+  await knex("listing_status_translations").insert([
     {
-      status_id: 1,
+      status_code: 'ACTIVE',
       language_code: "ru",
       name: "Активный",
     },
     {
-      status_id: 1,
+      status_code: 'ACTIVE',
       language_code: "en",
       name: "Active",
     },
     {
-      status_id: 1,
+      status_code: 'ACTIVE',
       language_code: "uz",
       name: "Faol",
     },
     {
-      status_id: 2,
+      status_code: "ARCHIVED",
       language_code: "ru",
       name: "Архивирован",
     },
     {
-      status_id: 2,
+      status_code: "ARCHIVED",
       language_code: "en",
       name: "Archived",
     },
     {
-      status_id: 2,
+      status_code: "ARCHIVED",
       language_code: "uz",
       name: "Arxivlangan",
     },
     {
-      status_id: 3,
+      status_code: "IN_MODERATION",
       language_code: "ru",
       name: "В модерации",
     },
     {
-      status_id: 3,
+      status_code: "IN_MODERATION",
       language_code: "en",
       name: "In moderation",
     },
     {
-      status_id: 3,
+      status_code: "IN_MODERATION",
       language_code: "uz",
       name: "Tekshiruvda",
     },
     {
-      status_id: 4,
+      status_code: "INDEXING",
       language_code: "ru",
       name: "Индексирование",
     },
     {
-      status_id: 4,
+      status_code: "INDEXING",
       language_code: "uz",
       name: "Indekslanmoqda",
     },
     {
-      status_id: 4,
+      status_code: "INDEXING",
       language_code: "en",
       name: "Indexing",
     },
+    {
+      status_code: 'DRAFT',
+      language_code: "en",
+      name: "Draft",
+    },
+    {
+      status_code: 'DRAFT',
+      language_code: "ru",
+      name: "Черновик",
+    },
+    {
+      status_code: 'DRAFT',
+      language_code: "uz",
+      name: "Qoralama",
+    }
   ]);
 
   await knex("auth_providers").insert([

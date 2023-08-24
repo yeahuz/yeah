@@ -11,7 +11,7 @@ export async function get_new(req, reply) {
 
   if (!req.partial) {
     const top = await render_file("/partials/top.html", {
-      meta: { title: t("title", { ns: "new-posting" }), lang: req.language },
+      meta: { title: t("title", { ns: "new-listing" }), lang: req.language },
       t,
       user,
     });

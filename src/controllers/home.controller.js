@@ -1,13 +1,13 @@
 import * as UserService from "../services/user.service.js";
 import * as CategoryService from "../services/category.service.js";
-import * as PostingService from "../services/posting.service.js";
+import * as ListingService from "../services/listing.service.js";
 import * as RegionService from "../services/region.service.js";
 import * as NotificationService from "../services/notification.service.js";
 import config from "../config/index.js";
 import path from "path";
 import fs from "fs";
 import { render_file } from "../utils/eta.js";
-import { array_to_tree, generate_srcset, interpolate } from "../utils/index.js";
+import { generate_srcset, interpolate } from "../utils/index.js";
 import { create_relative_formatter } from "../utils/date.js";
 import { registerFont, createCanvas } from "canvas";
 
@@ -117,16 +117,16 @@ export async function get_index(req, reply) {
     stream.push(top);
   }
 
-  const [categories, postings, regions] = await Promise.all([
+  const [categories, listings, regions] = await Promise.all([
     CategoryService.get_many({ lang: req.language, format: "tree" }),
-    PostingService.get_many({ status_id: 1 }),
+    ListingService.get_many({ status: "ACTIVE" }),
     RegionService.get_regions({ lang: req.language })
   ]);
 
   const home = await render_file("/home.html", {
     t,
     categories,
-    postings,
+    listings,
     lang: req.language,
     format_relative: create_relative_formatter(req.language),
     regions,

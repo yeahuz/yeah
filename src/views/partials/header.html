@@ -10,7 +10,7 @@
     <!-- <button class="btn btn-md btn-secondary-color ml-6 duration-200 scale-0 js-install-btn md:hidden"><%= it.t("install", { ns: "common" }) %></button> -->
     </div>
     <% if (it.user) { %>
-      <a href="/me?ps=active" class="bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
+      <a href="/myp" class="bg-gray-300 w-10 h-10 rounded-full cursor-pointer overflow-hidden flex items-center justify-center text-gray-500 md:hidden">
         <% if (it.user.profile_photo_url) { %>
           <img
             referrerpolicy="no-referrer"
@@ -190,7 +190,7 @@
       <% } else { %>
         <a class="btn btn-secondary js-ripple" href="/auth/login" noprefetch><%= it.t("login", { ns: "common" }) %></a>
       <% } %>
-      <a class="btn btn-primary js-ripple" href="/postings/new" noprefetch><%= it.t("create_poster", { ns: "common" }) %></a>
+      <a class="btn btn-primary js-ripple" href="/listings/wizard"><%= it.t("sell", { ns: "common" }) %></a>
     </div>
   </div>
 </header>

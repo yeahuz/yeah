@@ -9,16 +9,16 @@
     </form>
     <header class="flex justify-between w-full dark:bg-zinc-900 p-4 shadow-lg dark:drop-shadow-lg">
       <div class="flex space-x-2 items-center">
-        <img src="<%= it.chat.posting.cover_url %>/width=80" class="w-12 h-12 rounded-full overflow-hidden" alt="" crossorigin />
+        <img src="<%= it.chat.listing.cover_url %>/width=80" class="w-12 h-12 rounded-full overflow-hidden" alt="" crossorigin />
         <div class="flex flex-col">
-          <a href="<%= it.chat.posting.url %>" class="underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium">
-            <%= it.chat.posting.title %>
+          <a href="<%= it.chat.listing.url %>" class="underline decoration-transparent hover:decoration-white duration-200 text-gray-700 dark:text-gray-200 font-medium">
+            <%= it.chat.listing.title %>
           </a>
-          <a href="<%=it.chat.posting.creator?.profile_url %>" class="text-gray-500 dark:text-gray-300">@<%= it.chat.posting.creator?.username %></a>
+          <a href="<%=it.chat.listing.creator?.profile_url %>" class="text-gray-500 dark:text-gray-300">@<%= it.chat.listing.creator?.username %></a>
         </div>
       </div>
       <div>
-        <a href="<%= it.chat.posting.creator?.profile_url %>" class="btn btn-md btn-primary">View profile</a>
+        <a href="<%= it.chat.listing.creator?.profile_url %>" class="btn btn-md btn-primary">View profile</a>
       </div>
     </header>
     <div class="relative flex flex-col space-y-6" style="transform:translateZ(0);">

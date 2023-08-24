@@ -24,7 +24,7 @@
       ><%= it.t("tabs.purchases", { ns: "profile" })%></a>
   </li>
   <li>
-    <details class="group" <%= it.tab_active?.("/mys") ? "open" : ""%>>
+    <details class="group no-overlay" <%= it.tab_active?.("/mys") ? "open" : ""%>>
       <summary class="btn btn-md btn-left btn-tertiary-color no-hover">
         <%= it.t("tabs.selling", { ns: "profile" })%>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-auto -mr-2 duration-200 group-open:-rotate-180">
@@ -46,21 +46,21 @@
         </li>
         <li>
           <a
-            class="btn btn-md btn-left <%= it.tab_active('/mys/active') ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-            href="/mys/active"
+            class="btn btn-md btn-left <%= it.tab_active?.('/mys?status=ACTIVE') ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+            href="/mys?status=ACTIVE"
             ><%= it.t("tabs.selling_active", { ns: "profile" })%></a>
         </li>
         <li>
           <a
-            class="btn btn-md btn-left <%= it.tab_active('/mys/sold') ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-            href="/mys/sold"
-            ><%= it.t("tabs.selling_sold", { ns: "profile" })%></a>
+            class="btn btn-md btn-left <%= it.tab_active?.('/mys?status=IN_MODERATION') ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+            href="/mys?status=IN_MODERATION"
+            ><%= it.t("tabs.selling_moderation", { ns: "profile" })%></a>
         </li>
         <li>
           <a
-            class="btn btn-md btn-left <%= it.tab_active('/mys/moderation') ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
-            href="/mys/moderation"
-            ><%= it.t("tabs.selling_moderation", { ns: "profile" })%></a>
+            class="btn btn-md btn-left <%= it.tab_active?.('/mys?status=ARCHIVED') ? 'btn-secondary-color no-hover' : 'btn-tertiary-color'%>"
+            href="/mys?status=ARCHIVED"
+            ><%= it.t("tabs.selling_archived", { ns: "profile" })%></a>
         </li>
       </ul>
     </details>

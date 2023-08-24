@@ -18,6 +18,26 @@ export async function create_one({ public_key, counter, credential_id, transport
   return rows[0];
 }
 
+export async function update_one(id, update = {}) {
+  let sql = '';
+  let params = [id];
+  let keys = Object.keys(update);
+  for (let i = 0, len = keys.length; i < len; i++) {
+    params.push(update[keys[i]]);
+    sql += keys[i] + " = " + `$${params.length}`;
+    let is_last = i === len - 1;
+    if (!is_last) sql += ", "
+  }
+
+  let { rows, rowCount } = await query(`update credentials set ${sql} where id = $1`, params);
+
+  if (rowCount == 0) {
+    //TODO: could not find credential
+  }
+
+  return rows[0];
+}
+
 export async function delete_one(id) {
   let { rowCount } = await query(`delete from credentials where id = $1`, [id]);
   if (rowCount === 0) {
