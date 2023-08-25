@@ -366,7 +366,7 @@ export function up(knex) {
       t.string("cover_url", 512);
       t.string("hash_id").index();
       t.string("url", 512);
-      t.specificType("attribute_set", "INT[]").index(null, "GIN");
+      t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
       t.integer("category_id")
         .index()
         .notNullable()
@@ -531,8 +531,8 @@ export function up(knex) {
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.integer("price");
-      t.unique(["listing_id", "currency_code"]);
+      t.integer("amount");
+      t.unique("listing_id");
       t.timestamps(false, true);
     })
     .createTable("listing_categories", (t) => {
@@ -689,6 +689,9 @@ export function up(knex) {
         .references("id")
         .inTable("attachments")
         .onDelete("CASCADE");
+      t.smallint("display_order").defaultTo(0);
+      t.boolean("is_primary").defaultTo(false);
+      t.unique(["listing_id", "attachment_id"])
     })
     .createTable("transactions", (t) => {
       t.increments("id");

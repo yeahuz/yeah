@@ -1,11 +1,11 @@
 <form id="geo-query-form" action="/geo/predictions"></form>
 <form method="post" class="max-w-3xl js-listing-step-3">
-  <input type="hidden" name="location" class="js-location" value="<%= it.listing_data?.location ?? "" %>" />
+  <input type="hidden" name="location" class="js-location" value="<%= it.listing?.location ?? "" %>" />
   <div class="max-w-md w-full flex items-end js-location-input-container">
     <div class="relative w-full">
        <label class="text-sm font-medium text-gray-700 block dark:text-gray-200">
         <%= it.t("form.location.label", { ns: "new-listing" }) %>
-          <input form="geo-query-form" type="text" required minlength="2" value="<%= it.listing_data?.formatted_address ?? "" %>" autocomplete="off" class="form-control mt-2 js-geo-input" placeholder="<%= it.t("form.location.placeholder", { ns: "new-listing" }) %>" name="q" />
+          <input form="geo-query-form" type="text" required minlength="2" value="<%= it.listing?.formatted_address ?? "" %>" autocomplete="off" class="form-control mt-2 js-geo-input" placeholder="<%= it.t("form.location.placeholder", { ns: "new-listing" }) %>" name="q" />
        </label>
       <ul class="absolute bg-white shadow-lg w-full rounded-lg border border-gray-100 mt-1 overflow-hidden max-h-60 overflow-y-auto -z-10 opacity-0 translate-y-2 duration-200 dark:bg-zinc-900 dark:border-zinc-700 js-suggestions">
       </ul>
@@ -16,7 +16,7 @@
       </svg>
     </button>
   </div>
-  <% if (it.listing_data?.location) { %>
+  <% if (it.listing?.location) { %>
     <div id="map" class="h-72 w-full mt-5"> </div>
   <% } %>
   <label class="text-sm font-medium text-gray-700 inline-block max-w-md w-full dark:text-gray-200 mt-5">
@@ -24,7 +24,7 @@
     <div class="flex mt-2 relative">
       <input type="hidden" name="country_code" value="998" />
       <span class="border-l border-t border-b border-gray-300 py-2.5 px-3 text-gray-500 rounded-l-lg text-base font-normal dark:border-zinc-800 dark:text-gray-400">+998</span>
-      <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" value="<%= it.listing_data?.phone ?? "" %>" inputmode="numeric" name="phone"
+      <input type="text" autocomplete="tel" class="form-control !rounded-l-none js-masked-input" value="<%= it.listing?.phone ?? "" %>" inputmode="numeric" name="phone"
         placeholder="<%= it.t("form.phone.placeholder", { ns: "new-listing" }) %>"
         data-mask="## ### ## ##"
         data-unmask="#########"

@@ -8,7 +8,7 @@ class CFImages {
   }
 
   async request(url, { method, data, ...config } = {}) {
-    const response = await fetch(this.base_uri + url, {
+    let response = await fetch(this.base_uri + url, {
       method: method || (data ? "POST" : "GET"),
       body: data,
       headers: {
@@ -16,7 +16,7 @@ class CFImages {
         ...config.headers,
       },
     });
-    const json = await response.json().catch((e) => console.log({ e }));
+    let json = await response.json().catch((e) => console.log({ e }));
 
     if (!response.ok) {
       return Promise.reject(json);
@@ -26,7 +26,7 @@ class CFImages {
   }
 }
 
-const client = new CFImages({
+let client = new CFImages({
   token: config.cf_images_api_key,
   base_uri: config.cf_images_api_uri,
 });
@@ -36,23 +36,23 @@ export function get_cf_image_url(id) {
 }
 
 export async function get_direct_upload_url(file) {
-  const fd = new FormData();
+  let fd = new FormData();
   fd.append("requireSignedURLs", "false");
   fd.append("metadata", JSON.stringify(file));
-  const result = await client.request("/v2/direct_upload", { data: fd });
+  let result = await client.request("/v2/direct_upload", { data: fd });
   return { id: result.id, upload_url: result.uploadURL, public_url: get_cf_image_url(result.id) }
 }
 
 export async function get_direct_upload_urls(files) {
-  const urls = [];
-  for await (const url of async_pool(16, files, get_direct_upload_url)) {
+  let urls = [];
+  for await (let url of async_pool(16, files, get_direct_upload_url)) {
     urls.push(url);
   }
   return urls;
 }
 
 export async function get_one(id) {
-  const result = await client.request(`/v1/${id}`, {
+  let result = await client.request(`/v1/${id}`, {
     headers: { "Content-Type": "application/json" },
   });
 
@@ -62,8 +62,8 @@ export async function get_one(id) {
 }
 
 export async function upload(data) {
-  const fd = new FormData();
-  const buf = await data.toBuffer();
+  let fd = new FormData();
+  let buf = await data.toBuffer();
   if (!data.filename || !buf.length) return;
   fd.append("file", new Blob([buf]), data.filename);
   return await client.request("/v1", { data: fd });
@@ -74,7 +74,7 @@ export async function delete_one(id) {
 }
 
 export async function upload_url(url) {
-  const fd = new FormData();
+  let fd = new FormData();
   fd.append("url", url);
   return await client.request("/v1", { data: fd });
 }

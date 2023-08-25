@@ -221,13 +221,16 @@ export async function get_step(req, reply) {
       });
     } break;
     case "2": {
-      let listing = await ListingService.get_one({ id, relation: { attachments: true } });
-      let attributes = await AttributeService.get_category_attributes({
-        category_set: [listing.category_id],
-        lang: req.language,
-        format: "tree"
-      })
-
+      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
+      console.log({ listing });
+      let attributes = [];
+      if (listing) {
+        attributes = await AttributeService.get_category_attributes({
+          category_set: [listing.category_id],
+          lang: req.language,
+          format: "tree"
+        });
+      };
       rendered_step = await render_file(`/listing/new/step-${step}`, {
         flash,
         listing,
@@ -235,6 +238,14 @@ export async function get_step(req, reply) {
         generate_srcset,
         attributes,
         t
+      });
+    } break;
+    case "3": {
+      let listing = await ListingService.get_one({ id });
+      rendered_step = await render_file(`/listing/new/step-${step}`, {
+        flash,
+        t,
+        listing
       });
     } break;
     default:
@@ -485,7 +496,13 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-    } break;
+      let { attribute_set, description, amount, currency_code } = req.body;
+      await Promise.all([
+        ListingService.update_one(id, { attribute_set, description }),
+        ListingService.upsert_price({ amount, currency_code, id })
+      ]);
+      return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
+    }
     default:
       break;
   }

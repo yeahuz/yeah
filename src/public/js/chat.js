@@ -256,17 +256,12 @@ export class Chat {
 
     let action = form.getAttribute("api_action") || form.action;
     let [result, err] = await option(request(action, { body: message }));
+
     if (!err) {
       message.delivered.set(true);
       message.id.set(result.id);
       this.ws.send("message", result);
-      this.update_chat(message.chat_id, (chat) => {
-        chat.latest_message.type.set(result.type);
-        chat.latest_message.content.set(result.content);
-        chat.latest_message.created_at.set(result.created_at);
-        chat.latest_message.is_own.set(true);
-      });
-      this.messages_map.set(result.id, message);
+      this.update_latest_message(message, result);
     }
   }
 
@@ -360,14 +355,7 @@ export class Chat {
         media_msg.delivered.set(true);
         media_msg.id.set(result.id);
         this.ws.send("message", result)
-
-        this.update_chat(media_msg.chat_id, (chat) => {
-          chat.latest_message.type.set(result.type);
-          chat.latest_message.attachments.set(result.attachments);
-          chat.latest_message.created_at.set(result.created_at);
-          chat.latest_message.is_own.set(true);
-        });
-        this.messages_map.set(result.id, media_msg);
+        this.update_latest_message(media_msg, result);
       }
     }
 
@@ -377,17 +365,22 @@ export class Chat {
         files_msg.delivered.set(true);
         files_msg.id.set(result.id);
         files_msg.files.set(result.attachments);
-        this.ws.send("message", result);
 
-        this.update_chat(files_msg.chat_id, (chat) => {
-          chat.latest_message.type.set(result.type);
-          chat.latest_message.attachments.set(result.attachments);
-          chat.latest_message.created_at.set(result.created_at);
-          chat.latest_message.is_own.set(true);
-        });
-        this.messages_map.set(result.id, files_msg);
+        this.ws.send("message", result);
+        this.update_latest_message(files_msg, result);
       }
     }
+  }
+
+  update_latest_message(message, inserted) {
+    this.update_chat(message.chat_id, (chat) => {
+      chat.latest_message.type.set(inserted.type);
+      chat.latest_message.content.set(inserted.content);
+      chat.latest_message.attachments.set(inserted.attachments);
+      chat.latest_message.created_at.set(inserted.created_at);
+      chat.latest_message.is_own.set(true);
+    });
+    this.messages_map.set(inserted.id, message);
   }
 
   upload_to(urls) {

@@ -580,13 +580,13 @@ export async function seed(knex) {
     {
       id: 1,
       type: "checkbox",
-      key: "apartment_has",
+      key: "apartment-has",
       category_set: [1, 2, 3],
     },
     {
       id: 2,
       type: "radio",
-      key: "apartment_repair",
+      key: "apartment-repair",
       category_set: [1, 2, 3],
     },
     {
@@ -604,13 +604,13 @@ export async function seed(knex) {
     {
       id: 5,
       parent_id: 1,
-      key: "washing_machine",
+      key: "washing-machine",
       category_set: [1, 2, 3],
     },
     {
       id: 6,
       parent_id: 2,
-      key: "not_needed",
+      key: "not-needed",
       category_set: [1, 2, 3],
     },
     {
