@@ -359,14 +359,29 @@ export function up(knex) {
       t.integer("parent_id").index().references("id").inTable("categories").onDelete("CASCADE");
       t.timestamps(false, true);
     })
+    .createTable("attachments", (t) => {
+      t.increments("id");
+      t.string("resource_id").index();
+      t.string("name");
+      t.string("type");
+      t.string("caption").nullable();
+      t.integer("size").defaultTo(0);
+      t.string("url", 512);
+      t.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
+      t.timestamps(false, true);
+    })
     .createTable("listings", (t) => {
       t.increments("id");
       t.string("title");
       t.text("description");
-      t.string("cover_url", 512);
       t.string("hash_id").index();
       t.string("url", 512);
-      t.specificType("attribute_set", "INT[]").index(null, "GIN");
+      t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
+      t.integer("cover_id")
+        .index()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
       t.integer("category_id")
         .index()
         .notNullable()
@@ -531,8 +546,8 @@ export function up(knex) {
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.integer("price");
-      t.unique(["listing_id", "currency_code"]);
+      t.integer("amount");
+      t.unique("listing_id");
       t.timestamps(false, true);
     })
     .createTable("listing_categories", (t) => {
@@ -665,17 +680,6 @@ export function up(knex) {
       t.enu("placement", ["SEARCH", "FRONT"]).defaultTo("SEARCH");
       t.timestamps(false, true);
     })
-    .createTable("attachments", (t) => {
-      t.increments("id");
-      t.string("resource_id").index();
-      t.string("name");
-      t.string("type");
-      t.string("caption").nullable();
-      t.integer("size").defaultTo(0);
-      t.string("url", 512);
-      t.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
-      t.timestamps(false, true);
-    })
     .createTable("listing_attachments", (t) => {
       t.integer("listing_id")
         .index()
@@ -689,6 +693,8 @@ export function up(knex) {
         .references("id")
         .inTable("attachments")
         .onDelete("CASCADE");
+      t.smallint("display_order").defaultTo(0);
+      t.unique(["listing_id", "attachment_id"])
     })
     .createTable("transactions", (t) => {
       t.increments("id");

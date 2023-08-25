@@ -12,9 +12,8 @@ import {
   span
 } from "./dom.js";
 import { request, option, upload_request, async_pool, gen_id } from "./utils.js";
-import { close_icon } from "./icons.js";
 import { ListingPhotoPreviews } from "./components/listing-photo-preview.js";
-import { effect, signal } from "state";
+import { signal } from "state";
 import { add_listeners } from "dom";
 
 let photos_input = document.querySelector(".js-photos-input");
@@ -22,20 +21,6 @@ let attachment_link_form = document.querySelector(".js-attachment-sync-form");
 let attachment_create_form = document.querySelector(".js-attachment-create-form");
 let attachment_delete_forms = document.querySelectorAll(".js-attachment-delete-form");
 let previews = document.querySelector(".js-photo-previews");
-
-let attachments = signal([]);
-
-async function on_attachment_delete(e) {
-  e.preventDefault();
-  let form = e.target;
-  let action = form.getAttribute("api_action") || form.action;
-  let method = form.getAttribute("api_method") || form.method;
-  let [result, err] = await option(request(action, { method }));
-  if (!err) {
-    e.target.closest("li").remove();
-    previews.classList.toggle("hidden", previews.children.length < 1);
-  }
-}
 
 // function on_drag_over(e) {
 //   e.stopPropagation();
@@ -128,49 +113,6 @@ async function on_attachment_delete(e) {
 //   }
 // }
 
-function on_upload_progress(file) {
-  return (progress) => file.progress.set(Math.floor(progress.percent));
-}
-
-function on_upload_done(file) {
-  return () => file.uploading.set(false);
-}
-
-function upload_to(urls) {
-  return async function upload(file) {
-    let url = urls[file.temp_id];
-    if (!url) return
-    let fd = new FormData();
-    fd.append("file", file.raw, file.name);
-
-    let [_, upload_err] = await option(
-      upload_request(url.upload_url, {
-        data: fd,
-        method: "POST",
-        on_progress: on_upload_progress(file),
-        on_done: on_upload_done(file),
-      })
-    );
-
-    if (upload_err) {
-      console.log('Something went wrong uploading file');
-      return;
-    }
-
-    let [result, err] = await option(request(attachment_create_form.action, {
-      body: {
-        url: url.public_url,
-        resource_id: url.id,
-        size: file.size,
-        name: file.name,
-        type: file.type,
-      }
-    }))
-
-    return { id: result.id, order: file.order }
-  }
-}
-
 // async function upload_files(files = []) {
 //   let [urls, err] = await option(
 //     request("/cloudflare/images/direct_upload", {
@@ -200,55 +142,6 @@ function upload_to(urls) {
 //     }
 //   }
 // }
-
-async function on_photos_change(e) {
-  let files = e.target.files;
-  if (!files.length) return;
-
-  let new_attachments = [];
-  let order = previews.children.length;
-  for (let file of files) {
-    new_attachments.push({
-      temp_id: gen_id("attachment"),
-      raw: file,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      is_image: true,
-      uploading: signal(true),
-      progress: signal(0),
-      is_new: signal(true),
-      order: order++
-    })
-  }
-
-  attachments.update(curr => curr.concat(new_attachments));
-
-  ListingPhotoPreviews(attachments, previews);
-  upload_all(new_attachments);
-}
-
-async function upload_all(attachments) {
-  let [urls, err] = await option(
-    request("/cf/direct_upload", {
-      body: { files: attachments }
-    })
-  )
-
-  if (err) {
-    console.log("ERR", err);
-    return
-  }
-
-  let results = [];
-  for await (let result of async_pool(10, attachments, upload_to(urls))) {
-    results.push(result);
-  }
-
-  let [_, e] = await option(request(attachment_link_form.action, {
-    body: { attachments: results }
-  }));
-}
 
 // async function on_existing_delete(e) {
 //   e.preventDefault();
@@ -289,14 +182,131 @@ async function upload_all(attachments) {
 //   dragleave: on_drag_leave,
 // });
 
-add_listeners(photos_input, {
-  change: on_photos_change,
-});
+export class Uploader {
+  constructor(listing) {
+    this.listing = listing;
+    this.photos_input = document.querySelector(".js-photos-input");
+    this.attachment_link_form = document.querySelector(".js-attachment-sync-form");
+    this.attachment_create_form = document.querySelector(".js-attachment-create-form");
+    this.attachment_delete_forms = document.querySelectorAll(".js-attachment-delete-form");
+    this.previews = document.querySelector(".js-photo-previews");
 
-add_listeners(attachment_delete_forms, {
-  submit: on_attachment_delete,
-});
+    this.attachments = signal([]);
+    this.setup();
+  }
 
-// 1. Upload to r2
-// 2. Create attachments in db
-// 3. Sync attachments to listing
+  static from(listing) {
+    console.log({ listing });
+    return new Uploader(listing);
+  }
+
+  setup() {
+    add_listeners(photos_input, { change: this.on_photos_change });
+    add_listeners(attachment_delete_forms, { submit: this.on_attachment_delete });
+  }
+
+  on_photos_change(e) {
+    let files = e.target.files;
+    if (!files.length) return;
+
+    let new_attachments = [];
+    let order = this.previews.children.length;
+    for (let file of files) {
+      new_attachments.push({
+        temp_id: gen_id("attachment"),
+        raw: file,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        is_image: true,
+        uploading: signal(true),
+        progress: signal(0),
+        is_new: signal(true),
+        order: order++
+      })
+    }
+
+    this.attachments.update(curr => curr.concat(new_attachments));
+
+    ListingPhotoPreviews(this.attachments, this.previews);
+    this.upload_all(new_attachments);
+  }
+
+  async on_attachment_delete(e) {
+    e.preventDefault();
+    let form = e.target;
+    let action = form.getAttribute("api_action") || form.action;
+    let method = form.getAttribute("api_method") || form.method;
+    let [result, err] = await option(request(action, { method }));
+    if (!err) {
+      e.target.closest("li").remove();
+      this.previews.classList.toggle("hidden", previews.children.length < 1);
+    }
+  }
+
+  async upload_all(attachments) {
+    let [urls, err] = await option(
+      request("/cf/direct_upload", {
+        body: { files: attachments }
+      })
+    )
+
+    if (err) {
+      console.log("ERR", err);
+      return
+    }
+
+    let results = [];
+    for await (let result of async_pool(10, attachments, upload_to(urls))) {
+      results.push(result);
+    }
+
+    let [_, e] = await option(request(this.attachment_link_form.action, {
+      body: { attachments: results }
+    }));
+  }
+
+
+  on_upload_progress(file) {
+    return (progress) => file.progress.set(Math.floor(progress.percent));
+  }
+
+  on_upload_done(file) {
+    return () => file.uploading.set(false);
+  }
+
+  upload_to(urls) {
+    return async function upload(file) {
+      let url = urls[file.temp_id];
+      if (!url) return
+      let fd = new FormData();
+      fd.append("file", file.raw, file.name);
+
+      let [_, upload_err] = await option(
+        upload_request(url.upload_url, {
+          data: fd,
+          method: "POST",
+          on_progress: on_upload_progress(file),
+          on_done: on_upload_done(file),
+        })
+      );
+
+      if (upload_err) {
+        console.log("Something went wrong uploading file");
+        return;
+      }
+
+      let [result, err] = await option(request(this.attachment_create_form.action, {
+        body: {
+          url: url.public_url,
+          resource_id: url.id,
+          size: file.size,
+          name: file.name,
+          type: file.type,
+        }
+      }));
+
+      return { id: result.id, order: file.order }
+    }
+  }
+}

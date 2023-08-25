@@ -3,11 +3,11 @@ import * as CategoryService from "./category.service.js";
 import { InternalError } from "../utils/errors.js";
 import { commit_trx, start_trx, rollback_trx, query } from "./db.service.js";
 
-export async function create_one({ title, description, cover_url, status, created_by, attribute_set = [], category_id }) {
+export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
   let trx = await start_trx();
   try {
-    let { rows: [listing] } = await trx.query(`insert into listings (title, description, cover_url, status, created_by, attribute_set, category_id)
-      values ($1, $2, $3, $4, $5, $6, $7) returning id`, [title, description, cover_url, status, created_by, attribute_set, category_id]);
+    let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, attribute_set, category_id)
+      values ($1, $2, $3, $4, $5, $6) returning id`, [title, description, status, created_by, attribute_set, category_id]);
 
     let categories = await CategoryService.get_parents(category_id); await Promise.all(categories.map((category) => {
       return trx.query(`insert into listing_categories (category_id, listing_id) values ($1, $2)`, [category.id, listing.id]);
@@ -44,9 +44,7 @@ export async function create_listing(payload) {
   //   } = payload;
 
   //   let attribute_set = Object.values(params)
-  //     .flatMap((param) => [param.parent, ...param.value])
-  //     .map((v) => v.split("|")[1]);
-
+  //     .flatMap((param) => [param.parent, ...param.value]) .map((v) => v.split("|")[1]);
   //   let cover = attachments[cover_index || 0]; let listing = await create_one_trx(trx)({
   //     title,
   //     description,
@@ -212,7 +210,7 @@ export async function link_attachments(id, attachments = []) {
   try {
     await Promise.all(attachments.map(a => {
       return trx.query(`insert into listing_attachments (listing_id, attachment_id, display_order) values ($1, $2, $3) on conflict(listing_id, attachment_id) do nothing`, [id, a.id, a.order]);
-    }))
+    }));
     await commit_trx(trx);
   } catch (err) {
     rollback_trx(trx);

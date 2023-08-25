@@ -37,8 +37,8 @@
               class="rounded-lg h-36 object-cover w-full"
               crossorigin
               decoding="async" />
-          <input type="radio" name="cover_index" value="<%= i %>" id="cover-<%= i %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_index === String(i) ? "checked" : "" %> />
-          <label for="cover-<%= i %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-listing" }) %>"
+          <input type="radio" name="cover_id" value="<%= photo.id %>" id="cover-<%= photo.id %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_id === photo.id ? "checked" : "" %> />
+          <label for="cover-<%= photo.id %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-listing" }) %>"
                       data-cover_text="<%= it.t("form.photos.cover", { ns: "new-listing" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
                       peer-focus:after:scale-100 peer-focus:after:ring-2
                       peer-focus:after:ring-offset-2 peer-focus:after:ring-primary-600 group-focus:after:scale-100 group-focus:after:opacity-100
@@ -185,7 +185,9 @@
 </form>
 </main>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
-<script defer async type="module" src="/public/js/new-listing-step-2.js"></script>
-<script>
- document.title = "<%= it.t("title", { ns: "new-listing" })%> | Needs"
+<script type="module" defer async>
+import { Uploader } from "/public/js/new-listing-step-2.js";
+let listing = `<%~ JSON.stringify(it.listing) %>`;
+Uploader.from(JSON.parse(listing));
+document.title = "<%= it.t("title", { ns: "new-listing" })%> | Needs"
 </script>
