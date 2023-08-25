@@ -37,7 +37,7 @@
               class="rounded-lg h-36 object-cover w-full"
               crossorigin
               decoding="async" />
-          <input type="radio" name="cover_id" value="<%= photo.id %>" id="cover-<%= photo.id %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_id === photo.id ? "checked" : "" %> />
+          <input type="radio" form="listing-form" name="cover_id" value="<%= photo.id %>" id="cover-<%= photo.id %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_id === photo.id ? "checked" : "" %> />
           <label for="cover-<%= photo.id %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-listing" }) %>"
                       data-cover_text="<%= it.t("form.photos.cover", { ns: "new-listing" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
                       peer-focus:after:scale-100 peer-focus:after:ring-2
@@ -76,7 +76,7 @@
   <% } %>
   <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.photos.hint", { ns: "new-listing"}) %></span>
 </div>
-<form method="post" class="max-w-3xl js-listing-form">
+<form method="post" class="max-w-3xl js-listing-form" id="listing-form">
   <input type="hidden" name="step" value="2" />
   <% if (it.listing?.attachments?.length) { %>
     <% it.listing.attachments.forEach(function (photo) { %>
@@ -187,7 +187,7 @@
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>
 <script type="module" defer async>
 import { Uploader } from "/public/js/new-listing-step-2.js";
-let listing = `<%~ JSON.stringify(it.listing) %>`;
+let listing = `<%~ JSON.stringify({ id: it.listing.id }) %>`;
 Uploader.from(JSON.parse(listing));
 document.title = "<%= it.t("title", { ns: "new-listing" })%> | Needs"
 </script>
