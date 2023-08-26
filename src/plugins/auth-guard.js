@@ -35,7 +35,7 @@ async function auth_guard_impl(req, reply) {
   let sid = req.session.get("sid") || req.headers["authorization"];
   let session = await SessionService.get_one(sid);
 
-  let user = await UserService.get_by_id(session?.user_id, { roles: true });
+  let user = await UserService.get_by_id(session?.user_id);
 
   if (is_public) {
     req.user = user;

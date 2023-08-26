@@ -30,7 +30,7 @@ export async function delete_one(id) {
   let { rowCount } = await query(`delete from sessions where id = $1`, [id]);
   if (rowCount == 0) {
     //TODO: session not found, throw some error or something??
-    console.log("session not found")
+    console.log("session not found");
   }
 
   return id;

@@ -59,13 +59,12 @@ export async function signup({
 }
 
 export async function verify_password({ identifier, password }) {
-  let user = await UserService.get_by_email_phone(identifier, { roles: true });
+  let user = await UserService.get_by_email_phone(identifier);
   if (!user)
     throw new ResourceNotFoundError({
       key: "!user_exists",
       params: { user: identifier },
     });
-
 
   let is_valid = await argon2.verify(user.password, password);
 

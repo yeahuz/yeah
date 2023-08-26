@@ -42,7 +42,7 @@ export async function update_one(id, update = {}) {
     params.push(update[keys[i]]);
     sql += keys[i] + " = " + `$${params.length}`;
     let is_last = i === len - 1;
-    if (!is_last) sql += ", "
+    if (!is_last) sql += ", ";
   }
 
   let { rows, rowCount } = await query(`update users set ${sql} where id = $1`, params);
@@ -56,7 +56,7 @@ export async function update_one(id, update = {}) {
 export async function exists(identifier) {
   let field_name = email_regex.test(identifier) ? "email" : "phone";
   let { rows } = await query(`select 1 from users where ${field_name} = $1`, [identifier]);
-  return rows.length > 0
+  return rows.length > 0;
 }
 
 export async function get_by_email_phone(identifier, relation = {}) {
@@ -73,16 +73,33 @@ export async function get_by_email_phone(identifier, relation = {}) {
   return rows[0];
 }
 
-export async function get_by_id(id, params = {}) {
+export async function get_by_id(id, relation = {}) {
   //TODO: some API to select columns;
   if (!id) return;
-  let sql = `select u.id, u.name, u.website_url, u.username, u.phone, u.phone_verified, u.email, u.email_verified, u.profile_photo_url, u.email, u.profile_url${params.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''} from users u
-      ${params.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
-      where u.id = $1
-      ${params.roles ? 'group by u.id, ur.user_id, ur.role_id, r.id' : ''}`;
-
+  let sql = `select u.id, u.name, u.website_url, u.username,
+    u.phone, u.phone_verified, u.email, u.email_verified, u.profile_photo_url, u.email,
+    u.profile_url
+    ${relation.roles ? `, coalesce(array_agg(row_to_json(r)) filter (where r.id is not null), '{}') as roles` : ''}
+    ${relation.permissions ? `, coalesce(array_agg(row_to_json(p)) filter (where p.id is not null), '{}') as permissions` : ''}
+    from users u
+    ${relation.roles ? `left join user_roles ur on ur.user_id = u.id left join roles r on r.id = ur.role_id` : ''}
+    ${relation.permissions ? `
+      left join user_roles ur on ur.user_id = u.id
+      left join role_permissions rp on rp.role_id = ur.role_id left join permissions p on p.id = rp.permission_id` : ''}
+    where u.id = $1 group by u.id`;
   let { rows } = await query(sql, [id]);
   if (rows.length) return rows[0];
+}
+
+export async function get_permissions(id) {
+  if (!id) return [];
+  let { rows } = await query(`
+    select p.* from user_roles ur
+    left join role_permissions rp on rp.role_id = ur.role_id
+    left join permissions p on p.id = rp.permission_id
+    where user_id = $1`, [id]);
+
+  return rows;
 }
 
 async function cursor_paginate(model, list = [], excludes) {
@@ -105,7 +122,7 @@ export async function get_many({
   limit,
   excludes,
 } = {}) {
-  let sql = `select * from users`
+  let sql = `select * from users`;
   let params = [];
 
   let excluded_ids = [excludes].flat().filter(Boolean);
@@ -117,28 +134,28 @@ export async function get_many({
 
   if (id) {
     params.push(id);
-    sql += ` where id = $${params.length}`
+    sql += ` where id = $${params.length}`;
     let { rows } = await query(sql, params);
     return { list: rows, has_next: false, has_prev: false };
   }
 
   if (username) {
     params.push(username);
-    sql += ` where username = $${params.length}`
+    sql += ` where username = $${params.length}`;
     let { rows } = await query(sql, params);
     return { list: rows, has_next: false, has_prev: false };
   }
 
   if (phone) {
     params.push(phone);
-    sql += ` where phone = $${params.length}`
+    sql += ` where phone = $${params.length}`;
     let { rows } = await query(sql, params);
     return { list: rows, has_next: false, has_prev: false };
   }
 
   if (email) {
     params.push(phone);
-    sql += ` where email = $${params.length}`
+    sql += ` where email = $${params.length}`;
     let { rows } = await query(sql, params);
     return { list: rows, has_next: false, has_prev: false };
   }
@@ -154,11 +171,11 @@ export async function get_many({
   }
 
   params.push(limit);
-  sql += 'order by id desc limit $${params.length}'
+  sql += 'order by id desc limit $${params.length}';
 
   let { rows } = await query(sql, params);
 
-  return { list: rows }
+  return { list: rows };
 }
 
 export async function get_by_username(username) {
@@ -180,7 +197,7 @@ export async function delete_one(id) {
   let { rowCount } = await query(`delete from users where id = $1`, [id]);
   if (rowCount == 0) {
     //TODO: user not found, throw some error or something??
-    console.log("User not found")
+    console.log("User not found");
   }
 
   return id;

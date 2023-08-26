@@ -446,8 +446,30 @@ export function up(knex) {
     })
     .createTable("roles", (t) => {
       t.increments("id");
-      t.enu("code", ["admin", "moderator", "external_client"]);
+      t.enu("code", ["admin", "moderator", "user"]);
       t.timestamps(false, true);
+    })
+    .createTable("permissions", (t) => {
+      t.increments("id");
+      t.string("action").notNullable();
+      t.string("subject").notNullable();
+      t.jsonb("conditions").nullable();
+      t.specificType("fields", "VARCHAR[]").nullable();
+    })
+    .createTable("role_permissions", (t) => {
+      t.integer("permission_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("permissions")
+        .onDelete("CASCADE");
+      t.integer("role_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("roles")
+        .onDelete("CASCADE");
+      t.unique(["permission_id", "role_id"]);
     })
     .createTable("role_translations", (t) => {
       t.increments("id");
@@ -962,12 +984,6 @@ export function up(knex) {
       t.unique(["notification_type_name", "language_code"]);
       t.timestamps(false, true);
     })
-    .createTable("external_clients", (t) => {
-      t.increments("id");
-      t.string("title");
-      t.string("token").index();
-      t.boolean("active").defaultTo(true);
-    })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION));
 }
 
@@ -979,7 +995,7 @@ export async function down(knex) {
     category_fields, category_field_values, category_field_translations,
     category_field_value_translations, chat_members, confirmation_codes,
     countries, country_translations, credentials, currencies, districts,
-    district_translations, exchange_rates, external_clients, invoices,
+    district_translations, exchange_rates, invoices,
     invoice_lines, languages, message_attachments, messages, notifications,
     notification_types, notification_type_translations, payment_providers, payment_statuses,
     payment_status_translations, payments, listing_attachments,
@@ -988,7 +1004,8 @@ export async function down(knex) {
     listings, products, promotions, read_messages, regions, region_translations,
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
-    user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen
+    user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen,
+    permissions, role_permissions
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)

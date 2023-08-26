@@ -884,109 +884,109 @@ export async function seed(knex) {
     },
   ]);
 
-  await knex("external_clients").insert([
+  let roles = [
     {
-      title: "Needs Admin",
-      token: "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15",
-    },
-    {
-      title: "Needs Socket",
-      token: "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860",
-    },
-  ]);
-
-  await knex("roles").insert([
-    {
-      id: 1,
       code: "admin",
+      permissions: [
+        { action: "manage", subject: "all" }
+      ],
+      translations: [
+        {
+          language_code: "en",
+          title: "Administrator"
+        },
+        {
+          language_code: "ru",
+          title: "Администратор"
+        },
+        {
+          language_code: "uz",
+          title: "Administrator"
+        }
+      ]
     },
     {
-      id: 2,
+      code: "user",
+      permissions: [
+        {
+          action: "update",
+          subject: "Listing",
+          fields: ["title", "description", "attribute_set", "cover_id", "category_id"],
+          conditions: { created_by: "return (user) => user.id" }
+        },
+        {
+          action: "delete",
+          subject: "Chat",
+          conditions: { created_by: "return (user) => user.id" }
+        },
+        {
+          action: "delete",
+          subject: "Session",
+          conditions: { user_id: "return (user) => user.id" }
+        },
+        {
+          action: "manage",
+          subject: "Credential",
+          conditions: { user_id: "return (user) => user.id" }
+        },
+        {
+          action: "update",
+          subject: "Message",
+          fields: ["content", "reply_to"],
+          conditions: { sender_id: "return (user) => user.id" }
+        },
+        {
+          action: "manage",
+          subject: "User",
+          fields: ["phone", "email", "name", "username", "bio", "website_url", "profile_photo_url", "email", "password"],
+          conditions: { id: "return (user) => user.id" }
+        }
+      ],
+      translations: [
+        {
+          language_code: "en",
+          title: "User"
+        },
+        {
+          language_code: "ru",
+          title: "Пользователь"
+        },
+        {
+          language_code: "uz",
+          title: "Foydalanuvchi"
+        }
+      ]
+    },
+    {
       code: "moderator",
-    },
-    {
-      id: 3,
-      code: "external_client",
-    },
-  ]);
-
-  await knex("role_translations").insert([
-    {
-      role_id: 1,
-      title: "Администратор",
-      language_code: "ru",
-    },
-    {
-      role_id: 1,
-      title: "Administrator",
-      language_code: "en",
-    },
-    {
-      role_id: 1,
-      title: "Administrator",
-      language_code: "uz",
-    },
-    {
-      role_id: 2,
-      title: "Модератор",
-      language_code: "ru",
-    },
-    {
-      role_id: 2,
-      title: "Moderator",
-      language_code: "en",
-    },
-    {
-      role_id: 2,
-      title: "Moderator",
-      language_code: "uz",
-    },
-    {
-      role_id: 3,
-      title: "Внешний клиент",
-      language_code: "ru",
-    },
-    {
-      role_id: 3,
-      title: "External client",
-      language_code: "en",
-    },
-    {
-      role_id: 3,
-      title: "Tashqi klient",
-      language_code: "uz",
-    },
-  ]);
-
-  await knex("users").insert([
-    {
-      id: 1,
-      email: "yeah-admin@needs.uz",
-      password: await argon2.hash(
-        "943a221881e6c5146616fa143fbf1fe26f486f7b568bda3290d3fe26b3f67c15"
-      ),
-      email_verified: true,
-      name: "Yeah Admin",
-    },
-    {
-      id: 2,
-      email: "yeah-socket@needs.uz",
-      password: await argon2.hash(
-        "5ef5e6ce4441ed8c45126180da04399042ed23e6560f65bfa0b557de22b26860"
-      ),
-      email_verified: true,
-      name: "Yeah Socket",
-    },
-  ]);
-
-  await knex.raw("select setval('users_id_seq', max(id)) from users");
-
-  await knex("user_roles").insert([
-    {
-      user_id: 2,
-      role_id: 3
+      translations: [
+        {
+          language_code: "en",
+          title: "Moderator"
+        },
+        {
+          language_code: "ru",
+          title: "Модератор"
+        },
+        {
+          language_code: "uz",
+          title: "Moderator"
+        }
+      ]
     }
-  ]);
+  ];
+
+  for (let role of roles) {
+    let result = await knex("roles").insert({
+      code: role.code
+    }).returning("id");
+    let role_id = result[0].id;
+    await knex("role_translations").insert(role.translations.map(t => Object.assign(t, { role_id })));
+    if (role.permissions) {
+      let permissions = await knex("permissions").insert(role.permissions).returning("id");
+      await knex("role_permissions").insert(permissions.map(p => ({ role_id, permission_id: p.id })));
+    }
+  };
 
   await insert_regions();
 

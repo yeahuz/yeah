@@ -26,6 +26,7 @@ export const auth = async (fastify) => {
     url: "/otp",
     handler: AuthController.create_otp,
     schema: auth_schema.create_otp,
+    config: { public: true }
     // config: {
     //   rateLimit: {
     //     max: 5,
@@ -38,22 +39,26 @@ export const auth = async (fastify) => {
     url: "/otp/confirmation",
     handler: AuthController.confirm_otp,
     schema: auth_schema.confirm_otp,
+    config: { public: true }
   });
   fastify.route({
     method: "GET",
     url: "/qr/:token",
     handler: AuthController.get_qr_login,
+    config: { public: true }
   });
   fastify.route({
     method: "POST",
     url: "/qr/:token/confirmation",
     handler: AuthController.qr_login_confirm,
+    config: { public: true }
   });
   fastify.route({
     method: "POST",
     url: "/qr",
     handler: AuthController.qr_login,
     constraints: { accept: "application/json" },
+    config: { public: true }
   });
   fastify.route({
     method: "POST",

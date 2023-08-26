@@ -3,39 +3,8 @@ import * as CredentialService from "../services/credential.service.js";
 import * as UserService from "../services/user.service.js";
 import * as SessionService from "../services/session.service.js";
 import * as jwt from "../utils/jwt.js";
-import { AuthorizationError, ResourceNotFoundError } from "../utils/errors.js";
 import { AssertionRequest, CredentialRequest } from "../utils/webauthn.js";
-import { admin_user, external_client } from "../utils/roles.js";
 import { transform_object } from "../utils/index.js";
-
-export async function admin_login(req, reply) {
-  let { identifier, password } = req.body;
-
-  let user = await AuthService.verify_password({ identifier, password });
-
-  if (!admin_user(user)) throw new AuthorizationError();
-
-  let has_credential = await CredentialService.exists_for(user.id);
-
-  if (!has_credential) {
-    throw new ResourceNotFoundError({ key: "credential_not_found" });
-  }
-
-  let token = jwt.sign({ id: user.id }, { expiresIn: 120 });
-  reply.send({ token });
-  return reply;
-}
-
-export async function external_client_login(req, reply) {
-  let user_agent = req.headers["user-agent"];
-  let ip = req.ip;
-  let { identifier, password } = req.body;
-  let user = await AuthService.verify_password({ identifier, password });
-  if (!external_client(user)) throw new AuthorizationError();
-  let session = await SessionService.create_one({ user_id: user.id, user_agent, ip });
-  reply.send(session);
-  return reply;
-}
 
 export async function login(req, reply) {
   let { identifier, password } = req.body;
