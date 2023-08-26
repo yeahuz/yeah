@@ -20,6 +20,7 @@ import { pg_to_es } from "./jobs.js";
 import { render_file, eta } from "./utils/eta.js";
 import qs from "qs";
 import cors from "@fastify/cors";
+import { auth_guard } from "./plugins/auth-guard.js";
 
 // process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 

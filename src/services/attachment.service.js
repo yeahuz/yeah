@@ -26,8 +26,10 @@ export async function get_by_resource_id(resource_id, service = "CF_IMAGES") {
 }
 
 function create_one_impl(trx = { query }) {
-  return async ({ size, resource_id, name, type, url } = {}) => {
-    let { rows } = await trx.query(`insert into attachments (size, resource_id, name, type, url) values ($1, $2, $3, $4, $5) returning id`, [size, resource_id, name, type, url]);
+  return async ({ size, resource_id, name, type, url, created_by } = {}) => {
+    let { rows } = await trx.query(`insert into attachments
+      (size, resource_id, name, type, url, created_by) values
+      ($1, $2, $3, $4, $5, $6) returning id`, [size, resource_id, name, type, url, created_by]);
     return rows[0];
   };
 }

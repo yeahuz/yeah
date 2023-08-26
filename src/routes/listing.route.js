@@ -1,6 +1,6 @@
 import { new_listing_schema } from "../schemas/new-listing.schema.js";
 import * as ListingController from "../controllers/listing.controller.js";
-import { authenticated_user } from "../utils/roles.js";
+import { policy_guard } from "../plugins/policy-guard.js";
 
 export let listing = async (fastify) => {
   fastify.route({
@@ -12,11 +12,13 @@ export let listing = async (fastify) => {
     method: "GET",
     url: "/:hash_id",
     handler: ListingController.get_one,
+    config: { public: true }
   });
   fastify.route({
     method: "GET",
     url: "/:hash_id/contact",
     handler: ListingController.get_contact,
+    config: { public: true }
   });
   fastify.route({
     method: "POST",
@@ -27,8 +29,8 @@ export let listing = async (fastify) => {
     method: "GET",
     url: "/wizard",
     handler: ListingController.get_step,
+    config: { public: true }
   });
-
   fastify.route({
     method: "GET",
     url: "/wizard/:id",
@@ -37,14 +39,13 @@ export let listing = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/wizard",
-    handler: ListingController.submit_step,
-    preHandler: fastify.can([authenticated_user])
+    handler: ListingController.submit_step
   });
   fastify.route({
     method: "POST",
     url: "/wizard/:id",
     handler: ListingController.submit_step,
-    preHandler: fastify.can([authenticated_user])
+    onRequest: policy_guard(),
   });
   // fastify.route({
   //   method: "GET",

@@ -1,5 +1,6 @@
 import * as ListingService from "../services/listing.service.js";
 import { transform_object } from "../utils/index.js";
+import { permittedFieldsOf } from "@casl/ability/extra";
 
 export async function get_one(req, reply) {
   let { id } = req.params;
@@ -21,17 +22,19 @@ export async function get_filters(req, reply) {
 
 export async function update_one(req, reply) {
   let { id } = req.params;
-  let { status } = req.body;
-  return await ListingService.update_one(id, { status });
+  let ability = req.ability;
+  return await ListingService.update_one(ability, id, req.body);
 }
 
 export async function link_attachments(req, reply) {
   let { id } = req.params;
   let { attachments = [] } = req.body;
-  return await ListingService.link_attachments(id, attachments)
+  let ability = req.ability;
+  return await ListingService.link_attachments(ability, id, attachments)
 }
 
 export async function unlink_attachment(req, reply) {
   let { id, attachment_id } = req.params;
-  return await ListingService.unlink_attachment(id, attachment_id);
+  let ability = req.ability;
+  return await ListingService.unlink_attachment(ability, id, attachment_id);
 }

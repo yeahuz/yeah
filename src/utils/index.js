@@ -25,6 +25,16 @@ export function interpolate(str, params) {
   return s;
 }
 
+export function pick(obj, keys) {
+  let ret = {}
+  for (let key of keys) {
+    if (obj[key]) {
+      ret[key] = obj[key];
+    }
+  }
+  return ret;
+}
+
 export function flatten_obj(obj, parent, res = {}) {
   for (let prop in obj) {
     let key = parent ? parent + "." + prop : prop;

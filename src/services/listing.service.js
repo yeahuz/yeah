@@ -1,7 +1,10 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
-import { InternalError } from "../utils/errors.js";
+import { AuthorizationError, InternalError } from "../utils/errors.js";
 import { commit_trx, start_trx, rollback_trx, query } from "./db.service.js";
+import { subject } from "@casl/ability";
+import { permittedFieldsOf } from "@casl/ability/extra";
+import { pick } from "../utils/index.js";
 
 export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
   let trx = await start_trx();
@@ -185,10 +188,17 @@ export async function get_statuses({ lang = "en" }) {
   return rows;
 }
 
-export async function update_one(id, update) {
+export async function update_one(ability, id, update) {
+  let listing = await get_one({ id });
+
+  if (!ability.can("update", subject("Listing", listing))) {
+    throw new AuthorizationError();
+  }
+
+  let fields = permittedFieldsOf(ability, "update", subject("Listing", listing), { fieldsFrom: (rule) => rule.fields });
   let sql = '';
   let params = [id];
-  let keys = Object.keys(update);
+  let keys = Object.keys(pick(update, fields));
   for (let i = 0, len = keys.length; i < len; i++) {
     params.push(update[keys[i]]);
     sql += keys[i] + "=" + `$${params.length}`;
@@ -205,7 +215,12 @@ export async function update_one(id, update) {
   return rows[0];
 }
 
-export async function link_attachments(id, attachments = []) {
+export async function link_attachments(ability, id, attachments = []) {
+  let listing = await get_one({ id });
+  if (!ability.can("update", subject("Listing", listing))) {
+    throw new AuthorizationError();
+  }
+
   let trx = await start_trx();
   try {
     await Promise.all(attachments.map(a => {
@@ -218,12 +233,20 @@ export async function link_attachments(id, attachments = []) {
   }
 }
 
-export async function unlink_attachment(listing_id, attachment_id) {
+export async function unlink_attachment(ability, listing_id, attachment_id) {
+  let listing = await get_one({ id });
+  if (!ability.can("update", subject("Listing", listing))) {
+    throw new AuthorizationError();
+  }
   await query(`delete from listing_attachments where listing_id = $1 and attachment_id = $2`, [listing_id, attachment_id])
   return attachment_id;
 }
 
-export async function upsert_price({ amount, currency_code, id }) {
+export async function upsert_price(ability, { amount, currency_code, id }) {
+  let listing = await get_one({ id });
+  if (!ability.can("update", subject("Listing", listing))) {
+    throw new AuthorizationError();
+  }
   let { rows } = await query(`insert into listing_prices (amount, currency_code, listing_id)
     values ($1, $2, $3) on conflict(listing_id) do update set amount = $1, currency_code = $2`,
     [amount, currency_code, id]);

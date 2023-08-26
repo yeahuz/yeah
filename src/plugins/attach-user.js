@@ -16,6 +16,10 @@ async function attach_user_impl(req, reply) {
     req.session.set("sid", null)
   }
 
+  console.log("==================================")
+  console.log({ CONFIG: reply.context.config });
+  console.log("==================================")
+
   let user = await UserService.get_by_id(session?.user_id, { roles: true });
   req.user = user;
 }

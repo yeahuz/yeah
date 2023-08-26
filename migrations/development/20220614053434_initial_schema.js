@@ -367,6 +367,12 @@ export function up(knex) {
       t.string("caption").nullable();
       t.integer("size").defaultTo(0);
       t.string("url", 512);
+      t.integer("created_by")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
       t.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
       t.timestamps(false, true);
     })

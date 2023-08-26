@@ -1,5 +1,5 @@
 import * as ListingController from "../controllers/listing-api.controller.js";
-import { external_client, admin_user } from "../utils/roles.js";
+import { policy_guard } from "../plugins/policy-guard.js";
 
 export const listing_api = async (fastify) => {
   fastify.route({
@@ -21,16 +21,19 @@ export const listing_api = async (fastify) => {
     method: "PATCH",
     url: "/:id",
     handler: ListingController.update_one,
-    onRequest: fastify.can_api([external_client, admin_user]),
+    onRequest: policy_guard()
+    //onRequest: fastify.can_api([external_client, admin_user]),
   });
   fastify.route({
     method: "POST",
     url: "/:id/attachments",
-    handler: ListingController.link_attachments
+    handler: ListingController.link_attachments,
+    onRequest: policy_guard()
   });
   fastify.route({
     method: "DELETE",
     url: "/:id/attachments/:attachment_id",
-    handler: ListingController.unlink_attachment
+    handler: ListingController.unlink_attachment,
+    onRequest: policy_guard()
   });
 };

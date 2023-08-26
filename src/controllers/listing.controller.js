@@ -99,46 +99,6 @@ export async function submit_second_step(req, reply) {
   return reply;
 }
 
-// TODO: This function is fucking shit. Fix this.
-export async function submit_second_step_old(req, reply) {
-  let { id } = req.params;
-
-  let fields;
-  let uploaded_files = [];
-  for await (let result of S3Service.upload_multiple(req.files())) {
-    let { fields: result_fields, attachment } = result;
-    if (!fields) fields = result_fields;
-
-    if (attachment) {
-      let photo = await AttachmentService.create_one(attachment);
-      uploaded_files.push(photo);
-    }
-  }
-
-  let body = {};
-  for (let key of Object.keys(fields)) {
-    let field = fields[key];
-    if (Array.isArray(field)) {
-      body[key] = field.filter((k) => !k.file).map((k) => k.value);
-    } else if (!field.file && field.value) {
-      body[key] = field.value;
-    }
-  }
-
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-
-  uploaded_files = existing.uploaded_files
-    ? (existing.uploaded_files || []).concat(uploaded_files)
-    : uploaded_files;
-
-  await redis_client.set(
-    id,
-    JSON.stringify(Object.assign(existing, Object.assign(body, { uploaded_files })))
-  );
-
-  reply.redirect(`/listings/wizard/${id}/3`);
-}
-
 export async function submit_third_step(req, reply) {
   let { id } = req.params;
   let { location, phone } = req.body;
@@ -486,6 +446,7 @@ export async function submit_step(req, reply) {
   let step = req.query.step || "1";
   let id = req.params.id;
   let user = req.user;
+  let ability = req.ability;
   let { title, category_id } = req.body;
 
   let next_step = Number(step) + 1;

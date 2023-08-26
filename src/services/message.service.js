@@ -14,7 +14,7 @@ function create_one_impl(trx = { query }) {
       trx.query("update chats set last_message_id = $1 where id = $2", [message.id, chat_id])
     ]);
 
-    let inserted = await Promise.all(attachments.map(AttachmentService.create_one_trx(trx)));
+    let inserted = await Promise.all(attachments.map(a => AttachmentService.create_one_trx(trx)(Object.assign(a, { created_by: sender_id }))));
     await Promise.all(inserted.map(a => {
       return trx.query(`insert into message_attachments (attachment_id, message_id) values ($1, $2)`, [a.id, message.id]);
     }));

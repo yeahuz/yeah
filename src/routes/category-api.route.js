@@ -6,18 +6,18 @@ export const category_api = async (fastify) => {
     method: "GET",
     url: "/",
     handler: CategoryApiController.get_many,
-    onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+    //onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
   });
   fastify.route({
     method: "POST",
     url: "/",
     handler: CategoryApiController.create_one,
-    onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+    //onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
   });
   fastify.route({
     method: "DELETE",
     url: "/:id",
     handler: CategoryApiController.delete_one,
-    onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+    //onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
   });
 };

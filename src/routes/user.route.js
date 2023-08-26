@@ -6,7 +6,7 @@ export const user = async (fastify) => {
     method: "POST",
     url: "/:id/phones/otp",
     handler: UserController.send_phone_code,
-    onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
     // config: {
     //   rateLimit: {
     //     max: 3,
@@ -18,7 +18,7 @@ export const user = async (fastify) => {
     method: "POST",
     url: "/:id/phones",
     handler: UserController.update_phone,
-    onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
     config: {
       rateLimit: {
         max: 10,
@@ -30,7 +30,7 @@ export const user = async (fastify) => {
     method: "POST",
     url: "/:id/emails",
     handler: UserController.update_email,
-    onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
     config: {
       rateLimit: {
         max: 10,
@@ -42,7 +42,7 @@ export const user = async (fastify) => {
     method: "POST",
     url: "/:id/emails/otp",
     handler: UserController.send_email_link,
-    onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
     config: {
       rateLimit: {
         max: 3,
@@ -54,13 +54,13 @@ export const user = async (fastify) => {
     method: "GET",
     url: "/:id/emails",
     handler: UserController.get_email_form,
-    onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
   });
   fastify.route({
     method: "POST",
     url: "/:id",
     handler: UserController.update_one,
-    onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
   });
   fastify.route({
     method: "GET",

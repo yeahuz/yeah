@@ -35,6 +35,7 @@ import { is_partial } from "../plugins/is-partial.js";
 import { chunk_view } from "../plugins/chunk-view.js";
 import { init_stream } from "../plugins/init-stream.js";
 import { DomainError, ValidationError, InternalError } from "../utils/errors.js";
+import { api_auth_guard, auth_guard } from "../plugins/auth-guard.js";
 
 export const routes = async (fastify) => {
   // Plugins
@@ -44,7 +45,7 @@ export const routes = async (fastify) => {
   fastify.register(is_partial);
   fastify.register(chunk_view);
   fastify.register(init_stream);
-  fastify.register(attach_user);
+  fastify.register(auth_guard);
 
   // Routes
   fastify.register(home);
@@ -70,7 +71,7 @@ export const routes = async (fastify) => {
 };
 
 export const api_routes = async (fastify) => {
-  fastify.register(attach_user);
+  fastify.register(api_auth_guard);
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
   fastify.register(listing_api, { prefix: "/listings" });

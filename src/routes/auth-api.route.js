@@ -7,18 +7,21 @@ export const auth_api = async (fastify) => {
     method: "POST",
     url: "/login",
     handler: AuthApiController.login,
+    config: { public: true }
     // schema: auth_api_schema.login,
-    onRequest: fastify.can_api([guest_user]),
+    //onRequest: fastify.can_api([guest_user]),
   });
   fastify.route({
     method: "POST",
     url: "/admin/login",
     handler: AuthApiController.admin_login,
+    config: { public: true }
   });
   fastify.route({
     method: "POST",
     url: "/external/login",
     handler: AuthApiController.external_client_login,
+    config: { public: true }
   });
   fastify.route({
     method: "GET",
@@ -35,24 +38,24 @@ export const auth_api = async (fastify) => {
     method: "GET",
     url: "/sessions/:id",
     handler: AuthApiController.get_session,
-    onRequest: fastify.can_api([own_session, external_client]),
+    config: { public: true }
+    //onRequest: fastify.can_api([own_session, external_client]),
   });
   fastify.route({
     method: "DELETE",
     url: "/sessions/:id",
     handler: AuthApiController.delete_session,
-    onRequest: fastify.can_api([own_session, external_client]),
+    //onRequest: fastify.can_api([own_session, external_client]),
   });
   fastify.route({
     method: "GET",
     url: "/session",
     handler: AuthApiController.get_me,
-    onRequest: fastify.can_api([authenticated_user])
+    //onRequest: fastify.can_api([authenticated_user])
   });
   fastify.route({
     method: "DELETE",
     url: "/session",
     handler: AuthApiController.logout,
-    onRequest: fastify.can_api([authenticated_user])
   });
 };

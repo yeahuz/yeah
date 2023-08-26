@@ -6,12 +6,10 @@ export const payment = async (fastify) => {
     method: "GET",
     url: "/new",
     handler: PaymentController.get_new,
-    onRequest: fastify.can([authenticated_user]),
   });
   fastify.route({
     method: "POST",
     url: "/new",
     handler: PaymentController.create_new_payment,
-    onRequest: fastify.can([authenticated_user]),
   });
 };

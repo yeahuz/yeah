@@ -16,18 +16,18 @@ export async function get_many({ user_id }) {
     cm.unread_count,
     cm.last_read_message_id,
     json_build_object(
-      'id', p.id,
-      'title', p.title,
-      'cover_url', p.cover_url,
-      'url', p.url,
-      'creator', json_build_object('name', u.name)
+      'id', l.id,
+      'title', l.title,
+      'cover_url', a2.url,
+      'url', l.url,
+      'creator', u.name
     ) as listing,
     case
       when m.type is null then null
       else json_build_object(
         'type', m.type,
         'content', m.content,
-        'attachments', coalesce(json_agg(json_build_object('id', a.id, 'name', a.name)) filter (where a.id is not null), '[]'::json),
+        'attachments', coalesce(json_agg(json_build_object('id', a.id, 'name', a.name)) filter (where a.id is not null), '{}'),
         'created_at', m.created_at,
         'sender_id', m.sender_id,
         'is_own', case when m.sender_id = $1 then 1 else 0 end
@@ -37,9 +37,10 @@ export async function get_many({ user_id }) {
     left join messages m on m.chat_id = c.id and m.id = c.last_message_id
     left join message_attachments ma on ma.message_id = c.last_message_id
     left join attachments a on a.id = ma.attachment_id
-    join listings p on p.id = c.listing_id
-    join users u on u.id = p.created_by
-    group by c.id, p.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name, cm.last_read_message_id
+    join listings l on l.id = c.listing_id
+    left join attachments a2 on a2.id = l.cover_id
+    join users u on u.id = l.created_by
+    group by c.id, l.id, m.type, m.content, m.created_at, m.sender_id, cm.unread_count, u.name, cm.last_read_message_id, a2.url
   `, [user_id]);
 
   return rows;
@@ -59,17 +60,17 @@ export async function get_one({ id }) {
   let { rows } = await query(`
     select c.id,
     json_build_object(
-    'id', p.id,
-    'title', p.title,
-    'url', p.url,
-    'cover_url', p.cover_url,
-    'creator', json_build_object('profile_url', u.profile_url, 'username', u.username)
-    ) as listing
+    'id', l.id,
+    'title', l.title,
+    'url', l.url,
+    'cover_url', a.url,
+    'creator', json_build_object('profile_url', u.profile_url, 'username', u.username)) as listing
     from chats c
-    join listings p on p.id = c.listing_id
-    join users u on u.id = p.created_by
+    join listings l on l.id = c.listing_id
+    join users u on u.id = l.created_by
+    left join attachments a on a.id = l.cover_id
     where c.id = $1
-    group by p.*, c.id, p.id, u.profile_url, u.username
+    group by l.*, c.id, l.id, u.profile_url, u.username
   `, [id])
 
   if (rows.length) return rows[0];
@@ -106,10 +107,11 @@ export async function create_chat({ created_by, listing_id, members = [] }) {
     await commit_trx(trx)
 
     let { rows: [listing] } = await query(`
-      select p.id, cover_url, url, title, u.name as creator
-      from listings p
-      join users u on u.id = p.created_by
-      where p.id = $1`,
+      select l.id, a.url as cover_url, url, title, u.name as creator
+      from listings l
+      join users u on u.id = l.created_by
+      left join attachments a on a.id = l.cover_id
+      where l.id = $1`,
       [listing_id]);
 
     chat.url = url;
