@@ -1,0 +1,11 @@
+{
+  "title": "Sotish",
+  "tabs": {
+    "overview": "Umumiy",
+    "active": "Faol",
+    "sold": "Sotilgan",
+    "moderation": "Tekshiruvda",
+    "archived": "Arxivlangan",
+    "draft": "Qoralama"
+  }
+}

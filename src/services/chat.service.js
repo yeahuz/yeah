@@ -2,6 +2,7 @@ import * as MessageService from "./message.service.js";
 import { AuthorizationError, BadRequestError, InternalError } from "../utils/errors.js";
 import { commit_trx, query, rollback_trx, start_trx } from "./db.service.js";
 import { option } from "../utils/index.js";
+import { sqids } from "../utils/sqids.js";
 import config from "../config/index.js";
 
 export let create_one_trx = (trx) => create_one_impl(trx);
@@ -108,7 +109,7 @@ export async function create_chat({ created_by, listing_id, members = [] }) {
   let trx = await start_trx();
   try {
     let { rows: [chat] } = await trx.query("insert into chats (created_by, listing_id) values ($1, $2) returning id", [created_by, listing_id]);
-    let url = new URL(`chats/${chat.id}`, config.origin).href;
+    let url = new URL(`chats/${sqids.encode([chat.id])}`, config.origin).href;
     await trx.query("update chats set url = $1 where id = $2", [url, chat.id])
     await Promise.all(members.map(m => trx.query("insert into chat_members (chat_id, user_id) values ($1, $2)", [chat.id, m])))
     await commit_trx(trx)

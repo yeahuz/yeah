@@ -1,0 +1,43 @@
+<% if (it.listings.list.length) {%>
+  <table class="w-full shadow-sm mb-5 self-start">
+    <thead class="text-left text-gray-500 text-sm dark:text-gray-200">
+      <tr class="">
+        <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-3/5 rounded-s-lg">Title</th>
+        <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800">Price</th>
+        <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 rounded-e-lg"></th>
+      </tr>
+    </thead>
+    <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800">
+      <% it.listings.list.forEach(function (item) {%>
+        <tr>
+          <td class="px-1 py-2 flex items-center space-x-3">
+            <img src="<%= item.cover_url %>/thumbnail" crossorigin="anonymous" decoding="async" loading="lazy" referrerpolicy="no-referrer" class="h-12 w-20 object-cover rounded-md" />
+            <a class="text-gray-900 font-medium dark:text-white" href="#">
+              <%= item.title %>
+            </a>
+          </td>
+          <td class="p-3 text-gray-900 dark:text-white">
+            <%= new Intl.NumberFormat(it.lang, { currency: item.currency, style: "currency", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(item.price) %>
+          </td>
+          <td class="p-3 text-gray-500 w-16">
+            <details class="relative">
+              <summary class="btn btn-secondary btn-xs btn-square">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                </svg>
+              </summary>
+              <ul class="overflow-hidden absolute right-0 bg-white w-64 shadow-lg border border-gray-100 mt-2 rounded-lg z-50 dark:bg-zinc-900 dark:border-zinc-800">
+                <li class="flex">
+                  <button class="btn btn-secondary btn-md btn-menu-item w-full btn-left">Архивировать</button>
+                </li>
+              </ul>
+            </details>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+<div>
+</div>
+</main>

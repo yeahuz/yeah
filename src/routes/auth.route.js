@@ -26,8 +26,8 @@ export let auth = async (fastify) => {
     url: "/otp",
     handler: AuthController.create_otp,
     schema: auth_schema.create_otp,
-    config: { public: true },
     config: {
+      public: true,
       rateLimit: {
         max: 5,
         timeWindow: 43200000,

@@ -20,7 +20,7 @@ const DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION = `DROP FUNCTION on_payment_status_
 export function up(knex) {
   return knex.schema
     .createTable("users", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("phone", 15).unique();
       t.boolean("phone_verified").defaultTo(false);
       t.string("name");
@@ -31,14 +31,13 @@ export function up(knex) {
       t.string("email").unique();
       t.boolean("email_verified").defaultTo(false);
       t.string("password").notNullable();
-      t.string("hash_id").index();
       t.string("profile_url");
       t.boolean("verified").defaultTo(false);
       t.timestamps(false, true);
     })
     .createTable("last_seen", (t) => {
       t.timestamp("time").defaultTo(knex.fn.now());
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -46,10 +45,10 @@ export function up(knex) {
         .onDelete("CASCADE")
     })
     .createTable("user_preferences", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("name");
       t.string("value");
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -57,7 +56,7 @@ export function up(knex) {
         .onDelete("CASCADE");
     })
     .createTable("confirmation_codes", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("code");
       t.string("identifier").unique();
       t.timestamp("expires_at");
@@ -65,15 +64,14 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("auth_providers", (t) => {
-      t.increments("id");
-      t.string("name").unique();
+      t.string("name").primary();
       t.string("logo_url");
       t.boolean("active");
       t.timestamps(false, true);
     })
     .createTable("accounts", (t) => {
-      t.increments("id");
-      t.integer("user_id")
+      t.bigIncrements("id");
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -90,16 +88,16 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("products", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("title");
       t.string("description");
       t.integer("unit_price");
       t.timestamps(false, true);
     })
     .createTable("billing_accounts", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.integer("balance").defaultTo(0);
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -122,7 +120,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("payments", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.integer("debit_amount").defaultTo(0);
       t.integer("credit_amount").defaultTo(0);
       t.string("status")
@@ -137,7 +135,7 @@ export function up(knex) {
         .references("name")
         .inTable("payment_providers")
         .onDelete("CASCADE");
-      t.integer("billing_account_id")
+      t.bigInteger("billing_account_id")
         .index()
         .notNullable()
         .references("id")
@@ -146,25 +144,26 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("invoices", (t) => {
-      t.increments("id");
-      t.integer("payment_id")
+      t.bigIncrements("id");
+      t.bigInteger("payment_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("payments")
         .onDelete("CASCADE");
-      t.integer("billing_account_id")
+      t.bigInteger("billing_account_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("billing_accounts")
         .onDelete("CASCADE");
+      t.unique(["payment_id", "billing_account_id"]);
       t.timestamps(false, true);
     })
     .createTable("invoice_lines", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.smallint("quantity").defaultTo(1);
-      t.integer("product_id")
+      t.bigInteger("product_id")
         .index()
         .notNullable()
         .references("id")
@@ -178,34 +177,34 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("notifications", (t) => {
-      t.increments("id").primary();
-      t.integer("sender_id").index().notNullable().references("id").inTable("users");
+      t.bigIncrements("id").primary();
+      t.bigInteger("sender_id").index().notNullable().references("id").inTable("users");
       t.string("type").index().notNullable().references("name").inTable("notification_types");
       t.string("href");
-      t.string("hash_id").unique();
       t.timestamps(false, true);
     })
     .createTable("user_notifications", (t) => {
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("notification_id")
+      t.bigInteger("notification_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("notifications")
         .onDelete("CASCADE");
       t.boolean("read").defaultTo(false);
+      t.unique(["user_id", "notification_id"]);
     })
     .createTable("user_cards", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("pan");
       t.string("expiry");
       t.boolean("default").defaultTo(false);
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -214,8 +213,8 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("user_reviews", (t) => {
-      t.increments("id");
-      t.integer("user_id")
+      t.bigIncrements("id");
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -223,7 +222,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.text("comment");
       t.smallint("rating");
-      t.integer("from")
+      t.bigInteger("from")
         .index()
         .notNullable()
         .references("id")
@@ -231,14 +230,14 @@ export function up(knex) {
         .onDelete("CASCADE");
     })
     .createTable("credentials", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("credential_id", 1024);
       t.string("title").notNullable();
       t.text("public_key");
       t.integer("counter");
       t.json("transports");
       t.timestamps(false, true);
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -251,7 +250,7 @@ export function up(knex) {
       t.specificType("ip", "INET");
       t.timestamp("expires_at");
       t.timestamps(false, true);
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -259,12 +258,12 @@ export function up(knex) {
         .onDelete("CASCADE");
     })
     .createTable("user_location", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.point("coords");
       t.string("city");
       t.string("region");
       t.string("country");
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -273,7 +272,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("user_agents", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("raw");
       t.string("browser_name");
       t.string("browser_version");
@@ -297,7 +296,7 @@ export function up(knex) {
         .references("id")
         .inTable("sessions")
         .onDelete("CASCADE");
-      t.integer("credential_id")
+      t.bigInteger("credential_id")
         .index()
         .notNullable()
         .references("id")
@@ -360,24 +359,29 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("attachments", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("resource_id").index();
       t.string("name");
       t.string("type");
       t.string("caption").nullable();
       t.integer("size").defaultTo(0);
       t.string("url", 512);
+      t.bigInteger("created_by")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
       t.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
       t.timestamps(false, true);
     })
     .createTable("listings", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("title");
       t.text("description");
-      t.string("hash_id").index();
       t.string("url", 512);
       t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
-      t.integer("cover_id")
+      t.bigInteger("cover_id")
         .index()
         .references("id")
         .inTable("attachments")
@@ -388,7 +392,7 @@ export function up(knex) {
         .references("id")
         .inTable("categories")
         .onDelete("CASCADE")
-      t.integer("created_by")
+      t.bigInteger("created_by")
         .index()
         .notNullable()
         .references("id")
@@ -440,8 +444,30 @@ export function up(knex) {
     })
     .createTable("roles", (t) => {
       t.increments("id");
-      t.enu("code", ["admin", "moderator", "external_client"]);
+      t.enu("code", ["admin", "moderator", "user"]);
       t.timestamps(false, true);
+    })
+    .createTable("permissions", (t) => {
+      t.increments("id");
+      t.string("action").notNullable();
+      t.string("subject").notNullable();
+      t.jsonb("conditions").nullable();
+      t.specificType("fields", "VARCHAR[]").nullable();
+    })
+    .createTable("role_permissions", (t) => {
+      t.integer("permission_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("permissions")
+        .onDelete("CASCADE");
+      t.integer("role_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("roles")
+        .onDelete("CASCADE");
+      t.unique(["permission_id", "role_id"]);
     })
     .createTable("role_translations", (t) => {
       t.increments("id");
@@ -462,7 +488,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("user_roles", (t) => {
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -495,13 +521,13 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_bookmarks", (t) => {
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("listing_id")
+      t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
@@ -533,14 +559,14 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_prices", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("currency_code")
         .index()
         .notNullable()
         .references("code")
         .inTable("currencies")
         .onDelete("CASCADE");
-      t.integer("listing_id")
+      t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
@@ -653,7 +679,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_attributes", (t) => {
-      t.integer("listing_id")
+      t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
@@ -669,7 +695,7 @@ export function up(knex) {
     })
     .createTable("promotions", (t) => {
       t.increments("id");
-      t.integer("listing_id")
+      t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
@@ -681,13 +707,13 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_attachments", (t) => {
-      t.integer("listing_id")
+      t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.integer("attachment_id")
+      t.bigInteger("attachment_id")
         .index()
         .notNullable()
         .references("id")
@@ -697,15 +723,15 @@ export function up(knex) {
       t.unique(["listing_id", "attachment_id"])
     })
     .createTable("transactions", (t) => {
-      t.increments("id");
-      t.integer("user_id")
+      t.bigIncrements("id");
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("amount");
-      t.integer("card_id")
+      t.bigInteger("amount");
+      t.bigInteger("card_id")
         .index()
         .notNullable()
         .references("id")
@@ -738,21 +764,20 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("chats", (t) => {
-      t.increments("id");
-      t.integer("created_by")
+      t.bigIncrements("id");
+      t.bigInteger("created_by")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("listing_id")
+      t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t
-        .integer("last_message_id")
+      t.bigInteger("last_message_id")
         .index()
         .nullable()
       t.string("url");
@@ -760,36 +785,36 @@ export function up(knex) {
       t.index("created_at");
     })
     .createTable("chat_members", (t) => {
-      t.integer("chat_id")
+      t.bigInteger("chat_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("chats")
         .onDelete("CASCADE");
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("last_read_message_id")
+      t.bigInteger("last_read_message_id")
         .index()
         .nullable()
       t.integer("unread_count").defaultTo(0);
       t.unique(["chat_id", "user_id"]);
     })
     .createTable("messages", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.text("content").defaultTo("");
       t.enu("type", ["photo", "file", "video", "text", "media"]).defaultTo("text");
       t.integer("reply_to").index().references("id").inTable("messages");
-      t.integer("sender_id")
+      t.bigInteger("sender_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("users")
         .onDelete("CASCADE");
-      t.integer("chat_id")
+      t.bigInteger("chat_id")
         .index()
         .notNullable()
         .references("id")
@@ -804,13 +829,13 @@ export function up(knex) {
       t.foreign("last_read_message_id").references("id").inTable("messages").onDelete("SET NULL");
     })
     .createTable("read_messages", (t) => {
-      t.integer("message_id")
+      t.bigInteger("message_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("messages")
         .onDelete("CASCADE");
-      t.integer("user_id")
+      t.bigInteger("user_id")
         .index()
         .notNullable()
         .references("id")
@@ -819,13 +844,13 @@ export function up(knex) {
       t.unique(["message_id", "user_id"]);
     })
     .createTable("message_attachments", (t) => {
-      t.integer("message_id")
+      t.bigInteger("message_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("messages")
         .onDelete("CASCADE");
-      t.integer("attachment_id")
+      t.bigInteger("attachment_id")
         .index()
         .notNullable()
         .references("id")
@@ -914,7 +939,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_location", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.string("formatted_address");
       t.point("coords");
       t.integer("listing_id")
@@ -956,12 +981,6 @@ export function up(knex) {
       t.unique(["notification_type_name", "language_code"]);
       t.timestamps(false, true);
     })
-    .createTable("external_clients", (t) => {
-      t.increments("id");
-      t.string("title");
-      t.string("token").index();
-      t.boolean("active").defaultTo(true);
-    })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION));
 }
 
@@ -973,7 +992,7 @@ export async function down(knex) {
     category_fields, category_field_values, category_field_translations,
     category_field_value_translations, chat_members, confirmation_codes,
     countries, country_translations, credentials, currencies, districts,
-    district_translations, exchange_rates, external_clients, invoices,
+    district_translations, exchange_rates, invoices,
     invoice_lines, languages, message_attachments, messages, notifications,
     notification_types, notification_type_translations, payment_providers, payment_statuses,
     payment_status_translations, payments, listing_attachments,
@@ -982,7 +1001,8 @@ export async function down(knex) {
     listings, products, promotions, read_messages, regions, region_translations,
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
-    user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen
+    user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen,
+    permissions, role_permissions
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)

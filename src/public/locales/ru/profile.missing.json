@@ -1,9 +1,11 @@
 {
   "tabs": {
-    "selling": {
-      "title": "tabs.selling.title"
-    },
+    "selling": "tabs.selling",
     "selling_sell": "tabs.selling_sell",
-    "selling_archived": "tabs.selling_archived"
+    "selling_archived": "tabs.selling_archived",
+    "selling_overview": "tabs.selling_overview",
+    "selling_active": "tabs.selling_active",
+    "selling_moderation": "tabs.selling_moderation",
+    "selling_draft": "tabs.selling_draft"
   }
 }

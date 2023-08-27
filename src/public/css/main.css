@@ -501,15 +501,20 @@ button:disabled {
 }
 
 .btn-md {
-  --size-x: 1.25rem;
+  --size-x: 0.75rem;
   --size-y: 0.625rem;
   --font-size: 0.875rem;
 }
 
 .btn-xs {
-  --size-x: 1rem;
+  --size-x: 0.75rem;
   --size-y: 0.5rem;
   --font-size: 0.75rem;
+}
+
+.btn-menu-item {
+  --radius: 0;
+  --border-color: var(--transparent);
 }
 
 .form-control {

@@ -44,6 +44,7 @@ i18next
       "email-templates",
       "sms",
       "chats",
+      "selling"
     ],
     fallbackLng: "ru",
     backend: {

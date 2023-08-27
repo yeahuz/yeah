@@ -202,6 +202,7 @@ export async function get_step(req, reply) {
     } break;
     case "3": {
       let listing = await ListingService.get_one({ id });
+      console.log({ listing });
       rendered_step = await render_file(`/listing/new/step-${step}`, {
         flash,
         t,
@@ -459,8 +460,8 @@ export async function submit_step(req, reply) {
     case "2": {
       let { attribute_set, description, amount, currency_code, cover_id } = req.body;
       await Promise.all([
-        ListingService.update_one(id, { attribute_set, description, cover_id }),
-        ListingService.upsert_price({ amount, currency_code, id })
+        ListingService.update_one(ability, id, { attribute_set, description, cover_id }),
+        ListingService.upsert_price(ability, { amount, currency_code, id })
       ]);
       return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
     }

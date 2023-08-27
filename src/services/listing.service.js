@@ -1,10 +1,12 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import { AuthorizationError, InternalError } from "../utils/errors.js";
-import { commit_trx, start_trx, rollback_trx, query } from "./db.service.js";
+import { commit_trx, start_trx, rollback_trx, query, escapeIdentifier } from "./db.service.js";
 import { subject } from "@casl/ability";
 import { permittedFieldsOf } from "@casl/ability/extra";
 import { pick } from "../utils/index.js";
+import { sqids } from "../utils/sqids.js";
+import config from "../config/index.js";
 
 export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
   let trx = await start_trx();
@@ -12,7 +14,10 @@ export async function create_one({ title, description, status, created_by, attri
     let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, attribute_set, category_id)
       values ($1, $2, $3, $4, $5, $6) returning id`, [title, description, status, created_by, attribute_set, category_id]);
 
-    let categories = await CategoryService.get_parents(category_id); await Promise.all(categories.map((category) => {
+    let url = new URL(`listings/${sqids.encode([listing.id])}`, config.origin).href;
+    await trx.query(`update listings set url = $1 where id = $2`, [url, listing.id]);
+    let categories = await CategoryService.get_parents(category_id);
+    await Promise.all(categories.map((category) => {
       return trx.query(`insert into listing_categories (category_id, listing_id) values ($1, $2)`, [category.id, listing.id]);
     }));
 
@@ -87,18 +92,6 @@ export async function create_listing(payload) {
   // }
 }
 
-async function cursor_paginate(model, list = [], excludes = []) {
-  let first = list[0];
-  let last = list[list.length - 1];
-
-  let has_next =
-    last && !!(await model.query().findOne("id", "<", last.id).whereNotIn("id", excludes));
-  let has_prev =
-    first && !!(await model.query().findOne("id", ">", first.id).whereNotIn("id", excludes));
-
-  return { list, has_next, has_prev };
-}
-
 
 export async function get_one({ id, lang = "en", relation = {} } = {}) {
   if (!id) return;
@@ -162,22 +155,61 @@ export async function get_by_hash_id({ hash_id, relation = {} } = {}) {
   return rows[0];
 }
 
+async function cursor_paginate(list = []) {
+  let first = list[0];
+  let last = list[list.length - 1];
+  let has_next = false;
+  let has_prev = false;
+
+  if (last) {
+    let { rows } = await query(`select 1 from listings where id < $1 limit 1`, [last.id]);
+    has_next = rows.length > 0;
+  }
+
+  if (first) {
+    let { rows } = await query(`select 1 from listings where id > $1 limit 1`, [first.id]);
+    has_prev = rows.length > 0;
+  }
+
+  return { list, has_next, has_prev };
+}
+
 export async function get_many({
   currency = "UZS",
   status,
   limit = 15,
   lang = "en",
   cursor,
-  direction
+  direction,
+  created_by
 } = {}) {
-  let { rows } = await query(`
-    select l.*, er.to_currency as currency, round(lp.amount * er.rate) as price, row_to_json(ll) as location from listings l
-    join listing_prices lp on lp.listing_id = l.id
-    join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
-    join listing_location ll on ll.listing_id = l.id
-    where l.status = $2 order by l.id limit $3`, [currency, status, limit]);
-  // TODO: handle pagination
-  return { list: rows }
+  let params = [currency, status, limit];
+  let sql = `
+    select l.*, a.url as cover_url, er.to_currency as currency, round(lp.amount * er.rate) as price, row_to_json(ll) as location from listings l
+    left join listing_prices lp on lp.listing_id = l.id
+    left join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
+    left join listing_location ll on ll.listing_id = l.id
+    left join attachments a on a.id = l.cover_id
+    where l.status = $2
+  `
+
+  if (created_by) {
+    params.push(created_by);
+    sql += `and l.created_by = $${params.length}`;
+  }
+
+  if (direction === "after") {
+    params.push(cursor)
+    sql += ` and l.id < $${params.length}`;
+  } else if (direction === "before") {
+    params.push(cursor);
+    sql += ` and l.id > $${params.length}`;
+  }
+
+  sql += ` order by l.id limit $3`;
+  let { rows } = await query(sql, params);
+  console.log({ rows });
+  return await cursor_paginate(rows);
 }
 
 export async function get_statuses({ lang = "en" }) {

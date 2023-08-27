@@ -10,13 +10,6 @@
     "overview": "Обзор",
     "recently_viewed": "Недавно просмотренные",
     "watchlist": "Наблюдаемые",
-    "purchases": "Покупки",
-    "selling": "Продажа",
-    "selling_active": "Активные",
-    "selling_overview": "Обзор",
-    "selling_sold": "Проданные",
-    "selling_sell": "Продать",
-    "selling_moderation": "В модерации",
-    "selling_archived": "Архивирован"
+    "purchases": "Покупки"
   }
 }

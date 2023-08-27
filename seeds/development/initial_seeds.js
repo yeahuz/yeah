@@ -1,5 +1,4 @@
 import fs from "fs";
-import * as argon2 from "argon2";
 
 export async function seed(knex) {
   await knex("auth_providers").del();
@@ -934,13 +933,13 @@ export async function seed(knex) {
           action: "create",
           subject: "Message",
           fields: ["content", "reply_to", "attachments", "type"],
-          conditions: { sender_id: "return (user) => user.id", members: "return (user) => ({ $in: [{ id: user.id }] })" }
+          conditions: { sender_id: "return (user) => user.id" }
         },
         {
           action: "update",
           subject: "Message",
           fields: ["content", "reply_to"],
-          conditions: { sender_id: "return (user) => user.id", members: "return (user) => ({ $in: [{ id: user.id }] })" }
+          conditions: { sender_id: "return (user) => user.id" }
         },
         {
           action: "manage",

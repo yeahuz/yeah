@@ -1,10 +1,21 @@
 import config from "../config/index.js";
-import knex from "knex";
 import pkg from "pg";
 
-let { Pool } = pkg;
+export let { Pool, escapeIdentifier, types } = pkg;
+
+types.setTypeParser(20, BigInt);
 
 export let pool = new Pool({ connectionString: config.postgres_uri, connectionTimeoutMillis: 1000 });
+export let ROLES = {};
+
+async function populate_user_roles() {
+  let { rows } = await pool.query(`select * from roles`);
+  for (let role of rows) {
+    ROLES[role.code] = role.id;
+  }
+}
+
+populate_user_roles();
 
 export async function query(text, params) {
   console.log("executing query", { text });
@@ -60,9 +71,3 @@ pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);
 })
-
-export let yeah = knex({
-  client: "pg",
-  connection: config.postgres_uri,
-  pool: { min: 0 },
-});
