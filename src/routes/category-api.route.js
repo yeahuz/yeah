@@ -1,23 +1,23 @@
 import * as CategoryApiController from "../controllers/category-api.controller.js";
-import { authenticated_user, admin_user } from "../utils/roles.js";
+import { policy_guard } from "../plugins/policy-guard.js";
 
-export const category_api = async (fastify) => {
+export let category_api = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/",
     handler: CategoryApiController.get_many,
-    //onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+    config: { public: true }
   });
   fastify.route({
     method: "POST",
     url: "/",
     handler: CategoryApiController.create_one,
-    //onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "Category"))
   });
   fastify.route({
     method: "DELETE",
     url: "/:id",
     handler: CategoryApiController.delete_one,
-    //onRequest: fastify.can_api([authenticated_user, admin_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "Category"))
   });
 };

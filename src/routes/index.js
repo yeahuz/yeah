@@ -11,8 +11,6 @@ import { search } from "./search.route.js";
 import { category } from "./category.route.js";
 import { payment } from "./payment.route.js";
 import { billing } from "./billing.route.js";
-import { cfimg } from "./cfimg.route.js";
-import { cfr2 } from "./cfr2.route.js";
 import { cf } from "./cf.route.js";
 import { chat } from "./chat.route.js";
 import { profile } from "./profile.route.js";
@@ -29,7 +27,6 @@ import { attribute_api } from "./attribute-api.route.js";
 import { attachment_api } from "./attachment-api.route.js";
 
 // Plugins
-import { attach_user } from "../plugins/attach-user.js";
 import { is_xhr } from "../plugins/is-xhr.js";
 import { is_partial } from "../plugins/is-partial.js";
 import { chunk_view } from "../plugins/chunk-view.js";
@@ -61,8 +58,6 @@ export const routes = async (fastify) => {
   fastify.register(category, { prefix: "/categories" });
   fastify.register(category, { prefix: "/c" });
   fastify.register(payment, { prefix: "/payments" });
-  fastify.register(cfimg, { prefix: "/cloudflare/images" });
-  fastify.register(cfr2, { prefix: "/cloudflare/r2" });
   fastify.register(cf, { prefix: "/cf" });
   fastify.register(billing, { prefix: "/billing" });
   fastify.register(profile, { prefix: "/myp" });

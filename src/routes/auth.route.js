@@ -1,8 +1,8 @@
 import * as AuthController from "../controllers/auth.controller.js";
+import { policy_guard } from "../plugins/policy-guard.js";
 import { auth_schema } from "../schemas/auth.schema.js";
-import { authenticated_user, guest_user, own_credential, own_session } from "../utils/roles.js";
 
-export const auth = async (fastify) => {
+export let auth = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/login",
@@ -26,13 +26,13 @@ export const auth = async (fastify) => {
     url: "/otp",
     handler: AuthController.create_otp,
     schema: auth_schema.create_otp,
-    config: { public: true }
-    // config: {
-    //   rateLimit: {
-    //     max: 5,
-    //     timeWindow: 43200000,
-    //   },
-    // },
+    config: { public: true },
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: 43200000,
+      },
+    },
   });
   fastify.route({
     method: "POST",
@@ -121,14 +121,14 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/credentials/:id",
     handler: AuthController.update_credential,
-    //onRequest: fastify.can([authenticated_user, own_credential], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "Credential"))
   });
   fastify.route({
     method: "DELETE",
     url: "/credentials/:id",
     handler: AuthController.delete_credential,
-    //onRequest: fastify.can([authenticated_user, own_credential], { relation: "and" }),
     constraints: { accept: "application/json" },
+    onRequest: policy_guard((ability) => ability.can("manage", "Credential")),
   });
   fastify.route({
     method: "POST",
@@ -140,12 +140,12 @@ export const auth = async (fastify) => {
     method: "POST",
     url: "/sessions",
     handler: AuthController.update_sessions,
-    //onRequest: fastify.can([authenticated_user]),
+    onRequest: policy_guard((ability) => ability.can("manage", "Session"))
   });
   fastify.route({
     method: "POST",
     url: "/sessions/:id",
     handler: AuthController.update_session,
-    //onRequest: fastify.can([authenticated_user, own_session], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "Session"))
   });
 };

@@ -1,6 +1,6 @@
 import * as BillingController from "../controllers/billing.controller.js";
 
-export const billing = async (fastify) => {
+export let billing = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/payme",

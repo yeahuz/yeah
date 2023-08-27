@@ -1,5 +1,5 @@
 import * as MessageService from "./message.service.js";
-import { BadRequestError, InternalError } from "../utils/errors.js";
+import { AuthorizationError, BadRequestError, InternalError } from "../utils/errors.js";
 import { commit_trx, query, rollback_trx, start_trx } from "./db.service.js";
 import { option } from "../utils/index.js";
 import config from "../config/index.js";
@@ -56,7 +56,10 @@ export async function get_chat_ids({ user_id }) {
   return rows;
 }
 
-export async function get_one({ id }) {
+export async function get_one({ id, user_id }) {
+  if (!is_chat_member(user_id, id)) {
+    throw new AuthorizationError();
+  }
   let { rows } = await query(`
     select c.id,
     json_build_object(
@@ -77,6 +80,10 @@ export async function get_one({ id }) {
 }
 
 export async function create_message({ chat_id, content, reply_to, sender_id, type, attachments = [] } = {}) {
+  if (!is_chat_member(sender_id, chat_id)) {
+    throw new AuthorizationError();
+  }
+
   let trx = await start_trx();
   try {
     let message = await MessageService.create_one_trx(trx)({
@@ -134,6 +141,11 @@ export async function is_chat_member(user_id, id) {
   return rows.length > 0;
 }
 
+export async function get_members(id) {
+  let { rows } = await query(`select u.id from chat_members cm join users u on u.id = cm.user_id where chat_id = $1`, [id]);
+  return rows;
+}
+
 export async function get_member_chat(user_id, chats = []) {
   let { rows } = await query(`select c.* from chats c join chat_members cm on cm.chat_id = c.id and cm.user_id = $1`, [user_id]);
   return rows[0];
@@ -148,6 +160,10 @@ export async function get_member_chat(user_id, chats = []) {
 }
 
 export async function read_message({ id, chat_id, user_id }) {
+  if (!is_chat_member(user_id, chat_id)) {
+    throw new AuthorizationError();
+  }
+
   let trx = await start_trx();
   try {
     let [_, err] = await option(trx.query("insert into read_messages (message_id, user_id) values ($1, $2)", [id, user_id]));

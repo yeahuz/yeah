@@ -1,24 +1,24 @@
 import * as UserController from "../controllers/user.controller.js";
-import { current_user, authenticated_user } from "../utils/roles.js";
+import { policy_guard } from "../plugins/policy-guard.js";
 
-export const user = async (fastify) => {
+export let user = async (fastify) => {
   fastify.route({
     method: "POST",
     url: "/:id/phones/otp",
     handler: UserController.send_phone_code,
-    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
-    // config: {
-    //   rateLimit: {
-    //     max: 3,
-    //     timeWindow: 43200000,
-    //   },
-    // },
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
+    config: {
+      rateLimit: {
+        max: 3,
+        timeWindow: 43200000,
+      },
+    },
   });
   fastify.route({
     method: "POST",
     url: "/:id/phones",
     handler: UserController.update_phone,
-    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
     config: {
       rateLimit: {
         max: 10,
@@ -30,7 +30,7 @@ export const user = async (fastify) => {
     method: "POST",
     url: "/:id/emails",
     handler: UserController.update_email,
-    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
     config: {
       rateLimit: {
         max: 10,
@@ -42,7 +42,7 @@ export const user = async (fastify) => {
     method: "POST",
     url: "/:id/emails/otp",
     handler: UserController.send_email_link,
-    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
     config: {
       rateLimit: {
         max: 3,
@@ -54,17 +54,18 @@ export const user = async (fastify) => {
     method: "GET",
     url: "/:id/emails",
     handler: UserController.get_email_form,
-    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
   fastify.route({
     method: "POST",
     url: "/:id",
     handler: UserController.update_one,
-    // onRequest: fastify.can([authenticated_user, current_user], { relation: "and" }),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
   fastify.route({
     method: "GET",
     url: "/:username",
     handler: UserController.get_one,
+    config: { public: true }
   })
 };

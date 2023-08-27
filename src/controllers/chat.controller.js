@@ -77,7 +77,7 @@ export async function get_one(req, reply) {
   stream.push(chat_list);
 
   let [chat, messages] = await Promise.all([
-    ChatService.get_one({ id }),
+    ChatService.get_one({ id, user_id: user.id }),
     MessageService.get_many({ chat_id: id, user_id: user.id }),
   ]);
 

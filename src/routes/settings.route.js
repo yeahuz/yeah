@@ -1,6 +1,6 @@
 import * as SettingsController from "../controllers/settings.controller.js";
 
-export const settings = async (fastify) => {
+export let settings = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/",

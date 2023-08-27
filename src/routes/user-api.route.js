@@ -1,29 +1,29 @@
 import * as UserApiController from "../controllers/user-api.controller.js";
-import { current_user, admin_user, external_client, chat_member } from "../utils/roles.js";
+import { policy_guard } from "../plugins/policy-guard.js";
 
-export const user_api = async (fastify) => {
+export let user_api = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/:id",
     handler: UserApiController.get_one,
-    onRequest: fastify.can_api([current_user, admin_user, external_client]),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
   fastify.route({
     method: "GET",
     url: "/:id/chats",
     handler: UserApiController.get_chats,
-    onRequest: fastify.can_api([chat_member, admin_user, external_client]),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
   fastify.route({
     method: "GET",
     url: "/",
     handler: UserApiController.get_many,
-    onRequest: fastify.can_api([admin_user, external_client]),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
   fastify.route({
     method: "DELETE",
     url: "/:id",
     handler: UserApiController.delete_one,
-    onRequest: fastify.can_api([admin_user, external_client]),
+    onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
 };

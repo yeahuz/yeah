@@ -920,8 +920,9 @@ export async function seed(knex) {
           conditions: { created_by: "return (user) => user.id" }
         },
         {
-          action: "delete",
+          action: "manage",
           subject: "Session",
+          fields: ["active"],
           conditions: { user_id: "return (user) => user.id" }
         },
         {
@@ -930,10 +931,16 @@ export async function seed(knex) {
           conditions: { user_id: "return (user) => user.id" }
         },
         {
+          action: "create",
+          subject: "Message",
+          fields: ["content", "reply_to", "attachments", "type"],
+          conditions: { sender_id: "return (user) => user.id", members: "return (user) => ({ $in: [{ id: user.id }] })" }
+        },
+        {
           action: "update",
           subject: "Message",
           fields: ["content", "reply_to"],
-          conditions: { sender_id: "return (user) => user.id" }
+          conditions: { sender_id: "return (user) => user.id", members: "return (user) => ({ $in: [{ id: user.id }] })" }
         },
         {
           action: "manage",

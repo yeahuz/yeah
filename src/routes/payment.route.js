@@ -1,7 +1,6 @@
 import * as PaymentController from "../controllers/payment.controller.js";
-import { authenticated_user } from "../utils/roles.js";
 
-export const payment = async (fastify) => {
+export let payment = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/new",

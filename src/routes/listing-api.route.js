@@ -1,7 +1,7 @@
 import * as ListingController from "../controllers/listing-api.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export const listing_api = async (fastify) => {
+export let listing_api = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -22,7 +22,6 @@ export const listing_api = async (fastify) => {
     url: "/:id",
     handler: ListingController.update_one,
     onRequest: policy_guard()
-    //onRequest: fastify.can_api([external_client, admin_user]),
   });
   fastify.route({
     method: "POST",

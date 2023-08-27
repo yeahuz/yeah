@@ -1,6 +1,6 @@
 import * as CategoryController from "../controllers/category.controller.js";
 
-export const category = async (fastify) => {
+export let category = async (fastify) => {
   fastify.route({
     method: "GET",
     url: "/",
