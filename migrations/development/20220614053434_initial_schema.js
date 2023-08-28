@@ -387,6 +387,7 @@ export function up(knex) {
       t.string("url", 512);
       t.integer("units_in_stock").defaultTo(1);
       t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
+      t.boolean("offers_enabled").defaultTo(false);
       t.bigInteger("cover_id")
         .index()
         .references("id")
@@ -424,6 +425,35 @@ export function up(knex) {
       t.string("coupon_code").nullable();
       t.enu("unit", ["PERCENTAGE", "CURRENCY"]);
       t.string("value").default("");
+    })
+    .createTable("orders", (t) => {
+      t.bigIncrements("id");
+      t.bigInteger("customer_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      t.timestamps(false, true);
+    })
+    .creatTable("order_items", (t) => {
+      t.bigIncrements("id");
+      t.bigInteger("order_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("orders")
+        .onDelete("CASCADE");
+      t.bigInteger("listing_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listings")
+        .onDelete("CASCADE");
+      t.integer("quantity");
+      t.bigInteger("unit_price");
+      t.unique(["listing_id", "order_id"])
+      t.timestamps(false, true);
     })
     .createTable("payment_status_translations", (t) => {
       t.increments("id");
@@ -992,6 +1022,32 @@ export function up(knex) {
       t.string("title");
       t.text("content");
       t.unique(["notification_type_name", "language_code"]);
+      t.timestamps(false, true);
+    })
+    .createTable("user_addresses", (t) => {
+      t.bigIncrements("id");
+      t.string("name").notNullable();
+      t.string("country_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("countries")
+        .onDelete("CASCADE");
+      t.string("region_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("regions")
+        .onDelete("CASCADE");
+      t.string("district_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("districts")
+        .onDelete("CASCADE");
+      t.string("postal_code");
+      t.string("address").notNullable();
+      t.string("address2")
       t.timestamps(false, true);
     })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION));
