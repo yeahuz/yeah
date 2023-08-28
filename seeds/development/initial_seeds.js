@@ -910,7 +910,7 @@ export async function seed(knex) {
         {
           action: "update",
           subject: "Listing",
-          fields: ["title", "description", "attribute_set", "cover_id", "category_id"],
+          fields: ["title", "description", "attribute_set", "cover_id", "category_id", "unit_price", "quantity"],
           conditions: { created_by: "return (user) => user.id" }
         },
         {

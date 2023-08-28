@@ -100,6 +100,9 @@ dependencies:
   google-auth-library:
     specifier: ^8.8.0
     version: 8.8.0
+  hashids:
+    specifier: ^2.3.0
+    version: 2.3.0
   i18next:
     specifier: ^23.2.1
     version: 23.2.1
@@ -3109,6 +3112,10 @@ packages:
     engines: {node: '>= 0.4.0'}
     dependencies:
       function-bind: 1.1.1
+
+  /hashids@2.3.0:
+    resolution: {integrity: sha512-ljM73TE/avEhNnazxaj0Dw3BbEUuLC5yYCQ9RSkSUcT4ZSU6ZebdKCIBJ+xT/DnSYW36E9k82GH1Q6MydSIosQ==}
+    dev: false
 
   /hashlru@2.3.0:
     resolution: {integrity: sha512-0cMsjjIC8I+D3M44pOQdsy0OHXGLVz6Z0beRuufhKa0KfaD2wGwAev6jILzXsd3/vpnNQJmWyZtIILqM1N+n5A==}

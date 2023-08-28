@@ -3,7 +3,7 @@ import pkg from "pg";
 
 export let { Pool, escapeIdentifier, types } = pkg;
 
-types.setTypeParser(20, BigInt);
+types.setTypeParser(20, String);
 
 export let pool = new Pool({ connectionString: config.postgres_uri, connectionTimeoutMillis: 1000 });
 export let ROLES = {};

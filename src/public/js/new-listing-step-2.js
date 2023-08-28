@@ -1,6 +1,6 @@
 import { request, option, upload_request, async_pool, gen_id } from "./utils.js";
 import { ListingPhotoPreview } from "./components/listing-photo-preview.js";
-import { signal } from "state";
+import { signal, effect } from "state";
 import { add_listeners, fragment } from "dom";
 
 export class Uploader {
@@ -26,8 +26,6 @@ export class Uploader {
 
   async setup() {
     await this.tpromise;
-    this.previews.classList.toggle("hidden", this.attachments_count < 1);
-
     add_listeners(this.photos_input, { change: this.on_photos_change.bind(this) });
     add_listeners(this.attachment_delete_forms, { submit: this.on_attachment_delete() });
     add_listeners(this.photos_area, {
@@ -35,6 +33,12 @@ export class Uploader {
       drop: this.on_drop.bind(this),
       dragenter: this.on_drag_enter.bind(this),
       dragleave: this.on_drag_leave.bind(this),
+    });
+
+    effect(() => {
+      let count = this.attachments_count();
+      if (count < 1) this.previews.classList.add("hidden");
+      else this.previews.classList.remove("hidden");
     })
   }
 

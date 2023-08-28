@@ -2,7 +2,7 @@ import * as BillingService from "./billing.service.js";
 import { createHash, randomBytes } from "crypto";
 import { query, ROLES } from "./db.service.js";
 import * as argon2 from "argon2";
-import { sqids } from "../utils/sqids.js";
+import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
 
 let email_regex =
@@ -31,7 +31,7 @@ function create_one_impl(trx = { query }) {
       [email, phone, hash, name, gravatar(email, profile_photo_url), phone_verified, email_verified]
     );
 
-    let profile_url = new URL(`u/${sqids.encode([user.id])}`, config.origin).href;
+    let profile_url = new URL(`u/${hashids.encode([user.id])}`, config.origin).href;
     await Promise.all([
       trx.query(`update users set profile_url = $1 where id = $2`, [profile_url, user.id]),
       trx.query(`insert into user_roles (user_id, role_id) values ($1, $2)`, [user.id, ROLES.user]),

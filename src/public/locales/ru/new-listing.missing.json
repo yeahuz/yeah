@@ -1,3 +1,11 @@
 {
-  "title": "title"
+  "title": "title",
+  "form": {
+    "specs": {
+      "heading": "form.specs.heading"
+    },
+    "description": {
+      "label": "form.description.label"
+    }
+  }
 }

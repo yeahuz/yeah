@@ -375,11 +375,18 @@ export function up(knex) {
       t.enu("service", ["AWS_S3", "CF_IMAGES", "CF_R2"]).index();
       t.timestamps(false, true);
     })
+    .createTable("currencies", (t) => {
+      t.increments("id");
+      t.string("code").unique();
+      t.timestamps(false, true);
+    })
     .createTable("listings", (t) => {
       t.bigIncrements("id");
       t.string("title");
       t.text("description");
       t.string("url", 512);
+      t.integer("quantity").defaultTo(1);
+      t.bigInteger("unit_price")
       t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
       t.bigInteger("cover_id")
         .index()
@@ -404,7 +411,22 @@ export function up(knex) {
         .references("code")
         .inTable("listing_statuses")
         .onDelete("CASCADE");
+      t.string("currency_code")
+        .index()
+        .references("code")
+        .inTable("currencies")
+        .onDelete("CASCADE")
       t.timestamps(false, true);
+    })
+    .createTable("listing_discounts", (t) => {
+      t.bigInteger("listing_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listings")
+        .onDelete("CASCADE")
+      t.specificType("quantity", "int4range")
+      t.specificType("percent_modifier", "real")
     })
     .createTable("payment_status_translations", (t) => {
       t.increments("id");
@@ -534,11 +556,6 @@ export function up(knex) {
         .inTable("listings")
         .onDelete("CASCADE");
       t.unique(["user_id", "listing_id"]);
-    })
-    .createTable("currencies", (t) => {
-      t.increments("id");
-      t.string("code").unique();
-      t.timestamps(false, true);
     })
     .createTable("exchange_rates", (t) => {
       t.increments("id");

@@ -182,7 +182,6 @@ export async function get_step(req, reply) {
     } break;
     case "2": {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
-      console.log({ listing });
       let attributes = [];
       if (listing) {
         attributes = await AttributeService.get_category_attributes({
@@ -458,7 +457,7 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-      let { attribute_set, description, amount, currency_code, cover_id } = req.body;
+      let { attribute_set, description, currency_code, cover_id, unit_price, quantity = 1 } = req.body;
       await Promise.all([
         ListingService.update_one(ability, id, { attribute_set, description, cover_id }),
         ListingService.upsert_price(ability, { amount, currency_code, id })

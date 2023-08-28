@@ -62,7 +62,6 @@ export async function get_selling(req, reply) {
   stream.push(profile_top);
 
   let profile_tabs = await render_file("/partials/profile-tabs.html", {
-    url: req.url,
     t,
     tab_active: tab_active(req.url)
   });

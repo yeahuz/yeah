@@ -1,11 +1,11 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import { AuthorizationError, InternalError } from "../utils/errors.js";
-import { commit_trx, start_trx, rollback_trx, query, escapeIdentifier } from "./db.service.js";
+import { commit_trx, start_trx, rollback_trx, query } from "./db.service.js";
 import { subject } from "@casl/ability";
 import { permittedFieldsOf } from "@casl/ability/extra";
 import { pick } from "../utils/index.js";
-import { sqids } from "../utils/sqids.js";
+import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
 
 export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
@@ -14,7 +14,7 @@ export async function create_one({ title, description, status, created_by, attri
     let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, attribute_set, category_id)
       values ($1, $2, $3, $4, $5, $6) returning id`, [title, description, status, created_by, attribute_set, category_id]);
 
-    let url = new URL(`listings/${sqids.encode([listing.id])}`, config.origin).href;
+    let url = new URL(`listings/${hashids.encode([listing.id])}`, config.origin).href;
     await trx.query(`update listings set url = $1 where id = $2`, [url, listing.id]);
     let categories = await CategoryService.get_parents(category_id);
     await Promise.all(categories.map((category) => {
@@ -266,7 +266,7 @@ export async function link_attachments(ability, id, attachments = []) {
 }
 
 export async function unlink_attachment(ability, listing_id, attachment_id) {
-  let listing = await get_one({ id });
+  let listing = await get_one({ id: listing_id });
   if (!ability.can("update", subject("Listing", listing))) {
     throw new AuthorizationError();
   }

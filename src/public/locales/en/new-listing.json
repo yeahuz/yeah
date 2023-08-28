@@ -29,17 +29,26 @@
       "placeholder": "Choose category"
     },
     "description": {
-      "label": "Description",
+      "heading": "DESCRIPTION",
       "placeholder": "Describe your listing in more detail",
       "hint": "Minumum 80 characters"
     },
     "photos": {
-      "label": "Photos",
+      "heading": "PHOTOS",
       "hint": "The first photo will be on the cover of the listing (max 50 photos)",
       "click_to_upload": "Click to upload",
       "or_drag_drop": "or drag and drop",
       "choose_as_cover": "Choose as cover",
       "cover": "Cover"
+    },
+    "pricing": {
+      "heading": "PRICING"
+    },
+    "shipping": {
+      "heading": "SHIPPING"
+    },
+    "specs": {
+      "label": "LISTING SPECS"
     },
     "location": {
       "label": "Location",
