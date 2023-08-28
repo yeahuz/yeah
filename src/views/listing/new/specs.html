@@ -1,0 +1,55 @@
+<section>
+  <h2 class="font-semibold"><%= it.t("form.specs.heading", { ns: "new-listing" })%></h2>
+  <% it.attributes?.forEach(function (field) { %>
+    <% if (field.type === "input") { %>
+      <div class="mt-5">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          <%= field?.name %>
+          <input type="<%= field.type %>" autocomplete="off" inputmode="<%= field.inputmode %>" class="form-control mt-2" placeholder="<%= field.placeholder %>" name="<%= field.key %>" />
+        </label>
+      </div>
+    <% } %>
+    <% if (field.type === "radio") { %>
+      <input form="listing-form" type="hidden" name="attribute_set" value="<%= field.id %>" />
+      <div class="space-y-2 mt-5">
+        <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
+          <%= field.name %>
+        </span>
+        <% field.children.forEach(function (val, index) { %>
+          <div class="flex items-center">
+            <input form="listing-form" type="radio" name="attribute_set" <%= it.listing.attribute_set.includes(val.id) ? "checked" : "" %> value="<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+                        bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
+                        font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
+                        checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
+            <label for="<%= field.key %>-<%= val.id %>" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white"><%= val.name %></label>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+      <% if (field.type === "checkbox") { %>
+        <input form="listing-form" type="hidden" name="attribute_set" value="<%= field.id %>" />
+        <div class="space-y-2 mt-5">
+          <div class="text-sm block">
+            <span class="font-medium text-gray-700 dark:text-gray-200">
+              <%= field.name %>
+            </span>
+          </div>
+          <% field.children.forEach(function (val) { %>
+          <div class="flex items-center">
+            <input form="listing-form" type="checkbox" name="attribute_set" <%= it.listing.attribute_set.includes(val.id) ? "checked" : "" %> id="<%= field.key %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>" />
+            <label for="<%= field.key %>-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+                <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </label>
+            <% if (val?.name) { %>
+              <label for="<%= field.key %>-<%= val.id %>" class="checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
+                <%= val.name %>
+              </label>
+            <% } %>
+          </div>
+          <% }) %>
+        </div>
+      <% } %>
+    <% }) %>
+</section>

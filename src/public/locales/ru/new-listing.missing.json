@@ -6,6 +6,9 @@
     },
     "description": {
       "label": "form.description.label"
+    },
+    "shipping": {
+      "dimensions_unit": "form.shipping.dimensions_unit"
     }
   }
 }

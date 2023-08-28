@@ -42,10 +42,28 @@
       "cover": "Cover"
     },
     "pricing": {
-      "heading": "PRICING"
+      "heading": "PRICING",
+      "quantity": "Quantity",
+      "price": "Price",
+      "allow_offers": "Allow offers",
+      "allow_offers_description": "Buyers interested in your item can make you offers -- you can accept, counter or decline",
+      "minimum": "Minimum",
+      "auto_accept": "Auto-accept",
+      "volume_pricing": "Add volume pricing",
+      "volume_pricing_description": "Offer a discount when buyers purchase more than one item at a time."
     },
     "shipping": {
-      "heading": "SHIPPING"
+      "heading": "SHIPPING",
+      "method": "Shipping method",
+      "standard": "Standard",
+      "pickup": "Local pickup only",
+      "pkg_weight": "Package weight",
+      "pkg_weight_unit": "kg.",
+      "pkg_dimensions": "Package dimensions",
+      "pkg_dimensions_unit": "cm.",
+      "pkg_length": "Length",
+      "pkg_height": "Height",
+      "pkg_width": "Width"
     },
     "specs": {
       "label": "LISTING SPECS"

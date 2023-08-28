@@ -1,0 +1,155 @@
+<section>
+  <h2 class="font-semibold mb-4"><%= it.t("form.pricing.heading", { ns: "new-listing" })%></h2>
+  <div class="grid grid-cols-12 gap-4">
+    <div class="col-span-3">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+        <%= it.t("form.pricing.quantity", { ns: "new-listing" }) %>
+        <input form="listing-form" type="number" class="form-control mt-2" value="<%= it.listing?.units_in_stock %>" placeholder="1" name="units_in_stock" required />
+      </label>
+    </div>
+    <div class="col-span-5">
+      <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
+        <%= it.t("form.pricing.price", { ns: "new-listing" }) %>
+      </span>
+      <div class="flex mt-2">
+        <input form="listing-form" type="number" value="<%= it.listing?.price?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
+        <div class="relative min-w-fit">
+          <select form="listing-form" name="currency_code" class="form-control !rounded-l-none mr-6">
+            <option value="USD" <%= it.listing?.price?.currency_code === "USD" || !it.listing?.price?.currency_code ? "selected" : "" %>>USD</option>
+            <option value="UZS" <%= it.listing?.price?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
+          </select>
+          <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex justify-between py-6 px-4 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
+    <div>
+      <div>
+        <strong class="font-semibold"><%= it.t("form.pricing.allow_offers", { ns: "new-listing" })%></strong>
+        <p class="text-sm"><%= it.t("form.pricing.allow_offers_description", { ns: "new-listing" })%></p>
+      </div>
+      <div class="grid grid-cols-12 mt-4 gap-4">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
+          <%= it.t("form.pricing.minimum", { ns: "new-listing" }) %>
+          <input form="listing-form" type="number" class="form-control mt-2" value="1" placeholder="1" name="minimum" required />
+        </label>
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
+          <%= it.t("form.pricing.auto_accept", { ns: "new-listing" }) %>
+          <input form="listing-form" type="number" class="form-control mt-2" value="1" placeholder="1" name="auto_accept" required />
+        </label>
+      </div>
+    </div>
+    <div class="flex self-start">
+      <input form="listing-form" type="checkbox" name="offers_enabled" id="offers-enabled" class="checkbox-input appearance-none peer" />
+      <label for="offers-enabled" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+          <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </label>
+    </div>
+  </div>
+  <div class="flex justify-between py-6 px-4 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
+    <div>
+      <div>
+        <strong class="font-semibold"><%= it.t("form.pricing.volume_pricing", { ns: "new-listing" }) %></strong>
+        <p class="text-sm"><%= it.t("form.pricing.volume_pricing_description", { ns: "new-listing" }) %></p>
+      </div>
+      <div class="grid grid-cols-12 mt-4 gap-4">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-3">
+          Buy 2 and save
+          <div class="relative">
+            <select class="form-control mt-2 block" name="discounts.1.value" form="listing-form">
+              <% for (let i = 1; i <= 80; i++) {%>
+                <option><%= i %>%</option>
+              <% } %>
+            </select>
+            <svg
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+            >
+                <path
+                d="m6 9 6 6 6-6"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                />
+            </svg>
+          </div>
+        </label>
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-3">
+          Buy 3 and save
+          <div class="relative">
+            <select class="form-control mt-2 block" name="discounts.2.value" form="listing-form">
+              <% for (let i = 1; i <= 80; i++) {%>
+                <option><%= i %>%</option>
+              <% } %>
+            </select>
+            <svg
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+            >
+                <path
+                d="m6 9 6 6 6-6"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                />
+            </svg>
+          </div>
+        </label>
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-3">
+          Buy 4 and save
+          <div class="relative">
+            <select class="form-control mt-2 block" name="discounts.3.value" form="listing-form">
+              <% for (let i = 1; i <= 80; i++) {%>
+                <option><%= i %>%</option>
+              <% } %>
+            </select>
+            <svg
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+            >
+                <path
+                d="m6 9 6 6 6-6"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                />
+            </svg>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="flex self-start">
+      <input form="listing-form" type="checkbox" name="volume_pricing_enabled" id="volume-pricing-enabled" class="checkbox-input appearance-none peer" />
+      <label for="volume-pricing-enabled" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+          <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </label>
+    </div>
+  </div>
+</section>

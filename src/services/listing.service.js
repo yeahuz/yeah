@@ -116,7 +116,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   }
 
   if (relation.price) {
-    sql += `left join listing_prices lp on lp.listing_id = l.id`
+    sql += `left join listing_prices lp on lp.listing_id = l.id and not exists (select 1 from listing_prices lp2 where lp2.listing_id = l.id and lp2.created_at > lp.created_at)`
   }
 
   sql += ` where l.id = $1 group by l.id`
@@ -185,7 +185,7 @@ export async function get_many({
 } = {}) {
   let params = [currency, status, limit];
   let sql = `
-    select l.*, a.url as cover_url, er.to_currency as currency, round(lp.amount * er.rate) as price, row_to_json(ll) as location from listings l
+    select l.*, a.url as cover_url, er.to_currency as currency, round(lp.unit_price * er.rate) as price, row_to_json(ll) as location from listings l
     left join listing_prices lp on lp.listing_id = l.id
     left join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
     left join listing_location ll on ll.listing_id = l.id
@@ -238,13 +238,15 @@ export async function update_one(ability, id, update) {
     if (!is_last) sql += ", "
   }
 
-  let { rowCount, rows } = await query(`update listings set ${sql} where id = $1`, params)
+  if (sql) {
+    let { rowCount, rows } = await query(`update listings set ${sql} where id = $1`, params)
 
-  if (rowCount === 0) {
-    //TODO: does not exist
+    if (rowCount === 0) {
+      //TODO: does not exist
+    }
+
+    return rows[0];
   }
-
-  return rows[0];
 }
 
 export async function link_attachments(ability, id, attachments = []) {
@@ -274,14 +276,11 @@ export async function unlink_attachment(ability, listing_id, attachment_id) {
   return attachment_id;
 }
 
-export async function upsert_price(ability, { amount, currency_code, id }) {
+export async function upsert_price(ability, { unit_price, currency_code, id }) {
   let listing = await get_one({ id });
   if (!ability.can("update", subject("Listing", listing))) {
     throw new AuthorizationError();
   }
-  let { rows } = await query(`insert into listing_prices (amount, currency_code, listing_id)
-    values ($1, $2, $3) on conflict(listing_id) do update set amount = $1, currency_code = $2`,
-    [amount, currency_code, id]);
-
+  let { rows } = await query(`insert into listing_prices (unit_price, currency_code, listing_id) values ($1, $2, $3)`, [unit_price, currency_code, id]);
   return rows[0];
 }

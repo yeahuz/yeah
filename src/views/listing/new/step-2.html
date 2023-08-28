@@ -7,256 +7,27 @@
 <form method="post" action="/api/listings/<%= it.listing.id %>/attachments" class="js-attachment-sync-form"></form>
 <form method="post" id="upload-form" enctype="multipart/form-data" action="/listings/wizard/<%= it.listing.id %>/<%= it.step %>/attachments?return_to=/listings/wizard/<%= it.listing.id %>/<%= it.step %>"></form>
 <div class="max-w-3xl space-y-6">
-  <section>
-    <h2 class="font-semibold"><%= it.t("form.photos.heading", { ns: "new-listing" })%></h2>
-    <div class="flex flex-col gap-6 mt-4">
-      <ul class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 <%= it.listing?.attachments?.length > 0 ? '' : 'hidden' %> js-photo-previews">
-        <% it.listing?.attachments.forEach(function (photo, i) { %>
-          <li class="relative group rounded-lg">
-            <form api_action="/api/listings/<%= it.listing.id %>/attachments/<%= photo.id %>" action="/listings/<%= it.listing.id %>/attachments/<%= photo.id %>" method="POST" api_method="DELETE" class="js-attachment-delete-form">
-              <button name="_action" value="delete" tabindex="0" class="outline-none group-hover:scale-100 focus:scale-100 focus:ring-2
-                                            focus:ring-offset-2 focus:ring-error-500 group-focus:scale-100 md:scale-0 duration-200
-                                            absolute z-10 bottom-full left-full translate-y-1/2 -translate-x-1/2 bg-error-500 text-white
-                                            rounded-full p-0.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="pointer-events-none">
-                  <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
-            </form>
-            <img
-                src="<%= photo.url ?? "" %>/thumbnail"
-                srcset="<%= it.generate_srcset(photo.url, "fit=scale-down", 4) %>"
-                sizes="(min-width: 640px) calc(calc(768px / 2) - 16px), (min-width: 768px) calc(calc(768px / 3) - 16px), (min-width: 1024px) calc(calc(768px / 4) - 16px), 100vw"
-                alt=""
-                class="rounded-lg h-36 object-cover w-full"
-                crossorigin
-                decoding="async" />
-            <input type="radio" form="listing-form" name="cover_id" value="<%= photo.id %>" id="cover-<%= photo.id %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_id === photo.id ? "checked" : "" %> />
-            <label for="cover-<%= photo.id %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-listing" }) %>"
-                        data-cover_text="<%= it.t("form.photos.cover", { ns: "new-listing" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
-                        peer-focus:after:scale-100 peer-focus:after:ring-2
-                        peer-focus:after:ring-offset-2 peer-focus:after:ring-primary-600 group-focus:after:scale-100 group-focus:after:opacity-100
-                        relative text-xs after:opacity-100 md:after:opacity-50 md:after:scale-0 after:duration-200 after:origin-bottom-left after:absolute after:rounded-bl-lg
-                        after:rounded-tr-lg after:whitespace-nowrap after:p-2
-                        after:content-[attr(data-choose\_cover\_text)] after:bottom-0 after:bg-primary-600
-                        after:text-white peer-checked:after:scale-100 peer-checked:after:opacity-100 peer-checked:after:content-[attr(data-cover\_text)]"></label>
-          </li>
-        <% }) %>
-      </ul>
-      <div class="rounded-lg border border-gray-200 flex flex-col items-center justify-center p-4 shadow-xs dark:border-zinc-800 js-photos-area">
-        <span class="p-3 rounded-full bg-gray-100 text-gray-600 inline-block mb-3 dark:bg-zinc-800 dark:text-gray-300">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
-            <path d="M8 16L12 12M12 12L16 16M12 12V21M20 16.7428C21.2215 15.734 22 14.2079 22 12.5C22 9.46243 19.5376 7 16.5 7C16.2815 7 16.0771 6.886 15.9661 6.69774C14.6621 4.48484 12.2544 3 9.5 3C5.35786 3 2 6.35786 2 10.5C2 12.5661 2.83545 14.4371 4.18695 15.7935" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <div class="text-center">
-          <p class="text-sm">
-            <input type="file" name="files" accept="image/*" class="absolute -z-10 opacity-0 peer js-photos-input" id="photos-input" multiple form="upload-form" accept="image/png, image/jpeg, image/jpg, image/avif, image/webp" required />
-            <label class="font-medium text-primary-700 cursor-pointer peer-focus:outline dark:text-primary-400" for="photos-input">
-              <%= it.t("form.photos.click_to_upload", { ns: "new-listing" }) %>
-            </label>
-            <span class="text-gray-500 dark:text-gray-400">
-              <%= it.t("form.photos.or_drag_drop", { ns: "new-listing" }) %>
-            </span>
-          </p>
-          <span class="text-gray-500 text-xs dark:text-gray-400">
-            PNG, JGP, WebP, AVIF
-          </span>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section>
-    <h2 class="font-semibold"><%= it.t("form.specs.heading", { ns: "new-listing" })%></h2>
-    <% it.attributes?.forEach(function (field) { %>
-      <% if (field.type === "input") { %>
-        <div class="mt-5">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            <%= field?.name %>
-            <input type="<%= field.type %>" autocomplete="off" inputmode="<%= field.inputmode %>" class="form-control mt-2" placeholder="<%= field.placeholder %>" name="<%= field.key %>" />
-          </label>
-        </div>
-      <% } %>
-      <% if (field.type === "radio") { %>
-        <input type="hidden" name="attribute_set" value="<%= field.id %>" />
-        <div class="space-y-2 mt-5">
-          <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
-            <%= field.name %>
-          </span>
-          <% field.children.forEach(function (val, index) { %>
-            <div class="flex items-center">
-              <input type="radio" name="attribute_set" <%= it.listing.attribute_set.includes(val.id) ? "checked" : "" %> value="<%= val.id %>" id="<%= field.key %>-<%= val.id %>" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
-                          bg-white dark:bg-zinc-900 m-0 relative grid place-content-center
-                          font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
-                          checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer" />
-              <label for="<%= field.key %>-<%= val.id %>" class="cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-white"><%= val.name %></label>
-            </div>
-          <% }) %>
-        </div>
-      <% } %>
-        <% if (field.type === "checkbox") { %>
-          <input type="hidden" name="attribute_set" value="<%= field.id %>" />
-          <div class="space-y-2 mt-5">
-            <div class="text-sm block">
-              <span class="font-medium text-gray-700 dark:text-gray-200">
-                <%= field.name %>
-              </span>
-            </div>
-            <% field.children.forEach(function (val) { %>
-            <div class="flex items-center"> <input type="checkbox" name="attribute_set" <%= it.listing.attribute_set.includes(val.id) ? "checked" : "" %> id="<%= field.key %>-<%= val.id %>" class="checkbox-input appearance-none peer" value="<%= val.id %>"/> <label for="<%= field.name %>-<%= val.id %>" class="checkbox-control cursor-pointer  border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
-                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </label>
-              <% if (val?.name) { %>
-              <label for="<%= field.key %>-<%= val.id %>" class="checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
-                <%= val.name %>
-              </label>
-              <% } %>
-            </div>
-            <% }) %>
-          </div>
-        <% } %>
-      <% }) %>
-  </section>
+  <%~ await includeAsync ("./photos.html", it) %>
+  <%~ await includeAsync ("./specs.html", it) %>
   <section>
     <h2 class="font-semibold mb-4"><%= it.t("form.description.heading", { ns: "new-listing" })%></h2>
     <elastic-textarea>
-      <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" minlength="80" class="form-control" required><%= it.listing?.description ?? ""%></textarea>
+      <textarea form="listing-form" name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" minlength="80" class="form-control" required><%= it.listing?.description ?? ""%></textarea>
       <% if (it.flash?.validation_errors?.[0]?.description) { %>
         <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors[0].description %></small>
       <% } %>
     </elastic-textarea>
   </section>
-  <section>
-    <h2 class="font-semibold mb-4"><%= it.t("form.pricing.heading", { ns: "new-listing" })%></h2>
-    <div class="flex space-x-4">
-      <div>
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-          Количество
-          <input type="number" class="form-control mt-2" value="1" placeholder="1" name="quantity" required />
-        </label>
-      </div>
-      <div>
-        <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
-          <%= it.t("form.price.label", { ns: "new-listing" }) %>
-        </span>
-        <div class="flex mt-2">
-          <input type="number" value="<%= it.listing?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
-          <div class="relative min-w-fit">
-            <select name="currency_code" class="form-control !rounded-l-none mr-6">
-              <option value="USD" <%= it.listing?.currency_code === "USD" || !it.listing?.currency_code ? "selected" : "" %>>USD</option>
-              <option value="UZS" <%= it.listing?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
-            </select>
-            <svg
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
-            >
-              <path
-                d="m6 9 6 6 6-6"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="flex justify-between py-6 px-4 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
-      <div>
-        <div>
-          <strong class="font-semibold">Allow offers</strong>
-          <p>Buyers interested in your item can make you offers -- you can accept, counter or decline</p>
-        </div>
-        <div class="grid grid-cols-12 mt-4 space-x-4">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
-            Минимум
-            <input type="number" class="form-control mt-2" value="1" placeholder="1" name="quantity" required />
-          </label>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
-            Авто-акцепт
-            <input type="number" class="form-control mt-2" value="1" placeholder="1" name="quantity" required />
-          </label>
-        </div>
-      </div>
-      <label>
-        Allow
-        <input type="checkbox" />
-      </label>
-    </div>
-    <div class="flex justify-between py-6 px-4 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
-      <div>
-        <div>
-          <strong class="font-semibold">Add volume pricing</strong>
-          <p>Offer a discount when buyers purchase more than one item at a time.</p>
-        </div>
-        <div class="grid grid-cols-12 mt-4 space-x-4">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
-            Минимум
-            <input type="number" class="form-control mt-2" value="1" placeholder="1" name="quantity" required />
-          </label>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
-            Авто-акцепт
-            <input type="number" class="form-control mt-2" value="1" placeholder="1" name="quantity" required />
-          </label>
-        </div>
-      </div>
-      <label>
-        Allow
-        <input type="checkbox" />
-      </label>
-    </div>
-  </section>
-  <section>
-    <h2 class="font-semibold mb-4"><%= it.t("form.shipping.heading", { ns: "new-listing" })%></h2>
-    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-      Shipping method
-      <select class="form-control mt-2 block max-w-xs">
-        <option>Стандартная доставка</option>
-        <option>Local pickup only</option>
-      </select>
-    </label>
-    <div class="grid grid-cols-12">
-      <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-2">
-        Package weight
-        <input type="text" inputmode="numeric" class="form-control mt-2" value="1" placeholder="1" name="package_weight" required />
-      </label>
-      <div class="col-span-6">
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Package dimensions</span>
-        <div class="flex">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            <input type="text" inputmode="numeric" class="form-control" value="1" placeholder="1" name="dimensions.length" required />
-          </label>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            <input type="text" inputmode="numeric" class="form-control" value="1" placeholder="1" name="dimensions.width" required />
-          </label>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            <input type="text" inputmode="numeric" class="form-control" value="1" placeholder="1" name="dimensions.height" required />
-          </label>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-<div class="max-w-3xl">
-  <div class="flex justify-between items-center mb-2">
-    <span class="text-sm font-medium text-gray-700 inline-block relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
-      <%= it.t("form.photos.heading", { ns: "new-listing" }) %>
-    </span>
-    <noscript>
-      <button class="btn btn-md btn-secondary-color" form="upload-form"><%= it.t("upload", { ns: "common" })%></button>
-    </noscript>
-  </div>
-  <% if (it.flash?.validation_errors?.[0]?.photos) {%>
-    <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors[0].photos %></small>
-  <% } %>
-  <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.photos.hint", { ns: "new-listing"}) %></span>
+  <%~ await includeAsync ("./pricing.html", it) %>
+  <%~ await includeAsync ("./shipping.html", it) %>
 </div>
 <form method="post" class="max-w-3xl js-listing-form" id="listing-form">
+  <input type="hidden" name="discounts.1.unit" value="PERCENTAGE">
+  <input type="hidden" name="discounts.2.unit" value="PERCENTAGE">
+  <input type="hidden" name="discounts.3.unit" value="PERCENTAGE">
+  <input type="hidden" name="discounts.1.min_quantity_value" value="2">
+  <input type="hidden" name="discounts.2.min_quantity_value" value="3">
+  <input type="hidden" name="discounts.3.min_quantity_value" value="4">
   <input type="hidden" name="step" value="2" />
   <% if (it.listing?.attachments?.length) { %>
     <% it.listing.attachments.forEach(function (photo) { %>
@@ -269,49 +40,7 @@
   <% if (it.listing?.category_id) { %>
     <input type="hidden" name="category_id" value="<%= it.listing.category_id %>" />
   <% } %>
-  <div class="mt-5">
-    <label>
-      <span class="relative text-sm font-medium text-gray-700 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
-        <%= it.t("form.description.label", { ns: "new-listing" }) %>
-      </span>
-      <elastic-textarea>
-        <textarea name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" minlength="80" class="form-control mt-2" required><%= it.listing?.description ?? ""%></textarea>
-        <% if (it.flash?.validation_errors?.[0]?.description) { %>
-          <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors[0].description %></small>
-        <% } %>
-      </elastic-textarea>
-    </label/>
-    <span class="font-normal text-gray-500 block mt-1.5 text-sm dark:text-gray-400"><%= it.t("form.description.hint", { ns: "new-listing"}) %></span>
-  </div>
-  <label class="w-full block mt-5 max-w-md">
-    <span class="text-sm font-medium text-gray-700 relative after:absolute after:content-['*'] after:text-error-500 after:ml-0.5 dark:text-gray-200 dark:after:text-error-400">
-      <%= it.t("form.price.label", { ns: "new-listing" }) %>
-    </span>
-    <div class="flex mt-2">
-      <input type="number" value="<%= it.listing?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
-      <div class="relative min-w-fit">
-        <select name="currency_code" class="form-control !rounded-l-none mr-6">
-          <option value="USD" <%= it.listing?.currency_code === "USD" || !it.listing?.currency_code ? "selected" : "" %>>USD</option>
-          <option value="UZS" <%= it.listing?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
-        </select>
-        <svg
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
-        >
-          <path
-            d="m6 9 6 6 6-6"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-  </label>
-  <button class="btn btn-lg btn-primary mt-8">Далее</button>
+  <button class="btn btn-lg btn-primary mt-8 btn-enabled">Далее</button>
 </form>
 </main>
 <script defer async type="module" src="/public/js/elastic-textarea.js"></script>

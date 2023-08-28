@@ -42,10 +42,28 @@
       "cover": "Обложка"
     },
     "pricing": {
-      "heading": "ЦЕНЫ"
+      "heading": "ЦЕНЫ",
+      "quantity": "Количество",
+      "price": "Цена",
+      "allow_offers": "Разрешить предложения",
+      "allow_offers_description": "Покупатели, заинтересованные в вашем товаре, могут делать вам предложения — вы можете принять, отклонить или отклонить их.",
+      "minimum": "Минимум",
+      "auto_accept": "Автоматическое принятие",
+      "volume_pricing": "Добавить оптовую цену",
+      "volume_pricing_description": "Предложите скидку, если покупатели покупают более одного товара одновременно."
     },
     "shipping": {
-      "heading": "ДОСТАВКА"
+      "heading": "ДОСТАВКА",
+      "method": "Способ доставки",
+      "standard": "Стандартная",
+      "pickup": "Только cамовывоз",
+      "pkg_weight": "Вес посылки",
+      "pkg_weight_unit": "кг.",
+      "pkg_dimensions": "Размеры посылки",
+      "pkg_dimensions_unit": "см.",
+      "pkg_length": "Длина",
+      "pkg_height": "Высота",
+      "pkg_width": "Ширина"
     },
     "specs": {
       "heading": "СПЕЦИФИКАЦИЯ"

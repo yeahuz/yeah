@@ -385,8 +385,7 @@ export function up(knex) {
       t.string("title");
       t.text("description");
       t.string("url", 512);
-      t.integer("quantity").defaultTo(1);
-      t.bigInteger("unit_price")
+      t.integer("units_in_stock").defaultTo(1);
       t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
       t.bigInteger("cover_id")
         .index()
@@ -411,11 +410,6 @@ export function up(knex) {
         .references("code")
         .inTable("listing_statuses")
         .onDelete("CASCADE");
-      t.string("currency_code")
-        .index()
-        .references("code")
-        .inTable("currencies")
-        .onDelete("CASCADE")
       t.timestamps(false, true);
     })
     .createTable("listing_discounts", (t) => {
@@ -424,9 +418,12 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("listings")
-        .onDelete("CASCADE")
-      t.specificType("quantity", "int4range")
-      t.specificType("percent_modifier", "real")
+        .onDelete("CASCADE");
+      t.integer("minimum_order_value").defaultTo(0);
+      t.integer("minimum_quantity_value").defaultTo(1);
+      t.string("coupon_code").nullable();
+      t.enu("unit", ["PERCENTAGE", "CURRENCY"]);
+      t.string("value").default("");
     })
     .createTable("payment_status_translations", (t) => {
       t.increments("id");
@@ -589,8 +586,7 @@ export function up(knex) {
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.integer("amount");
-      t.unique("listing_id");
+      t.bigInteger("unit_price");
       t.timestamps(false, true);
     })
     .createTable("listing_categories", (t) => {
@@ -1019,7 +1015,7 @@ export async function down(knex) {
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
     user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen,
-    permissions, role_permissions
+    permissions, role_permissions, listing_discounts
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)
