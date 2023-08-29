@@ -7,6 +7,7 @@ import { permittedFieldsOf } from "@casl/ability/extra";
 import { pick } from "../utils/index.js";
 import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
+import { SetIdentityFeedbackForwardingEnabledCommand } from "@aws-sdk/client-ses";
 
 export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
   let trx = await start_trx();
@@ -128,7 +129,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   }
 
   if (relation.price) {
-    sql += ` left join listing_prices lp on lp.listing_id = l.id and not exists (select 1 from listing_prices lp2 where lp2.listing_id = l.id and lp2.created_at > lp.created_at)`
+    sql += ` left join listing_prices lp on lp.id = l.price_id`;
   }
 
   sql += ` where l.id = $1 group by l.id`
@@ -198,7 +199,7 @@ export async function get_many({
   let params = [currency, status, limit];
   let sql = `
     select l.*, a.url as cover_url, er.to_currency as currency, round(lp.unit_price * er.rate) as price, row_to_json(ll) as location from listings l
-    left join listing_prices lp on lp.listing_id = l.id
+    left join listing_prices lp on lp.id = l.price_id
     left join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
     left join listing_location ll on ll.listing_id = l.id
     left join attachments a on a.id = l.cover_id
@@ -293,8 +294,16 @@ export async function upsert_price(ability, { unit_price, currency_code, id }) {
   if (!ability.can("update", subject("Listing", listing))) {
     throw new AuthorizationError();
   }
-  let { rows } = await query(`insert into listing_prices (unit_price, currency_code, listing_id) values ($1, $2, $3)`, [unit_price, currency_code, id]);
-  return rows[0];
+  let trx = await start_trx();
+  try {
+    let { rows: [price] } = await query(`insert into listing_prices (unit_price, currency_code, listing_id) values ($1, $2, $3) returning id`, [unit_price, currency_code, id]);
+    await query(`update listings set price_id = $1 where id = $2`, [price.id, id]);
+    await commit_trx(trx);
+    return price;
+  } catch (err) {
+    rollback_trx(trx);
+    throw new InternalError();
+  }
 }
 
 export async function upsert_discounts(ability, id, discounts = []) {

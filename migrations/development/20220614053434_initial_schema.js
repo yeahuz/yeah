@@ -380,14 +380,52 @@ export function up(knex) {
       t.string("code").unique();
       t.timestamps(false, true);
     })
+    .createTable("stores", (t) => {
+      t.integer("id");
+      t.string("url").notNullable();
+      t.bigInteger("banner_id")
+        .index()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
+      t.bigInteger("logo_id")
+        .index()
+        .references("id")
+        .inTable("attachments")
+        .onDelete("CASCADE");
+      t.string("description");
+      t.timestamps(false, true);
+    })
+    .createTable("listing_prices", (t) => {
+      t.bigIncrements("id");
+      t.string("currency_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      t.bigInteger("unit_price");
+      t.bigInteger("listing_id").index().notNullable();
+      t.timestamps(false, true);
+    })
     .createTable("listings", (t) => {
       t.bigIncrements("id");
       t.string("title");
       t.text("description");
       t.string("url", 512);
-      t.integer("units_in_stock").defaultTo(1);
       t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
       t.boolean("offers_enabled").defaultTo(false);
+      t.boolean("variations_enabled").defaultTo(false);
+      t.integer("store_id")
+        .index()
+        .references("id")
+        .inTable("stores")
+        .onDelete("CASCADE");
+      t.bigInteger("price_id")
+        .index()
+        .references("id")
+        .inTable("listing_prices")
+        .onDelete("CASCADE");
       t.bigInteger("cover_id")
         .index()
         .references("id")
@@ -413,6 +451,70 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.timestamps(false, true);
     })
+    .table("listing_prices", (t) => {
+      t.foreign("listing_id").references("id").inTable("listings").onDelete("CASCADE");
+    })
+    .createTable("listing_variations", (t) => {
+      t.bigIncrements("id");
+      t.bigInteger("listing_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listings")
+        .onDelete("CASCADE");
+      t.bigInteger("price_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_prices")
+        .onDelete("CASCADE");
+      t.unique(["listing_id", "price_id"])
+      t.timestamps(false, true);
+    })
+    .createTable("listing_variation_values", (t) => {
+      t.bigInteger("listing_variation_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_variations")
+        .onDelete("CASCADE");
+      t.integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes")
+        .onDelete("CASCADE");
+      t.integer("attribute_value_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes")
+        .onDelete("CASCADE");
+      t.unique(["listing_variation_id", "attribute_value_id", "attribute_id"]);
+    })
+    .createTable("stock_levels", (t) => {
+      t.bigIncrements("id");
+      t.bigInteger("listing_id")
+        .index()
+        .references("id")
+        .inTable("listings")
+        .onDelete("CASCADE");
+      t.bigInteger("listing_variation_id")
+        .index()
+        .references("id")
+        .inTable("listing_variations")
+        .onDelete("CASCADE");
+      t.integer("quantity").defaultTo(0);
+      t.timestamps(false, true);
+    })
+    // .createTable("listing_promotions", (t) => {
+    //   t.bigInteger("listing_id")
+    //     .index()
+    //     .notNullable()
+    //     .references("id")
+    //     .inTable("listings")
+    //     .onDelete("CASCADE");
+    // })
     .createTable("listing_discounts", (t) => {
       t.increments("id");
       t.bigInteger("listing_id")
@@ -424,9 +526,15 @@ export function up(knex) {
       t.integer("min_order_value").defaultTo(0);
       t.integer("min_qty_value").defaultTo(1);
       t.string("coupon_code").nullable().index();
+      t.string("name");
+      t.string("description");
       t.enu("unit", ["PERCENTAGE", "CURRENCY"]);
       t.string("value").default("");
+      t.enu("type", ["ORDER_DISCOUNT", "VOLUME_DISCOUNT", "COUPON_DISCOUNT"]);
+      t.smallint("priority").defaultTo(1);
       t.unique(["min_qty_value", "listing_id", "unit", "min_order_value"]);
+      t.enu("status", ["SCHEDULED", "RUNNING", "PAUSED", "DRAFT", "ENDED", "INVALID"]);
+      t.timestamps(false, true);
     })
     .createTable("orders", (t) => {
       t.bigIncrements("id");
@@ -456,6 +564,11 @@ export function up(knex) {
       t.bigInteger("unit_price");
       t.unique(["listing_id", "order_id"])
       t.timestamps(false, true);
+    })
+    .createTable("shipping_services", (t) => {
+      t.increments("id");
+      t.string("name").notNullable();
+      t.specificType("estimate", "int4range").notNullable();
     })
     .createTable("payment_status_translations", (t) => {
       t.increments("id");
@@ -604,23 +717,6 @@ export function up(knex) {
       t.unique(["from_currency", "to_currency"]);
       t.timestamps(false, true);
     })
-    .createTable("listing_prices", (t) => {
-      t.bigIncrements("id");
-      t.string("currency_code")
-        .index()
-        .notNullable()
-        .references("code")
-        .inTable("currencies")
-        .onDelete("CASCADE");
-      t.bigInteger("listing_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("listings")
-        .onDelete("CASCADE");
-      t.bigInteger("unit_price");
-      t.timestamps(false, true);
-    })
     .createTable("listing_categories", (t) => {
       t.integer("category_id")
         .index()
@@ -662,8 +758,7 @@ export function up(knex) {
         "file",
         "search",
         "tel",
-      ])
-        .defaultTo("text");
+      ]).defaultTo("text");
       t.enu("facet_type", ["checkbox", "radio", "number", "select", "range"]);
       t.enu("input_mode", ["text", "decimal", "numeric", "tel", "search", "email", "url"])
         .defaultTo("text");
@@ -1073,7 +1168,8 @@ export async function down(knex) {
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
     user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen,
-    permissions, role_permissions, listing_discounts, orders, order_items, user_addresses
+    permissions, role_permissions, listing_discounts, orders, order_items, user_addresses,
+    listing_variations, listing_variation_values, stock_levels, shipping_services
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)

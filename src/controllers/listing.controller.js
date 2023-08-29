@@ -456,9 +456,9 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-      let { attribute_set, description, currency_code, cover_id, unit_price, units_in_stock, discounts = [] } = req.body;
+      let { attribute_set, description, currency_code, cover_id, unit_price, quantity, discounts = [], variations = [] } = req.body;
       await Promise.all([
-        ListingService.update_one(ability, id, { attribute_set, description, cover_id, units_in_stock }),
+        ListingService.update_one(ability, id, { attribute_set, description, cover_id }),
         ListingService.upsert_price(ability, { unit_price, currency_code, id }),
         ListingService.upsert_discounts(ability, id, discounts)
       ]);
