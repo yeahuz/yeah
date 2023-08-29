@@ -96,12 +96,14 @@ export async function create_listing(payload) {
 export async function get_one({ id, lang = "en", relation = {} } = {}) {
   if (!id) return;
   let params = [id];
+  // ${relation.discounts ? `, coalesce(array_agg(row_to_json(ld)) filter (where ld.id is not null), '{}') as discounts` : ''}
   let sql = `
     select l.*
     ${relation.price ? `, row_to_json(lp) as price` : ''}
     ${relation.location ? `, row_to_json(ll) as location` : ''}
     ${relation.attachments ? `, coalesce(array_agg(row_to_json(a) order by la.display_order asc) filter (where a.id is not null), '{}') as attachments` : ''}
     ${relation.attributes ? `, coalesce(array_agg(row_to_json(ab)) filter (where ab.id is not null), '{}') as attributes` : ''}
+    ${relation.discounts ? `, coalesce(ld.discounts, '[]') as discounts` : ''}
     from listings l
     ${relation.attachments ? `
     left join listing_attachments la on la.listing_id = l.id
@@ -115,12 +117,23 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
             left join attribute_translations at on at.attribute_id = ab.id and at.language_code = $${params.length}`
   }
 
+  // if (relation.discounts) {
+  //   sql += ` left join listing_discounts ld on ld.listing_id = l.id`
+  // }
+  //
+  if (relation.discounts) {
+    sql += ` left join lateral
+      (select listing_id, jsonb_agg(ld) filter(where ld.id is not null) as discounts from listing_discounts ld where ld.listing_id = l.id group by ld.listing_id)
+      ld on ld.listing_id = l.id`
+  }
+
   if (relation.price) {
-    sql += `left join listing_prices lp on lp.listing_id = l.id and not exists (select 1 from listing_prices lp2 where lp2.listing_id = l.id and lp2.created_at > lp.created_at)`
+    sql += ` left join listing_prices lp on lp.listing_id = l.id and not exists (select 1 from listing_prices lp2 where lp2.listing_id = l.id and lp2.created_at > lp.created_at)`
   }
 
   sql += ` where l.id = $1 group by l.id`
 
+  if (relation.discounts) sql += `, ld.discounts`
   if (relation.price) sql += ', lp.*'
 
   let { rows } = await query(sql, params);
@@ -175,8 +188,7 @@ async function cursor_paginate(list = []) {
 }
 
 export async function get_many({
-  currency = "UZS",
-  status,
+  currency = "UZS", status,
   limit = 15,
   lang = "en",
   cursor,
@@ -284,3 +296,33 @@ export async function upsert_price(ability, { unit_price, currency_code, id }) {
   let { rows } = await query(`insert into listing_prices (unit_price, currency_code, listing_id) values ($1, $2, $3)`, [unit_price, currency_code, id]);
   return rows[0];
 }
+
+export async function upsert_discounts(ability, id, discounts = []) {
+  let listing = await get_one({ id });
+  if (!ability.can("update", subject("Listing", listing))) {
+    throw new AuthorizationError();
+  }
+
+  let trx = await start_trx();
+  try {
+    let results = await Promise.all(discounts.map(d => upsert_discount_trx(trx)(Object.assign(d, { listing_id: id }))));
+    await commit_trx(trx);
+    return results;
+  } catch (err) {
+    rollback_trx(trx);
+    throw new InternalError();
+  }
+}
+
+function upsert_discount_impl(trx = { query }) {
+  return async function upsert_discount({ min_order_value = 0, min_qty_value, unit, value, listing_id }) {
+    let { rows } = await trx.query(`insert into listing_discounts (min_order_value, min_qty_value, unit, value, listing_id)
+    values ($1, $2, $3, $4, $5) on conflict (min_qty_value, listing_id, unit, min_order_value)
+    do update set min_order_value = $1, min_qty_value = $2, unit = $3, value = $4`, [min_order_value, min_qty_value, unit, value, listing_id]);
+
+    return rows[0];
+  }
+}
+
+export let upsert_discount_trx = (trx) => upsert_discount_impl(trx);
+export let upsert_discount = upsert_discount_impl();

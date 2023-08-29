@@ -662,14 +662,16 @@ checkbox-control {
   transition-delay: 100ms;
 }
 
-.checkbox-input:checked ~ .checkbox-control {
+.checkbox-input:checked ~ .checkbox-control,
+.checkbox-input:checked ~ .group > .checkbox-control {
   border: 1px solid rgb(var(--primary-600));
   background-color: rgb(var(--primary-600));
   transition: background-color 100ms ease-out;
   transition-delay: 50ms;
 }
 
-.checkbox-input:checked + .checkbox-control .checkbox-icon {
+.checkbox-input:checked + .checkbox-control .checkbox-icon,
+.checkbox-input:checked ~ .group > .checkbox-control .checkbox-icon {
   color: white;
 }
 
@@ -679,7 +681,8 @@ checkbox-control {
   transition: all 200ms linear;
 }
 
-.checkbox-input:checked + .checkbox-control .checkbox-icon path {
+.checkbox-input:checked + .checkbox-control .checkbox-icon path,
+.checkbox-input:checked ~ .group > .checkbox-control .checkbox-icon path {
   stroke-dashoffset: 0;
   transition: all 200ms linear;
   transition-delay: 100ms;

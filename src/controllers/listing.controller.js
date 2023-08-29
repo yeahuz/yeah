@@ -181,7 +181,7 @@ export async function get_step(req, reply) {
       });
     } break;
     case "2": {
-      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
+      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, discounts: true } });
       let attributes = [];
       if (listing) {
         attributes = await AttributeService.get_category_attributes({
@@ -456,10 +456,11 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-      let { attribute_set, description, currency_code, cover_id, unit_price, units_in_stock } = req.body;
+      let { attribute_set, description, currency_code, cover_id, unit_price, units_in_stock, discounts = [] } = req.body;
       await Promise.all([
         ListingService.update_one(ability, id, { attribute_set, description, cover_id, units_in_stock }),
-        ListingService.upsert_price(ability, { unit_price, currency_code, id })
+        ListingService.upsert_price(ability, { unit_price, currency_code, id }),
+        ListingService.upsert_discounts(ability, id, discounts)
       ]);
       return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
     }

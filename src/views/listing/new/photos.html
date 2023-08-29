@@ -13,15 +13,16 @@
                 <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
-          </form> <img
-              src="<%= photo.url ?? "" %>/thumbnail"
-              srcset="<%= it.generate_srcset(photo.url, "fit=scale-down", 4) %>"
-              sizes="(min-width: 640px) calc(calc(768px / 2) - 16px), (min-width: 768px) calc(calc(768px / 3) - 16px), (min-width: 1024px) calc(calc(768px / 4) - 16px), 100vw"
-              alt=""
-              class="rounded-lg h-36 object-cover w-full"
-              crossorigin
-              decoding="async" />
-          <input type="radio" form="listing-form" name="cover_id" value="<%= photo.id %>" id="cover-<%= photo.id %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_id === photo.id ? "checked" : "" %> />
+          </form>
+          <img
+            src="<%= photo.url ?? "" %>/thumbnail"
+            srcset="<%= it.generate_srcset(photo.url, "fit=scale-down", 4) %>"
+            sizes="(min-width: 640px) calc(calc(768px / 2) - 16px), (min-width: 768px) calc(calc(768px / 3) - 16px), (min-width: 1024px) calc(calc(768px / 4) - 16px), 100vw"
+            alt=""
+            class="rounded-lg h-36 object-cover w-full"
+            crossorigin
+            decoding="async" />
+          <input type="radio" form="listing-form" name="cover_id" value="<%= photo.id %>" id="cover-<%= photo.id %>" class="absolute opacity-0 w-0 -z-10 peer" <%= it.listing?.cover_id === String(photo.id) ? "checked" : "" %> />
           <label for="cover-<%= photo.id %>" data-choose_cover_text="<%= it.t("form.photos.choose_as_cover", { ns: "new-listing" }) %>"
                       data-cover_text="<%= it.t("form.photos.cover", { ns: "new-listing" }) %>" class="group-hover:after:scale-100 group-hover:after:opacity-100
                       peer-focus:after:scale-100 peer-focus:after:ring-2

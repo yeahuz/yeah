@@ -414,17 +414,19 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_discounts", (t) => {
+      t.increments("id");
       t.bigInteger("listing_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.integer("minimum_order_value").defaultTo(0);
-      t.integer("minimum_quantity_value").defaultTo(1);
-      t.string("coupon_code").nullable();
+      t.integer("min_order_value").defaultTo(0);
+      t.integer("min_qty_value").defaultTo(1);
+      t.string("coupon_code").nullable().index();
       t.enu("unit", ["PERCENTAGE", "CURRENCY"]);
       t.string("value").default("");
+      t.unique(["min_qty_value", "listing_id", "unit", "min_order_value"]);
     })
     .createTable("orders", (t) => {
       t.bigIncrements("id");
@@ -436,7 +438,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.timestamps(false, true);
     })
-    .creatTable("order_items", (t) => {
+    .createTable("order_items", (t) => {
       t.bigIncrements("id");
       t.bigInteger("order_id")
         .index()
@@ -1033,13 +1035,13 @@ export function up(knex) {
         .references("code")
         .inTable("countries")
         .onDelete("CASCADE");
-      t.string("region_id")
+      t.integer("region_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("regions")
         .onDelete("CASCADE");
-      t.string("district_id")
+      t.integer("district_id")
         .index()
         .notNullable()
         .references("id")
@@ -1071,7 +1073,7 @@ export async function down(knex) {
     roles, role_translations, sessions, sessions_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
     user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen,
-    permissions, role_permissions, listing_discounts
+    permissions, role_permissions, listing_discounts, orders, order_items, user_addresses
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)

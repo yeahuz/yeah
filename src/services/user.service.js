@@ -80,6 +80,7 @@ export async function get_by_email_phone(identifier, relation = {}) {
   return rows[0];
 }
 
+//TODO: use lateral join to dedup
 export async function get_by_id(id, relation = {}) {
   //TODO: some API to select columns;
   if (!id) return;
