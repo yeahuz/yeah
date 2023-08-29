@@ -454,7 +454,7 @@ export function up(knex) {
     .table("listing_prices", (t) => {
       t.foreign("listing_id").references("id").inTable("listings").onDelete("CASCADE");
     })
-    .createTable("listing_variations", (t) => {
+    .createTable("listing_skus", (t) => {
       t.bigIncrements("id");
       t.bigInteger("listing_id")
         .index()
@@ -471,12 +471,12 @@ export function up(knex) {
       t.unique(["listing_id", "price_id"])
       t.timestamps(false, true);
     })
-    .createTable("listing_variation_values", (t) => {
-      t.bigInteger("listing_variation_id")
+    .createTable("listing_sku_attributes", (t) => {
+      t.bigInteger("listing_sku_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("listing_variations")
+        .inTable("listing_skus")
         .onDelete("CASCADE");
       t.integer("attribute_id")
         .index()
@@ -490,21 +490,112 @@ export function up(knex) {
         .references("id")
         .inTable("attributes")
         .onDelete("CASCADE");
-      t.unique(["listing_variation_id", "attribute_value_id", "attribute_id"]);
+      t.unique(["listing_sku_id", "attribute_value_id", "attribute_id"]);
     })
     .createTable("stock_levels", (t) => {
       t.bigIncrements("id");
-      t.bigInteger("listing_id")
+      t.bigInteger("listing_sku_id")
         .index()
+        .notNullable()
         .references("id")
-        .inTable("listings")
-        .onDelete("CASCADE");
-      t.bigInteger("listing_variation_id")
-        .index()
-        .references("id")
-        .inTable("listing_variations")
+        .inTable("listing_skus")
         .onDelete("CASCADE");
       t.integer("quantity").defaultTo(0);
+      t.timestamps(false, true);
+    })
+    .createTable("promotion_statuses", (t) => {
+      t.string("code").primary();
+      t.string("bg_hex", 7);
+      t.string("fg_hex", 7);
+    })
+    .createTable("promotion_types", (t) => {
+      t.string("code").primary();
+    })
+    .createTable("promotions", (t) => {
+      t.increments("id");
+      t.string("status")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("promotion_statuses")
+        .onDelete("CASCADE");
+      t.string("type")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("promotion_types")
+        .onDelete("CASCADE");
+      t.smallint("priority").defaultTo(1);
+      t.string("name");
+      t.string("description");
+      t.timestamp("end_date");
+      t.timestamp("start_date");
+      t.timestamps(false, true);
+    })
+    .createTable("promotion_skus", (t) => {
+      t.bigInteger("listing_sku_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
+      t.integer("promotion_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
+      t.unique(["listing_sku_id", "promotion_id"]);
+    })
+    .createTable("promotion_discounts", (t) => {
+      t.integer("promotion_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
+      t.integer("promotion_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
+    })
+    .createTable("promotion_status_translations", (t) => {
+      t.increments("id");
+      t.string("status_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("promotion_types")
+        .onDelete("CASCADE");
+      t.string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+      t.unique(["status_code", "language_code"]);
+      t.timestamps(false, true);
+    })
+    .createTable("promotion_type_translations", (t) => {
+      t.increments("id");
+      t.string("status_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("promotion_types")
+        .onDelete("CASCADE");
+      t.string("language_code")
+        .index()
+        .notNullable()
+        .references("code")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+      t.string("description");
+      t.unique(["status_code", "language_code"]);
       t.timestamps(false, true);
     })
     // .createTable("listing_promotions", (t) => {
@@ -526,14 +617,9 @@ export function up(knex) {
       t.integer("min_order_value").defaultTo(0);
       t.integer("min_qty_value").defaultTo(1);
       t.string("coupon_code").nullable().index();
-      t.string("name");
-      t.string("description");
       t.enu("unit", ["PERCENTAGE", "CURRENCY"]);
       t.string("value").default("");
-      t.enu("type", ["ORDER_DISCOUNT", "VOLUME_DISCOUNT", "COUPON_DISCOUNT"]);
-      t.smallint("priority").defaultTo(1);
       t.unique(["min_qty_value", "listing_id", "unit", "min_order_value"]);
-      t.enu("status", ["SCHEDULED", "RUNNING", "PAUSED", "DRAFT", "ENDED", "INVALID"]);
       t.timestamps(false, true);
     })
     .createTable("orders", (t) => {
@@ -833,19 +919,19 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.unique(["listing_id", "category_field_value_id"]);
     })
-    .createTable("promotions", (t) => {
-      t.increments("id");
-      t.bigInteger("listing_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("listings")
-        .onDelete("CASCADE");
-      t.smallint("boost_score");
-      t.timestamp("expiration_date");
-      t.enu("placement", ["SEARCH", "FRONT"]).defaultTo("SEARCH");
-      t.timestamps(false, true);
-    })
+    // .createTable("promotions", (t) => {
+    //   t.increments("id");
+    //   t.bigInteger("listing_id")
+    //     .index()
+    //     .notNullable()
+    //     .references("id")
+    //     .inTable("listings")
+    //     .onDelete("CASCADE");
+    //   t.smallint("boost_score");
+    //   t.timestamp("expiration_date");
+    //   t.enu("placement", ["SEARCH", "FRONT"]).defaultTo("SEARCH");
+    //   t.timestamps(false, true);
+    // })
     .createTable("listing_attachments", (t) => {
       t.bigInteger("listing_id")
         .index()
