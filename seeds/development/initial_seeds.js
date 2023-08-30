@@ -31,7 +31,7 @@ export async function seed(knex) {
   await knex("promotion_types").del();
   await knex("promotion_statuses").del();
 
-  // t.enu("type", ["ORDER_DISCOUNT", "VOLUME_DISCOUNT", "COUPON_DISCOUNT"]);
+  // t.enu("type", ["ORDER_DISCOUNT", "VOLUME_DISCOUNT", "COUPON_DISCOUNT", "MARKDOWN_SALE"]);
   // t.enu("status", ["SCHEDULED", "RUNNING", "PAUSED", "DRAFT", "ENDED", "INVALID"]);
 
   async function insert_regions() {
