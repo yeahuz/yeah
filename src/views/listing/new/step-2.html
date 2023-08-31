@@ -12,7 +12,7 @@
   <section>
     <h2 class="font-semibold mb-4"><%= it.t("form.description.heading", { ns: "new-listing" })%></h2>
     <elastic-textarea>
-      <textarea form="listing-form" name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" minlength="80" class="form-control" required><%= it.listing?.description ?? ""%></textarea>
+      <textarea form="listing-form" name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" class="form-control" required><%= it.listing?.description ?? ""%></textarea>
       <% if (it.flash?.validation_errors?.[0]?.description) { %>
         <small class="text-error-500 mt-1 text-sm block"><%= it.flash.validation_errors[0].description %></small>
       <% } %>

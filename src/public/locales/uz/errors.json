@@ -30,5 +30,5 @@
   "password_short": "Parol juda qisqa. U kamida 6 ta belgidan iborat bo'lishi kerak",
   "invalid_otp_length": "Kod 6 ta belgidan iborat boʻlishi kerak",
   "invalid_auth_method": "Autentifikatsiya usuli `phone` yoki `email` bilan mos kelishi kerak",
-  "invalid_currency_code": "Valyuta kodi yaroqsiz"
+  "invalid_currency": "Valyuta kodi yaroqsiz"
 }

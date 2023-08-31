@@ -83,7 +83,7 @@ async function pg_to_es_impl() {
   //   join region_translations rt on rt.region_id = r.id and rt.language_code = $2
   //   join district_translations dt on dt.district_id = d.id and dt.language_code = $2
   //   join listing_prices pp on pp.listing_id = p.id
-  //   join exchange_rates er on er.from_currency = pp.currency_code and er.to_currency = $1
+  //   join exchange_rates er on er.from_currency = pp.currency and er.to_currency = $1
   //   left join attributes a on a.id = any(p.attribute_set)
   //   left join attribute_translations at on at.attribute_id = a.id and at.language_code = $2
   //   left join listing_categories pc on pc.listing_id = p.id
@@ -118,7 +118,7 @@ async function pg_to_es_impl() {
   //   .join("districts as d", "pl.district_id", "d.id")
   //   .join("regions as r", "pl.region_id", "r.id")
   //   .join("listing_prices as pp", "p.id", "pp.listing_id")
-  //   .join("exchange_rates", "exchange_rates.from_currency", "pp.currency_code")
+  //   .join("exchange_rates", "exchange_rates.from_currency", "pp.currency")
   //   .where("exchange_rates.to_currency", "=", "USD")
   //   .modifyGraph("categories.translation", (builder) =>
   //     builder.select("title").where({ language_code: "ru" })

@@ -1,0 +1,158 @@
+{
+  "types": [
+    {
+      "id": "VOLUME_DISCOUNT",
+      "translations": {
+        "en": {
+          "name": "Volume discount",
+          "description": "Discount applied when customer buys more of the same listing"
+        },
+        "ru": {
+          "name": "Оптовая скидка",
+          "description": "Скидка применяется, когда клиент покупает больше одного и того же товара."
+        },
+        "uz": {
+          "name": "Ulgurji chegirma",
+          "description": "Chegirma mijoz bir xil mahsulotdan ko'proq sotib olganida qo'llaniladi."
+        }
+      }
+    },
+    {
+      "id": "ORDER_DISCOUNT",
+      "translations": {
+        "en": {
+          "name": "Order discount",
+          "description": "Applied when order meets certain requirements. Example: Buy two and save 15%"
+        },
+        "ru": {
+          "name": "Скидка на заказ",
+          "description": "Применяется, когда заказ соответствует определенным требованиям. Пример: купите два и сэкономьте 15 %."
+        },
+        "uz": {
+          "name": "Buyurtma uchun chegirma",
+          "description": "Buyurtma ma'lum talablarga javob berganda qo'llaniladi. Misol: ikkitasini sotib oling va 15% tejang"
+        }
+      }
+    },
+    {
+      "id": "COUPON_DISCOUNT",
+      "translations": {
+        "en": {
+          "name": "Coupon discount",
+          "description": "Applied when customers uses coupon code when ordering"
+        },
+        "ru": {
+          "name": "Скидка по купону",
+          "description": "Применяется, когда клиенты используют код купона при заказе"
+        },
+        "uz": {
+          "name": "Kupon chegirmasi",
+          "description": "Mijozlar buyurtma berishda kupon kodidan foydalanganda qo'llaniladi"
+        }
+      }
+    },
+    {
+      "id": "MARKDOWN_SALE",
+      "translations": {
+        "en": {
+          "name": "Markdown sale",
+          "description": "Applied to all selected listings/categories. Example: Save 30% on all winter clothes"
+        },
+        "ru": {
+          "name": "Продажа со скидкой",
+          "description": "Применяется ко всем выбранным спискам/категориям. Пример: сэкономьте 30 % на всей зимней одежде."
+        },
+        "uz": {
+          "name": "Markdown savdosi",
+          "description": "Barcha tanlangan ro'yxatlar/toifalar uchun qo'llaniladi. Misol: Barcha qishki kiyimlarga 30% chegirma"
+        }
+      }
+    }
+  ],
+  "statuses": [
+    {
+      "id": "SCHEDULED",
+      "translations": {
+        "en": {
+          "name": "Scheduled"
+        },
+        "ru": {
+          "name": "Запланирован"
+        },
+        "uz": {
+          "name": "Rejalashtirilgan"
+        }
+      }
+    },
+    {
+      "id": "RUNNING",
+      "translations": {
+        "en": {
+          "name": "Running"
+        },
+        "ru": {
+          "name": "В процессе"
+        },
+        "uz": {
+          "name": "Jarayonda"
+        }
+      }
+    },
+    {
+      "id": "PAUSED",
+      "translations": {
+        "en": {
+          "name": "Paused"
+        },
+        "ru": {
+          "name": "Приостановлен"
+        },
+        "uz": {
+          "name": "To'xtatilgan"
+        }
+      }
+    },
+    {
+      "id": "DRAFT",
+      "translations": {
+        "en": {
+          "name": "Draft"
+        },
+        "ru": {
+          "name": "Черновик"
+        },
+        "uz": {
+          "name": "Qoralama"
+        }
+      }
+    },
+    {
+      "id": "ENDED",
+      "translations": {
+        "en": {
+          "name": "Ended"
+        },
+        "ru": {
+          "name": "Закончен"
+        },
+        "uz": {
+          "name": "Tugagan"
+        }
+      }
+    },
+    {
+      "id": "INVALID",
+      "translations": {
+        "en": {
+          "name": "Invalid"
+        },
+        "ru": {
+          "name": "Неверный"
+        },
+        "uz": {
+          "name": "Yaroqsiz"
+        }
+      }
+    }
+  ]
+}

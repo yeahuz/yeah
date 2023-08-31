@@ -1,5 +1,5 @@
 <section>
-  <% let groups = it.listing.discounts.reduce((acc, curr) => { acc[curr.min_qty_value] = curr; return acc; }, {}) %>
+  <% let groups = it.listing.discounts?.reduce((acc, curr) => { acc[curr.min_qty_value] = curr; return acc; }, {}) || {} %>
   <h2 class="font-semibold mb-4"><%= it.t("form.pricing.heading", { ns: "new-listing" })%></h2>
   <div class="grid grid-cols-12 gap-4">
     <div class="col-span-3">
@@ -15,9 +15,9 @@
       <div class="flex mt-2">
         <input form="listing-form" type="number" value="<%= it.listing?.price?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
         <div class="relative min-w-fit">
-          <select form="listing-form" name="currency_code" class="form-control !rounded-l-none mr-6">
-            <option value="USD" <%= it.listing?.price?.currency_code === "USD" || !it.listing?.price?.currency_code ? "selected" : "" %>>USD</option>
-            <option value="UZS" <%= it.listing?.price?.currency_code === "UZS" ? "selected" : "" %>>UZS</option>
+          <select form="listing-form" name="currency" class="form-control !rounded-l-none mr-6">
+            <option value="USD" <%= it.listing?.price?.currency === "USD" || !it.listing?.price?.currency ? "selected" : "" %>>USD</option>
+            <option value="UZS" <%= it.listing?.price?.currency === "UZS" ? "selected" : "" %>>UZS</option>
           </select>
           <svg
             fill="none"

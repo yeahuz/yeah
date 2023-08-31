@@ -30,5 +30,5 @@
   "password_short": "Password is too short. It should be at least 6 characters",
   "invalid_otp_length": "OTP should be 6 characters long",
   "invalid_auth_method": "Auth method should match `phone` or `email`",
-  "invalid_currency_code": "Invalid currency code"
+  "invalid_currency": "Invalid currency code"
 }

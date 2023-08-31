@@ -504,6 +504,27 @@ export function up(knex) {
     .table("listing_prices", (t) => {
       t.foreign("listing_id").references("id").inTable("listings").onDelete("CASCADE");
     })
+    .createTable("listing_attributes", (t) => {
+      t.bigInteger("listing_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listings")
+        .onDelete("CASCADE");
+      t.integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes")
+        .onDelete("CASCADE");
+      t.integer("attribute_value_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes")
+        .onDelete("CASCADE");
+      t.unique(["listing_id", "attribute_value_id", "attribute_id"]);
+    })
     .createTable("listing_skus", (t) => {
       t.bigIncrements("id");
       t.bigInteger("listing_id")
@@ -1157,7 +1178,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("country_translations", (t) => {
-      t.string("country_code")
+      t.string("country_id")
         .index()
         .notNullable()
         .references("id")
@@ -1174,7 +1195,7 @@ export function up(knex) {
     })
     .createTable("regions", (t) => {
       t.increments("id");
-      t.string("country_code")
+      t.string("country_id")
         .index()
         .notNullable()
         .references("id")
@@ -1278,7 +1299,7 @@ export function up(knex) {
     .createTable("user_addresses", (t) => {
       t.bigIncrements("id");
       t.string("name").notNullable();
-      t.string("country_code")
+      t.string("country_id")
         .index()
         .notNullable()
         .references("id")

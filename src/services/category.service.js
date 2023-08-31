@@ -6,7 +6,7 @@ export async function create_one({ translation, parent_id }) {
   let trx = await start_trx();
   try {
     let { rows: [category] } = await trx.query(`insert into categories (parent_id) values ($1) returning id`, [parent_id]);
-    await Promise.all(translation.map(t => trx.query(`insert into category_translations (category_id, title, description, language_code)`, [category.id, t.title, t.description, t.language_code])))
+    await Promise.all(translation.map(t => trx.query(`insert into category_translations (category_id, title, description, language_id)`, [category.id, t.title, t.description, t.language_id])))
     await commit_trx(trx);
   } catch (err) {
     rollback_trx(trx);
@@ -15,7 +15,7 @@ export async function create_one({ translation, parent_id }) {
 }
 
 export async function get_many({ lang = "en", format = "tree" } = {}) {
-  let { rows } = await query(`select c.id, c.parent_id, ct.title from categories c join category_translations ct on ct.category_id = c.id and ct.language_code = $1`, [lang.substring(0, 2)]);
+  let { rows } = await query(`select c.id, c.parent_id, ct.title from categories c join category_translations ct on ct.category_id = c.id and ct.language_id = $1`, [lang.substring(0, 2)]);
   if (format === "tree") return array_to_tree(rows);
   return rows;
 }
@@ -26,7 +26,7 @@ export async function get_by_parent({ lang = "en", parent_id = null } = {}) {
     select c.id, c.parent_id, ct.title,
     exists (select 1 from categories where parent_id = c.id and parent_id is not null limit 1) as has_children
     from categories c
-    join category_translations ct on ct.category_id = c.id and ct.language_code = $1`;
+    join category_translations ct on ct.category_id = c.id and ct.language_id = $1`;
   if (parent_id != null) {
     params.push(parent_id);
     sql += ` where parent_id = $${params.length}`;

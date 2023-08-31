@@ -1,13 +1,12 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import { AuthorizationError, InternalError } from "../utils/errors.js";
-import { commit_trx, start_trx, rollback_trx, query } from "./db.service.js";
+import { commit_trx, start_trx, rollback_trx, query, prepare_bulk_insert } from "./db.service.js";
 import { subject } from "@casl/ability";
 import { permittedFieldsOf } from "@casl/ability/extra";
 import { pick } from "../utils/index.js";
 import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
-import { SetIdentityFeedbackForwardingEnabledCommand } from "@aws-sdk/client-ses";
 
 export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
   let trx = await start_trx();
@@ -31,6 +30,11 @@ export async function create_one({ title, description, status, created_by, attri
   }
 }
 
+export async function create_sku({ listing_id, price_id, custom_sku, store_id }) {
+  let { rows } = await query(`insert into listing_skus (listing_id, price_id, custom_sku, store_id) values ($1, $2, $3, $4) returning id`, [listing_id, price_id, custom_sku, store_id]);
+  return rows[0];
+}
+
 export async function create_listing(payload) {
   //TODO: create listing impl
   // let trx = start_trx();
@@ -46,7 +50,7 @@ export async function create_listing(payload) {
   //     district_id,
   //     region_id,
   //     cover_index,
-  //     currency_code,
+  //     currency,
   //     price,
   //     created_by,
   //     params,
@@ -84,7 +88,7 @@ export async function create_listing(payload) {
   //     region_id,
   //   });
 
-  //   await listing.$relatedQuery("price", trx).insert({ currency_code, price });
+  //   await listing.$relatedQuery("price", trx).insert({ currency, price });
   //   await commit_trx(trx);
   // } catch (err) {
   //   console.log({ err });
@@ -115,7 +119,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   if (relation.attributes) {
     params.push(lang.substring(0, 2));
     sql += `left join attributes ab on ab.id = any(l.attribute_set)
-            left join attribute_translations at on at.attribute_id = ab.id and at.language_code = $${params.length}`
+            left join attribute_translations at on at.attribute_id = ab.id and at.language_id = $${params.length}`
   }
 
   // if (relation.discounts) {
@@ -154,7 +158,7 @@ export async function get_by_hash_id({ hash_id, relation = {} } = {}) {
     ${relation.creator ? `, json_build_object('name', u.name, 'id', u.id, 'profile_photo_url', u.profile_photo_url, 'profile_url', u.profile_url) as creator` : ''}
     from listings l
     join listing_prices lp on lp.listing_id  = l.id
-    join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
+    join exchange_rates er on er.from_currency = lp.currency and er.to_currency = $1
     ${relation.attachments ? `
     left join listing_attachments la on la.listing_id = l.id
     left join attachments a on a.id = la.attachment_id
@@ -200,7 +204,7 @@ export async function get_many({
   let sql = `
     select l.*, a.url as cover_url, er.to_currency as currency, round(lp.unit_price * er.rate) as price, row_to_json(ll) as location from listings l
     left join listing_prices lp on lp.id = l.price_id
-    left join exchange_rates er on er.from_currency = lp.currency_code and er.to_currency = $1
+    left join exchange_rates er on er.from_currency = lp.currency and er.to_currency = $1
     left join listing_location ll on ll.listing_id = l.id
     left join attachments a on a.id = l.cover_id
     where l.status = $2
@@ -227,7 +231,7 @@ export async function get_many({
 
 export async function get_statuses({ lang = "en" }) {
   let { rows } = await query(`select ls.id, ls.code, ls.bg_hex, ls.fg_hex, lst.name from listing_statuses ls
-    join listing_status_translations lst on lst.status_code = ls.code and language_code = $1
+    join listing_status_translations lst on lst.status_code = ls.code and language_id = $1
   `, [lang.substring(0, 2)])
 
   return rows;
@@ -262,6 +266,12 @@ export async function update_one(ability, id, update) {
   }
 }
 
+export async function update_listing_attributes(id, attributes = []) {
+  let prepared = prepare_bulk_insert(attributes, { data: { listing_id: id }, columns_map: { id: "attribute_id", value: "attribute_value_id" } });
+  let { rows } = await query(`insert into listing_attributes ${prepared.sql}`, prepared.params);
+  return rows
+}
+
 export async function link_attachments(ability, id, attachments = []) {
   let listing = await get_one({ id });
   if (!ability.can("update", subject("Listing", listing))) {
@@ -289,14 +299,14 @@ export async function unlink_attachment(ability, listing_id, attachment_id) {
   return attachment_id;
 }
 
-export async function upsert_price(ability, { unit_price, currency_code, id }) {
+export async function upsert_price(ability, { unit_price, currency, id }) {
   let listing = await get_one({ id });
   if (!ability.can("update", subject("Listing", listing))) {
     throw new AuthorizationError();
   }
   let trx = await start_trx();
   try {
-    let { rows: [price] } = await query(`insert into listing_prices (unit_price, currency_code, listing_id) values ($1, $2, $3) returning id`, [unit_price, currency_code, id]);
+    let { rows: [price] } = await query(`insert into listing_prices (unit_price, currency, listing_id) values ($1, $2, $3) returning id`, [unit_price, currency, id]);
     await query(`update listings set price_id = $1 where id = $2`, [price.id, id]);
     await commit_trx(trx);
     return price;

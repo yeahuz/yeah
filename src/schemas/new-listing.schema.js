@@ -29,11 +29,11 @@ export let new_listing_schema = {
           errorMessage: { minLength: "!listing_description_minlength" },
         },
         price: { type: "number" },
-        currency_code: {
+        currency: {
           type: "string",
           enum: ["UZS", "USD"],
           default: "USD",
-          errorMessage: { enum: "invalid_currency_code" },
+          errorMessage: { enum: "invalid_currency" },
         },
         photos: {
           type: "array",
@@ -49,7 +49,7 @@ export let new_listing_schema = {
           },
         },
       },
-      required: ["title", "category_id", "description", "price", "currency_code", "photos"],
+      required: ["title", "category_id", "description", "price", "currency", "photos"],
       errorMessage: {
         required: {
           photos: "listing_min_photos",

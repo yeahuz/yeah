@@ -17,6 +17,36 @@ async function populate_user_roles() {
 
 populate_user_roles();
 
+export function prepare_bulk_insert(data, extensions = { data = {}, columns_map = {} } = {}, predicate = () => true) {
+  let counter = 0;
+  let values = ``;
+  let columns = new Set();
+  let params = [];
+
+  for (let i = 0, len = data.length; i < len; i++) {
+    let item = Object.assign(data[i], extensions.data);
+    let is_last_item = i === len - 1;
+    let keys = Object.keys(item);
+    values += "("
+    for (let j = 0, len = keys.length; j < len; j++) {
+      let key = keys[j];
+      if (!predicate(key)) continue;
+      let mapped = extensions.columns_map[key];
+      if (mapped) columns.add(mapped);
+      else columns.add(key);
+      let is_last_key = j === len - 1;
+      if (is_last_key) values += `$${counter + 1}`;
+      else values += `$${counter + 1},`;
+      params.push(item[key]);
+      counter++
+    }
+    if (is_last_item) values += ")"
+    else values += "),"
+  }
+
+  return { sql: `(${Array.from(columns).join(",")}) values ${values}`, params }
+}
+
 export async function query(text, params) {
   console.log("executing query", { text });
   let start = performance.now();
