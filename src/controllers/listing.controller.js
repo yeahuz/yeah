@@ -181,7 +181,8 @@ export async function get_step(req, reply) {
       });
     } break;
     case "2": {
-      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
+      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, attributes: true } });
+      console.log(listing.attributes);
       let attributes = [];
       if (listing) {
         attributes = await AttributeService.get_category_attributes({
@@ -458,7 +459,6 @@ export async function submit_step(req, reply) {
     }
     case "2": {
       let { attribute_set, description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = [] } = req.body;
-      console.log(attributes);
       await Promise.all([
         ListingService.update_listing_attributes(id, attributes)
         // ListingService.update_one(ability, id, { attributes, description, cover_id }),

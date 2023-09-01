@@ -107,7 +107,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
     ${relation.price ? `, row_to_json(lp) as price` : ''}
     ${relation.location ? `, row_to_json(ll) as location` : ''}
     ${relation.attachments ? `, coalesce(array_agg(row_to_json(a) order by la.display_order asc) filter (where a.id is not null), '{}') as attachments` : ''}
-    ${relation.attributes ? `, coalesce(array_agg(row_to_json(ab)) filter (where ab.id is not null), '{}') as attributes` : ''}
+    ${relation.attributes ? `, coalesce(array_agg(row_to_json(lb)) filter (where lb.attribute_id is not null), '{}') as attributes` : ''}
     ${relation.discounts ? `, coalesce(ld.discounts, '[]') as discounts` : ''}
     from listings l
     ${relation.attachments ? `
@@ -118,7 +118,9 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
 
   if (relation.attributes) {
     params.push(lang.substring(0, 2));
-    sql += `left join attributes ab on ab.id = any(l.attribute_set)
+    sql += `left join listing_attributes lb on lb.listing_id = l.id
+            left join attributes ab on ab.id = lb.attribute_id
+            left join attributes ab2 on ab2.id = lb.attribute_value_id
             left join attribute_translations at on at.attribute_id = ab.id and at.language_id = $${params.length}`
   }
 
@@ -268,8 +270,8 @@ export async function update_one(ability, id, update) {
 
 export async function update_listing_attributes(id, attributes = []) {
   let prepared = prepare_bulk_insert(attributes, { data: { listing_id: id }, columns_map: { id: "attribute_id", value: "attribute_value_id" } });
-  let { rows } = await query(`insert into listing_attributes ${prepared.sql}`, prepared.params);
-  return rows
+  let { rows } = await query(`insert into listing_attributes ${prepared.sql} on conflict(attribute_id, attribute_value_id, listing_id) do nothing`, prepared.params);
+  return rows;
 }
 
 export async function link_attachments(ability, id, attachments = []) {

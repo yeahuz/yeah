@@ -301,6 +301,59 @@ export async function seed(knex) {
     },
   ]);
 
+  // Planning to use this for creating separate tables for each category with its columns.
+  // Listings will be but in one these tables based on selected category.
+  // This is also can be saved in databsae for retrieving information about which table name to query and fields to retrieve based on these definitions;
+  let categories = [
+    {
+      key: "electronics",
+      translation: ["Electronics", "Электроника", "Eletronika"],
+      columns: [
+        {
+          name: "brand",
+          translation: ["Brand", "Бренд", "Brend"],
+          type: "varchar",
+          options: ["Apple", "Samsung", "Nvidia", "Cisco", "AMD", "LG", "SONY", "Dell", "Xiaomi", "Microsoft", "Alienware"]
+        }
+      ],
+      children: [
+        {
+          key: "phones",
+          translation: ["Phones", "Телефоны", "Telefonlar"],
+          columns: [
+            {
+              name: "brand",
+              translation: ["Brand", "Бренд", "Brend"],
+              type: "varchar",
+              options: ["Apple", "Samsung", "Google", "Nothing", "OnePlus", "Asus", "Acer", "LG", "SONY", "Huawei", "Nokia", "Lenovo", "Xiaomi"]
+            },
+            {
+              name: "model",
+              type: "varchar",
+              translation: ["Model", "Модель", "Model"],
+            },
+            {
+              name: "storage_capacity",
+              type: "integer",
+              translation: ["Storage capacity", "Хранилище", "Saqlash hajmi"],
+            },
+            {
+              name: "color",
+              type: "varchar",
+              translation: ["Color", "Цвет", "Rang"],
+            },
+            {
+              name: "ram",
+              type: "integer",
+              nullable: true,
+              translation: ["RAM", "Оперативная память", "Xotira"],
+            }
+          ]
+        }
+      ]
+    }
+  ]
+
   await knex("categories").insert([
     {
       id: 1,
