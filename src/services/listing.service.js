@@ -1,7 +1,7 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
 import { AuthorizationError, InternalError } from "../utils/errors.js";
-import { commit_trx, start_trx, rollback_trx, query, prepare_bulk_insert } from "./db.service.js";
+import { commit_trx, start_trx, rollback_trx, query, prepare_bulk_insert, escapeIdentifier } from "./db.service.js";
 import { subject } from "@casl/ability";
 import { permittedFieldsOf } from "@casl/ability/extra";
 import { pick } from "../utils/index.js";
@@ -265,6 +265,22 @@ export async function update_one(ability, id, update) {
     }
 
     return rows[0];
+  }
+}
+
+export async function get_category_reference(id) {
+  let { rows } = await query(`select cr.* from listing_categories lc join category_reference cr on cr.category_id = lc.category_id where lc.listing_id = $1`, [id]);
+  return rows;
+}
+
+export async function update_listing_attributes_2(id, attributes = {}) {
+  let categories = await get_category_reference(id);
+
+  for (let category of categories) {
+    let fields = pick(attributes, category.columns);
+    let keys = Object.keys(fields).join(", ");
+    let values = Object.values(fields);
+    await query(`insert into ${escapeIdentifier(category.table_name)} (listing_id, ${keys}) values ($1, ${values.map((_, i) => `$${i + 2}`).join(", ")})`, [id, ...values]);
   }
 }
 

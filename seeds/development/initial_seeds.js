@@ -313,7 +313,10 @@ export async function seed(knex) {
           name: "brand",
           translation: ["Brand", "Бренд", "Brend"],
           type: "varchar",
-          options: ["Apple", "Samsung", "Nvidia", "Cisco", "AMD", "LG", "SONY", "Dell", "Xiaomi", "Microsoft", "Alienware"]
+          options: [
+            { value: "Apple" }, { value: "Samsung" }, { value: "Nvidia" }, { value: "Cisco" }, { value: "AMD" }, { value: "LG" },
+            { value: "SONY" }, { value: "Dell" }, { value: "Xiaomi" }, { value: "Microsoft" }, { value: "Alienware" }
+          ],
         }
       ],
       children: [
@@ -325,28 +328,77 @@ export async function seed(knex) {
               name: "brand",
               translation: ["Brand", "Бренд", "Brend"],
               type: "varchar",
-              options: ["Apple", "Samsung", "Google", "Nothing", "OnePlus", "Asus", "Acer", "LG", "SONY", "Huawei", "Nokia", "Lenovo", "Xiaomi"]
+              options: [
+                { value: "Apple" }, { value: "Samsung" }, { value: "Google" }, { value: "Nothing" }, { value: "OnePlus" }, { value: "ASUS" },
+                { value: "Acer" }, { value: "LG" }, { value: "SONY" }, { value: "Huawei" }, { value: "Nokia" }, { value: "Lenovo" }, { value: "Xiaomi" }
+              ],
             },
             {
               name: "model",
               type: "varchar",
               translation: ["Model", "Модель", "Model"],
+              options: [{ value: "Iphone 12" }, { value: "Iphone 13" }, { value: "Galaxy S22" }, { value: "Iphone 14 Pro" }, { value: "Iphone 13 Pro" }, { value: "Galaxy S23 Ultra" }]
             },
             {
               name: "storage_capacity",
               type: "integer",
+              units: ["GB", "MB", "KB"],
               translation: ["Storage capacity", "Хранилище", "Saqlash hajmi"],
+              options: [
+                { value: 1, unit: "GB" },
+                { value: 2, unit: "GB" },
+                { value: 4, unit: "GB" },
+                { value: 6, unit: "GB" },
+                { value: 8, unit: "GB" },
+                { value: 10, unit: "GB" },
+                { value: 12, unit: "GB" },
+                { value: 16, unit: "GB" },
+                { value: 20, unit: "GB" },
+                { value: 24, unit: "GB" },
+                { value: 32, unit: "GB" },
+                { value: 64, unit: "GB" },
+                { value: 128, unit: "GB" },
+                { value: 256, unit: "GB" },
+                { value: 512, unit: "GB" },
+                { value: 1024, unit: "GB" },
+                { value: 128, unit: "MB" },
+                { value: 256, unit: "MB" },
+                { value: 512, unit: "MB" },
+              ]
             },
             {
               name: "color",
               type: "varchar",
               translation: ["Color", "Цвет", "Rang"],
+              options: [
+                { value: "Red", translation: ["Red", "Красный", "Qizil"] },
+                { value: "Blue", translation: ["Blue", "Голубой", "Ko'k"] },
+                { value: "Green", translation: ["Green", "Зеленый", "Yashil"] },
+                { value: "Pink", translation: ["Pink", "Розовый", "Pushti"] }
+              ]
             },
             {
               name: "ram",
+              units: ["GB", "MB", "KB"],
               type: "integer",
               nullable: true,
               translation: ["RAM", "Оперативная память", "Xotira"],
+              options: [
+                { value: 1, unit: "GB" },
+                { value: 2, unit: "GB" },
+                { value: 4, unit: "GB" },
+                { value: 6, unit: "GB" },
+                { value: 8, unit: "GB" },
+                { value: 10, unit: "GB" },
+                { value: 12, unit: "GB" },
+                { value: 16, unit: "GB" },
+                { value: 20, unit: "GB" },
+                { value: 24, unit: "GB" },
+                { value: 32, unit: "GB" },
+                { value: 64, unit: "GB" },
+                { value: 128, unit: "GB" },
+                { value: 256, unit: "GB" }
+              ]
             }
           ]
         }
@@ -354,243 +406,345 @@ export async function seed(knex) {
     }
   ]
 
-  await knex("categories").insert([
-    {
-      id: 1,
-    },
-    {
-      id: 2,
-      parent_id: 1,
-    },
-    {
-      id: 3,
-      parent_id: 1,
-    },
-  ]);
+  async function insert_categories(categories = [], parent_id = null) {
+    if (!categories.length) return;
 
-  await knex.raw("select setval('categories_id_seq', max(id)) from categories");
+    for (let category of categories) {
+      let [inserted_category] = await knex("categories").insert({ parent_id }).returning("id");
+      let [en, ru, uz] = category.translation;
+      await knex("category_translations").insert([
+        {
+          title: en,
+          language_id: "en",
+          category_id: inserted_category.id
+        },
+        {
+          title: ru,
+          language_id: "ru",
+          category_id: inserted_category.id
+        },
+        {
+          title: uz,
+          language_id: "uz",
+          category_id: inserted_category.id
+        }
+      ]);
 
-  await knex("category_translations").insert([
-    {
-      category_id: 1,
-      title: "Недвижимость",
-      language_id: "ru",
-    },
-    {
-      category_id: 1,
-      title: "Ko'chmas mulk",
-      language_id: "uz",
-    },
-    {
-      category_id: 1,
-      title: "Real estate",
-      language_id: "en",
-    },
-    {
-      category_id: 2,
-      title: "Аренда квартиры",
-      language_id: "ru",
-    },
-    {
-      category_id: 2,
-      title: "Kvartira arendasi",
-      language_id: "uz",
-    },
-    {
-      category_id: 2,
-      title: "Rent apartment",
-      language_id: "en",
-    },
-    {
-      category_id: 3,
-      title: "Продажа квартиры",
-      language_id: "ru",
-    },
-    {
-      category_id: 3,
-      title: "Kvartira sotish",
-      language_id: "uz",
-    },
-    {
-      category_id: 3,
-      title: "Sell apartment",
-      language_id: "en",
-    },
-  ]);
+      let table_name = `${category.key}_listings`
+      await knex.schema.createTable(table_name, (t) => {
+        t.bigInteger("listing_id").index().notNullable().references("id").inTable("listings").primary();
+        for (let column of category.columns) {
+          if (column.type === "varchar" && column.nullable) t.string(column.name).nullable();
+          else if (column.type === "integer" && column.nullable) t.integer(column.name).nullable();
+          else if (column.type === "integer") t.integer(column.name).notNullable()
+          else if (column.type === "varchar") t.string(column.name).notNullable()
+        }
+      });
 
-  await knex("attributes").insert([
-    {
-      id: 1,
-      type: "checkbox",
-      key: "apartment-has",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 2,
-      type: "radio",
-      key: "apartment-repair",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 3,
-      parent_id: 1,
-      key: "internet",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 4,
-      parent_id: 1,
-      key: "refrigirator",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 5,
-      parent_id: 1,
-      key: "washing-machine",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 6,
-      parent_id: 2,
-      key: "not-needed",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 7,
-      parent_id: 2,
-      key: "euro",
-      category_set: [1, 2, 3],
-    },
-    {
-      id: 8,
-      parent_id: 2,
-      key: "designer",
-      category_set: [1, 2, 3],
-    },
-  ]);
+      await knex("category_reference").insert({ category_id: inserted_category.id, table_name, columns: category.columns.map(c => c.name) });
 
-  await knex("attribute_translations").insert([
-    {
-      attribute_id: 1,
-      language_id: "ru",
-      name: "В квартире есть",
-    },
-    {
-      attribute_id: 1,
-      language_id: "en",
-      name: "Apartment has",
-    },
-    {
-      attribute_id: 1,
-      language_id: "uz",
-      name: "Kvartirada bor",
-    },
-    {
-      attribute_id: 3,
-      language_id: "ru",
-      name: "Интернет",
-    },
-    {
-      attribute_id: 3,
-      language_id: "en",
-      name: "Internet",
-    },
-    {
-      attribute_id: 3,
-      language_id: "uz",
-      name: "Internet",
-    },
-    {
-      attribute_id: 4,
-      language_id: "ru",
-      name: "Холодильник",
-    },
-    {
-      attribute_id: 4,
-      language_id: "en",
-      name: "Refrigirator",
-    },
-    {
-      attribute_id: 4,
-      language_id: "uz",
-      name: "Muzlatgich",
-    },
-    {
-      attribute_id: 5,
-      language_id: "ru",
-      name: "Стиральная машина",
-    },
-    {
-      attribute_id: 5,
-      language_id: "en",
-      name: "Washing machine",
-    },
-    {
-      attribute_id: 5,
-      language_id: "uz",
-      name: "Kir uvish mashinasi",
-    },
-    {
-      attribute_id: 2,
-      language_id: "ru",
-      name: "Ремонт",
-    },
-    {
-      attribute_id: 2,
-      language_id: "en",
-      name: "Repair",
-    },
-    {
-      attribute_id: 2,
-      language_id: "uz",
-      name: "Ta'mir",
-    },
-    {
-      attribute_id: 6,
-      language_id: "ru",
-      name: "Не требуется",
-    },
-    {
-      attribute_id: 6,
-      language_id: "en",
-      name: "Not needed",
-    },
-    {
-      attribute_id: 6,
-      language_id: "uz",
-      name: "Kerak emas",
-    },
-    {
-      attribute_id: 7,
-      language_id: "ru",
-      name: "Евроремонт",
-    },
-    {
-      attribute_id: 7,
-      language_id: "en",
-      name: "Renovation",
-    },
-    {
-      attribute_id: 7,
-      language_id: "uz",
-      name: "Yevroremont",
-    },
-    {
-      attribute_id: 8,
-      language_id: "ru",
-      name: "Дизайнерская",
-    },
-    {
-      attribute_id: 8,
-      language_id: "en",
-      name: "Designer",
-    },
-    {
-      attribute_id: 8,
-      language_id: "uz",
-      name: "Dizayner",
-    },
-  ]);
+      for (let column of category.columns) {
+        let [en, ru, uz] = column.translation;
+        let [inserted_attribute] = await knex("attributes_2").insert({
+          key: column.name,
+          category_id: inserted_category.id,
+          units: column.units,
+          required: !column.nullable
+        }).returning("id")
+
+        await knex("attribute_2_translations").insert([
+          {
+            language_id: "en",
+            name: en,
+            attribute_id: inserted_attribute.id
+          },
+          {
+            language_id: "ru",
+            name: ru,
+            attribute_id: inserted_attribute.id
+          },
+          {
+            language_id: "uz",
+            name: uz,
+            attribute_id: inserted_attribute.id
+          }
+        ])
+
+        if (column.options) {
+          for (let option of column.options) {
+            let [attribute_option] = await knex("attribute_2_options").insert({
+              attribute_id: inserted_attribute.id,
+              value: option.value,
+              unit: option.unit
+            }).returning("id")
+
+            if (option.translation) {
+              let [en, ru, uz] = option.translation;
+              await knex("attribute_2_option_translations").insert([
+                {
+                  language_id: "en",
+                  name: en,
+                  attribute_option_id: attribute_option.id
+                },
+                {
+                  language_id: "ru",
+                  name: ru,
+                  attribute_option_id: attribute_option.id
+                },
+                {
+                  language_id: "uz",
+                  name: uz,
+                  attribute_option_id: attribute_option.id
+                }
+              ])
+            }
+          }
+        }
+      }
+
+      if (category.children) insert_categories(category.children, inserted_category.id);
+    }
+  }
+
+  await insert_categories(categories);
+
+  // await knex("categories").insert([
+  //   {
+  //     id: 1,
+  //   },
+  //   {
+  //     id: 2,
+  //     parent_id: 1,
+  //   },
+  //   {
+  //     id: 3,
+  //     parent_id: 1,
+  //   },
+  // ]);
+
+  // await knex.raw("select setval('categories_id_seq', max(id)) from categories");
+
+  // await knex("category_translations").insert([
+  //   {
+  //     category_id: 1,
+  //     title: "Недвижимость",
+  //     language_id: "ru",
+  //   },
+  //   {
+  //     category_id: 1,
+  //     title: "Ko'chmas mulk",
+  //     language_id: "uz",
+  //   },
+  //   {
+  //     category_id: 1,
+  //     title: "Real estate",
+  //     language_id: "en",
+  //   },
+  //   {
+  //     category_id: 2,
+  //     title: "Аренда квартиры",
+  //     language_id: "ru",
+  //   },
+  //   {
+  //     category_id: 2,
+  //     title: "Kvartira arendasi",
+  //     language_id: "uz",
+  //   },
+  //   {
+  //     category_id: 2,
+  //     title: "Rent apartment",
+  //     language_id: "en",
+  //   },
+  //   {
+  //     category_id: 3,
+  //     title: "Продажа квартиры",
+  //     language_id: "ru",
+  //   },
+  //   {
+  //     category_id: 3,
+  //     title: "Kvartira sotish",
+  //     language_id: "uz",
+  //   },
+  //   {
+  //     category_id: 3,
+  //     title: "Sell apartment",
+  //     language_id: "en",
+  //   },
+  // ]);
+
+  // await knex("attributes").insert([
+  //   {
+  //     id: 1,
+  //     type: "checkbox",
+  //     key: "apartment-has",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 2,
+  //     type: "radio",
+  //     key: "apartment-repair",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 3,
+  //     parent_id: 1,
+  //     key: "internet",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 4,
+  //     parent_id: 1,
+  //     key: "refrigirator",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 5,
+  //     parent_id: 1,
+  //     key: "washing-machine",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 6,
+  //     parent_id: 2,
+  //     key: "not-needed",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 7,
+  //     parent_id: 2,
+  //     key: "euro",
+  //     category_set: [1, 2, 3],
+  //   },
+  //   {
+  //     id: 8,
+  //     parent_id: 2,
+  //     key: "designer",
+  //     category_set: [1, 2, 3],
+  //   },
+  // ]);
+
+  // await knex("attribute_translations").insert([
+  //   {
+  //     attribute_id: 1,
+  //     language_id: "ru",
+  //     name: "В квартире есть",
+  //   },
+  //   {
+  //     attribute_id: 1,
+  //     language_id: "en",
+  //     name: "Apartment has",
+  //   },
+  //   {
+  //     attribute_id: 1,
+  //     language_id: "uz",
+  //     name: "Kvartirada bor",
+  //   },
+  //   {
+  //     attribute_id: 3,
+  //     language_id: "ru",
+  //     name: "Интернет",
+  //   },
+  //   {
+  //     attribute_id: 3,
+  //     language_id: "en",
+  //     name: "Internet",
+  //   },
+  //   {
+  //     attribute_id: 3,
+  //     language_id: "uz",
+  //     name: "Internet",
+  //   },
+  //   {
+  //     attribute_id: 4,
+  //     language_id: "ru",
+  //     name: "Холодильник",
+  //   },
+  //   {
+  //     attribute_id: 4,
+  //     language_id: "en",
+  //     name: "Refrigirator",
+  //   },
+  //   {
+  //     attribute_id: 4,
+  //     language_id: "uz",
+  //     name: "Muzlatgich",
+  //   },
+  //   {
+  //     attribute_id: 5,
+  //     language_id: "ru",
+  //     name: "Стиральная машина",
+  //   },
+  //   {
+  //     attribute_id: 5,
+  //     language_id: "en",
+  //     name: "Washing machine",
+  //   },
+  //   {
+  //     attribute_id: 5,
+  //     language_id: "uz",
+  //     name: "Kir uvish mashinasi",
+  //   },
+  //   {
+  //     attribute_id: 2,
+  //     language_id: "ru",
+  //     name: "Ремонт",
+  //   },
+  //   {
+  //     attribute_id: 2,
+  //     language_id: "en",
+  //     name: "Repair",
+  //   },
+  //   {
+  //     attribute_id: 2,
+  //     language_id: "uz",
+  //     name: "Ta'mir",
+  //   },
+  //   {
+  //     attribute_id: 6,
+  //     language_id: "ru",
+  //     name: "Не требуется",
+  //   },
+  //   {
+  //     attribute_id: 6,
+  //     language_id: "en",
+  //     name: "Not needed",
+  //   },
+  //   {
+  //     attribute_id: 6,
+  //     language_id: "uz",
+  //     name: "Kerak emas",
+  //   },
+  //   {
+  //     attribute_id: 7,
+  //     language_id: "ru",
+  //     name: "Евроремонт",
+  //   },
+  //   {
+  //     attribute_id: 7,
+  //     language_id: "en",
+  //     name: "Renovation",
+  //   },
+  //   {
+  //     attribute_id: 7,
+  //     language_id: "uz",
+  //     name: "Yevroremont",
+  //   },
+  //   {
+  //     attribute_id: 8,
+  //     language_id: "ru",
+  //     name: "Дизайнерская",
+  //   },
+  //   {
+  //     attribute_id: 8,
+  //     language_id: "en",
+  //     name: "Designer",
+  //   },
+  //   {
+  //     attribute_id: 8,
+  //     language_id: "uz",
+  //     name: "Dizayner",
+  //   },
+  // ]);
 
   await knex("countries").insert({
     id: "uz",

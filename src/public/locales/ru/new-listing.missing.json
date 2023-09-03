@@ -10,5 +10,9 @@
     "shipping": {
       "dimensions_unit": "form.shipping.dimensions_unit"
     }
+  },
+  "specs": {
+    "required": "specs.required",
+    "optional": "specs.optional"
   }
 }

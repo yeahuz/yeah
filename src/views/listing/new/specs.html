@@ -2,6 +2,39 @@
   <h2 class="font-semibold"><%= it.t("form.specs.heading", { ns: "new-listing" })%></h2>
   <% let child_counter = -1; %>
   <% let parent_child_counter = -1; %>
+  <% let optional_started = false %>
+  <h3 class="mt-5 font-semibold"><%= it.t("form.specs.required", { ns: "new-listing" })%></h3>
+  <% it.attributes.forEach(function (attribute) { %>
+    <% if (!attribute.required && !optional_started) {%>
+      <% optional_started = true %>
+      <h3 class="mt-5 font-semibold"><%= it.t("form.specs.optional", { ns: "new-listing" })%></h3>
+    <% } %>
+    <div class="mt-3.5 flex items-center">
+      <label class="flex-1 text-sm font-medium text-gray-700 dark:text-gray-200"><%= attribute.name %></label>
+      <div class="relative flex-1">
+        <select form="listing-form" name="attributes.<%= attribute.key %>" class="form-control flex-1" <%= attribute.required ? "required" : "" %>>
+          <option disabled selected></option>
+          <% attribute.options.forEach(function (option) {%>
+            <option value="<%= option.value %>"><%= option.name %> <%= option.unit %></option>
+          <% }) %>
+        </select>
+        <svg
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+    </div>
+  <% }) %>
   <% it.attributes?.forEach(function (field) { %>
     <% parent_child_counter++ %>
     <% if (field.type === "input") { %>

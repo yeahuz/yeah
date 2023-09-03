@@ -182,14 +182,14 @@ export async function get_step(req, reply) {
     } break;
     case "2": {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, attributes: true } });
-      console.log(listing.attributes);
       let attributes = [];
       if (listing) {
-        attributes = await AttributeService.get_category_attributes({
-          category_set: [listing.category_id],
-          lang: req.language,
-          format: "tree"
-        });
+        attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, lang: req.language });
+        // attributes = await AttributeService.get_category_attributes({
+        //   category_set: [listing.category_id],
+        //   lang: req.language,
+        //   format: "tree"
+        // });
       };
       console.log(attributes);
       rendered_step = await render_file(`/listing/new/step-${step}`, {
@@ -458,9 +458,11 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-      let { attribute_set, description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = [] } = req.body;
+      let { attribute_set, description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {} } = req.body;
+      console.log(attributes);
       await Promise.all([
-        ListingService.update_listing_attributes(id, attributes)
+        ListingService.update_listing_attributes_2(id, attributes)
+        //ListingService.update_listing_attributes(id, attributes)
         // ListingService.update_one(ability, id, { attributes, description, cover_id }),
         // ListingService.upsert_price(ability, { unit_price, currency, id }),
         // ListingService.upsert_discounts(ability, id, discounts)

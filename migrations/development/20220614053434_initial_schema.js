@@ -1322,6 +1322,73 @@ export function up(knex) {
       t.string("address2")
       t.timestamps(false, true);
     })
+    .createTable("attributes_2", (t) => {
+      t.increments("id");
+      t.boolean("multiple").defaultTo(false);
+      t.boolean("required").defaultTo(false);
+      t.string("key");
+      t.specificType("units", "VARCHAR[]").defaultTo('{}');
+      t.integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE");
+      t.timestamps(false, true);
+    })
+    .createTable("attribute_2_translations", (t) => {
+      t.increments("id");
+      t.integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes_2")
+        .onDelete("CASCADE");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+    })
+    .createTable("attribute_2_options", (t) => {
+      t.increments("id");
+      t.string("value");
+      t.string("unit").defaultTo("")
+      t.integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes_2")
+        .onDelete("CASCADE");
+    })
+    .createTable("attribute_2_option_translations", (t) => {
+      t.increments("id");
+      t.integer("attribute_option_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attribute_2_options")
+        .onDelete("CASCADE");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+    })
+    .createTable("category_reference", (t) => {
+      t.string("table_name");
+      t.integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE")
+      t.specificType("columns", "VARCHAR[]").defaultTo('{}')
+    })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION))
     .then(() => knex.raw(DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT))
     .then(() => knex.raw(DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT))
@@ -1351,7 +1418,8 @@ export async function down(knex) {
     listing_condition_translations, listing_conditions, listing_shipping_details,
     listing_shipping_services, listing_sku_attributes, listing_skus, promotion_criterion_categories,
     promotion_criterion_conditions, promotion_criterion_skus, promotion_status_translations, promotion_statuses,
-    promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations, stores
+    promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations, stores,
+    attributes_2, attribute_2_options
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)

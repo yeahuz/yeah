@@ -14,8 +14,23 @@ export async function create_one({ translation, parent_id }) {
   }
 }
 
-export async function get_many({ lang = "en", format = "tree" } = {}) {
-  let { rows } = await query(`select c.id, c.parent_id, ct.title from categories c join category_translations ct on ct.category_id = c.id and ct.language_id = $1`, [lang.substring(0, 2)]);
+export async function get_many({ lang = "en", format = "tree", relation = {} } = {}) {
+  let params = [];
+  let sql = `select c.id, c.parent_id
+  ${relation.translation ? `, ct.title` : ''}
+  ${relation.reference ? `, cr.table_name, cr.columns` : ''}
+  from categories c`;
+
+  if (relation.translation) {
+    params.push(lang.substring(0, 2));
+    sql += ` left join category_translations ct on ct.category_id = c.id and ct.language_id = $${params.length}`;
+  }
+  if (relation.reference) {
+    sql += ` left join category_reference cr on cr.category_id = c.id`;
+  }
+
+  let { rows } = await query(sql, params);
+
   if (format === "tree") return array_to_tree(rows);
   return rows;
 }
