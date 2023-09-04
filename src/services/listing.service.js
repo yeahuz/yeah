@@ -7,6 +7,7 @@ import { permittedFieldsOf } from "@casl/ability/extra";
 import { pick } from "../utils/index.js";
 import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
+import { CATEGORY_REFERENCE } from "../constants/index.js";
 
 export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
   let trx = await start_trx();
@@ -21,6 +22,7 @@ export async function create_one({ title, description, status, created_by, attri
       return trx.query(`insert into listing_categories (category_id, listing_id) values ($1, $2)`, [category.id, listing.id]);
     }));
 
+    await trx.query(`insert into listing_skus (listing_id) values ($1)`, [listing.id]);
     await commit_trx(trx)
     return listing;
   } catch (err) {
@@ -30,8 +32,10 @@ export async function create_one({ title, description, status, created_by, attri
   }
 }
 
-export async function create_sku({ listing_id, price_id, custom_sku, store_id }) {
-  let { rows } = await query(`insert into listing_skus (listing_id, price_id, custom_sku, store_id) values ($1, $2, $3, $4) returning id`, [listing_id, price_id, custom_sku, store_id]);
+export async function upsert_sku({ listing_id, price_id, custom_sku, store_id, id }) {
+  let { rows } = await query(`insert into listing_skus
+    (id, listing_id, price_id, custom_sku, store_id, id)
+    values ($1, $2, $3, $4, $5) returning id on conflict (listing_id, id) do update set price_id = $2, custom_sku = $3`, [listing_id, price_id, custom_sku, store_id, id]);
   return rows[0];
 }
 
@@ -102,27 +106,32 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   if (!id) return;
   let params = [id];
   // ${relation.discounts ? `, coalesce(array_agg(row_to_json(ld)) filter (where ld.id is not null), '{}') as discounts` : ''}
+  // ${relation.price ? `, row_to_json(lp) as price` : ''}
+  // ${relation.attributes ? `, coalesce(array_agg(row_to_json(lb)) filter (where lb.attribute_id is not null), '{}') as attributes` : ''}
   let sql = `
-    select l.*
-    ${relation.price ? `, row_to_json(lp) as price` : ''}
+    select l.*,
+    min(lsp.unit_price) as start_price,
+    max(lsp.unit_price) as max_price,
+    lsp.currency
     ${relation.location ? `, row_to_json(ll) as location` : ''}
     ${relation.attachments ? `, coalesce(array_agg(row_to_json(a) order by la.display_order asc) filter (where a.id is not null), '{}') as attachments` : ''}
-    ${relation.attributes ? `, coalesce(array_agg(row_to_json(lb)) filter (where lb.attribute_id is not null), '{}') as attributes` : ''}
     ${relation.discounts ? `, coalesce(ld.discounts, '[]') as discounts` : ''}
     from listings l
     ${relation.attachments ? `
     left join listing_attachments la on la.listing_id = l.id
     left join attachments a on a.id = la.attachment_id` : ''}
+    left join listing_skus ls on ls.listing_id = l.id
+    left join listing_sku_prices lsp on lsp.listing_id = l.id and lsp.listing_sku_id = ls.id
     ${relation.location ? `left join listing_location ll on ll.listing_id = l.id` : ''}
   `;
 
-  if (relation.attributes) {
-    params.push(lang.substring(0, 2));
-    sql += `left join listing_attributes lb on lb.listing_id = l.id
-            left join attributes ab on ab.id = lb.attribute_id
-            left join attributes ab2 on ab2.id = lb.attribute_value_id
-            left join attribute_translations at on at.attribute_id = ab.id and at.language_id = $${params.length}`
-  }
+  // if (relation.attributes) {
+  //   params.push(lang.substring(0, 2));
+  //   sql += `left join listing_attributes lb on lb.listing_id = l.id
+  //           left join attributes ab on ab.id = lb.attribute_id
+  //           left join attributes ab2 on ab2.id = lb.attribute_value_id
+  //           left join attribute_translations at on at.attribute_id = ab.id and at.language_id = $${params.length}`
+  // }
 
   // if (relation.discounts) {
   //   sql += ` left join listing_discounts ld on ld.listing_id = l.id`
@@ -134,18 +143,30 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
       ld on ld.listing_id = l.id`
   }
 
-  if (relation.price) {
-    sql += ` left join listing_prices lp on lp.id = l.price_id`;
-  }
+  // if (relation.price) {
+  //   sql += ` left join listing_prices lp on lp.id = l.price_id`;
+  // }
 
-  sql += ` where l.id = $1 group by l.id`
+  sql += ` where l.id = $1 group by l.id, lsp.currency`
 
   if (relation.discounts) sql += `, ld.discounts`
-  if (relation.price) sql += ', lp.*'
+  // if (relation.price) sql += ', lp.*'
 
   let { rows } = await query(sql, params);
 
   return rows[0];
+}
+
+export async function get_variants(listing) {
+  let reference = CATEGORY_REFERENCE[listing.category_id];
+  if (!reference) throw new Error("Category reference not found");
+  let { rows } = await query(`
+    select ls.*, lsp.unit_price as price, lsp.currency, t.* from listing_skus ls
+    left join ${escapeIdentifier(reference.table_name)} t on t.listing_id = ls.listing_id and t.listing_sku_id = ls.id
+    left join listing_sku_prices lsp on lsp.id = ls.price_id
+    where ls.listing_id = $1`, [listing.id])
+
+  return rows;
 }
 
 export async function get_by_hash_id({ hash_id, relation = {} } = {}) {
@@ -204,13 +225,16 @@ export async function get_many({
 } = {}) {
   let params = [currency, status, limit];
   let sql = `
-    select l.*, a.url as cover_url, er.to_currency as currency, round(lp.unit_price * er.rate) as price, row_to_json(ll) as location from listings l
-    left join listing_prices lp on lp.id = l.price_id
-    left join exchange_rates er on er.from_currency = lp.currency and er.to_currency = $1
+    select l.*, a.url as cover_url, er.to_currency as currency, round(prices.start_price * er.rate) as start_price, round(prices.max_price * er.rate) as max_price, row_to_json(ll) as location from listings l
+    left join listing_skus ls on ls.listing_id = l.id
+    left join (
+      select id, min(unit_price) as start_price, max(unit_price) as max_price, currency from listing_sku_prices group by id
+    ) prices on ls.price_id = prices.id
+    left join exchange_rates er on er.from_currency = prices.currency and er.to_currency = $1
     left join listing_location ll on ll.listing_id = l.id
     left join attachments a on a.id = l.cover_id
     where l.status = $2
-  `
+  `;
 
   if (created_by) {
     params.push(created_by);
@@ -273,22 +297,26 @@ export async function get_category_reference(id) {
   return rows;
 }
 
-export async function update_listing_attributes_2(id, attributes = {}) {
-  let categories = await get_category_reference(id);
-
-  for (let category of categories) {
+export async function update_listing_attributes({ listing_id, listing_sku_id, attributes }) {
+  let categories = await get_category_reference(listing_id);
+  let promises = categories.map((category) => {
     let fields = pick(attributes, category.columns);
-    let keys = Object.keys(fields).join(", ");
+    let keys = Object.keys(fields);
     let values = Object.values(fields);
-    await query(`insert into ${escapeIdentifier(category.table_name)} (listing_id, ${keys}) values ($1, ${values.map((_, i) => `$${i + 2}`).join(", ")})`, [id, ...values]);
-  }
+    let updates = keys.map((k, i) => `${k}=$${i + 3}`).join(", ");
+    return query(`insert into ${escapeIdentifier(category.table_name)} (listing_id, listing_sku_id, ${keys.join(", ")}) values ($1, $2, ${values.map((_, i) => `$${i + 3}`).join(", ")})
+      on conflict(listing_id, listing_sku_id) do update set ${updates}`,
+      [listing_id, listing_sku_id, ...values]);
+  });
+
+  return await Promise.all(promises);
 }
 
-export async function update_listing_attributes(id, attributes = []) {
-  let prepared = prepare_bulk_insert(attributes, { data: { listing_id: id }, columns_map: { id: "attribute_id", value: "attribute_value_id" } });
-  let { rows } = await query(`insert into listing_attributes ${prepared.sql} on conflict(attribute_id, attribute_value_id, listing_id) do nothing`, prepared.params);
-  return rows;
-}
+// export async function update_listing_attributes(id, attributes = []) {
+//   let prepared = prepare_bulk_insert(attributes, { data: { listing_id: id }, columns_map: { id: "attribute_id", value: "attribute_value_id" } });
+//   let { rows } = await query(`insert into listing_attributes ${prepared.sql} on conflict(attribute_id, attribute_value_id, listing_id) do nothing`, prepared.params);
+//   return rows;
+// }
 
 export async function link_attachments(ability, id, attachments = []) {
   let listing = await get_one({ id });
@@ -317,15 +345,15 @@ export async function unlink_attachment(ability, listing_id, attachment_id) {
   return attachment_id;
 }
 
-export async function upsert_price(ability, { unit_price, currency, id }) {
-  let listing = await get_one({ id });
+export async function upsert_price(ability, { unit_price, currency, listing_id, listing_sku_id }) {
+  let listing = await get_one({ id: listing_id });
   if (!ability.can("update", subject("Listing", listing))) {
     throw new AuthorizationError();
   }
   let trx = await start_trx();
   try {
-    let { rows: [price] } = await query(`insert into listing_prices (unit_price, currency, listing_id) values ($1, $2, $3) returning id`, [unit_price, currency, id]);
-    await query(`update listings set price_id = $1 where id = $2`, [price.id, id]);
+    let { rows: [price] } = await query(`insert into listing_sku_prices (unit_price, currency, listing_id, listing_sku_id) values ($1, $2, $3, $4) returning id`, [unit_price, currency, listing_id, listing_sku_id]);
+    await query(`update listing_skus set price_id = $1 where listing_id = $2`, [price.id, listing_id]);
     await commit_trx(trx);
     return price;
   } catch (err) {

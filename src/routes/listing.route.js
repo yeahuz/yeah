@@ -37,6 +37,11 @@ export let listing = async (fastify) => {
     handler: ListingController.get_step
   });
   fastify.route({
+    method: "GET",
+    url: "/wizard/:id/variations",
+    handler: ListingController.get_variations,
+  });
+  fastify.route({
     method: "POST",
     url: "/wizard",
     handler: ListingController.submit_step

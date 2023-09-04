@@ -1,6 +1,7 @@
 import * as BillingService from "./billing.service.js";
 import { createHash, randomBytes } from "crypto";
-import { query, ROLES } from "./db.service.js";
+import { query } from "./db.service.js";
+import { ROLES } from "../constants/index.js";
 import * as argon2 from "argon2";
 import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
@@ -34,7 +35,7 @@ function create_one_impl(trx = { query }) {
     let profile_url = new URL(`u/${hashids.encode([user.id])}`, config.origin).href;
     await Promise.all([
       trx.query(`update users set profile_url = $1 where id = $2`, [profile_url, user.id]),
-      trx.query(`insert into user_roles (user_id, role_id) values ($1, $2)`, [user.id, ROLES.user]),
+      trx.query(`insert into user_roles (user_id, role_id) values ($1, $2)`, [user.id, ROLES.USER]),
       BillingService.create_one_trx(trx)(user.id)
     ]);
     return user;

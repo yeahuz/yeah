@@ -169,7 +169,7 @@ export async function get_step(req, reply) {
     case "1": {
       let [listing, categories] = await Promise.all([
         ListingService.get_one({ id }),
-        CategoryService.get_many({ lang: req.language, format: "tree" })
+        CategoryService.get_many({ lang: req.language, format: "tree", relation: { translation: true } })
       ]);
       rendered_step = await render_file(`/listing/new/step-${step}`, {
         flash,
@@ -181,24 +181,20 @@ export async function get_step(req, reply) {
       });
     } break;
     case "2": {
-      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, attributes: true } });
+      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
+      let variants = await ListingService.get_variants(listing);
       let attributes = [];
       if (listing) {
         attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, lang: req.language });
-        // attributes = await AttributeService.get_category_attributes({
-        //   category_set: [listing.category_id],
-        //   lang: req.language,
-        //   format: "tree"
-        // });
       };
-      console.log(attributes);
       rendered_step = await render_file(`/listing/new/step-${step}`, {
         flash,
         listing,
         step,
         generate_srcset,
         attributes,
-        t
+        t,
+        variants
       });
     } break;
     case "3": {
@@ -286,6 +282,46 @@ export async function get_step(req, reply) {
   //     break;
   // }
   stream.push(rendered_step);
+
+  if (!req.partial) {
+    let bottom = await render_file("/partials/bottom.html", {
+      t,
+      user
+    });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
+
+export async function get_variations(req, reply) {
+  let flash = reply.flash();
+  let stream = reply.init_stream();
+  let user = req.user;
+  let t = req.i18n.t;
+  let id = req.params.id;
+  let { step = "1" } = req.query;
+  if (!req.partial) {
+    let top = await render_file("/partials/top.html", {
+      meta: { title: t("title", { ns: "new-listing" }), lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  let listing_top = await render_file("/listing/new/top.html", {
+    step,
+    t,
+    listing_id: id,
+  });
+  stream.push(listing_top);
+
+  let listing = await ListingService.get_one({ id });
+  let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true });
+  let variations = await render_file("/listing/new/variations-wizard.html", { step, attributes });
+  stream.push(variations);
 
   if (!req.partial) {
     let bottom = await render_file("/partials/bottom.html", {
@@ -458,12 +494,13 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-      let { attribute_set, description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {} } = req.body;
+      let { attribute_set, description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
       console.log(attributes);
       await Promise.all([
-        ListingService.update_listing_attributes_2(id, attributes)
-        //ListingService.update_listing_attributes(id, attributes)
-        // ListingService.update_one(ability, id, { attributes, description, cover_id }),
+        ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
+        ListingService.upsert_price(ability, { unit_price, currency, listing_id: id, listing_sku_id })
+        //ListingService.upsert_sku({ listing_id: id, price_id })
+        // ListingService.update_one(ability, id, { description, cover_id }),
         // ListingService.upsert_price(ability, { unit_price, currency, id }),
         // ListingService.upsert_discounts(ability, id, discounts)
       ]);

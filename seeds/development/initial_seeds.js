@@ -341,7 +341,7 @@ export async function seed(knex) {
             },
             {
               name: "storage_capacity",
-              type: "integer",
+              type: "varchar",
               units: ["GB", "MB", "KB"],
               translation: ["Storage capacity", "Хранилище", "Saqlash hajmi"],
               options: [
@@ -380,7 +380,7 @@ export async function seed(knex) {
             {
               name: "ram",
               units: ["GB", "MB", "KB"],
-              type: "integer",
+              type: "varchar",
               nullable: true,
               translation: ["RAM", "Оперативная память", "Xotira"],
               options: [
@@ -432,8 +432,8 @@ export async function seed(knex) {
 
       let table_name = `${category.key}_listings`
       await knex.schema.createTable(table_name, (t) => {
-        t.bigInteger("listing_id").notNullable();
-        t.bigInteger("listing_sku_id").notNullable();
+        t.bigInteger("listing_id").index().notNullable();
+        t.bigInteger("listing_sku_id").index().notNullable();
         t.foreign(["listing_sku_id", "listing_id"]).references(["id", "listing_id"]).inTable("listing_skus").onDelete("CASCADE");
         t.unique(["listing_id", "listing_sku_id"]);
         for (let column of category.columns) {
@@ -885,7 +885,7 @@ export async function seed(knex) {
 
   let roles = [
     {
-      code: "admin",
+      code: "ADMIN",
       permissions: [
         { action: "manage", subject: "all" }
       ],
@@ -905,7 +905,7 @@ export async function seed(knex) {
       ]
     },
     {
-      code: "user",
+      code: "USER",
       permissions: [
         {
           action: "update",
@@ -964,7 +964,7 @@ export async function seed(knex) {
       ]
     },
     {
-      code: "moderator",
+      code: "MODERATOR",
       translations: [
         {
           language_id: "en",
@@ -996,6 +996,6 @@ export async function seed(knex) {
 
   await Promise.all([
     insert_regions(),
-    //insert_promotion_stuff()
+    insert_promotion_stuff()
   ]);
 }

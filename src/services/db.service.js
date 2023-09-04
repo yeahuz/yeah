@@ -6,16 +6,6 @@ export let { Pool, escapeIdentifier, types } = pkg;
 types.setTypeParser(20, String);
 
 export let pool = new Pool({ connectionString: config.postgres_uri, connectionTimeoutMillis: 1000 });
-export let ROLES = {};
-
-async function populate_user_roles() {
-  let { rows } = await pool.query(`select * from roles`);
-  for (let role of rows) {
-    ROLES[role.code] = role.id;
-  }
-}
-
-populate_user_roles();
 
 export function prepare_bulk_insert(data, extensions = { data = {}, columns_map = {} } = {}, predicate = () => true) {
   let counter = 0;

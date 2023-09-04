@@ -118,7 +118,7 @@ export async function get_index(req, reply) {
   }
 
   const [categories, listings, regions] = await Promise.all([
-    CategoryService.get_many({ lang: req.language, format: "tree" }),
+    CategoryService.get_many({ lang: req.language, format: "tree", relation: { translation: true } }),
     ListingService.get_many({ status: "ACTIVE" }),
     RegionService.get_regions({ lang: req.language })
   ]);

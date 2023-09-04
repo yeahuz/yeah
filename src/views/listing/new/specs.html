@@ -15,7 +15,11 @@
         <select form="listing-form" name="attributes.<%= attribute.key %>" class="form-control flex-1" <%= attribute.required ? "required" : "" %>>
           <option disabled selected></option>
           <% attribute.options.forEach(function (option) {%>
-            <option value="<%= option.value %>"><%= option.name %> <%= option.unit %></option>
+            <% if (option.unit) { %>
+              <option value="<%= option.value %> <%= option.unit %>" <%= it.variants[0][attribute.key] === option.value + " " + option.unit ? "selected" : "" %>><%= option.name %> <%= option.unit %></option>
+            <% } else { %>
+              <option value="<%= option.value %>" <%= it.variants[0][attribute.key] === option.value ? "selected" : "" %>><%= option.name %></option>
+            <% } %>
           <% }) %>
         </select>
         <svg

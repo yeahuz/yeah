@@ -21,11 +21,12 @@ import { render_file, eta } from "./utils/eta.js";
 
 import qs from "qs";
 import cors from "@fastify/cors";
+import { load_constants } from "./constants/index.js";
 
 // process.env.UV_THREADPOOL_SIZE = os.cpus().length;
 
 export async function start() {
-  const app = fastify({
+  let app = fastify({
     maxParamLength: 1000,
     ignoreTrailingSlash: true,
     trustProxy: true,
@@ -49,7 +50,7 @@ export async function start() {
       ban: 2,
       redis: redis_client,
       errorResponseBuilder: (req, ctx) => {
-        const rtf = new Intl.RelativeTimeFormat("ru", { numeric: "always", style: "long" });
+        let rtf = new Intl.RelativeTimeFormat("ru", { numeric: "always", style: "long" });
         return new FloodError({
           params: { after: rtf.format(Math.floor(ctx.ttl / (1000 * 60 * 60)), "hour") },
         });
@@ -106,9 +107,9 @@ export async function start() {
 
     app.setErrorHandler((err, req, reply) => {
       console.log({ err });
-      const accept_lang = req.headers["accept-language"]
-      const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
-      const { err_to = "/" } = req.query;
+      let accept_lang = req.headers["accept-language"]
+      let t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
+      let { err_to = "/" } = req.query;
 
       if (err.validation) {
         if (req.xhr) {
@@ -138,14 +139,14 @@ export async function start() {
     });
 
     app.setNotFoundHandler(async (req, reply) => {
-      const accept_lang = req.headers["accept-language"]
-      const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
-      const referer = req.headers["referer"];
-      const theme = req.session.get("theme");
-      const is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
-      const is_partial_content = req.headers["x-content-mode"] === "partial";
-      const partial = is_navigation_preload || is_partial_content;
-      const html = await render_file("/404.html", {
+      let accept_lang = req.headers["accept-language"]
+      let t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
+      let referer = req.headers["referer"];
+      let theme = req.session.get("theme");
+      let is_navigation_preload = req.headers["service-worker-navigation-preload"] === "true";
+      let is_partial_content = req.headers["x-content-mode"] === "partial";
+      let partial = is_navigation_preload || is_partial_content;
+      let html = await render_file("/404.html", {
         meta: { lang: req.language },
         referer,
         theme,
@@ -156,7 +157,7 @@ export async function start() {
       return reply;
     });
 
-    const accept_strategy = {
+    let accept_strategy = {
       name: "accept",
       storage: function () {
         let handlers = {};
@@ -174,6 +175,7 @@ export async function start() {
       },
     };
 
+    await load_constants();
     app.addConstraintStrategy(accept_strategy);
     pg_to_es.start();
     app.register(routes);

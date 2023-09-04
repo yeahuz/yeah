@@ -9,6 +9,7 @@
 <div class="max-w-3xl space-y-6">
   <%~ await includeAsync ("./photos.html", it) %>
   <%~ await includeAsync ("./specs.html", it) %>
+  <%~ await includeAsync ("./variations.html", it) %>
   <section>
     <h2 class="font-semibold mb-4"><%= it.t("form.description.heading", { ns: "new-listing" })%></h2>
     <elastic-textarea>
@@ -28,6 +29,9 @@
   <input type="hidden" name="discounts.1.min_qty_value" value="2">
   <input type="hidden" name="discounts.2.min_qty_value" value="3">
   <input type="hidden" name="discounts.3.min_qty_value" value="4">
+  <% if (it.variants?.length) {%>
+    <input type="hidden" name="listing_sku_id" value="<%= it.variants[0].id %>">
+  <% } %>
   <input type="hidden" name="step" value="2" />
   <% if (it.listing?.attachments?.length) { %>
     <% it.listing.attachments.forEach(function (photo) { %>

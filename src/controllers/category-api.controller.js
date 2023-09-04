@@ -1,9 +1,8 @@
 import * as CategoryService from "../services/category.service.js";
-import { array_to_tree } from "../utils/index.js";
 
 export async function get_many(req, reply) {
   const { format = "tree" } = req.query;
-  return await CategoryService.get_many({ lang: req.language, format });
+  return await CategoryService.get_many({ lang: req.language, format, relation: { translation: true } });
 }
 
 export async function create_one(req, reply) {
