@@ -456,7 +456,6 @@ export function up(knex) {
         .inTable("currencies")
         .onDelete("CASCADE");
       t.bigInteger("unit_price");
-      t.bigInteger("listing_id").index().notNullable()
       t.bigInteger("listing_sku_id").index().notNullable();
       t.timestamps(false, true);
     })
@@ -465,7 +464,6 @@ export function up(knex) {
       t.string("title");
       t.text("description");
       t.string("url", 512);
-      t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
       t.boolean("best_offer_enabled").defaultTo(false);
       t.integer("store_id")
         .index()
@@ -518,19 +516,20 @@ export function up(knex) {
       t.string("custom_sku");
       t.unique(["listing_id", "price_id"]);
       t.unique(["custom_sku", "store_id", "listing_id"]);
-      t.primary(["listing_id", "id"]);
       t.timestamps(false, true);
     })
     .table("listing_sku_prices", (t) => {
-      t.foreign(["listing_id", "listing_sku_id"]).references(["listing_id", "id"]).inTable("listing_skus").onDelete("CASCADE");
+      t.foreign("listing_sku_id").references("id").inTable("listing_skus").onDelete("CASCADE");
     })
     .createTable("inventory", (t) => {
       t.bigIncrements("id");
-      t.bigInteger("listing_sku_id").index().notNullable()
-      t.bigInteger("listing_id").index().notNullable()
+      t.bigInteger("listing_sku_id")
+        .unique()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
       t.integer("quantity").defaultTo(0);
-      t.foreign(["listing_sku_id", "listing_id"]).references(["id", "listing_id"]).inTable("listing_skus").onDelete("CASCADE");
-      t.unique(["listing_sku_id", "listing_id"]);
       t.timestamps(false, true);
     })
     .createTable("promotion_statuses", (t) => {
@@ -569,16 +568,18 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("promotion_criterion_skus", (t) => {
-      t.bigInteger("listing_id").index().notNullable();
-      t.bigInteger("listing_sku_id").index().notNullable();
+      t.bigInteger("listing_sku_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
       t.integer("promotion_id")
         .index()
         .notNullable()
         .references("id")
         .inTable("promotions")
         .onDelete("CASCADE");
-      t.foreign(["listing_sku_id", "listing_id"]).references(["id", "listing_id"]).inTable("listing_skus").onDelete("CASCADE");
-      t.unique(["listing_sku_id", "listing_id"]);
       t.unique(["listing_sku_id", "promotion_id"]);
     })
     .createTable("promotion_criterion_categories", (t) => {
@@ -717,15 +718,15 @@ export function up(knex) {
         .references("id")
         .inTable("orders")
         .onDelete("CASCADE");
-      t.bigInteger("listing_id")
+      t.bigInteger("listing_sku_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("listings")
+        .inTable("listing_skus")
         .onDelete("CASCADE");
       t.integer("quantity");
       t.bigInteger("unit_price");
-      t.unique(["listing_id", "order_id"])
+      t.unique(["listing_sku_id", "order_id"])
       t.timestamps(false, true);
     })
     .createTable("shipping_cost_types", (t) => {

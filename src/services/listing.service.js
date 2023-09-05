@@ -9,11 +9,11 @@ import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
 import { CATEGORY_REFERENCE } from "../constants/index.js";
 
-export async function create_one({ title, description, status, created_by, attribute_set = [], category_id }) {
+export async function create_one({ title, description, status, created_by, category_id }) {
   let trx = await start_trx();
   try {
-    let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, attribute_set, category_id)
-      values ($1, $2, $3, $4, $5, $6) returning id`, [title, description, status, created_by, attribute_set, category_id]);
+    let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, category_id)
+      values ($1, $2, $3, $4, $5) returning id`, [title, description, status, created_by, category_id]);
 
     let url = new URL(`listings/${hashids.encode([listing.id])}`, config.origin).href;
     await trx.query(`update listings set url = $1 where id = $2`, [url, listing.id]);
@@ -121,7 +121,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
     left join listing_attachments la on la.listing_id = l.id
     left join attachments a on a.id = la.attachment_id` : ''}
     left join listing_skus ls on ls.listing_id = l.id
-    left join listing_sku_prices lsp on lsp.listing_id = l.id and lsp.listing_sku_id = ls.id
+    left join listing_sku_prices lsp on lsp.listing_sku_id = ls.id
     ${relation.location ? `left join listing_location ll on ll.listing_id = l.id` : ''}
   `;
 
@@ -161,9 +161,10 @@ export async function get_variants(listing) {
   let reference = CATEGORY_REFERENCE[listing.category_id];
   if (!reference) throw new Error("Category reference not found");
   let { rows } = await query(`
-    select ls.*, lsp.unit_price as price, lsp.currency, t.* from listing_skus ls
-    left join ${escapeIdentifier(reference.table_name)} t on t.listing_id = ls.listing_id and t.listing_sku_id = ls.id
+    select ls.*, lsp.unit_price, lsp.currency, t.*, i.quantity from listing_skus ls
+    left join ${escapeIdentifier(reference.table_name)} t on t.listing_sku_id = ls.id
     left join listing_sku_prices lsp on lsp.id = ls.price_id
+    left join inventory i on i.listing_sku_id = ls.id
     where ls.listing_id = $1`, [listing.id])
 
   return rows;
@@ -303,10 +304,10 @@ export async function update_listing_attributes({ listing_id, listing_sku_id, at
     let fields = pick(attributes, category.columns);
     let keys = Object.keys(fields);
     let values = Object.values(fields);
-    let updates = keys.map((k, i) => `${k}=$${i + 3}`).join(", ");
-    return query(`insert into ${escapeIdentifier(category.table_name)} (listing_id, listing_sku_id, ${keys.join(", ")}) values ($1, $2, ${values.map((_, i) => `$${i + 3}`).join(", ")})
-      on conflict(listing_id, listing_sku_id) do update set ${updates}`,
-      [listing_id, listing_sku_id, ...values]);
+    let updates = keys.map((k, i) => `${k}=$${i + 2}`).join(", ");
+    return query(`insert into ${escapeIdentifier(category.table_name)} (listing_sku_id, ${keys.join(", ")}) values ($1, ${values.map((_, i) => `$${i + 2}`).join(", ")})
+      on conflict(listing_sku_id) do update set ${updates}`,
+      [listing_sku_id, ...values]);
   });
 
   return await Promise.all(promises);
@@ -345,15 +346,11 @@ export async function unlink_attachment(ability, listing_id, attachment_id) {
   return attachment_id;
 }
 
-export async function upsert_price(ability, { unit_price, currency, listing_id, listing_sku_id }) {
-  let listing = await get_one({ id: listing_id });
-  if (!ability.can("update", subject("Listing", listing))) {
-    throw new AuthorizationError();
-  }
+export async function upsert_price(ability, { unit_price, currency, listing_sku_id }) {
   let trx = await start_trx();
   try {
-    let { rows: [price] } = await query(`insert into listing_sku_prices (unit_price, currency, listing_id, listing_sku_id) values ($1, $2, $3, $4) returning id`, [unit_price, currency, listing_id, listing_sku_id]);
-    await query(`update listing_skus set price_id = $1 where listing_id = $2`, [price.id, listing_id]);
+    let { rows: [price] } = await trx.query(`insert into listing_sku_prices (unit_price, currency, listing_sku_id) values ($1, $2, $3) returning id`, [unit_price, currency, listing_sku_id]);
+    await trx.query(`update listing_skus set price_id = $1 where id = $2`, [price.id, listing_sku_id]);
     await commit_trx(trx);
     return price;
   } catch (err) {

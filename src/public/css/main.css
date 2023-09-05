@@ -517,14 +517,16 @@ button:disabled {
   --border-color: var(--transparent);
 }
 
+
 .form-control {
   --placeholder-color: var(--color-form-control-placeholder);
   --text-color: var(--color-form-control-text);
   --border-color: var(--color-form-control-border);
-  --size: 0.625rem 0.875rem;
+  --size: 0.5rem 0.875rem;
   --bg-color: var(--color-form-control-bg);
   --ring-color: var(--color-form-control-ring);
   --shadow: var(--shadow-form-control);
+  --font-size: 1rem;
   background: rgb(var(--bg-color));
   border-radius: 0.5rem;
   padding: var(--size);
@@ -533,7 +535,7 @@ button:disabled {
   box-shadow: var(--shadow);
   outline: none;
   width: 100%;
-  font-size: 16px;
+  font-size: var(--font-size);
   line-height: 1.5;
   appearance: none;
   font-weight: 400;

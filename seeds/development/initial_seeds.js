@@ -430,12 +430,9 @@ export async function seed(knex) {
         }
       ]);
 
-      let table_name = `${category.key}_listings`
+      let table_name = `${category.key}_listing_attributes`
       await knex.schema.createTable(table_name, (t) => {
-        t.bigInteger("listing_id").index().notNullable();
-        t.bigInteger("listing_sku_id").index().notNullable();
-        t.foreign(["listing_sku_id", "listing_id"]).references(["id", "listing_id"]).inTable("listing_skus").onDelete("CASCADE");
-        t.unique(["listing_id", "listing_sku_id"]);
+        t.bigInteger("listing_sku_id").index().notNullable().references("id").inTable("listing_skus").onDelete("CASCADE").primary();
         for (let column of category.columns) {
           if (column.type === "varchar" && column.nullable) t.string(column.name).nullable();
           else if (column.type === "integer" && column.nullable) t.integer(column.name).nullable();

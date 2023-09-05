@@ -5,7 +5,7 @@
     <div class="col-span-3">
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
         <%= it.t("form.pricing.quantity", { ns: "new-listing" }) %>
-        <input form="listing-form" type="number" class="form-control mt-2" value="<%= it.listing?.units_in_stock %>" placeholder="1" name="units_in_stock" required />
+        <input form="listing-form" type="number" class="form-control mt-2" value="<%= it.variants?.[0]?.quantity %>" name="quantity" required />
       </label>
     </div>
     <div class="col-span-5">
@@ -13,11 +13,11 @@
         <%= it.t("form.pricing.price", { ns: "new-listing" }) %>
       </span>
       <div class="flex mt-2">
-        <input form="listing-form" type="number" value="<%= it.listing?.price?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
+        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" required />
         <div class="relative min-w-fit">
           <select form="listing-form" name="currency" class="form-control !rounded-l-none mr-6">
-            <option value="USD" <%= it.listing?.price?.currency === "USD" || !it.listing?.price?.currency ? "selected" : "" %>>USD</option>
-            <option value="UZS" <%= it.listing?.price?.currency === "UZS" ? "selected" : "" %>>UZS</option>
+            <option value="USD" <%= it.variants?.[0]?.currency === "USD" || !it.variants?.[0]?.currency ? "selected" : "" %>>USD</option>
+            <option value="UZS" <%= it.variants?.[0]?.currency === "UZS" ? "selected" : "" %>>UZS</option>
           </select>
           <svg
             fill="none"

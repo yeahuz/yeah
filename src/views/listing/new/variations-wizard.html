@@ -1,9 +1,42 @@
 <div>
-  Variations
-  <div>
-    <span>Attributes</span>
-    <% it.attributes.map(function (attribute) {%>
-      <label><%= attribute.name %></label>
-    <% }) %>
-  </div>
+  <details class="group no-overlay">
+    <summary class="bg-gray-100 p-4 flex rounded-t-md rounded-b-md justify-between items-center cursor-pointer dark:bg-zinc-800 group-open:rounded-b-none">
+      <span class="font-medium">Attributes</span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 duration-200 group-open:rotate-90">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+    </summary>
+    <div class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md">
+      <div class="flex max-w-3xl gap-4 items-center">
+        <select class="form-control !w-1/3">
+          <option disabled selected></option>
+          <% it.attributes.forEach(function (attribute) {%>
+            <option value="<%= attribute.value %>"><%= attribute.name %></option>
+          <% }) %>
+        </select>
+        <div class="flex gap-2 w-full">
+          <div>
+            <input type="checkbox" name="color" id="color-red" class="absolute -z-10 opacity-0 w-0 peer"/>
+            <label for="color-red" class="border border-gray-300 dark:border-zinc-700 p-2.5 rounded-md cursor-pointer text-gray-500
+                dark:text-gray-400 peer-checked:bg-gray-100 peer-checked:dark:bg-zinc-800 peer-checked:dark:border-zinc-600
+                peer-checked:text-gray-900 dark:peer-checked:text-white hover:bg-gray-50 hover:text-gray-900
+                hover:dark:bg-zinc-800 hover:dark:text-white duration-200">Red</label>
+          </div>
+          <div>
+            <input type="checkbox" name="color" id="color-black" class="absolute -z-10 opacity-0 w-0 peer"/>
+            <label for="color-black" class="border border-gray-300 dark:border-zinc-700 p-2.5 rounded-md cursor-pointer text-gray-500
+                dark:text-gray-400 peer-checked:bg-gray-100 peer-checked:dark:bg-zinc-800 peer-checked:dark:border-zinc-600
+                peer-checked:text-gray-900 dark:peer-checked:text-white hover:bg-gray-50 hover:text-gray-900
+                hover:dark:bg-zinc-800 hover:dark:text-white duration-200">Black</label>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-md mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+        </svg>
+        Add more
+      </button>
+    </div>
+  </details>
 </div>

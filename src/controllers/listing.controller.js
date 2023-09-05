@@ -3,6 +3,7 @@ import * as S3Service from "../services/s3.service.js";
 import * as AttachmentService from "../services/attachment.service.js";
 import * as CFImageService from "../services/cfimg.service.js";
 import * as ListingService from "../services/listing.service.js";
+import * as InventoryService from "../services/inventory.service.js";
 import * as AttributeService from "../services/attribute.service.js";
 import * as RegionService from "../services/region.service.js";
 import * as ChatService from "../services/chat.service.js";
@@ -319,7 +320,7 @@ export async function get_variations(req, reply) {
   stream.push(listing_top);
 
   let listing = await ListingService.get_one({ id });
-  let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true });
+  let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true, lang: req.language });
   let variations = await render_file("/listing/new/variations-wizard.html", { step, attributes });
   stream.push(variations);
 
@@ -494,11 +495,11 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
     }
     case "2": {
-      let { attribute_set, description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
-      console.log(attributes);
+      let { description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
       await Promise.all([
         ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
-        ListingService.upsert_price(ability, { unit_price, currency, listing_id: id, listing_sku_id })
+        ListingService.upsert_price(ability, { unit_price, currency, listing_sku_id }),
+        InventoryService.add({ listing_sku_id, quantity }),
         //ListingService.upsert_sku({ listing_id: id, price_id })
         // ListingService.update_one(ability, id, { description, cover_id }),
         // ListingService.upsert_price(ability, { unit_price, currency, id }),
