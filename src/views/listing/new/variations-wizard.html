@@ -6,24 +6,30 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>
     </summary>
-    <div class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md js-attributes flex flex-col gap-4">
-      <button class="btn btn-primary btn-md js-add-btn self-start">
+    <form class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md flex flex-col gap-4 js-attribute-form">
+      <button type="button" class="btn btn-primary btn-md js-add-btn self-start">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
         </svg>
         Add more
       </button>
-    </div>
+    </form>
   </details>
   <details class="group no-overlay mt-8">
     <summary class="bg-gray-100 p-4 flex rounded-t-md rounded-b-md justify-between items-center cursor-pointer dark:bg-zinc-800 group-open:rounded-b-none">
-      <span class="font-medium">SKUs</span>
+      <span class="font-medium">Combinations</span>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 duration-200 group-open:rotate-90">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>
     </summary>
-    <div class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md js-attributes flex flex-col gap-4">
-    </div>
+    <form class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md js-attributes flex flex-col gap-4 js-combinations-form">
+      <table class="w-full rounded-lg shadow-sm">
+        <thead class="text-left text-gray-500 text-sm dark:text-gray-200 js-thead">
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800 js-tbody">
+        </tbody>
+      </table>
+    </form>
   </details>
 </div>
 <script type="module" async defer>
