@@ -18,6 +18,8 @@
       "description": "What will the ad look like?"
     }
   },
+  "attributes": "Attributes",
+  "variations": "Variation combinations",
   "form": {
     "title": {
       "label": "Title",

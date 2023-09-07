@@ -18,6 +18,8 @@
       "description": "Как будет выглядет объвление"
     }
   },
+  "attributes": "Аттрибуты",
+  "variations": "Комбинации",
   "form": {
     "title": {
       "label": "Название",

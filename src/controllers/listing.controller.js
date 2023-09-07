@@ -321,7 +321,7 @@ export async function get_variations(req, reply) {
 
   let listing = await ListingService.get_one({ id });
   let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true, lang: req.language });
-  let variations = await render_file("/listing/new/variations-wizard.html", { step, attributes });
+  let variations = await render_file("/listing/new/variations-wizard.html", { step, attributes, t });
   stream.push(variations);
 
   if (!req.partial) {

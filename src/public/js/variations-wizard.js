@@ -9,18 +9,20 @@ import {
   label,
   tr,
   th,
-  td
+  td,
+  attrs,
+  svg,
+  html
 } from "dom";
 import { signal, effect } from "state";
+import { chevron_down_path } from "./icons.js";
 
-let add_btn = document.querySelector(".js-add-btn");
-
-function cartesian2(args) {
+function cartesian(args, formdata) {
   var r = [], max = args.length - 1;
   function helper(arr, i) {
     for (let j = 0, len = args[i].options.length; j < len; j++) {
       let a = arr.slice();
-      let obj = { name: args[i].name, value: args[i].options[j], label: args[i].label }
+      let obj = { name: args[i].name, value: args[i].options[j], label: args[i].label, value_label: formdata.get(`option_${args[i].options[j]}_label`) }
       a.push(obj);
       if (i == max) {
         r.push(a)
@@ -33,37 +35,54 @@ function cartesian2(args) {
   return r;
 }
 
-function TableHeaders(headers, where) {
+async function TableHeaders({ headers, where } = {}) {
+  let { t } = await import("./i18n.js");
   effect(() => {
     if (where) where.innerHTML = "";
     let row = tr({ class: "border-b border-b-gray-200 dark:border-b-zinc-800" },
-      th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-1/2" }, "SKU")
+      th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-20" }, "SKU")
     );
     for (let header of headers()) {
-      let thead = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-1/2" }, header);
+      let thead = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-20" }, header);
       row.append(thead);
     }
-    let quantity = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-1/2" }, "Quantity");
-    let price = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-1/2" }, "Price");
+    let quantity = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-20" }, t("form.pricing.quantity", { ns: "new-listing" }));
+    let price = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-20" }, t("form.pricing.price", { ns: "new-listing" }));
     row.append(quantity, price);
     if (where) where.append(row);
   });
 }
 
-function TableBody(combinations, where) {
+function TableBody({ variations, where } = {}) {
   effect(() => {
     if (where) where.innerHTML = "";
-    for (let combination of combinations()) {
+    for (let variation of variations()) {
       let row = tr(
         td({ class: "font-medium pl-0 p-3 text-gray-900 dark:text-white" }, input({ type: "text", name: "sku", class: "form-control" })),
       )
 
-      for (let item of combination) {
-        row.append(td({ class: "font-medium p-3 text-gray-900 dark:text-white" }, item.value))
+      for (let item of variation) {
+        row.append(td({ class: "font-medium p-3 text-gray-900 dark:text-white" }, item.value_label))
       }
 
-      row.append(td({ class: "font-medium p-3 text-gray-900 dark:text-white" }, input({ type: "text", name: "quantity", class: "form-control" })))
-      row.append(td({ class: "font-medium p-3 pr-0 text-gray-900 dark:text-white" }, input({ type: "text", name: "price", class: "form-control" })))
+      let price_input = div(
+        { class: "flex" },
+        input({ class: "number", name: "unit_price", class: "form-control !rounded-r-none", inputmode: "numeric", min: "0", autocomplete: "off", required: true }),
+        div(
+          { class: "relative min-w-fit" },
+          select(
+            { name: "currency", class: "form-control !rounded-l-none mr-6" },
+            option({ value: "USD" }, "USD"),
+            option({ value: "UZS" }, "UZS"),
+          ),
+          svg(
+            { class: "w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none", viewBox: "0 0 24 24", fill: "none" },
+            html(chevron_down_path)
+          )
+        )
+      )
+      row.append(td({ class: "font-medium p-3 pr-0 text-gray-900 dark:text-white" }, input({ type: "number", inputmode: "numeric", autocomplete: "off", name: "quantity", class: "form-control", value: 1 })))
+      row.append(td({ class: "font-medium p-3 text-gray-900 dark:text-white" }, price_input));
 
       if (where) where.append(row);
     }
@@ -79,12 +98,12 @@ function AttributeOptions(attribute, index, on_update) {
       let lab = input({ type: "hidden", name: `${att.key}_label`, value: att.name });
       list.append(lab)
     }
-    let count = 0;
     for (let option of att?.options || []) {
       let id = option.unit ? `${att.key}-${option.value}-${option.unit}` : `${att.key}-${option.value}`;
       let name = option.unit ? `${option.name} ${option.unit}` : option.name;
       let value = option.unit ? `${option.value} ${option.unit}` : option.value;
       let container = div(
+        input({ name: `option_${value}_label`, value: name, type: "hidden" }),
         input(
           { type: "checkbox", name: `${att.key}_options`, id: id + index, class: "absolute -z-10 opacity-0 w-0 peer", value },
           listeners({ change: on_update })
@@ -98,7 +117,6 @@ function AttributeOptions(attribute, index, on_update) {
         }, name)
       )
       list.append(container)
-      count++
     }
   })
 
@@ -107,7 +125,7 @@ function AttributeOptions(attribute, index, on_update) {
 
 function SelectOptions(attributes) {
   let list = fragment();
-  for (let attribute of attributes) list.append(option({ value: attribute.key }, attribute.name))
+  for (let attribute of attributes) list.append(option({ value: attribute.key }, attrs({ disabled: attribute.disabled }), attribute.name))
   return list;
 }
 
@@ -135,27 +153,30 @@ function AttributeSelector(attributes, index = 0, on_update) {
 
 export class Wizard {
   constructor(attributes) {
-    this.attributes = attributes;
-
+    this.attributes = attributes.map((a) => ({ ...a, disabled: signal(false) }));
     this.added_count = signal(0);
-    this.selected_attributes = new Map();
     this.add_btn = document.querySelector(".js-add-btn");
     this.attribute_form = document.querySelector(".js-attribute-form");
     this.combinations_form = document.querySelector(".js-combinations-form");
     this.thead = this.combinations_form.querySelector(".js-thead")
     this.tbody = this.combinations_form.querySelector(".js-tbody")
-    this.stuff = signal([]);
+    this.variations = signal([]);
     this.headers = signal([]);
+    this.tpromise = import("./i18n.js").then((mod) => {
+      this.t = mod.t;
+    });
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.tpromise;
     add_listeners(this.add_btn, {
       click: this.on_add.bind(this)
     });
 
-    TableHeaders(this.headers, this.thead);
-    TableBody(this.stuff, this.tbody);
+    TableHeaders({ headers: this.headers, where: this.thead, t: this.t });
+    TableBody({ variations: this.variations, where: this.tbody });
+
     effect(() => {
       let count = this.added_count();
       if (count >= this.attributes.length) {
@@ -164,11 +185,6 @@ export class Wizard {
         this.add_btn.classList.remove("!hidden")
       }
     });
-
-    effect(() => {
-      let changed = this.headers();
-      console.log("HEADERS CHANGED", changed);
-    })
   }
 
 
@@ -177,15 +193,18 @@ export class Wizard {
     let formdata = new FormData(this.attribute_form);
     let attribute_keys = formdata.getAll("attribute_keys");
     let headers = [];
-    let stuff = [];
+    let variations = [];
     for (let key of attribute_keys) {
       let options = formdata.getAll(`${key}_options`);
       let label = formdata.get(`${key}_label`);
-      headers.push(label);
-      stuff.push({ label, options, name: key });
+      if (options.length) {
+        headers.push(label);
+        variations.push({ label, options, name: key });
+      }
     }
-    this.headers.set(headers);
-    if (stuff.length) this.stuff.set(cartesian2(stuff));
+
+    if (headers.length) this.headers.set(headers);
+    if (variations.length) this.variations.set(cartesian(variations, formdata));
   }
 
   on_add() {
