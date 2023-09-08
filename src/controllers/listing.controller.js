@@ -321,7 +321,7 @@ export async function get_variations(req, reply) {
 
   let listing = await ListingService.get_one({ id });
   let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true, lang: req.language });
-  let variations = await render_file("/listing/new/variations-wizard.html", { step, attributes, t });
+  let variations = await render_file("/listing/new/variations-wizard.html", { step, attributes, t, listing_id: id });
   stream.push(variations);
 
   if (!req.partial) {
@@ -496,10 +496,11 @@ export async function submit_step(req, reply) {
     }
     case "2": {
       let { description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
+      console.log(variations);
       await Promise.all([
-        ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
-        ListingService.upsert_price(ability, { unit_price, currency, listing_sku_id }),
-        InventoryService.add({ listing_sku_id, quantity }),
+        // ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
+        // ListingService.upsert_price(ability, { unit_price, currency, listing_sku_id }),
+        // InventoryService.add({ listing_sku_id, quantity }),
         //ListingService.upsert_sku({ listing_id: id, price_id })
         // ListingService.update_one(ability, id, { description, cover_id }),
         // ListingService.upsert_price(ability, { unit_price, currency, id }),

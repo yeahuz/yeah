@@ -81,6 +81,7 @@
     "pg": "^8.11.0",
     "qrcode-esm": "^1.5.1",
     "qs": "^6.11.2",
+    "redom": "^3.29.1",
     "state": "github:jcbbb/state",
     "ua-parser-js": "^1.0.35",
     "ws": "^8.13.0"

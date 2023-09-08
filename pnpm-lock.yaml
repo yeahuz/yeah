@@ -154,6 +154,9 @@ dependencies:
   qs:
     specifier: ^6.11.2
     version: 6.11.2
+  redom:
+    specifier: ^3.29.1
+    version: 3.29.1
   state:
     specifier: github:jcbbb/state
     version: github.com/jcbbb/state/5e450998c78a9315729fc30f669269cc68b67f51
@@ -4459,6 +4462,10 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       redis-errors: 1.2.0
+    dev: false
+
+  /redom@3.29.1:
+    resolution: {integrity: sha512-hEQEcPGRj4W2UT4IIBsNw29zMNV6vtXQ8ttitQ+Uc5XpdQ7i8d5VgKfm6fPmYbbApKXa98dUoEzDgk1oqXVlMg==}
     dev: false
 
   /regenerator-runtime@0.13.11:

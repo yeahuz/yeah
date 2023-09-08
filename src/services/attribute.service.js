@@ -14,7 +14,7 @@ export async function get_category_attributes({ category_set = [], lang = "en", 
 
 export async function get_category_attributes_2({ category_id, lang = "en", enabled_for_variations }) {
   let sql = `
-    select a2.*, a2t.name, jsonb_agg(jsonb_build_object('name', coalesce(a2ot.name, a2o.value), 'value', a2o.value, 'unit', a2o.unit)) as options from attributes_2 a2
+    select a2.*, a2t.name, jsonb_agg(jsonb_build_object('id', a2o.id, 'name', coalesce(a2ot.name, a2o.value), 'value', a2o.value, 'unit', a2o.unit)) as options from attributes_2 a2
     left join attribute_2_translations a2t on a2t.attribute_id = a2.id and a2t.language_id = $1
     left join attribute_2_options a2o on a2o.attribute_id = a2.id
     left join attribute_2_option_translations a2ot on a2ot.attribute_option_id = a2o.id and a2ot.language_id = $1

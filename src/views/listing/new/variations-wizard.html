@@ -22,13 +22,14 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>
     </summary>
-    <form class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md js-attributes flex flex-col gap-4 js-combinations-form">
+    <form method="post" action="/listings/wizard/<%= it.listing_id %>?step=<%= it.step %>" class="p-4 border-x border-b border-b-gray-200 border-x-gray-200 dark:border-x-zinc-800 dark:border-b-zinc-800 rounded-b-md js-attributes flex flex-col gap-4 js-combinations-form">
       <table class="w-full rounded-lg shadow-sm">
         <thead class="text-left text-gray-500 text-sm dark:text-gray-200 js-thead">
         </thead>
         <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800 js-tbody">
         </tbody>
       </table>
+      <button class="btn btn-primary btn-md self-start">Submit</button>
     </form>
   </details>
 </div>
