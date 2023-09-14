@@ -14,26 +14,25 @@ import {
   span,
   button
 } from "dom";
-import { effect, signal } from "state";
 import { chevron_down_path } from "../icons.js";
-import { el, list, mount, setChildren, setAttr } from "redom";
+import { el, list, mount, setAttr } from "redom";
 
-class Li {
-  constructor() {
-    this.el = el("li");
+function cartesian(args, formdata) {
+  var r = [], max = args.length - 1;
+  function helper(arr, i) {
+    for (let j = 0, len = args[i].options?.length; j < len; j++) {
+      let a = arr.slice();
+      let obj = { key: args[i].key, value: args[i].options[j], label: args[i].label, value_label: formdata.get(`option_${args[i].options[j]}_label`) }
+      a.push(obj);
+      if (i == max) {
+        r.push(a)
+      } else {
+        helper(a, i + 1)
+      }
+    }
   }
-
-  update(data) {
-    this.el.textContent = data.name;
-  }
-}
-
-const ul = list("ul", Li, "_id");
-
-export function SelectOptions(attributes) {
-  let list = fragment();
-  for (let attribute of attributes) list.append(option({ value: attribute.key }, attribute.name))
-  return list;
+  helper([], 0);
+  return r;
 }
 
 class SelectOption {
@@ -42,9 +41,11 @@ class SelectOption {
   }
 
   update(attribute) {
-    this.el.value = attribute.key;
+    if (attribute.key) {
+      this.el.value = attribute.key;
+    }
     this.el.textContent = attribute.name;
-    this.el.toggleAttribute("disabled", !!attribute.disabled)
+    setAttr(this.el, { disabled: !!attribute.disabled, selected: !!attribute.selected });
   }
 }
 
@@ -61,37 +62,144 @@ class AttributeOption {
     )
   }
 
-  update(option, index, items, attribute) {
+  update(option, index, items, context) {
     let name = option.unit ? `${option.name} ${option.unit}` : option.name;
     let value = option.unit ? `${option.value} ${option.unit}` : option.value;
     setAttr(this.label, { for: option.id });
     setAttr(this.option_label, { name: `option_${value}_label`, value: name });
-    setAttr(this.checkbox, { name: `${attribute.key}_options`, id: option.id });
-
+    setAttr(this.checkbox, { name: `${context.attribute.key}_options`, id: option.id, value });
     this.label.textContent = name;
+    this.checkbox.onchange = context.on_change
   }
 }
 
-export class AttributeSelector2 {
-  constructor(attributes) {
+function AttributeOptionFactory(init, data, index, list) {
+  if (index === 0) {
+    return { el: el("input", { type: "hidden", name: `${data.key}_label`, value: data.name }) }
+  }
+
+  return new AttributeOption();
+}
+
+export class AttributeSelector {
+  constructor(attributes, on_change) {
     this.el = el(
       "div.flex.max-w-3xl.gap-4.items-start",
       (this.select = el("select.form-control !w-1/3 flex-shrink-0", { name: "attribute_keys" })),
-      (this.attribute_options = list(el("ul.flex.gap-2.w-full.flex-wrap"), AttributeOption, "id"))
+      (this.attribute_options = list("ul.flex.gap-2.w-full.flex-wrap", AttributeOptionFactory, "id"))
     );
 
+    attributes.unshift({ disabled: true, selected: true });
     this.select_options = list(this.select, SelectOption, "id");
     this.select_options.update(attributes);
 
-    this.select.prepend(el("option", { disabled: true, selected: true }));
-
     this.select.onchange = ({ target }) => {
       let found = attributes.find((a) => a.key === target.value);
-      if (found) this.attribute_options.update(found.options, found);
+      found.options.unshift(found);
+      if (found) this.attribute_options.update(found.options, { attribute: found, on_change });
     }
   }
-  onmount() {
-    console.log('on mount')
+}
+
+export class StaticHeader {
+  constructor(classname) {
+    this.el = el(`th.font-medium.p-3.bg-gray-100.dark:bg-zinc-800.${classname}`)
+  }
+
+  update(data) {
+    this.el.textContent = data.label;
+  }
+}
+
+export class DynamicHeader {
+  constructor() {
+    this.el = el("th.font-medium.p-3.bg-gray-100.dark:bg-zinc-800.whitespace-nowrap.w-full")
+  }
+
+  update(data) {
+    this.el.textContent = data.label;
+  }
+}
+
+function HeaderFactory(init, data, index, list) {
+  if (data.key === "sku") {
+    return new StaticHeader("min-w-[12rem]");
+  }
+  if (data.key === "actions") {
+    return new StaticHeader("min-w-[2rem]");
+  }
+  if (data.key === "price") {
+    return new StaticHeader("min-w-[20rem]");
+  }
+
+  if (data.key === "quantity") {
+    return new StaticHeader("w-10");
+  }
+
+  return new DynamicHeader();
+}
+
+class SkuTd {
+  constructor() {
+    this.el = el("td.font-medium.pl-0.p-3.text-gray-900.dark:text-white",
+      (this.input = el("input.form-control", { type: "text" })))
+  }
+
+  update(_, index) {
+    this.input.setAttribute("name", `variations[${index}].sku`);
+  }
+}
+
+class PriceTd {
+  constructor() {
+    this.el = el("td.font-medium.p-3.text-gray-900.dark:text-white",
+      el("div.flex",
+        el("input.form-control.!rounded-r-none", { required: true, autocomplete: "off", inputmode: "numeric", min: "0", type: "number" }),
+        el("div.relative.min-w-fit",
+          el("select.form-control.!rounded-l-none.mr-6",
+            el("option", "USD", { value: "USD" }),
+            el("option", "UZS", { value: "UZS" })
+          )
+        )
+      )
+    )
+  }
+}
+
+class Td {
+  constructor() {
+    this.el = el("td.font-medium.p-3.text-gray-900.dark:text-white",
+      (this.input = el("input", { type: "hidden" })),
+      (this.span = el("span"))
+    )
+  }
+
+  update(data, index) {
+    setAttr(this.input, { name: `variations[${index}].attributes.${data.key}`, value: data.value });
+    this.span.textContent = data.value_label;
+  }
+}
+
+function VariationFactory(init, data, index, list) {
+  if (data.key === "sku") {
+    return new SkuTd();
+  }
+
+  if (data.key === "price") {
+    return new PriceTd();
+  }
+
+  return new Td();
+}
+
+class Tr {
+  constructor() {
+    this.el = el("tr");
+    this.list = list(this.el, VariationFactory, "key");
+  }
+
+  update(data) {
+    this.list.update(data);
   }
 }
 
@@ -100,144 +208,47 @@ export class Wizard {
     this.attributes = attributes;
     this.add_btn = document.querySelector(".js-add-btn");
     this.attribute_form = document.querySelector(".js-attribute-form");
+    this.headers = list("tr.border-b border-b-gray-200 dark:border-b-zinc-800", HeaderFactory, "key");
+    this.variations = list(document.querySelector(".js-tbody"), Tr);
+    this.t;
 
     this.add_btn.onclick = () => {
-      mount(this.attribute_form, new AttributeSelector2(attributes), this.add_btn);
+      mount(this.attribute_form, new AttributeSelector(attributes, this.on_change.bind(this)), this.add_btn);
     }
+
+    import("/public/js/i18n.js").then(({ t }) => {
+      this.t = t;
+    });
+
+    mount(document.querySelector(".js-thead"), this.headers);
+  }
+
+  on_change() {
+    if (!this.t) return;
+    let formdata = new FormData(this.attribute_form);
+    let attribute_keys = formdata.getAll("attribute_keys");
+    let headers = Array(attribute_keys.length + 4).fill("");
+    let variations = Array(attribute_keys.length + 4).fill("");
+    headers[0] = { key: "sku", label: "SKU" }, variations[0] = { key: "sku", label: "SKU", options: [1] }
+    headers[headers.length - 1] = { key: "actions", label: "Actions" }, variations[variations.length - 1] = { key: "actions", label: "Actions", options: [1] };
+    headers[headers.length - 2] = { key: "price", label: this.t("form.pricing.price", { ns: "new-listing" }) }, variations[variations.length - 2] = { key: "price", label: this.t("form.pricing.price", { ns: "new-listing" }), options: [1] };
+    headers[headers.length - 3] = { key: "quantity", label: this.t("form.pricing.quantity", { ns: "new-listing" }) }, variations[variations.length - 3] = { key: "quantity", label: this.t("form.pricing.quantity", { ns: "new-listing" }), options: [1] };
+
+    for (let i = 0, len = attribute_keys.length; i < len; i++) {
+      let key = attribute_keys[i];
+      let options = formdata.getAll(`${key}_options`);
+      if (options.length) {
+        let label = formdata.get(`${key}_label`);
+        headers[i + 1] = { label, key };
+        variations[i + 1] = { label, options, key }
+      }
+    }
+
+    this.headers.update(headers);
+    this.variations.update(cartesian(variations, formdata));
   }
 
   static from(attributes) {
     return new Wizard(attributes)
   }
-}
-
-export function AttributeSelector(attributes, index = 0, on_update) {
-  let attribute = signal();
-  let component = div(
-    { class: "flex max-w-3xl gap-4 items-start" },
-    select(
-      { class: "form-control !w-1/3 flex-shrink-0", name: `attribute_keys` },
-      option({ disabled: true, selected: true }),
-      SelectOptions(attributes, index),
-      listeners({
-        change: ({ target }) => {
-          let found = attributes.find(a => a.key === target.value);
-          if (found) attribute.set(found)
-          if (on_update) on_update();
-        }
-      })
-    ),
-    AttributeOptions(attribute, index, on_update)
-  )
-
-  return component;
-}
-
-export async function TableHeaders({ headers, where } = {}) {
-  let { t } = await import("/public/js/i18n.js");
-  effect(() => {
-    if (where) where.innerHTML = "";
-    let row = tr({ class: "border-b border-b-gray-200 dark:border-b-zinc-800" },
-      th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[12rem]" }, "SKU")
-    );
-    for (let header of headers()) {
-      let thead = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 whitespace-nowrap w-full" }, header);
-      row.append(thead);
-    }
-    let quantity = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-10" }, t("form.pricing.quantity", { ns: "new-listing" }));
-    let price = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[20rem]" }, t("form.pricing.price", { ns: "new-listing" }));
-    let actions = th({ class: "font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[2rem]" }, "Actions");
-    row.append(quantity, price, actions);
-    if (where) where.append(row);
-  });
-}
-
-export function TableBody({ variations, where, remove_variation } = {}) {
-  effect(() => {
-    if (where) where.innerHTML = "";
-    let vars = variations();
-    for (let i = 0, len = vars.length; i < len; i++) {
-      let variation = vars[i];
-      let row = tr(
-        td({ class: "font-medium pl-0 p-3 text-gray-900 dark:text-white" }, input({ type: "text", name: `variations[${i}].sku`, class: "form-control" })),
-      )
-
-      for (let item of variation) {
-        row.append(
-          td({ class: "font-medium p-3 text-gray-900 dark:text-white" },
-            input({ type: "hidden", name: `variations[${i}].attributes.${item.key}`, value: item.value }),
-            span(item.value_label),
-          )
-        )
-      }
-
-      let price_input = div(
-        { class: "flex" },
-        input({ class: "number", name: `variations[${i}].unit_price`, class: "form-control !rounded-r-none", inputmode: "numeric", min: "0", autocomplete: "off", required: true }),
-        div(
-          { class: "relative min-w-fit" },
-          select(
-            { name: `variations[${i}].currency`, class: "form-control !rounded-l-none mr-6" },
-            option({ value: "USD" }, "USD"),
-            option({ value: "UZS" }, "UZS"),
-          ),
-          svg(
-            { class: "w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none", viewBox: "0 0 24 24", fill: "none" },
-            html(chevron_down_path)
-          )
-        )
-      )
-
-      row.append(td({ class: "font-medium p-3 text-gray-900 dark:text-white" }, input({ type: "number", inputmode: "numeric", autocomplete: "off", name: `variations[${i}].quantity`, class: "form-control", value: 1 })))
-      row.append(td({ class: "font-medium p-3 text-gray-900 dark:text-white" }, price_input));
-      row.append(td(
-        { class: "p-3 pr-0" },
-        button({
-          type: "button",
-          class: `btn btn-text btn-enabled btn-0 flex-shrink-0 underline decoration-transparent duration-300
-            hover:decoration-primary-500 group-peer-checked:hidden group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(209,224,255)]
-            dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]` },
-          listeners({ click: () => remove_variation(i) }),
-          //listeners({ click: () => row.remove() }),
-          "Delete"
-        )
-      ))
-
-      if (where) where.append(row);
-    }
-  })
-}
-
-function AttributeOptions(attribute, index, on_update) {
-  let list = div({ class: "flex gap-2 w-full flex-wrap" });
-  effect(() => {
-    list.innerHTML = "";
-    let att = attribute();
-    if (att) {
-      let lab = input({ type: "hidden", name: `${att.key}_label`, value: att.name });
-      list.append(lab)
-    }
-    for (let option of att?.options || []) {
-      let id = option.unit ? `${att.key}-${option.value}-${option.unit}` : `${att.key}-${option.value}`;
-      let name = option.unit ? `${option.name} ${option.unit}` : option.name;
-      let value = option.unit ? `${option.value} ${option.unit}` : option.value;
-      let container = div(
-        input({ name: `option_${value}_label`, value: name, type: "hidden" }),
-        input(
-          { type: "checkbox", name: `${att.key}_options`, id: id + index, class: "absolute -z-10 opacity-0 w-0 peer", value },
-          listeners({ change: on_update })
-        ),
-        label({
-          for: id + index,
-          class: `border border-gray-300 dark:border-zinc-700 p-2 rounded-md cursor-pointer text-gray-500
-           dark:text-gray-400 peer-checked:bg-gray-100 peer-checked:dark:bg-zinc-800 peer-checked:dark:border-zinc-600
-           peer-checked:text-gray-900 dark:peer-checked:text-white hover:bg-gray-50 hover:text-gray-900
-           hover:dark:bg-zinc-800 hover:dark:text-white duration-200 inline-block`
-        }, name)
-      )
-      list.append(container)
-    }
-  })
-
-  return list;
 }

@@ -39,69 +39,6 @@ export async function upsert_sku({ listing_id, price_id, custom_sku, store_id, i
   return rows[0];
 }
 
-export async function create_listing(payload) {
-  //TODO: create listing impl
-  // let trx = start_trx();
-  // try {
-  //   let {
-  //     title,
-  //     description,
-  //     attachments,
-  //     category_id,
-  //     formatted_address,
-  //     lat,
-  //     lon,
-  //     district_id,
-  //     region_id,
-  //     cover_index,
-  //     currency,
-  //     price,
-  //     created_by,
-  //     params,
-  //   } = payload;
-
-  //   let attribute_set = Object.values(params)
-  //     .flatMap((param) => [param.parent, ...param.value]) .map((v) => v.split("|")[1]);
-  //   let cover = attachments[cover_index || 0]; let listing = await create_one_trx(trx)({
-  //     title,
-  //     description,
-  //     cover_url: cover.url,
-  //     status_id: 3,
-  //     created_by,
-  //     attribute_set,
-  //   });
-
-  //   let att = await Promise.all(
-  //     attachments.map((a) =>
-  //       AttachmentService.create_one_trx(trx)({ resource_id: a.id, service: "CF_IMAGES" })
-  //     )
-  //   );
-
-  //   let categories = await CategoryService.get_parents(category_id);
-  //   await listing.$relatedQuery("attachments", trx).relate(att);
-  //   await listing.$relatedQuery("categories", trx).relate(
-  //     categories.map((c) => ({
-  //       ...c,
-  //       relation: c.id === Number(category_id) ? "DIRECT" : "PARENT",
-  //     }))
-  //   );
-  //   await listing.$relatedQuery("location", trx).insert({
-  //     formatted_address,
-  //     coords: raw(`point(${lat}, ${lon})`),
-  //     district_id,
-  //     region_id,
-  //   });
-
-  //   await listing.$relatedQuery("price", trx).insert({ currency, price });
-  //   await commit_trx(trx);
-  // } catch (err) {
-  //   console.log({ err });
-  //   rollback_trx(trx)
-  //   throw new InternalError();
-  // }
-}
-
-
 export async function get_one({ id, lang = "en", relation = {} } = {}) {
   if (!id) return;
   let params = [id];

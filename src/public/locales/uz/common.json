@@ -28,5 +28,6 @@
   "verify": "Tasdiqlash",
   "add": "Qo'shish",
   "add_more": "Ko'proq qo'shish",
-  "sell": "Sotish"
+  "sell": "Sotish",
+  "back": "Orqaga"
 }

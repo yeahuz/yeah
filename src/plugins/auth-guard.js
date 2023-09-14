@@ -42,7 +42,7 @@ async function auth_guard_impl(req, reply) {
     return;
   }
 
-  if (sid && !user) {
+  if ((sid && !user) || !user) {
     if (req.xhr) throw new AuthorizationError();
     let params = new URLSearchParams({ return_to: req.url + "?" + new URLSearchParams(Object.assign(req.query, req.body)) });
     return reply.redirect(`/auth/login?${params.toString()}`);
