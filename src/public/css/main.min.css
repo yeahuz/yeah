@@ -793,6 +793,10 @@ video {
   margin-bottom: 0.25rem;
 }
 
+.mb-12 {
+  margin-bottom: 3rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -911,10 +915,6 @@ video {
 
 .mt-8 {
   margin-top: 2rem;
-}
-
-.mb-12 {
-  margin-bottom: 3rem;
 }
 
 .line-clamp-2 {
@@ -1916,10 +1916,6 @@ video {
 
 .pl-8 {
   padding-left: 2rem;
-}
-
-.pr-0 {
-  padding-right: 0px;
 }
 
 .text-left {

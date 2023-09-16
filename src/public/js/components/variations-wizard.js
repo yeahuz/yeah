@@ -9,13 +9,11 @@ import {
   tr,
   th,
   td,
-  svg,
-  html,
   span,
   button
 } from "dom";
 import { chevron_down_path } from "../icons.js";
-import { el, list, mount, setAttr } from "redom";
+import { el, list, mount, setAttr, svg } from "redom";
 
 function cartesian(args, formdata) {
   var r = [], max = args.length - 1;
@@ -159,6 +157,10 @@ class PriceTd {
           el("select.form-control.!rounded-l-none.mr-6",
             el("option", "USD", { value: "USD" }),
             el("option", "UZS", { value: "UZS" })
+          ),
+          svg("svg.w-5.h-5.absolute.top-1/2.-translate-y-1/2.right-[14px].text-gray-500.pointer-events-none",
+            { fill: "none", viewBox: "0 0 24 24" },
+            svg("path", { d: "m6 9 6 6 6-6", stroke: "currentColor", "stroke-width": "1.5", "stroke-linecap": "roudn", "stroke-linejoin": "round" })
           )
         )
       )
@@ -180,6 +182,18 @@ class Td {
   }
 }
 
+class ActionsTd {
+  constructor() {
+    this.el = el("td",
+      (this.remove_btn = el("button", { type: "button" }, "Remove")),
+    )
+
+    this.remove_btn.onclick = () => {
+      console.log("ONCLICK");
+    }
+  }
+}
+
 function VariationFactory(init, data, index, list) {
   if (data.key === "sku") {
     return new SkuTd();
@@ -187,6 +201,9 @@ function VariationFactory(init, data, index, list) {
 
   if (data.key === "price") {
     return new PriceTd();
+  }
+  if (data.key === "actions") {
+    return new ActionsTd();
   }
 
   return new Td();
