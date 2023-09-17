@@ -1075,3 +1075,11 @@ j [data-tooltip][data-flow="right"]::before {
     stroke-dashoffset: 24;
   }
 }
+
+@media screen and (max-width: 48rem) {
+  dialog {
+    margin-block-end: 0;
+    padding: 0;
+    width: 100%;
+  }
+}

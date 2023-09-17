@@ -296,6 +296,69 @@ export async function get_step(req, reply) {
   return reply;
 }
 
+export async function get_attrs(req, reply) {
+  let flash = reply.flash();
+  let stream = reply.init_stream();
+  let user = req.user;
+  let t = req.i18n.t;
+  let id = req.params.id;
+  if (!req.partial) {
+    let top = await render_file("/partials/top.html", {
+      meta: { title: t("title", { ns: "new-listing" }), lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  let listing = await ListingService.get_one({ id });
+  let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true, lang: req.language });
+  let attrs = await render_file("/listing/variations/attrs.html", { attributes, listing_id: id, t });
+  stream.push(attrs);
+
+  if (!req.partial) {
+    let bottom = await render_file("/partials/bottom.html", {
+      t,
+      user
+    });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
+
+export async function get_combos(req, reply) {
+  let flash = reply.flash();
+  let stream = reply.init_stream();
+  let user = req.user;
+  let t = req.i18n.t;
+  let id = req.params.id;
+  if (!req.partial) {
+    let top = await render_file("/partials/top.html", {
+      meta: { title: t("title", { ns: "new-listing" }), lang: req.language },
+      t,
+      user,
+    });
+    stream.push(top);
+  }
+
+  let listing = await ListingService.get_one({ id });
+  let combos = await render_file("/listing/variations/combos.html", { listing_id: id, t });
+  stream.push(combos);
+
+  if (!req.partial) {
+    let bottom = await render_file("/partials/bottom.html", {
+      t,
+      user
+    });
+    stream.push(bottom);
+  }
+
+  stream.push(null);
+  return reply;
+}
+
 export async function get_variations(req, reply) {
   let flash = reply.flash();
   let stream = reply.init_stream();

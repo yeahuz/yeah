@@ -38,8 +38,13 @@ export let listing = async (fastify) => {
   });
   fastify.route({
     method: "GET",
-    url: "/wizard/:id/variations",
-    handler: ListingController.get_variations,
+    url: "/wizard/:id/attrs",
+    handler: ListingController.get_attrs,
+  });
+  fastify.route({
+    method: "GET",
+    url: "/wizard/:id/combos",
+    handler: ListingController.get_combos,
   });
   fastify.route({
     method: "POST",
