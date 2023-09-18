@@ -51,7 +51,7 @@
     <% } %>
     <% if (field.type === "radio") { %>
       <% count = parent_child_counter + child_counter %>
-      <input form="listing-form" type="hidden" name="attributes[<%= count  %>].id" value="<%= field.id %>" />
+      <input form="listing-form" type="hidden" name="attributes[<%= count %>].id" value="<%= field.id %>" />
       <div class="space-y-2 mt-5">
         <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
           <%= field.name %>

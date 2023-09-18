@@ -23,7 +23,7 @@ export async function create_one({ title, description, status, created_by, categ
     }));
 
     await trx.query(`insert into listing_skus (listing_id) values ($1)`, [listing.id]);
-    await commit_trx(trx)
+    await commit_trx(trx);
     return listing;
   } catch (err) {
     console.log({ err });
@@ -37,6 +37,23 @@ export async function upsert_sku({ listing_id, price_id, custom_sku, store_id, i
     (id, listing_id, price_id, custom_sku, store_id, id)
     values ($1, $2, $3, $4, $5) returning id on conflict (listing_id, id) do update set price_id = $2, custom_sku = $3`, [listing_id, price_id, custom_sku, store_id, id]);
   return rows[0];
+}
+
+export async function update_variation_options(id, options) {
+  let { rows } = await query(`update listings set variation_options = $1 where id = $2`, [options, id]);
+  return rows[0];
+}
+
+export async function resolve_variation_options(options, lang = "en") {
+  let { rows } = await query(`
+    select ao.id, coalesce(aot.name, ao.value || ' ' || ao.unit) as option_label, at.name as label, ao.attribute_id
+    from attribute_2_options ao
+    left join attributes_2 a on a.id = ao.attribute_id
+    left join attribute_2_option_translations aot on aot.attribute_option_id = ao.id and aot.language_id = $2
+    left join attribute_2_translations at on at.attribute_id = a.id and at.language_id = $2
+    where ao.id = any($1)`,
+  [options, lang.substring(0, 2)]);
+  return rows;
 }
 
 export async function get_one({ id, lang = "en", relation = {} } = {}) {
@@ -77,16 +94,16 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   if (relation.discounts) {
     sql += ` left join lateral
       (select listing_id, jsonb_agg(ld) filter(where ld.id is not null) as discounts from listing_discounts ld where ld.listing_id = l.id group by ld.listing_id)
-      ld on ld.listing_id = l.id`
+      ld on ld.listing_id = l.id`;
   }
 
   // if (relation.price) {
   //   sql += ` left join listing_prices lp on lp.id = l.price_id`;
   // }
 
-  sql += ` where l.id = $1 group by l.id, lsp.currency`
+  sql += ` where l.id = $1 group by l.id, lsp.currency`;
 
-  if (relation.discounts) sql += `, ld.discounts`
+  if (relation.discounts) sql += `, ld.discounts`;
   // if (relation.price) sql += ', lp.*'
 
   let { rows } = await query(sql, params);
@@ -102,7 +119,7 @@ export async function get_variants(listing) {
     left join ${escapeIdentifier(reference.table_name)} t on t.listing_sku_id = ls.id
     left join listing_sku_prices lsp on lsp.id = ls.price_id
     left join inventory i on i.listing_sku_id = ls.id
-    where ls.listing_id = $1`, [listing.id])
+    where ls.listing_id = $1`, [listing.id]);
 
   return rows;
 }

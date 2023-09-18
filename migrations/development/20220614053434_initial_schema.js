@@ -465,6 +465,7 @@ export function up(knex) {
       t.text("description");
       t.string("url", 512);
       t.boolean("best_offer_enabled").defaultTo(false);
+      t.specificType("variation_options", "INT[]").index(null, "GIN");
       t.integer("store_id")
         .index()
         .references("id")
@@ -480,7 +481,7 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("categories")
-        .onDelete("CASCADE")
+        .onDelete("CASCADE");
       t.bigInteger("created_by")
         .index()
         .notNullable()
@@ -1307,7 +1308,7 @@ export function up(knex) {
     .createTable("attribute_2_options", (t) => {
       t.increments("id");
       t.string("value");
-      t.string("unit").defaultTo("")
+      t.string("unit").defaultTo("");
       t.integer("attribute_id")
         .index()
         .notNullable()
@@ -1338,12 +1339,12 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("categories")
-        .onDelete("CASCADE")
-      t.specificType("columns", "VARCHAR[]").defaultTo('{}')
+        .onDelete("CASCADE");
+      t.specificType("columns", "VARCHAR[]").defaultTo('{}');
     })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION))
     .then(() => knex.raw(DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT))
-    .then(() => knex.raw(DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT))
+    .then(() => knex.raw(DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT));
 }
 
 export async function down(knex) {

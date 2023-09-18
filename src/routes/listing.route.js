@@ -42,6 +42,11 @@ export let listing = async (fastify) => {
     handler: ListingController.get_attrs,
   });
   fastify.route({
+    method: "POST",
+    url: "/wizard/:id/attrs",
+    handler: ListingController.save_attrs,
+  });
+  fastify.route({
     method: "GET",
     url: "/wizard/:id/combos",
     handler: ListingController.get_combos,

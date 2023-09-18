@@ -132,8 +132,8 @@ export async function submit_fourth_step(req, reply) {
   let [_, err] = await option(ListingService.create_listing(Object.assign(listing_data, { created_by: user.id })));
 
   if (err) {
-    req.flash("err", err.build(t))
-    return reply.redirect(err_to)
+    req.flash("err", err.build(t));
+    return reply.redirect(err_to);
   }
 
   reply.redirect(req.url);
@@ -328,6 +328,12 @@ export async function get_attrs(req, reply) {
   return reply;
 }
 
+export async function save_attrs(req, reply) {
+  let id = req.params.id;
+  let { options = [] } = req.body;
+  await ListingService.update_variation_options(id, options);
+}
+
 export async function get_combos(req, reply) {
   let flash = reply.flash();
   let stream = reply.init_stream();
@@ -344,6 +350,8 @@ export async function get_combos(req, reply) {
   }
 
   let listing = await ListingService.get_one({ id });
+  let options = await ListingService.resolve_variation_options(listing.variation_options, req.language);
+  console.log(options);
   let combos = await render_file("/listing/variations/combos.html", { listing_id: id, t });
   stream.push(combos);
 
@@ -491,7 +499,7 @@ export async function contact(req, reply) {
     return reply;
   }
 
-  redis_client.publish("messages/new", JSON.stringify(sent))
+  redis_client.publish("messages/new", JSON.stringify(sent));
 
   req.flash("success", { message: t("message_sent", { ns: "success" }) });
   reply.redirect(add_t(req.url));
@@ -553,9 +561,9 @@ export async function submit_step(req, reply) {
   let next_step = Number(step) + 1;
   switch (step) {
     case "1": {
-      if (id) return reply.redirect(`/listings/wizard/${id}?step=${next_step}`)
+      if (id) return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
       let listing = await ListingService.create_one({ category_id, title, created_by: user.id, status: "DRAFT" });
-      return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`)
+      return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`);
     }
     case "2": {
       let { description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
