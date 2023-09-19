@@ -53,6 +53,11 @@ export let listing = async (fastify) => {
   });
   fastify.route({
     method: "POST",
+    url: "/wizard/:id/combos",
+    handler: ListingController.save_combos,
+  });
+  fastify.route({
+    method: "POST",
     url: "/wizard",
     handler: ListingController.submit_step
   });

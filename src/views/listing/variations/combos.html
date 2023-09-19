@@ -1,63 +1,71 @@
 <main class="max-w-7xl mx-auto my-20 px-4 xl:px-0">
-  <h1 class="font-medium text-3xl text-gray-900 dark:text-white mb-12">Combinations</h1>
-  <table class="w-full rounded-lg shadow-sm">
-    <thead class="text-left text-gray-500 text-sm dark:text-gray-200 js-thead">
-      <tr class="border-b border-b-gray-200 dark:border-b-zinc-800">
-        <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[12rem]">
-          SKU
-        </th>
-        <% it.headers.forEach(function (header) {%>
-          <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 whitespace-nowrap w-full">
-            <%= header %>
+  <div class="flex justify-between items-start">
+    <h1 class="font-medium text-3xl text-gray-900 dark:text-white mb-12">Combinations</h1>
+    <button class="btn btn-primary btn-lg" form="variations-form"><%= it.t("save_continue", { ns: "common" })%></button>
+  </div>
+  <form id="variations-form" method="post">
+    <table class="w-full rounded-lg shadow-sm">
+      <thead class="text-left text-gray-500 text-sm dark:text-gray-200 js-thead">
+        <tr class="border-b border-b-gray-200 dark:border-b-zinc-800">
+          <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[12rem]">
+            SKU
           </th>
-        <% }) %>
-        <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-10">
-          <%= it.t("form.pricing.quantity", { ns: "new-listing" })%>
-        </th>
-        <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[20rem]">
-          <%= it.t("form.pricing.price", { ns: "new-listing" })%>
-        </th>
-      </tr>
-    </thead>
-    <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800 js-tbody">
-      <% it.combos.forEach(function (combo) {%>
-        <tr>
-          <td class="font-medium pl-0 p-3 text-gray-900 dark:text-white">
-            <input type="text" class="form-control" />
-          </td>
-          <% combo.forEach(function (item) { %>
-            <td class="font-medium p-3 text-gray-900 dark:text-white"><%= item.value %></td>
+          <% it.headers.forEach(function (header) {%>
+            <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 whitespace-nowrap w-full">
+              <%= header %>
+            </th>
           <% }) %>
-          <td class="font-medium p-3 text-gray-900 dark:text-white">
-            <input type="number" name="quantity" class="form-control" />
-          </td>
-          <td class="font-medium p-3 text-gray-900 dark:text-white">
-            <div class="flex">
-              <input class="form-control !rounded-r-none" required autocomplete="off" inputmode="numeric" min="0", type="number" />
-              <div class="relative min-w-fit">
-                <select class="form-control !rounded-l-none mr-6">
-                  <option value="USD">USD</option>
-                  <option value="UZS">UZS</option>
-                </select>
-                <svg
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
-                >
-                  <path
-                    d="m6 9 6 6 6-6"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-          </td>
+          <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 w-10">
+            <%= it.t("form.pricing.quantity", { ns: "new-listing" })%>
+          </th>
+          <th class="font-medium p-3 bg-gray-100 dark:bg-zinc-800 min-w-[20rem]">
+            <%= it.t("form.pricing.price", { ns: "new-listing" })%>
+          </th>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800 js-tbody">
+        <% it.combos.forEach(function (combo, idx) {%>
+          <tr>
+            <td class="font-medium pl-0 p-3 text-gray-900 dark:text-white">
+              <input type="text" class="form-control" name="variations[<%= idx %>].sku" />
+            </td>
+            <% combo.forEach(function (item) { %>
+              <td class="font-medium p-3 text-gray-900 dark:text-white">
+                <input type="hidden" name="variations[<%= idx %>].attributes.<%= item.key %>" value="<%= item.value %>" />
+                <%= item.value %>
+              </td>
+            <% }) %>
+            <td class="font-medium p-3 text-gray-900 dark:text-white">
+              <input type="number" name="variations[<%= idx %>].quantity" class="form-control" value="1" />
+            </td>
+            <td class="font-medium p-3 text-gray-900 dark:text-white">
+              <div class="flex">
+                <input class="form-control !rounded-r-none" name="variations[<%= idx %>].unit_price" required autocomplete="off" inputmode="numeric" min="0", type="number" />
+                <div class="relative min-w-fit">
+                  <select class="form-control !rounded-l-none mr-6" name="variations[<%= idx %>].currency">
+                    <option value="USD">USD</option>
+                    <option value="UZS">UZS</option>
+                  </select>
+                  <svg
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
+                  >
+                    <path
+                      d="m6 9 6 6 6-6"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </form>
 </main>

@@ -334,6 +334,11 @@ export async function save_attrs(req, reply) {
   await ListingService.update_variation_options(id, options);
 }
 
+export async function save_combos(req, reply) {
+  let { variations } = req.body;
+  variations.forEach(console.log);
+}
+
 function cartesian(args) {
   let r = [], max = args.length - 1;
 

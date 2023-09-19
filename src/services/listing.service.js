@@ -253,27 +253,6 @@ export async function get_category_reference(id) {
   return rows;
 }
 
-export async function update_listing_attributes({ listing_id, listing_sku_id, attributes }) {
-  let categories = await get_category_reference(listing_id);
-  let promises = categories.map((category) => {
-    let fields = pick(attributes, category.columns);
-    let keys = Object.keys(fields);
-    let values = Object.values(fields);
-    let updates = keys.map((k, i) => `${k}=$${i + 2}`).join(", ");
-    return query(`insert into ${escapeIdentifier(category.table_name)} (listing_sku_id, ${keys.join(", ")}) values ($1, ${values.map((_, i) => `$${i + 2}`).join(", ")})
-      on conflict(listing_sku_id) do update set ${updates}`,
-      [listing_sku_id, ...values]);
-  });
-
-  return await Promise.all(promises);
-}
-
-// export async function update_listing_attributes(id, attributes = []) {
-//   let prepared = prepare_bulk_insert(attributes, { data: { listing_id: id }, columns_map: { id: "attribute_id", value: "attribute_value_id" } });
-//   let { rows } = await query(`insert into listing_attributes ${prepared.sql} on conflict(attribute_id, attribute_value_id, listing_id) do nothing`, prepared.params);
-//   return rows;
-// }
-
 export async function link_attachments(ability, id, attachments = []) {
   let listing = await get_one({ id });
   if (!ability.can("update", subject("Listing", listing))) {
@@ -297,18 +276,46 @@ export async function unlink_attachment(ability, listing_id, attachment_id) {
   if (!ability.can("update", subject("Listing", listing))) {
     throw new AuthorizationError();
   }
-  await query(`delete from listing_attachments where listing_id = $1 and attachment_id = $2`, [listing_id, attachment_id])
+  await query(`delete from listing_attachments where listing_id = $1 and attachment_id = $2`, [listing_id, attachment_id]);
   return attachment_id;
 }
 
-export async function upsert_price(ability, { unit_price, currency, listing_sku_id }) {
-  let trx = await start_trx();
-  try {
+export async function upsert_price(trx = { query }) {
+  return async ({ unit_price, currency, listing_sku_id }) => {
     let { rows: [price] } = await trx.query(`insert into listing_sku_prices (unit_price, currency, listing_sku_id) values ($1, $2, $3) returning id`, [unit_price, currency, listing_sku_id]);
     await trx.query(`update listing_skus set price_id = $1 where id = $2`, [price.id, listing_sku_id]);
-    await commit_trx(trx);
     return price;
-  } catch (err) {
+  };
+}
+
+export async function update_listing_attributes(listing_id)  {
+  let categories = await get_category_reference(listing_id);
+  return async ({ listing_sku_id, attributes, trx = { query } }) => {
+    let promises = categories.map((category) => {
+      let fields = pick(attributes, category.columns);
+      let keys = Object.keys(fields);
+      let values = Object.values(fields);
+      let updates = keys.map((k, i) => `${k}=$${i + 2}`).join(", ");
+      return trx.query(`insert into ${escapeIdentifier(category.table_name)} (listing_sku_id, ${keys.join(", ")}) values ($1, ${values.map((_, i) => `$${i + 2}`).join(", ")})
+        on conflict(listing_sku_id) do update set ${updates}`,
+        [listing_sku_id, ...values]);
+    });
+    return await Promise.all(promises);
+  };
+}
+
+export async function upsert_sku2({ listing_id, price_id, unit_price, currency, custom_sku, store_id, id, attributes }) {
+  let update_attributes = await update_listing_attributes(listing_id);
+  let trx = await start_trx();
+  try {
+    let { rows: [sku] } = await trx.query(`insert into listing_skus
+      (id, listing_id, price_id, custom_sku, store_id, id)
+      values ($1, $2, $3, $4, $5) returning id on conflict (listing_id, id) do update set price_id = $2, custom_sku = $3`, [listing_id, price_id, custom_sku, store_id, id]);
+    await Promise.all([upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }), update_attributes({ trx, lisitng_sku_id: sku.id, attributes })]);
+    await commit_trx(trx);
+    return sku;
+  } catch(err) {
+    console.log({ err });
     rollback_trx(trx);
     throw new InternalError();
   }
