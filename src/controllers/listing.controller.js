@@ -334,6 +334,25 @@ export async function save_attrs(req, reply) {
   await ListingService.update_variation_options(id, options);
 }
 
+function cartesian(args) {
+  let r = [], max = args.length - 1;
+
+  function helper(arr, i) {
+    for (let j = 0, len = args[i].options?.length; j < len; j++) {
+      let a = arr.slice();
+      a.push({ key: args[i].key, label: args[i].name, value: args[i].options[j].value });
+      if (i == max) {
+        r.push(a);
+      } else {
+        helper(a, i + 1);
+      }
+    }
+  }
+
+  helper([], 0);
+  return r;
+}
+
 export async function get_combos(req, reply) {
   let flash = reply.flash();
   let stream = reply.init_stream();
@@ -351,8 +370,8 @@ export async function get_combos(req, reply) {
 
   let listing = await ListingService.get_one({ id });
   let options = await ListingService.resolve_variation_options(listing.variation_options, req.language);
-  console.log(options);
-  let combos = await render_file("/listing/variations/combos.html", { listing_id: id, t });
+
+  let combos = await render_file("/listing/variations/combos.html", { listing_id: id, t, combos: cartesian(options), headers: options.map((c) => c.name) });
   stream.push(combos);
 
   if (!req.partial) {

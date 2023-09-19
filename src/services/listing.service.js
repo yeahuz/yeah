@@ -46,12 +46,13 @@ export async function update_variation_options(id, options) {
 
 export async function resolve_variation_options(options, lang = "en") {
   let { rows } = await query(`
-    select ao.id, coalesce(aot.name, ao.value || ' ' || ao.unit) as option_label, at.name as label, ao.attribute_id
+    select ao.attribute_id, at.name, a.key,
+    json_agg(json_build_object('value', coalesce(aot.name, ao.value || ' ' || ao.unit))) as options
     from attribute_2_options ao
     left join attributes_2 a on a.id = ao.attribute_id
     left join attribute_2_option_translations aot on aot.attribute_option_id = ao.id and aot.language_id = $2
     left join attribute_2_translations at on at.attribute_id = a.id and at.language_id = $2
-    where ao.id = any($1)`,
+    where ao.id = any($1) group by ao.attribute_id, at.name, a.key`,
   [options, lang.substring(0, 2)]);
   return rows;
 }
