@@ -289,7 +289,7 @@ export function cartesian(args) {
       let a = arr.slice();
       a.push({ key: args[i].key, label: args[i].name, value: args[i].options[j].value, value_label: args[i].options[j].value_label });
       if (i == max) {
-        r.push(a);
+        r.push({ id: a.map((i) => i.value).join("-"), items: a });
       } else {
         helper(a, i + 1);
       }

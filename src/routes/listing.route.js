@@ -40,6 +40,7 @@ export let listing = async (fastify) => {
     method: "POST",
     url: "/wizard/:id/attrs",
     handler: ListingController.save_attrs,
+    onRequest: policy_guard(),
   });
   fastify.route({
     method: "GET",

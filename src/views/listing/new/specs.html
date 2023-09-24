@@ -1,10 +1,11 @@
 <section>
-  <h2 class="font-semibold"><%= it.t("form.specs.heading", { ns: "new-listing" })%></h2>
+  <h2 class="font-semibold uppercase"><%= it.t("form.specs.heading", { ns: "new-listing" })%></h2>
   <% let child_counter = -1; %>
   <% let parent_child_counter = -1; %>
   <% let optional_started = false %>
   <h3 class="mt-5 font-semibold"><%= it.t("form.specs.required", { ns: "new-listing" })%></h3>
-  <% it.attributes.forEach(function (attribute) { %>
+  <% for (let attribute of it.attributes) { %>
+    <% if (it.listing.attributes?.includes(attribute.id)) continue %>
     <% if (!attribute.required && !optional_started) {%>
       <% optional_started = true %>
       <h3 class="mt-5 font-semibold"><%= it.t("form.specs.optional", { ns: "new-listing" })%></h3>
@@ -38,7 +39,7 @@
         </svg>
       </div>
     </div>
-  <% }) %>
+  <% } %>
   <% it.attributes?.forEach(function (field) { %>
     <% parent_child_counter++ %>
     <% if (field.type === "input") { %>

@@ -137,9 +137,11 @@ export async function seed(knex) {
   await knex("currencies").insert([
     {
       id: "USD",
+      symbol: "$",
     },
     {
       id: "UZS",
+      symbol: "UZS",
     },
   ]);
 
@@ -343,6 +345,7 @@ export async function seed(knex) {
               name: "storage_capacity",
               type: "varchar",
               units: ["GB", "MB", "KB"],
+              enabled_for_variations: true,
               translation: ["Storage capacity", "Хранилище", "Saqlash hajmi"],
               options: [
                 { value: 1, unit: "GB" },
@@ -369,6 +372,7 @@ export async function seed(knex) {
             {
               name: "color",
               type: "varchar",
+              enabled_for_variations: true,
               translation: ["Color", "Цвет", "Rang"],
               options: [
                 { value: "Red", translation: ["Red", "Красный", "Qizil"] },
@@ -382,6 +386,7 @@ export async function seed(knex) {
               units: ["GB", "MB", "KB"],
               type: "varchar",
               nullable: true,
+              enabled_for_variations: true,
               translation: ["RAM", "Оперативная память", "Xotira"],
               options: [
                 { value: 1, unit: "GB" },
@@ -449,7 +454,8 @@ export async function seed(knex) {
           key: column.name,
           category_id: inserted_category.id,
           units: column.units,
-          required: !column.nullable
+          required: !column.nullable,
+          enabled_for_variations: !!column.enabled_for_variations
         }).returning("id");
 
         await knex("attribute_2_translations").insert([
@@ -907,7 +913,7 @@ export async function seed(knex) {
         {
           action: "update",
           subject: "Listing",
-          fields: ["title", "description", "attributes", "cover_id", "category_id", "quantity", "variation_data"],
+          fields: ["title", "description", "attributes", "cover_id", "category_id", "quantity", "temp_variations", "attribute_options", "attributes"],
           conditions: { created_by: "return (user) => user.id" }
         },
         {

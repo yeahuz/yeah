@@ -428,7 +428,8 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("currencies", (t) => {
-      t.string("id").primary();
+      t.string("id", 10).primary();
+      t.string("symbol", 10);
       t.timestamps(false, true);
     })
     .createTable("stores", (t) => {
@@ -465,8 +466,9 @@ export function up(knex) {
       t.text("description");
       t.string("url", 512);
       t.boolean("best_offer_enabled").defaultTo(false);
-      t.specificType("variation_options", "INT[]").index(null, "GIN");
-      t.jsonb("variation_data").nullable();
+      t.specificType("attributes", "INT[]").index(null, "GIN");
+      t.specificType("attribute_options", "INT[]").index(null, "GIN");
+      t.jsonb("temp_variations").nullable();
       t.integer("store_id")
         .index()
         .references("id")

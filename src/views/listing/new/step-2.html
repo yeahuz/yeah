@@ -16,7 +16,7 @@
   <%~ await includeAsync ("./specs.html", it) %>
   <%~ await includeAsync ("./variations.html", it) %>
   <section>
-    <h2 class="font-semibold mb-4"><%= it.t("form.description.heading", { ns: "new-listing" })%></h2>
+    <h2 class="font-semibold mb-4 uppercase"><%= it.t("form.description.heading", { ns: "new-listing" })%></h2>
     <elastic-textarea>
       <textarea form="listing-form" name="description" placeholder="<%= it.t("form.description.placeholder", { ns: "new-listing" }) %>" rows="5" class="form-control" required><%= it.listing?.description ?? ""%></textarea>
       <% if (it.flash?.validation_errors?.[0]?.description) { %>

@@ -31,12 +31,12 @@
       "placeholder": "Choose category"
     },
     "description": {
-      "heading": "DESCRIPTION",
+      "heading": "Description",
       "placeholder": "Describe your listing in more detail",
       "hint": "Minumum 80 characters"
     },
     "photos": {
-      "heading": "PHOTOS",
+      "heading": "Photos",
       "hint": "The first photo will be on the cover of the listing (max 50 photos)",
       "click_to_upload": "Click to upload",
       "or_drag_drop": "or drag and drop",
@@ -44,7 +44,7 @@
       "cover": "Cover"
     },
     "pricing": {
-      "heading": "PRICING",
+      "heading": "Pricing",
       "quantity": "Quantity",
       "price": "Price",
       "allow_offers": "Allow offers",
@@ -55,7 +55,7 @@
       "volume_pricing_description": "Offer a discount when buyers purchase more than one item at a time."
     },
     "shipping": {
-      "heading": "SHIPPING",
+      "heading": "Shipping",
       "method": "Shipping method",
       "standard": "Standard",
       "pickup": "Local pickup only",
@@ -68,7 +68,7 @@
       "pkg_width": "Width"
     },
     "specs": {
-      "label": "SPECIFICS",
+      "label": "Specificis",
       "required": "Required",
       "optional": "Optional"
     },

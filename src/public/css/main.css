@@ -261,7 +261,7 @@ html.dark {
   --color-form-control-border: var(--zinc-800);
   --color-form-control-bg: var(--zinc-900);
   --color-form-control-ring: var(--zinc-800);
-  --color-form-control-bg-disabled: var(--zinc-700);
+  --color-form-control-bg-disabled: var(--zinc-800);
   --color-form-control-border-focused: var(--zinc-600);
 
   /* Badge */

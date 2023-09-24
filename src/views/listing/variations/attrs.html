@@ -1,15 +1,16 @@
 <main class="max-w-7xl mx-auto my-20 px-4 xl:px-0">
   <h1 class="font-medium text-3xl text-gray-900 dark:text-white mb-12">Attributes</h1>
   <div>
-    <form method="post" action="?return_to=/listings/wizard/<%= it.listing_id %>/combos" class="flex flex-col gap-8">
+    <form method="post" action="?return_to=/listings/wizard/<%= it.listing.id %>/combos" class="flex flex-col gap-8">
       <ul class="flex flex-col gap-6">
         <% it.attributes.forEach(function(attribute, idx) {%>
           <li>
+            <input type="hidden" name="attributes[<%= idx %>].id" value="<%= attribute.id %>"/>
             <span class="font-semibold"><%= attribute.name %></span>
             <ul class="flex gap-4 flex-wrap mt-2">
               <% attribute.options.forEach(function(option) {%>
                 <li class="flex items-start">
-                  <input type="checkbox" name="options[]" value="<%= option.id %>" id="<%= option.id %>" class="checkbox-input appearance-none peer" />
+                  <input <%= it.listing.attribute_options?.includes(option.id) ? "checked" : "" %> type="checkbox" name="attributes[<%= idx %>].options[]" value="<%= option.id %>" id="<%= option.id %>" class="checkbox-input appearance-none peer" />
                   <label for="<%= option.id %>" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                       <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

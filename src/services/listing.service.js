@@ -22,7 +22,6 @@ export async function create_one({ title, description, status, created_by, categ
       return trx.query(`insert into listing_categories (category_id, listing_id) values ($1, $2)`, [category.id, listing.id]);
     }));
 
-    await trx.query(`insert into listing_skus (listing_id) values ($1)`, [listing.id]);
     await commit_trx(trx);
     return listing;
   } catch (err) {
@@ -44,7 +43,7 @@ export async function update_variation_options(id, options) {
   return rows[0];
 }
 
-export async function resolve_variation_options(options, lang = "en") {
+export async function resolve_attribute_options(options, lang = "en") {
   let { rows } = await query(`
     select ao.attribute_id, at.name, a.key,
     json_agg(json_build_object('value_label', coalesce(aot.name, ao.value || ' ' || ao.unit), 'value', ao.value || coalesce(' ' || nullif(ao.unit, ''), ''))) as options
@@ -53,7 +52,7 @@ export async function resolve_variation_options(options, lang = "en") {
     left join attribute_2_option_translations aot on aot.attribute_option_id = ao.id and aot.language_id = $2
     left join attribute_2_translations at on at.attribute_id = a.id and at.language_id = $2
     where ao.id = any($1) group by ao.attribute_id, at.name, a.key`,
-  [options, lang.substring(0, 2)]);
+    [options, lang.substring(0, 2)]);
   return rows;
 }
 
@@ -288,7 +287,7 @@ export function upsert_price(trx = { query }) {
   };
 }
 
-export async function update_listing_attributes(listing_id)  {
+export async function update_listing_attributes(listing_id) {
   let categories = await get_category_reference(listing_id);
   return async ({ listing_sku_id, attributes, trx = { query } }) => {
     let promises = categories.map((category) => {
@@ -317,7 +316,7 @@ export async function upsert_sku2({ listing_id, price_id, unit_price, currency, 
     await Promise.all([upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }), update_attributes({ trx, listing_sku_id: sku.id, attributes })]);
     await commit_trx(trx);
     return sku;
-  } catch(err) {
+  } catch (err) {
     console.log({ err });
     rollback_trx(trx);
     throw new InternalError();

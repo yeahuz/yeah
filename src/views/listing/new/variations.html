@@ -5,5 +5,42 @@
             hover:decoration-primary-500 group-peer-checked:hidden group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(209,224,255)]
             dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]" href="/listings/wizard/<%= it.listing.id %>/attrs">Edit</a>
   </div>
-  <p>Select multiple variants of the same listing</p>
+  <% if (it.selected_attributes?.length) { %>
+    <% let stats = it.listing.temp_variations.reduce(function (ac, cur) { %>
+    <% ac.quantity += Number(cur.quantity) %>
+    <% ac.min_price = Math.min(ac.min_price, Number(cur.unit_price)); %>
+    <% ac.max_price = Math.max(ac.max_price, Number(cur.unit_price)); %>
+    <% return ac; %>
+    <% }, { min_price: Infinity, max_price: 0, quantity: 0 }) %>
+    <div>
+      <h3 class="font-semibold my-3.5">Attributes</h3>
+      <dl class="grid grid-cols-2 gap-3.5">
+        <% it.selected_attributes.forEach(function (attribute) {%>
+          <div class="flex gap-4">
+            <dt class="text-gray-500 dark:text-gray-400 basis-36"><%= attribute.name %></dt>
+            <dd>
+              <a href="/listings/wizard/<%= it.listing.id %>/combos" class="underline decoration-transparent hover:decoration-white duration-200">
+                <%= attribute.options.map((option) => option.value_label).join(", ") %>
+              </a>
+            </dd>
+          </div>
+        <% }) %>
+      </dl>
+    </div>
+    <div class="mt-6">
+      <h3 class="font-semibold my-2"><%= it.t("form.pricing.heading", { ns: "new-listing" }) %></h3>
+      <dl class="grid grid-cols-2 gap-2">
+        <div class="flex gap-4">
+          <dt class="text-gray-500 dark:text-gray-400 basis-36"><%= it.t("form.pricing.price", { ns: "new-listing" })%></dt>
+          <dd>$<%= stats.min_price %> - $<%= stats.max_price %></dd>
+        </div>
+        <div class="flex gap-4">
+          <dt class="text-gray-500 dark:text-gray-400 basis-36"><%= it.t("form.pricing.quantity", { ns: "new-listing" })%></dt>
+          <dd><%= stats.quantity %></dd>
+        </div>
+      </dl>
+    </div>
+  <% } else { %>
+    <p>Select multiple variants of the same listing</p>
+  <% } %>
 </section>

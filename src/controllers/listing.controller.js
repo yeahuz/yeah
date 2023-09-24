@@ -58,8 +58,10 @@ export async function get_step(req, reply) {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
       let variants = await ListingService.get_variants(listing);
       let attributes = [];
+      let selected_attributes = [];
       if (listing) {
         attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, lang: req.language });
+        selected_attributes = await ListingService.resolve_attribute_options(listing.attribute_options, req.language);
       };
       rendered_step = await render_file(`/listing/new/step-${step}`, {
         flash,
@@ -68,7 +70,8 @@ export async function get_step(req, reply) {
         generate_srcset,
         attributes,
         t,
-        variants
+        variants,
+        selected_attributes
       });
     } break;
     case "3": {
@@ -186,7 +189,7 @@ export async function get_attrs(req, reply) {
 
   let listing = await ListingService.get_one({ id });
   let attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, enabled_for_variations: true, lang: req.language });
-  let attrs = await render_file("/listing/variations/attrs.html", { attributes, listing_id: id, t });
+  let attrs = await render_file("/listing/variations/attrs.html", { attributes, listing, t });
   stream.push(attrs);
 
   if (!req.partial) {
@@ -203,20 +206,29 @@ export async function get_attrs(req, reply) {
 
 export async function save_attrs(req, reply) {
   let id = req.params.id;
+  let ability = req.ability;
   let return_to = req.query.return_to;
-  let { options = [] } = req.body;
-  await ListingService.update_variation_options(id, options);
+  let { attributes = [] } = req.body;
+  let options = [];
+  let selected_attributes = [];
+  for (let attribute of attributes) {
+    if (attribute.options?.length) {
+      selected_attributes.push(attribute.id)
+      options.push(...attribute.options);
+    }
+  }
+  if (!selected_attributes.length) return reply.redirect(`/listings/wizard/${id}?step=2`);
+  await ListingService.update_one(ability, id, { attributes: selected_attributes, attribute_options: options });
   return reply.redirect(return_to);
 }
 
 
-// export async function upsert_sku2({ listing_id, unit_price, currency, custom_sku, store_id, id, attributes }) {
 export async function save_combos(req, reply) {
-  let { variation_data } = req.body;
+  let { temp_variations } = req.body;
   let id = req.params.id;
   let return_to = req.query.return_to;
   let ability = req.ability;
-  await ListingService.update_one(ability, id, { variation_data: JSON.stringify(variation_data) });
+  await ListingService.update_one(ability, id, { temp_variations: JSON.stringify(temp_variations) });
   return reply.redirect(return_to);
 }
 
@@ -236,9 +248,8 @@ export async function get_combos(req, reply) {
   }
 
   let listing = await ListingService.get_one({ id });
-  let options = await ListingService.resolve_variation_options(listing.variation_options, req.language);
-
-  let combos = await render_file("/listing/variations/combos.html", { listing_id: id, t, combos: cartesian(options), headers: options.map((c) => c.name) });
+  let options = await ListingService.resolve_attribute_options(listing.attribute_options, req.language);
+  let combos = await render_file("/listing/variations/combos.html", { listing, t, combos: cartesian(options), headers: options.map((c) => c.name) });
   stream.push(combos);
 
   if (!req.partial) {

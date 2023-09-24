@@ -761,6 +761,16 @@ video {
   margin-bottom: 1.25rem;
 }
 
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.my-3\.5 {
+  margin-top: 0.875rem;
+  margin-bottom: 0.875rem;
+}
+
 .-ml-2 {
   margin-left: -0.5rem;
 }
@@ -1298,6 +1308,10 @@ video {
   flex-basis: 66.666667%;
 }
 
+.basis-36 {
+  flex-basis: 9rem;
+}
+
 .basis-40 {
   flex-basis: 10rem;
 }
@@ -1389,6 +1403,10 @@ video {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .grid-cols-6 {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
@@ -1451,6 +1469,14 @@ video {
 
 .gap-8 {
   gap: 2rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-3\.5 {
+  gap: 0.875rem;
 }
 
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
@@ -1996,6 +2022,10 @@ video {
   font-weight: 600;
 }
 
+.uppercase {
+  text-transform: uppercase;
+}
+
 .leading-\[0\] {
   line-height: 0;
 }
@@ -2412,7 +2442,7 @@ html.dark {
   --color-form-control-border: var(--zinc-800);
   --color-form-control-bg: var(--zinc-900);
   --color-form-control-ring: var(--zinc-800);
-  --color-form-control-bg-disabled: var(--zinc-700);
+  --color-form-control-bg-disabled: var(--zinc-800);
   --color-form-control-border-focused: var(--zinc-600);
   /* Badge */
   --color-badge-text: var(--gray-300);
@@ -3452,6 +3482,10 @@ j [data-tooltip][data-flow="right"]::before {
 
 .hover\:text-primary-700:hover {
   color: rgb(var(--primary-700));
+}
+
+.hover\:underline:hover {
+  text-decoration-line: underline;
 }
 
 .hover\:decoration-gray-600:hover {

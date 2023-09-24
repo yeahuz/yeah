@@ -3,7 +3,7 @@
     <h1 class="font-medium text-3xl text-gray-900 dark:text-white mb-12">Combinations</h1>
     <button class="btn btn-primary btn-lg" form="variations-form"><%= it.t("save_continue", { ns: "common" })%></button>
   </div>
-  <form id="variations-form" method="post" action="?return_to=/listings/wizard/<%= it.listing_id %>?step=2">
+  <form id="variations-form" method="post" action="?return_to=/listings/wizard/<%= it.listing.id %>?step=2">
     <table class="w-full rounded-lg shadow-sm">
       <thead class="text-left text-gray-500 text-sm dark:text-gray-200 js-thead">
         <tr class="border-b border-b-gray-200 dark:border-b-zinc-800">
@@ -24,27 +24,29 @@
         </tr>
       </thead>
       <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800 js-tbody">
-        <% it.combos.forEach(function (combo, idx) {%>
+        <% let variations_map = it.listing.temp_variations.reduce((acc, curr) => { acc[curr.id] = curr; return acc; }, {})%>
+        <% it.combos.forEach(function (combo, idx) { %>
           <tr>
+            <input type="hidden" name="temp_variations[<%= idx %>].id" value="<%= combo.id %>" />
             <td class="font-medium pl-0 p-3 text-gray-900 dark:text-white">
-              <input type="text" class="form-control" name="variation_data[<%= idx %>].sku" />
+              <input type="text" class="form-control" name="temp_variations[<%= idx %>].sku" value="<%= variations_map[combo.id].sku ?? ""%>" />
             </td>
-            <% combo.forEach(function (item) { %>
+            <% combo.items.forEach(function (item) { %>
               <td class="font-medium p-3 text-gray-900 dark:text-white">
-                <input type="hidden" name="variation_data[<%= idx %>].attributes.<%= item.key %>" value="<%= item.value %>" />
+                <input type="hidden" name="temp_variations[<%= idx %>].attributes.<%= item.key %>" value="<%= item.value %>" />
                 <%= item.value_label %>
               </td>
             <% }) %>
             <td class="font-medium p-3 text-gray-900 dark:text-white">
-              <input type="number" name="variation_data[<%= idx %>].quantity" class="form-control" value="1" />
+              <input type="number" name="temp_variations[<%= idx %>].quantity" class="form-control" value="<%= variations_map[combo.id].quantity ?? "1" %>" />
             </td>
             <td class="font-medium p-3 text-gray-900 dark:text-white">
               <div class="flex">
-                <input class="form-control !rounded-r-none" name="variation_data[<%= idx %>].unit_price" value="1" required autocomplete="off" inputmode="numeric" min="0", type="number" />
+                <input class="form-control !rounded-r-none" name="temp_variations[<%= idx %>].unit_price" value="<%= variations_map[combo.id].unit_price ?? "0"%>" required autocomplete="off" inputmode="numeric" min="0", type="number" />
                 <div class="relative min-w-fit">
-                  <select class="form-control !rounded-l-none mr-6" name="variation_data[<%= idx %>].currency">
-                    <option value="USD">USD</option>
-                    <option value="UZS">UZS</option>
+                  <select class="form-control !rounded-l-none mr-6" name="temp_variations[<%= idx %>].currency">
+                    <option value="USD" <%= variations_map[combo.id].currency === "USD" ? "selected" : ""%>>USD</option>
+                    <option value="UZS" <%= variations_map[combo.id].currency === "UZS" ? "selected" : ""%>>UZS</option>
                   </select>
                   <svg
                     fill="none"
