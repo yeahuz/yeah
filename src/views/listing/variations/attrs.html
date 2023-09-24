@@ -1,7 +1,7 @@
 <main class="max-w-7xl mx-auto my-20 px-4 xl:px-0">
   <h1 class="font-medium text-3xl text-gray-900 dark:text-white mb-12">Attributes</h1>
   <div>
-    <form method="post" class="flex flex-col gap-8">
+    <form method="post" action="?return_to=/listings/wizard/<%= it.listing_id %>/combos" class="flex flex-col gap-8">
       <ul class="flex flex-col gap-6">
         <% it.attributes.forEach(function(attribute, idx) {%>
           <li>

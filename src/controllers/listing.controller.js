@@ -11,134 +11,7 @@ import { render_file } from "../utils/eta.js";
 import { generate_srcset, option, add_t } from "../utils/index.js";
 import { redis_client } from "../services/redis.service.js";
 import { async_pool_all } from "../utils/async-pool.js";
-
-export async function update_attachment(req, reply) {
-  let { id, attachment_id } = req.params;
-  let { return_to } = req.query;
-  let { _action } = req.body;
-
-  switch (_action) {
-    case "delete_attachment": {
-      let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-      let attachments = existing.attachments?.filter((f) => f.id !== attachment_id);
-      await redis_client.set(id, JSON.stringify(Object.assign(existing, { attachments })));
-      let [result, err] = await option(CFImageService.delete_one(attachment_id));
-    }
-    default:
-      break;
-  }
-
-  reply.redirect(return_to);
-  return reply;
-}
-
-export async function upload_attachments(req, reply) {
-  let { return_to = "/" } = req.query;
-  let { id } = req.params;
-  let files = req.files();
-  let results = await async_pool_all(20, files, CFImageService.upload);
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-  let attachments = (existing.attachments || []).concat(
-    results.map(CFImageService.get_cf_image_url)
-  );
-
-  await redis_client.set(id, JSON.stringify(Object.assign(existing, { attachments })));
-
-  reply.redirect(return_to);
-  return reply;
-}
-
-export async function delete_attachment(req, reply) {
-  let { attachment_id, id } = req.params;
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-  let attachments = existing.attachments?.filter((f) => f.id !== attachment_id);
-  await redis_client.set(id, JSON.stringify(Object.assign(existing, { attachments })));
-  let [result, err] = await option(CFImageService.delete_one(attachment_id));
-  reply.send({ status: "oke" });
-  return reply;
-}
-
-export async function sync_attachments(req, reply) {
-  let { id } = req.params;
-  let { photo_id } = req.body;
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-
-  await redis_client.set(
-    id,
-    JSON.stringify(
-      Object.assign(existing, {
-        attachments: [
-          ...new Set(
-            (existing.attachments || []).concat({
-              id: photo_id,
-              url: CFImageService.get_cf_image_url(photo_id),
-            })
-          ),
-        ],
-      })
-    )
-  );
-
-  reply.send({ status: "oke" });
-  return reply;
-}
-
-export async function submit_first_step(req, reply) {
-  let { id } = req.params;
-  let { title, category_id } = req.body;
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-  await redis_client.set(id, JSON.stringify(Object.assign(existing, { title, category_id })));
-  reply.redirect(`/listings/wizard/${id}/2`);
-}
-
-export async function submit_second_step(req, reply) {
-  let { id } = req.params;
-  let body = req.body;
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-  await redis_client.set(id, JSON.stringify(Object.assign(existing, body)));
-  reply.redirect(`/listings/wizard/${id}/3`);
-  return reply;
-}
-
-export async function submit_third_step(req, reply) {
-  let { id } = req.params;
-  let { location, phone } = req.body;
-  let [formatted_address, lat, lon, district_id, region_id] = location.split("|");
-  let existing = JSON.parse((await redis_client.get(id)) || null) || {};
-  await redis_client.set(
-    id,
-    JSON.stringify(
-      Object.assign(existing, {
-        formatted_address,
-        lat,
-        lon,
-        district_id,
-        region_id,
-        location,
-        phone,
-      })
-    )
-  );
-  reply.redirect(`/listings/wizard/${id}/4`);
-  return reply;
-}
-
-export async function submit_fourth_step(req, reply) {
-  let { id } = req.params;
-  let { err_to } = req.query;
-  let t = req.t;
-  let user = req.user;
-  let listing_data = JSON.parse((await redis_client.get(id)) || null) || {};
-  let [_, err] = await option(ListingService.create_listing(Object.assign(listing_data, { created_by: user.id })));
-
-  if (err) {
-    req.flash("err", err.build(t));
-    return reply.redirect(err_to);
-  }
-
-  reply.redirect(req.url);
-  return reply;
-}
+import { cartesian } from "../utils/index.js";
 
 export async function get_step(req, reply) {
   let flash = reply.flash();
@@ -330,32 +203,21 @@ export async function get_attrs(req, reply) {
 
 export async function save_attrs(req, reply) {
   let id = req.params.id;
+  let return_to = req.query.return_to;
   let { options = [] } = req.body;
   await ListingService.update_variation_options(id, options);
+  return reply.redirect(return_to);
 }
 
+
+// export async function upsert_sku2({ listing_id, unit_price, currency, custom_sku, store_id, id, attributes }) {
 export async function save_combos(req, reply) {
-  let { variations } = req.body;
-  variations.forEach(console.log);
-}
-
-function cartesian(args) {
-  let r = [], max = args.length - 1;
-
-  function helper(arr, i) {
-    for (let j = 0, len = args[i].options?.length; j < len; j++) {
-      let a = arr.slice();
-      a.push({ key: args[i].key, label: args[i].name, value: args[i].options[j].value });
-      if (i == max) {
-        r.push(a);
-      } else {
-        helper(a, i + 1);
-      }
-    }
-  }
-
-  helper([], 0);
-  return r;
+  let { variation_data } = req.body;
+  let id = req.params.id;
+  let return_to = req.query.return_to;
+  let ability = req.ability;
+  await ListingService.update_one(ability, id, { variation_data: JSON.stringify(variation_data) });
+  return reply.redirect(return_to);
 }
 
 export async function get_combos(req, reply) {
@@ -431,11 +293,6 @@ export async function get_variations(req, reply) {
   return reply;
 }
 
-export async function get_new(req, reply) {
-  let id = Math.random().toString(32).slice(2);
-  reply.code(302).redirect(`/listings/wizard/${id}/1`);
-}
-
 export async function get_contact(req, reply) {
   let { hash_id } = req.params;
   let { region_id } = req.query;
@@ -489,14 +346,14 @@ export async function contact(req, reply) {
   let { listing_id, creator_id } = req.query;
   let { content } = req.body;
   let chats = await ChatService.get_listing_chats(listing_id);
-  let chat = await ChatService.get_member_chat(user.id, chats)
+  let chat = await ChatService.get_member_chat(user.id, chats);
 
   if (!chat) {
     let [new_chat, err] = await option(ChatService.create_chat({
       created_by: user.id,
       listing_id,
       members: [creator_id, user.id]
-    }))
+    }));
 
     if (err) {
       req.flash("err", err.build(t));
@@ -504,8 +361,8 @@ export async function contact(req, reply) {
       return reply;
     }
 
-    chat = new_chat
-    redis_client.publish("chats/new", JSON.stringify(chat))
+    chat = new_chat;
+    redis_client.publish("chats/new", JSON.stringify(chat));
   }
 
   let [sent, sent_err] = await option(
@@ -591,7 +448,6 @@ export async function submit_step(req, reply) {
     }
     case "2": {
       let { description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
-      console.log(variations);
       await Promise.all([
         // ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
         // ListingService.upsert_price(ability, { unit_price, currency, listing_sku_id }),

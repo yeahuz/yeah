@@ -5,11 +5,6 @@ import { policy_guard } from "../plugins/policy-guard.js";
 export let listing = async (fastify) => {
   fastify.route({
     method: "GET",
-    url: "/new",
-    handler: ListingController.get_new,
-  });
-  fastify.route({
-    method: "GET",
     url: "/:hash_id",
     handler: ListingController.get_one,
     config: { public: true }
@@ -55,6 +50,7 @@ export let listing = async (fastify) => {
     method: "POST",
     url: "/wizard/:id/combos",
     handler: ListingController.save_combos,
+    onRequest: policy_guard(),
   });
   fastify.route({
     method: "POST",

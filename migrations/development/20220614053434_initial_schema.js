@@ -466,6 +466,7 @@ export function up(knex) {
       t.string("url", 512);
       t.boolean("best_offer_enabled").defaultTo(false);
       t.specificType("variation_options", "INT[]").index(null, "GIN");
+      t.jsonb("variation_data").nullable();
       t.integer("store_id")
         .index()
         .references("id")

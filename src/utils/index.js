@@ -280,3 +280,22 @@ export function format_phone(phone) {
     "$1 $2 $3 $4"
   );
 }
+
+export function cartesian(args) {
+  let r = [], max = args.length - 1;
+
+  function helper(arr, i) {
+    for (let j = 0, len = args[i].options?.length; j < len; j++) {
+      let a = arr.slice();
+      a.push({ key: args[i].key, label: args[i].name, value: args[i].options[j].value, value_label: args[i].options[j].value_label });
+      if (i == max) {
+        r.push(a);
+      } else {
+        helper(a, i + 1);
+      }
+    }
+  }
+
+  helper([], 0);
+  return r;
+}

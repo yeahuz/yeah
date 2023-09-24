@@ -430,14 +430,14 @@ export async function seed(knex) {
         }
       ]);
 
-      let table_name = `${category.key}_listing_attributes`
+      let table_name = `${category.key}_listing_attributes`;
       await knex.schema.createTable(table_name, (t) => {
         t.bigInteger("listing_sku_id").index().notNullable().references("id").inTable("listing_skus").onDelete("CASCADE").primary();
         for (let column of category.columns) {
           if (column.type === "varchar" && column.nullable) t.string(column.name).nullable();
           else if (column.type === "integer" && column.nullable) t.integer(column.name).nullable();
-          else if (column.type === "integer") t.integer(column.name).notNullable()
-          else if (column.type === "varchar") t.string(column.name).notNullable()
+          else if (column.type === "integer") t.integer(column.name).notNullable();
+          else if (column.type === "varchar") t.string(column.name).notNullable();
         }
       });
 
@@ -450,7 +450,7 @@ export async function seed(knex) {
           category_id: inserted_category.id,
           units: column.units,
           required: !column.nullable
-        }).returning("id")
+        }).returning("id");
 
         await knex("attribute_2_translations").insert([
           {
@@ -907,7 +907,7 @@ export async function seed(knex) {
         {
           action: "update",
           subject: "Listing",
-          fields: ["title", "description", "attributes", "cover_id", "category_id", "quantity"],
+          fields: ["title", "description", "attributes", "cover_id", "category_id", "quantity", "variation_data"],
           conditions: { created_by: "return (user) => user.id" }
         },
         {

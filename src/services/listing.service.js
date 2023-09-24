@@ -47,7 +47,7 @@ export async function update_variation_options(id, options) {
 export async function resolve_variation_options(options, lang = "en") {
   let { rows } = await query(`
     select ao.attribute_id, at.name, a.key,
-    json_agg(json_build_object('value', coalesce(aot.name, ao.value || ' ' || ao.unit))) as options
+    json_agg(json_build_object('value_label', coalesce(aot.name, ao.value || ' ' || ao.unit), 'value', ao.value || coalesce(' ' || nullif(ao.unit, ''), ''))) as options
     from attribute_2_options ao
     left join attributes_2 a on a.id = ao.attribute_id
     left join attribute_2_option_translations aot on aot.attribute_option_id = ao.id and aot.language_id = $2
@@ -214,7 +214,7 @@ export async function get_many({
 export async function get_statuses({ lang = "en" }) {
   let { rows } = await query(`select ls.id, ls.code, ls.bg_hex, ls.fg_hex, lst.name from listing_statuses ls
     join listing_status_translations lst on lst.status_code = ls.code and language_id = $1
-  `, [lang.substring(0, 2)])
+  `, [lang.substring(0, 2)]);
 
   return rows;
 }
@@ -234,11 +234,11 @@ export async function update_one(ability, id, update) {
     params.push(update[keys[i]]);
     sql += keys[i] + "=" + `$${params.length}`;
     let is_last = i === len - 1;
-    if (!is_last) sql += ", "
+    if (!is_last) sql += ", ";
   }
 
   if (sql) {
-    let { rowCount, rows } = await query(`update listings set ${sql} where id = $1`, params)
+    let { rowCount, rows } = await query(`update listings set ${sql} where id = $1`, params);
 
     if (rowCount === 0) {
       //TODO: does not exist
@@ -280,7 +280,7 @@ export async function unlink_attachment(ability, listing_id, attachment_id) {
   return attachment_id;
 }
 
-export async function upsert_price(trx = { query }) {
+export function upsert_price(trx = { query }) {
   return async ({ unit_price, currency, listing_sku_id }) => {
     let { rows: [price] } = await trx.query(`insert into listing_sku_prices (unit_price, currency, listing_sku_id) values ($1, $2, $3) returning id`, [unit_price, currency, listing_sku_id]);
     await trx.query(`update listing_skus set price_id = $1 where id = $2`, [price.id, listing_sku_id]);
@@ -296,22 +296,25 @@ export async function update_listing_attributes(listing_id)  {
       let keys = Object.keys(fields);
       let values = Object.values(fields);
       let updates = keys.map((k, i) => `${k}=$${i + 2}`).join(", ");
-      return trx.query(`insert into ${escapeIdentifier(category.table_name)} (listing_sku_id, ${keys.join(", ")}) values ($1, ${values.map((_, i) => `$${i + 2}`).join(", ")})
-        on conflict(listing_sku_id) do update set ${updates}`,
-        [listing_sku_id, ...values]);
+      if (keys.length) {
+        return trx.query(`insert into ${escapeIdentifier(category.table_name)} (${["listing_sku_id", ...keys].join(", ")}) values (${["$1", ...values.map((_, i) => `$${i + 2}`)].join(", ")})
+          on conflict(listing_sku_id) do update set ${updates}`,
+          [listing_sku_id, ...values]);
+      }
+      return Promise.resolve();
     });
     return await Promise.all(promises);
   };
 }
 
-export async function upsert_sku2({ listing_id, price_id, unit_price, currency, custom_sku, store_id, id, attributes }) {
+export async function upsert_sku2({ listing_id, price_id, unit_price, currency, custom_sku, store_id, attributes }) {
   let update_attributes = await update_listing_attributes(listing_id);
   let trx = await start_trx();
   try {
     let { rows: [sku] } = await trx.query(`insert into listing_skus
-      (id, listing_id, price_id, custom_sku, store_id, id)
-      values ($1, $2, $3, $4, $5) returning id on conflict (listing_id, id) do update set price_id = $2, custom_sku = $3`, [listing_id, price_id, custom_sku, store_id, id]);
-    await Promise.all([upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }), update_attributes({ trx, lisitng_sku_id: sku.id, attributes })]);
+      (listing_id, price_id, custom_sku, store_id)
+      values ($1, $2, $3, $4) returning id`, [listing_id, price_id, custom_sku, store_id]);
+    await Promise.all([upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }), update_attributes({ trx, listing_sku_id: sku.id, attributes })]);
     await commit_trx(trx);
     return sku;
   } catch(err) {
