@@ -17,9 +17,9 @@
           <option disabled selected></option>
           <% attribute.options.forEach(function (option) {%>
             <% if (option.unit) { %>
-              <option value="<%= option.value %> <%= option.unit %>" <%= it.variants[0][attribute.key] === option.value + " " + option.unit ? "selected" : "" %>><%= option.name %> <%= option.unit %></option>
+              <option value="<%= option.value %> <%= option.unit %>" <%= it.variants?.[0]?.[attribute.key] === option.value + " " + option.unit ? "selected" : "" %>><%= option.name %> <%= option.unit %></option>
             <% } else { %>
-              <option value="<%= option.value %>" <%= it.variants[0][attribute.key] === option.value ? "selected" : "" %>><%= option.name %></option>
+              <option value="<%= option.value %>" <%= it.variants?.[0]?.[attribute.key] === option.value ? "selected" : "" %>><%= option.name %></option>
             <% } %>
           <% }) %>
         </select>

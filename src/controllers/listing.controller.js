@@ -57,6 +57,7 @@ export async function get_step(req, reply) {
     case "2": {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
       let variants = await ListingService.get_variants(listing);
+      console.log({ variants });
       let attributes = [];
       let selected_attributes = [];
       if (listing) {
@@ -458,7 +459,17 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`);
     }
     case "2": {
-      let { description, currency, cover_id, unit_price, quantity, discounts = [], variations = [], attributes = {}, listing_sku_id } = req.body;
+      let { description, currency, cover_id, unit_price, quantity, discounts = [], attributes = {}, listing_sku_id } = req.body;
+      let [listing] = await Promise.all([
+        ListingService.get_one({ id }),
+        ListingService.cleanup_skus({ listing_id: id })
+      ]);
+      if (listing.temp_variations.length) {
+        await Promise.all(listing.temp_variations.map((variation) => {
+          return ListingService.upsert_sku2({ listing_id: id, ...variation, attributes: { ...attributes, ...variation.attributes } })
+        }));
+      }
+      await ListingService.update_one(ability, id, { description, cover_id });
       await Promise.all([
         // ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
         // ListingService.upsert_price(ability, { unit_price, currency, listing_sku_id }),

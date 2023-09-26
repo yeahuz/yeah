@@ -1,4 +1,5 @@
 <section>
+  <input type="hidden" name="currency" value="USD" />
   <% let groups = it.listing.discounts?.reduce((acc, curr) => { acc[curr.min_qty_value] = curr; return acc; }, {}) || {} %>
   <h2 class="font-semibold mb-4 uppercase"><%= it.t("form.pricing.heading", { ns: "new-listing" })%></h2>
   <div class="grid grid-cols-12 gap-4 <%= it.selected_attributes?.length ? '' : ''%>">
@@ -13,27 +14,8 @@
         <%= it.t("form.pricing.price", { ns: "new-listing" }) %>
       </span>
       <div class="flex mt-2">
-        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-r-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" placeholder="<%= it.t("form.price.placeholder", { ns: "new-listing" }) %>" <%= it.selected_attributes?.length ? "disabled" : "required"%> />
-        <div class="relative min-w-fit">
-          <select form="listing-form" name="currency" class="form-control !rounded-l-none mr-6" <%= it.selected_attributes?.length ? "disabled" : "required"%>>
-            <option value="USD" <%= it.variants?.[0]?.currency === "USD" || !it.variants?.[0]?.currency ? "selected" : "" %>>USD</option>
-            <option value="UZS" <%= it.variants?.[0]?.currency === "UZS" ? "selected" : "" %>>UZS</option>
-          </select>
-          <svg
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
-          >
-            <path
-              d="m6 9 6 6 6-6"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
+        <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-l-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" <%= it.selected_attributes?.length ? "disabled" : "required"%> />
       </div>
     </div>
   </div>

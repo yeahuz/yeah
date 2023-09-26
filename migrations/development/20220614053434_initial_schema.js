@@ -468,7 +468,7 @@ export function up(knex) {
       t.boolean("best_offer_enabled").defaultTo(false);
       t.specificType("attributes", "INT[]").index(null, "GIN");
       t.specificType("attribute_options", "INT[]").index(null, "GIN");
-      t.jsonb("temp_variations").nullable();
+      t.jsonb("temp_variations").defaultTo([])
       t.integer("store_id")
         .index()
         .references("id")

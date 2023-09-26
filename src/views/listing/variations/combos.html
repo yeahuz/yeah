@@ -24,12 +24,13 @@
         </tr>
       </thead>
       <tbody class="text-sm divide-y divide-gray-200 dark:divide-zinc-800 js-tbody">
-        <% let variations_map = it.listing.temp_variations.reduce((acc, curr) => { acc[curr.id] = curr; return acc; }, {})%>
+        <% let variations_map = it.listing.temp_variations?.reduce((acc, curr) => { acc[curr.id] = curr; return acc; }, {})%>
         <% it.combos.forEach(function (combo, idx) { %>
           <tr>
             <input type="hidden" name="temp_variations[<%= idx %>].id" value="<%= combo.id %>" />
+            <input type="hidden" name="temp_variations[<%= idx %>].currency" value="USD" />
             <td class="font-medium pl-0 p-3 text-gray-900 dark:text-white">
-              <input type="text" class="form-control" name="temp_variations[<%= idx %>].sku" value="<%= variations_map[combo.id].sku ?? ""%>" />
+              <input type="text" class="form-control" name="temp_variations[<%= idx %>].custom_sku" value="<%= variations_map?.[combo.id]?.custom_sku ?? ""%>" />
             </td>
             <% combo.items.forEach(function (item) { %>
               <td class="font-medium p-3 text-gray-900 dark:text-white">
@@ -38,32 +39,12 @@
               </td>
             <% }) %>
             <td class="font-medium p-3 text-gray-900 dark:text-white">
-              <input type="number" name="temp_variations[<%= idx %>].quantity" class="form-control" value="<%= variations_map[combo.id].quantity ?? "1" %>" />
+              <input type="number" name="temp_variations[<%= idx %>].quantity" class="form-control" value="<%= variations_map?.[combo.id]?.quantity ?? "1" %>" />
             </td>
             <td class="font-medium p-3 text-gray-900 dark:text-white">
               <div class="flex">
-                <input class="form-control !rounded-r-none" name="temp_variations[<%= idx %>].unit_price" value="<%= variations_map[combo.id].unit_price ?? "0"%>" required autocomplete="off" inputmode="numeric" min="0", type="number" />
-                <div class="relative min-w-fit">
-                  <select class="form-control !rounded-l-none mr-6" name="temp_variations[<%= idx %>].currency">
-                    <option value="USD" <%= variations_map[combo.id].currency === "USD" ? "selected" : ""%>>USD</option>
-                    <option value="UZS" <%= variations_map[combo.id].currency === "UZS" ? "selected" : ""%>>UZS</option>
-                  </select>
-                  <svg
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    class="w-5 h-5 absolute top-1/2 -translate-y-1/2 right-[14px] text-gray-500 pointer-events-none"
-                  >
-                    <path
-                      d="m6 9 6 6 6-6"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
+                <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+                <input type="number" value="<%= variations_map?.[combo.id]?.unit_price ?? "" %>" class="form-control !rounded-l-none" name="temp_variations[<%= idx %>].unit_price" inputmode="numeric" min="0" autocomplete="off" <%= it.selected_attributes?.length ? "disabled" : "required"%> /> </div>
             </td>
           </tr>
         <% }) %>

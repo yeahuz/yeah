@@ -1,5 +1,6 @@
 import * as AttachmentService from "./attachment.service.js";
 import * as CategoryService from "./category.service.js";
+import * as InventoryService from "./inventory.service.js";
 import { AuthorizationError, InternalError } from "../utils/errors.js";
 import { commit_trx, start_trx, rollback_trx, query, prepare_bulk_insert, escapeIdentifier } from "./db.service.js";
 import { subject } from "@casl/ability";
@@ -63,10 +64,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   // ${relation.price ? `, row_to_json(lp) as price` : ''}
   // ${relation.attributes ? `, coalesce(array_agg(row_to_json(lb)) filter (where lb.attribute_id is not null), '{}') as attributes` : ''}
   let sql = `
-    select l.*,
-    min(lsp.unit_price) as start_price,
-    max(lsp.unit_price) as max_price,
-    lsp.currency
+    select l.*
     ${relation.location ? `, row_to_json(ll) as location` : ''}
     ${relation.attachments ? `, coalesce(array_agg(row_to_json(a) order by la.display_order asc) filter (where a.id is not null), '{}') as attachments` : ''}
     ${relation.discounts ? `, coalesce(ld.discounts, '[]') as discounts` : ''}
@@ -74,10 +72,11 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
     ${relation.attachments ? `
     left join listing_attachments la on la.listing_id = l.id
     left join attachments a on a.id = la.attachment_id` : ''}
-    left join listing_skus ls on ls.listing_id = l.id
-    left join listing_sku_prices lsp on lsp.listing_sku_id = ls.id
     ${relation.location ? `left join listing_location ll on ll.listing_id = l.id` : ''}
   `;
+
+  // left join listing_skus ls on ls.listing_id = l.id
+  // left join listing_sku_prices lsp on lsp.listing_sku_id = ls.id
 
   // if (relation.attributes) {
   //   params.push(lang.substring(0, 2));
@@ -101,7 +100,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   //   sql += ` left join listing_prices lp on lp.id = l.price_id`;
   // }
 
-  sql += ` where l.id = $1 group by l.id, lsp.currency`;
+  sql += ` where l.id = $1 group by l.id`;
 
   if (relation.discounts) sql += `, ld.discounts`;
   // if (relation.price) sql += ', lp.*'
@@ -206,7 +205,6 @@ export async function get_many({
 
   sql += ` order by l.id limit $3`;
   let { rows } = await query(sql, params);
-  console.log({ rows });
   return await cursor_paginate(rows);
 }
 
@@ -306,14 +304,18 @@ export async function update_listing_attributes(listing_id) {
   };
 }
 
-export async function upsert_sku2({ listing_id, price_id, unit_price, currency, custom_sku, store_id, attributes }) {
+export async function upsert_sku2({ listing_id, price_id, unit_price, currency, custom_sku, store_id, attributes, quantity }) {
   let update_attributes = await update_listing_attributes(listing_id);
   let trx = await start_trx();
   try {
     let { rows: [sku] } = await trx.query(`insert into listing_skus
       (listing_id, price_id, custom_sku, store_id)
       values ($1, $2, $3, $4) returning id`, [listing_id, price_id, custom_sku, store_id]);
-    await Promise.all([upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }), update_attributes({ trx, listing_sku_id: sku.id, attributes })]);
+    await Promise.all([
+      InventoryService.add_trx(trx)({ listing_sku_id: sku.id, quantity }),
+      upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }),
+      update_attributes({ trx, listing_sku_id: sku.id, attributes })
+    ]);
     await commit_trx(trx);
     return sku;
   } catch (err) {
@@ -321,6 +323,11 @@ export async function upsert_sku2({ listing_id, price_id, unit_price, currency, 
     rollback_trx(trx);
     throw new InternalError();
   }
+}
+
+export async function cleanup_skus({ listing_id }) {
+  let { rowCount } = await query(`delete from listing_skus where listing_id = $1`, [listing_id]);
+  return rowCount;
 }
 
 export async function upsert_discounts(ability, id, discounts = []) {
