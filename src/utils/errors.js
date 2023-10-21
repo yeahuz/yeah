@@ -3,7 +3,7 @@ import { i18next } from "./i18n.js";
 export class DomainError extends Error {
   #t = i18next.getFixedT("en");
 
-  constructor({ key, status_code, view, errors = [], params } = {}) {
+  constructor({ key, status_code, view, errors = [], params, raw } = {}) {
     super();
     this.key = key;
     this.status_code = status_code;
@@ -12,6 +12,7 @@ export class DomainError extends Error {
     this.params = params;
     this.message = this.#t(key, { ns: "errors", ...this.params });
     this.name = this.constructor.name;
+    this.raw = raw;
     Error.captureStackTrace(this, this.constructor);
   }
 
@@ -69,8 +70,8 @@ export class BadRequestError extends DomainError {
 }
 
 export class InternalError extends DomainError {
-  constructor({ key = "generic_internal" } = {}) {
-    super({ key, status_code: 500 });
+  constructor({ key = "generic_internal", raw } = {}) {
+    super({ key, status_code: 500, raw });
   }
 }
 

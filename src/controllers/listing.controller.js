@@ -4,6 +4,7 @@ import * as AttachmentService from "../services/attachment.service.js";
 import * as CFImageService from "../services/cfimg.service.js";
 import * as ListingService from "../services/listing.service.js";
 import * as InventoryService from "../services/inventory.service.js";
+import * as PromotionService from "../services/promotion.service.js";
 import * as AttributeService from "../services/attribute.service.js";
 import * as RegionService from "../services/region.service.js";
 import * as ChatService from "../services/chat.service.js";
@@ -459,26 +460,23 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`);
     }
     case "2": {
-      let { description, currency, cover_id, unit_price, quantity, discounts = [], attributes = {}, listing_sku_id } = req.body;
+      let { description, currency, cover_id, unit_price, quantity, discount_rules = [], attributes = {}, best_offer_enabled } = req.body;
+      console.log(discount_rules);
       let [listing] = await Promise.all([
         ListingService.get_one({ id }),
         ListingService.cleanup_skus({ listing_id: id })
       ]);
       if (listing.temp_variations.length) {
         await Promise.all(listing.temp_variations.map((variation) => {
-          return ListingService.upsert_sku2({ listing_id: id, ...variation, attributes: { ...attributes, ...variation.attributes } })
+          return ListingService.upsert_sku({ listing_id: id, ...variation, attributes: { ...attributes, ...variation.attributes } })
         }));
+      } else {
+        console.log({ currency, unit_price, quantity, attributes })
+        await ListingService.upsert_sku({ listing_id: id, currency, unit_price, quantity, attributes });
       }
-      await ListingService.update_one(ability, id, { description, cover_id });
-      await Promise.all([
-        // ListingService.update_listing_attributes({ listing_sku_id, listing_id: id, attributes }),
-        // ListingService.upsert_price(ability, { unit_price, currency, listing_sku_id }),
-        // InventoryService.add({ listing_sku_id, quantity }),
-        //ListingService.upsert_sku({ listing_id: id, price_id })
-        // ListingService.update_one(ability, id, { description, cover_id }),
-        // ListingService.upsert_price(ability, { unit_price, currency, id }),
-        // ListingService.upsert_discounts(ability, id, discounts)
-      ]);
+
+      await ListingService.update_one(ability, id, { description, cover_id, best_offer_enabled });
+      await PromotionService.add_volume_pricing({ rules: discount_rules })
       //return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
     }
     default:

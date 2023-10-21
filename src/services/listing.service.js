@@ -32,13 +32,6 @@ export async function create_one({ title, description, status, created_by, categ
   }
 }
 
-export async function upsert_sku({ listing_id, price_id, custom_sku, store_id, id }) {
-  let { rows } = await query(`insert into listing_skus
-    (id, listing_id, price_id, custom_sku, store_id, id)
-    values ($1, $2, $3, $4, $5) returning id on conflict (listing_id, id) do update set price_id = $2, custom_sku = $3`, [listing_id, price_id, custom_sku, store_id, id]);
-  return rows[0];
-}
-
 export async function update_variation_options(id, options) {
   let { rows } = await query(`update listings set variation_options = $1 where id = $2`, [options, id]);
   return rows[0];
@@ -304,7 +297,7 @@ export async function update_listing_attributes(listing_id) {
   };
 }
 
-export async function upsert_sku2({ listing_id, price_id, unit_price, currency, custom_sku, store_id, attributes, quantity }) {
+export async function upsert_sku({ listing_id, price_id, unit_price, currency, custom_sku, store_id, attributes, quantity }) {
   let update_attributes = await update_listing_attributes(listing_id);
   let trx = await start_trx();
   try {

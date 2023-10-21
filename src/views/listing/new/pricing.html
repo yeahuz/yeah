@@ -1,5 +1,5 @@
 <section>
-  <input type="hidden" name="currency" value="USD" />
+  <input type="hidden" name="currency" form="listing-form" value="USD" />
   <% let groups = it.listing.discounts?.reduce((acc, curr) => { acc[curr.min_qty_value] = curr; return acc; }, {}) || {} %>
   <h2 class="font-semibold mb-4 uppercase"><%= it.t("form.pricing.heading", { ns: "new-listing" })%></h2>
   <div class="grid grid-cols-12 gap-4 <%= it.selected_attributes?.length ? '' : ''%>">
@@ -20,13 +20,13 @@
     </div>
   </div>
   <div class="flex flex-col justify-between py-6 px-4 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
-    <input form="listing-form" type="checkbox" name="offers_enabled" id="offers-enabled" class="checkbox-input appearance-none peer" />
+    <input form="listing-form" type="checkbox" name="best_offer_enabled" id="best-offer-enabled" class="checkbox-input appearance-none peer" />
     <div class="flex justify-between items-start w-full group">
       <div class="w-full">
-        <label for="offers-enabled" class="font-semibold"><%= it.t("form.pricing.allow_offers", { ns: "new-listing" })%></label>
+        <label for="best-offer-enabled" class="font-semibold"><%= it.t("form.pricing.allow_offers", { ns: "new-listing" })%></label>
         <p class="text-sm"><%= it.t("form.pricing.allow_offers_description", { ns: "new-listing" })%></p>
       </div>
-      <label for="offers-enabled" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px
+      <label for="best-offer-enabled" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px
             ring-offset-white dark:ring-offset-zinc-900 peer-focus:group-[]:ring-2 peer-focus:group-[]:ring-primary-600 peer-focus:group-[]:ring-offset-2">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
           <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -36,11 +36,17 @@
     <div class="grid-cols-12 mt-4 gap-4 hidden peer-checked:grid">
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
         <%= it.t("form.pricing.minimum", { ns: "new-listing" }) %>
-        <input form="listing-form" type="number" class="form-control mt-2" value="1" placeholder="1" name="minimum" required />
+        <div class="flex mt-2">
+          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+          <input form="listing-form" type="number" class="form-control !rounded-l-none" value="1" name="best_offer_minimum" inputmode="numeric" min="1" autocomplete="off" required />
+        </div>
       </label>
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
         <%= it.t("form.pricing.auto_accept", { ns: "new-listing" }) %>
-        <input form="listing-form" type="number" class="form-control mt-2" value="1" placeholder="1" name="auto_accept" required />
+        <div class="flex mt-2">
+          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+          <input form="listing-form" type="number" class="form-control !rounded-l-none" value="1" name="best_offer_accept" inputmode="numeric" min="1" autocomplete="off" required />
+        </div>
       </label>
     </div>
   </div>
@@ -62,7 +68,9 @@
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-3">
         Buy 2 and save
         <div class="relative">
-          <select class="form-control mt-2 block" name="discounts.1.value" form="listing-form">
+          <input type="hidden" name="discount_rules.0.specification.min_quantity" value="2" form="listing-form" />
+          <input type="hidden" name="discount_rules.0.benefit.unit" value="PERCENT" form="listing-form" />
+          <select class="form-control mt-2 block" name="discount_rules.0.benefit.value" form="listing-form">
             <% for (let i = 1; i <= 80; i++) {%>
             <option <%= groups["2"]?.value === String(i) ? "selected" : "" %> value="<%= i %>"><%= i %>%</option>
             <% } %>
@@ -86,7 +94,9 @@
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-3">
         Buy 3 and save
         <div class="relative">
-          <select class="form-control mt-2 block" name="discounts.2.value" form="listing-form">
+          <input type="hidden" name="discount_rules.1.specification.min_quantity" value="3" form="listing-form" />
+          <input type="hidden" name="discount_rules.1.benefit.unit" value="PERCENT" form="listing-form" />
+          <select class="form-control mt-2 block" name="discount_rules.1.benefit.value" form="listing-form">
             <% for (let i = 1; i <= 80; i++) {%>
             <option <%= groups["3"]?.value === String(i) ? "selected" : "" %> value="<%= i %>"><%= i %>%</option>
             <% } %>
@@ -110,7 +120,9 @@
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-3">
         Buy 4 and save
         <div class="relative">
-          <select class="form-control mt-2 block" name="discounts.3.value" form="listing-form">
+          <input type="hidden" name="discount_rules.2.specification.min_quantity" value="4" form="listing-form" />
+          <input type="hidden" name="discount_rules.2.benefit.unit" value="PERCENT" form="listing-form" />
+          <select class="form-control mt-2 block" name="discount_rules.2.benefit.value" form="listing-form">
             <% for (let i = 1; i <= 80; i++) {%>
             <option <%= groups["4"]?.value === String(i) ? "selected" : "" %> value="<%= i %>"><%= i %>%</option>
             <% } %>
