@@ -461,22 +461,20 @@ export async function submit_step(req, reply) {
     }
     case "2": {
       let { description, currency, cover_id, unit_price, quantity, discount_rules = [], attributes = {}, best_offer_enabled } = req.body;
-      console.log(discount_rules);
       let [listing] = await Promise.all([
         ListingService.get_one({ id }),
         ListingService.cleanup_skus({ listing_id: id })
       ]);
       if (listing.temp_variations.length) {
         await Promise.all(listing.temp_variations.map((variation) => {
-          return ListingService.upsert_sku({ listing_id: id, ...variation, attributes: { ...attributes, ...variation.attributes } })
+          return ListingService.upsert_sku({ listing_id: id, created_by: user.id, ...variation, attributes: { ...attributes, ...variation.attributes } })
         }));
       } else {
-        console.log({ currency, unit_price, quantity, attributes })
-        await ListingService.upsert_sku({ listing_id: id, currency, unit_price, quantity, attributes });
+        await ListingService.upsert_sku({ listing_id: id, created_by: user.id, currency, unit_price, quantity, attributes });
       }
 
       await ListingService.update_one(ability, id, { description, cover_id, best_offer_enabled });
-      await PromotionService.add_volume_pricing({ rules: discount_rules })
+      await PromotionService.add_volume_pricing({ rules: discount_rules, created_by: user.id })
       //return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
     }
     default:

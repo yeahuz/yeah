@@ -297,13 +297,13 @@ export async function update_listing_attributes(listing_id) {
   };
 }
 
-export async function upsert_sku({ listing_id, price_id, unit_price, currency, custom_sku, store_id, attributes, quantity }) {
+export async function upsert_sku({ listing_id, price_id, unit_price, currency, custom_sku, created_by, attributes, quantity }) {
   let update_attributes = await update_listing_attributes(listing_id);
   let trx = await start_trx();
   try {
     let { rows: [sku] } = await trx.query(`insert into listing_skus
-      (listing_id, price_id, custom_sku, store_id)
-      values ($1, $2, $3, $4) returning id`, [listing_id, price_id, custom_sku, store_id]);
+      (listing_id, price_id, custom_sku, created_by)
+      values ($1, $2, $3, $4) returning id`, [listing_id, price_id, custom_sku, created_by]);
     await Promise.all([
       InventoryService.add_trx(trx)({ listing_sku_id: sku.id, quantity }),
       upsert_price(trx)({ unit_price, currency, listing_sku_id: sku.id }),

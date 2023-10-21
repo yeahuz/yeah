@@ -69,7 +69,7 @@
         Buy 2 and save
         <div class="relative">
           <input type="hidden" name="discount_rules.0.specification.min_quantity" value="2" form="listing-form" />
-          <input type="hidden" name="discount_rules.0.benefit.unit" value="PERCENT" form="listing-form" />
+          <input type="hidden" name="discount_rules.0.benefit.unit" value="PERCENTAGE" form="listing-form" />
           <select class="form-control mt-2 block" name="discount_rules.0.benefit.value" form="listing-form">
             <% for (let i = 1; i <= 80; i++) {%>
             <option <%= groups["2"]?.value === String(i) ? "selected" : "" %> value="<%= i %>"><%= i %>%</option>
@@ -95,7 +95,7 @@
         Buy 3 and save
         <div class="relative">
           <input type="hidden" name="discount_rules.1.specification.min_quantity" value="3" form="listing-form" />
-          <input type="hidden" name="discount_rules.1.benefit.unit" value="PERCENT" form="listing-form" />
+          <input type="hidden" name="discount_rules.1.benefit.unit" value="PERCENTAGE" form="listing-form" />
           <select class="form-control mt-2 block" name="discount_rules.1.benefit.value" form="listing-form">
             <% for (let i = 1; i <= 80; i++) {%>
             <option <%= groups["3"]?.value === String(i) ? "selected" : "" %> value="<%= i %>"><%= i %>%</option>
@@ -121,7 +121,7 @@
         Buy 4 and save
         <div class="relative">
           <input type="hidden" name="discount_rules.2.specification.min_quantity" value="4" form="listing-form" />
-          <input type="hidden" name="discount_rules.2.benefit.unit" value="PERCENT" form="listing-form" />
+          <input type="hidden" name="discount_rules.2.benefit.unit" value="PERCENTAGE" form="listing-form" />
           <select class="form-control mt-2 block" name="discount_rules.2.benefit.value" form="listing-form">
             <% for (let i = 1; i <= 80; i++) {%>
             <option <%= groups["4"]?.value === String(i) ? "selected" : "" %> value="<%= i %>"><%= i %>%</option>

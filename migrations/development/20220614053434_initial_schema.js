@@ -16,20 +16,11 @@ let ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
 `;
 
 let DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION = `DROP FUNCTION on_payment_status_update`;
-let DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT = `ALTER TABLE discount_benefits ADD CONSTRAINT "db_curreny_code_is_not_null_check"
+let DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT = `ALTER TABLE discount_benefits ADD CONSTRAINT "db_currency_code_is_not_null_check"
   CHECK (
     unit = 'PERCENTAGE'
     OR currency is not null
   )`
-
-let DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT = `ALTER TABLE discount_specifications ADD CONSTRAINT "ds_curreny_code_is_not_null_check"
-  CHECK (
-    min_amount is not null
-    OR min_amount_currency is not null
-    AND
-    for_each_amount is not null
-    OR for_each_amount_currency is not null
-  )`;
 
 export function up(knex) {
   return knex.schema
@@ -432,22 +423,6 @@ export function up(knex) {
       t.string("symbol", 10);
       t.timestamps(false, true);
     })
-    .createTable("stores", (t) => {
-      t.increments("id");
-      t.string("url").notNullable();
-      t.bigInteger("banner_id")
-        .index()
-        .references("id")
-        .inTable("attachments")
-        .onDelete("CASCADE");
-      t.bigInteger("logo_id")
-        .index()
-        .references("id")
-        .inTable("attachments")
-        .onDelete("CASCADE");
-      t.string("description");
-      t.timestamps(false, true);
-    })
     .createTable("listing_sku_prices", (t) => {
       t.bigIncrements("id");
       t.string("currency")
@@ -469,11 +444,6 @@ export function up(knex) {
       t.specificType("attributes", "INT[]").index(null, "GIN");
       t.specificType("attribute_options", "INT[]").index(null, "GIN");
       t.jsonb("temp_variations").defaultTo([])
-      t.integer("store_id")
-        .index()
-        .references("id")
-        .inTable("stores")
-        .onDelete("CASCADE");
       t.bigInteger("cover_id")
         .index()
         .references("id")
@@ -512,14 +482,14 @@ export function up(knex) {
         .references("id")
         .inTable("listing_sku_prices")
         .onDelete("CASCADE");
-      t.integer("store_id")
+      t.bigInteger("created_by")
         .index()
+        .notNullable()
         .references("id")
-        .inTable("stores")
+        .inTable("users")
         .onDelete("CASCADE");
       t.string("custom_sku");
       t.unique(["listing_id", "price_id"]);
-      t.unique(["custom_sku", "store_id", "listing_id"]);
       t.timestamps(false, true);
     })
     .table("listing_sku_prices", (t) => {
@@ -563,11 +533,11 @@ export function up(knex) {
       t.string("description");
       t.timestamp("end_date");
       t.timestamp("start_date");
-      t.integer("store_id")
+      t.bigInteger("created_by")
         .index()
         .notNullable()
         .references("id")
-        .inTable("stores")
+        .inTable("users")
         .onDelete("CASCADE");
       t.timestamps(false, true);
     })
@@ -1347,7 +1317,6 @@ export function up(knex) {
     })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION))
     .then(() => knex.raw(DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT))
-    .then(() => knex.raw(DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT));
 }
 
 export async function down(knex) {
@@ -1374,7 +1343,7 @@ export async function down(knex) {
     listing_condition_translations, listing_conditions, listing_shipping_details,
     listing_shipping_services, listing_sku_attributes, listing_skus, promotion_criterion_categories,
     promotion_criterion_conditions, promotion_criterion_skus, promotion_status_translations, promotion_statuses,
-    promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations, stores,
+    promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations,
     attributes_2, attribute_2_options
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
