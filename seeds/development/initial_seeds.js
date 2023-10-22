@@ -54,6 +54,21 @@ export async function seed(knex) {
     }
   }
 
+  async function insert_best_offer_stuff() {
+    let { statuses } = JSON.parse(fs.readFileSync(process.cwd() + "/src/data/best-offers.json", "utf-8"));
+    for (let status of statuses) {
+      await knex("best_offer_statuses").insert({
+        id: status.id
+      });
+      for (let lang in status.translations) {
+        let { name } = status.translations[lang];
+        await knex("best_offer_status_translations").insert({
+          name, language_id: lang, status_id: status.id
+        })
+      }
+    }
+  }
+
   async function insert_regions() {
     let { cities: regions } = JSON.parse(
       fs.readFileSync(process.cwd() + "/src/data/soato.json", "utf-8")
@@ -999,6 +1014,7 @@ export async function seed(knex) {
 
   await Promise.all([
     insert_regions(),
-    insert_promotion_stuff()
+    insert_promotion_stuff(),
+    insert_best_offer_stuff()
   ]);
 }

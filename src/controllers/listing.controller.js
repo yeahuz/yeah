@@ -58,7 +58,6 @@ export async function get_step(req, reply) {
     case "2": {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
       let variants = await ListingService.get_variants(listing);
-      console.log({ variants });
       let attributes = [];
       let selected_attributes = [];
       if (listing) {
@@ -475,7 +474,7 @@ export async function submit_step(req, reply) {
 
       await ListingService.update_one(ability, id, { description, cover_id, best_offer_enabled });
       await PromotionService.add_volume_pricing({ rules: discount_rules, created_by: user.id })
-      //return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
+      return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
     }
     default:
       break;

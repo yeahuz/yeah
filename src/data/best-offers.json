@@ -1,0 +1,130 @@
+{
+  "statuses": [
+    {
+      "id": "ACCEPTED",
+      "translations": {
+        "en": {
+          "name": "Accepted"
+        },
+        "ru": {
+          "name": "Принятый"
+        },
+        "uz": {
+          "name": "Qabul qilingan"
+        }
+      }
+    },
+    {
+      "id": "ACTIVE",
+      "translations": {
+        "en": {
+          "name": "Active"
+        },
+        "ru": {
+          "name": "Активный"
+        },
+        "uz": {
+          "name": "Faol"
+        }
+      }
+    },
+    {
+      "id": "COUNTERED",
+      "translations": {
+        "en": {
+          "name": "Countered"
+        },
+        "ru": {
+          "name": "Контрпредложение"
+        },
+        "uz": {
+          "name": "Qarshi taklif"
+        }
+      }
+    },
+    {
+      "id": "DECLINED",
+      "translations": {
+        "en": {
+          "name": "Declined"
+        },
+        "ru": {
+          "name": "Отклоненный"
+        },
+        "uz": {
+          "name": "Rad etildi"
+        }
+      }
+    },
+    {
+      "id": "EXPIRED",
+      "translations": {
+        "en": {
+          "name": "Expired"
+        },
+        "ru": {
+          "name": "Истекший"
+        },
+        "uz": {
+          "name": "Muddati tugagan"
+        }
+      }
+    },
+    {
+      "id": "PENDING",
+      "translations": {
+        "en": {
+          "name": "Pending"
+        },
+        "ru": {
+          "name": "В ожидании"
+        },
+        "uz": {
+          "name": "Kutilmoqda"
+        }
+      }
+    },
+    {
+      "id": "PENDING_BUYER_CONFIRMATION",
+      "translations": {
+        "en": {
+          "name": "Pending buyer confirmation"
+        },
+        "ru": {
+          "name": "Ожидает подтверждения покупателя"
+        },
+        "uz": {
+          "name": "Xaridor tasdiqlanishi kutilmoqda"
+        }
+      }
+    },
+    {
+      "id": "PENDING_BUYER_PAYMENT",
+      "translations": {
+        "en": {
+          "name": "Pending payment"
+        },
+        "ru": {
+          "name": "Ожидает платежа"
+        },
+        "uz": {
+          "name": "Toʻlov kutilmoqda"
+        }
+      }
+    },
+    {
+      "id": "RETRACTED",
+      "translations": {
+        "en": {
+          "name": "Retracted"
+        },
+        "ru": {
+          "name": "Отозванный"
+        },
+        "uz": {
+          "name": "Qaytarilgan"
+        }
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+
 let ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
   CREATE OR REPLACE FUNCTION on_payment_status_update() RETURNS trigger AS $$
   BEGIN
@@ -16,20 +17,11 @@ let ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
 `;
 
 let DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION = `DROP FUNCTION on_payment_status_update`;
-let DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT = `ALTER TABLE discount_benefits ADD CONSTRAINT "db_curreny_code_is_not_null_check"
+let DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT = `ALTER TABLE discount_benefits ADD CONSTRAINT "db_currency_code_is_not_null_check"
   CHECK (
     unit = 'PERCENTAGE'
     OR currency is not null
   )`
-
-let DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT = `ALTER TABLE discount_specifications ADD CONSTRAINT "ds_curreny_code_is_not_null_check"
-  CHECK (
-    min_amount is not null
-    OR min_amount_currency is not null
-    AND
-    for_each_amount is not null
-    OR for_each_amount_currency is not null
-  )`;
 
 export function up(knex) {
   return knex.schema
@@ -428,26 +420,11 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("currencies", (t) => {
-      t.string("id").primary();
+      t.string("id", 10).primary();
+      t.string("symbol", 10);
       t.timestamps(false, true);
     })
-    .createTable("stores", (t) => {
-      t.increments("id");
-      t.string("url").notNullable();
-      t.bigInteger("banner_id")
-        .index()
-        .references("id")
-        .inTable("attachments")
-        .onDelete("CASCADE");
-      t.bigInteger("logo_id")
-        .index()
-        .references("id")
-        .inTable("attachments")
-        .onDelete("CASCADE");
-      t.string("description");
-      t.timestamps(false, true);
-    })
-    .createTable("listing_prices", (t) => {
+    .createTable("listing_sku_prices", (t) => {
       t.bigIncrements("id");
       t.string("currency")
         .index()
@@ -456,7 +433,24 @@ export function up(knex) {
         .inTable("currencies")
         .onDelete("CASCADE");
       t.bigInteger("unit_price");
-      t.bigInteger("listing_id").index().notNullable();
+      t.bigInteger("listing_sku_id").index().notNullable();
+      t.timestamps(false, true);
+    })
+    .createTable("listing_policies", (t) => {
+      t.bigIncrements("id");
+      t.boolean("best_offer_enabled").defaultTo(false);
+      t.bigInteger("best_offer_autoaccept");
+      t.bigInteger("best_offer_minimum");
+      t.string("best_offer_minimum_currency")
+        .index()
+        .references("id")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      t.string("best_offer_autoaccept_currency")
+        .index()
+        .references("id")
+        .inTable("currencies")
+        .onDelete("CASCADE");
       t.timestamps(false, true);
     })
     .createTable("listings", (t) => {
@@ -464,18 +458,15 @@ export function up(knex) {
       t.string("title");
       t.text("description");
       t.string("url", 512);
-      t.specificType("attribute_set", "INT[]").index(null, "GIN").defaultTo('{}');
-      t.boolean("best_offer_enabled").defaultTo(false);
-      t.integer("store_id")
-        .index()
-        .references("id")
-        .inTable("stores")
-        .onDelete("CASCADE");
-      t.bigInteger("price_id")
-        .index()
-        .references("id")
-        .inTable("listing_prices")
-        .onDelete("CASCADE");
+      t.specificType("attributes", "INT[]").index(null, "GIN");
+      t.specificType("attribute_options", "INT[]").index(null, "GIN");
+      t.jsonb("temp_variations").defaultTo([])
+      t.bigInteger("policy_id")
+       .index()
+       .notNullable()
+       .references("id")
+       .inTable("listing_policies")
+       .onDelete("CASCADE");
       t.bigInteger("cover_id")
         .index()
         .references("id")
@@ -486,7 +477,7 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("categories")
-        .onDelete("CASCADE")
+        .onDelete("CASCADE");
       t.bigInteger("created_by")
         .index()
         .notNullable()
@@ -501,30 +492,6 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.timestamps(false, true);
     })
-    .table("listing_prices", (t) => {
-      t.foreign("listing_id").references("id").inTable("listings").onDelete("CASCADE");
-    })
-    .createTable("listing_attributes", (t) => {
-      t.bigInteger("listing_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("listings")
-        .onDelete("CASCADE");
-      t.integer("attribute_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("attributes")
-        .onDelete("CASCADE");
-      t.integer("attribute_value_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("attributes")
-        .onDelete("CASCADE");
-      t.unique(["listing_id", "attribute_value_id", "attribute_id"]);
-    })
     .createTable("listing_skus", (t) => {
       t.bigIncrements("id");
       t.bigInteger("listing_id")
@@ -535,45 +502,64 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.bigInteger("price_id")
         .index()
+        .references("id")
+        .inTable("listing_sku_prices")
+        .onDelete("CASCADE");
+      t.bigInteger("created_by")
+        .index()
         .notNullable()
         .references("id")
-        .inTable("listing_prices")
-        .onDelete("CASCADE");
-      t.integer("store_id")
-        .index()
-        .references("id")
-        .inTable("stores")
+        .inTable("users")
         .onDelete("CASCADE");
       t.string("custom_sku");
       t.unique(["listing_id", "price_id"]);
-      t.unique(["custom_sku", "store_id", "listing_id"]);
       t.timestamps(false, true);
     })
-    .createTable("listing_sku_attributes", (t) => {
-      t.bigInteger("listing_sku_id")
+    .table("listing_sku_prices", (t) => {
+      t.foreign("listing_sku_id").references("id").inTable("listing_skus").onDelete("CASCADE");
+    })
+    .createTable("best_offer_statuses", (t) => {
+      t.string("id").primary();
+      t.string("bg_hex", 7);
+      t.string("fg_hex", 7);
+    })
+    .createTable("best_offers", (t) => {
+      t.bigIncrements("id");
+      t.string("message", 512).defaultTo('');
+      t.timestamp("expires_at");
+      t.enu("type", ["BUYER_BEST_OFFER", "BUYER_COUNTER_OFFER", "SELLER_COUNTER_OFFER"]);
+      t.string("currency")
         .index()
+        .notNullable()
+        .references("id")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      t.bigInteger("unit_price").notNullable();
+      t.integer("quantity").defaultTo(1);
+      t.bigInteger("made_by")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      t.string("status_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("best_offer_statuses")
+        .onDelete("CASCADE");
+      t.bigInteger("listing_sku_id")
+        .unique()
         .notNullable()
         .references("id")
         .inTable("listing_skus")
         .onDelete("CASCADE");
-      t.integer("attribute_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("attributes")
-        .onDelete("CASCADE");
-      t.integer("attribute_value_id")
-        .index()
-        .notNullable()
-        .references("id")
-        .inTable("attributes")
-        .onDelete("CASCADE");
-      t.unique(["listing_sku_id", "attribute_value_id", "attribute_id"]);
+      t.timestamps(false, true);
     })
-    .createTable("stock_levels", (t) => {
+    .createTable("inventory", (t) => {
       t.bigIncrements("id");
       t.bigInteger("listing_sku_id")
-        .index()
+        .unique()
         .notNullable()
         .references("id")
         .inTable("listing_skus")
@@ -608,11 +594,11 @@ export function up(knex) {
       t.string("description");
       t.timestamp("end_date");
       t.timestamp("start_date");
-      t.integer("store_id")
+      t.bigInteger("created_by")
         .index()
         .notNullable()
         .references("id")
-        .inTable("stores")
+        .inTable("users")
         .onDelete("CASCADE");
       t.timestamps(false, true);
     })
@@ -667,7 +653,7 @@ export function up(knex) {
         .index()
         .notNullable()
         .references("id")
-        .inTable("listing_skus")
+        .inTable("promotions")
         .onDelete("CASCADE");
       t.smallint("rule_order").defaultTo(0);
       t.timestamps(false, true);
@@ -749,6 +735,24 @@ export function up(knex) {
       t.unique(["type_id", "language_id"]);
       t.timestamps(false, true);
     })
+    .createTable("best_offer_status_translations", (t) => {
+      t.increments("id");
+      t.string("status_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("best_offer_statuses")
+        .onDelete("CASCADE");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+      t.unique(["status_id", "language_id"]);
+      t.timestamps(false, true);
+    })
     .createTable("orders", (t) => {
       t.bigIncrements("id");
       t.bigInteger("customer_id")
@@ -767,15 +771,15 @@ export function up(knex) {
         .references("id")
         .inTable("orders")
         .onDelete("CASCADE");
-      t.bigInteger("listing_id")
+      t.bigInteger("listing_sku_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("listings")
+        .inTable("listing_skus")
         .onDelete("CASCADE");
       t.integer("quantity");
       t.bigInteger("unit_price");
-      t.unique(["listing_id", "order_id"])
+      t.unique(["listing_sku_id", "order_id"])
       t.timestamps(false, true);
     })
     .createTable("shipping_cost_types", (t) => {
@@ -897,7 +901,7 @@ export function up(knex) {
     })
     .createTable("roles", (t) => {
       t.increments("id");
-      t.enu("code", ["admin", "moderator", "user"]);
+      t.enu("code", ["ADMIN", "MODERATOR", "USER"]);
       t.timestamps(false, true);
     })
     .createTable("permissions", (t) => {
@@ -1322,9 +1326,76 @@ export function up(knex) {
       t.string("address2")
       t.timestamps(false, true);
     })
+    .createTable("attributes_2", (t) => {
+      t.increments("id");
+      t.boolean("multiple").defaultTo(false);
+      t.boolean("required").defaultTo(false);
+      t.boolean("enabled_for_variations").defaultTo(false);
+      t.string("key");
+      t.specificType("units", "VARCHAR[]").defaultTo('{}');
+      t.integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE");
+      t.timestamps(false, true);
+    })
+    .createTable("attribute_2_translations", (t) => {
+      t.increments("id");
+      t.integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes_2")
+        .onDelete("CASCADE");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+    })
+    .createTable("attribute_2_options", (t) => {
+      t.increments("id");
+      t.string("value");
+      t.string("unit").defaultTo("");
+      t.integer("attribute_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attributes_2")
+        .onDelete("CASCADE");
+    })
+    .createTable("attribute_2_option_translations", (t) => {
+      t.increments("id");
+      t.integer("attribute_option_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("attribute_2_options")
+        .onDelete("CASCADE");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+    })
+    .createTable("category_reference", (t) => {
+      t.string("table_name");
+      t.integer("category_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("categories")
+        .onDelete("CASCADE");
+      t.specificType("columns", "VARCHAR[]").defaultTo('{}');
+    })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION))
     .then(() => knex.raw(DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT))
-    .then(() => knex.raw(DISCOUNT_SPECIFICATION_CURRENCY_CONSTRAINT))
 }
 
 export async function down(knex) {
@@ -1339,19 +1410,20 @@ export async function down(knex) {
     invoice_lines, languages, message_attachments, messages, notifications,
     notification_types, notification_type_translations, payment_providers, payment_statuses,
     payment_status_translations, payments, listing_attachments,
-    listing_attributes, listing_bookmarks, listing_categories, listing_prices,
+    listing_attributes, listing_bookmarks, listing_categories, listing_sku_prices,
     listing_location, listing_status_translations, listing_statuses,
     listings, products, promotions, read_messages, regions, region_translations,
     roles, role_translations, sessions, session_credentials, transaction_statuses,
     transaction_status_translations, transactions, user_agents, user_cards,
     user_location, user_notifications, user_preferences, user_reviews, user_roles, last_seen,
     permissions, role_permissions, listing_discounts, orders, order_items, user_addresses,
-    listing_variations, listing_variation_values, stock_levels, shipping_services,
+    listing_variations, listing_variation_values, inventory, shipping_services,
     category_conditions, discount_benefits, discount_rules, discount_specifications,
     listing_condition_translations, listing_conditions, listing_shipping_details,
     listing_shipping_services, listing_sku_attributes, listing_skus, promotion_criterion_categories,
     promotion_criterion_conditions, promotion_criterion_skus, promotion_status_translations, promotion_statuses,
-    promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations, stores
+    promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations,
+    attributes_2, attribute_2_options, best_offers, best_offer_statuses, best_offer_status_translations, listing_policies
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)

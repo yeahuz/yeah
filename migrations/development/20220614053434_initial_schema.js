@@ -435,15 +435,37 @@ export function up(knex) {
       t.bigInteger("listing_sku_id").index().notNullable();
       t.timestamps(false, true);
     })
+    .createTable("listing_policies", (t) => {
+      t.bigIncrements("id");
+      t.boolean("best_offer_enabled").defaultTo(false);
+      t.bigInteger("best_offer_autoaccept");
+      t.bigInteger("best_offer_minimum");
+      t.string("best_offer_minimum_currency")
+        .index()
+        .references("id")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      t.string("best_offer_autoaccept_currency")
+        .index()
+        .references("id")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      t.timestamps(false, true);
+    })
     .createTable("listings", (t) => {
       t.bigIncrements("id");
       t.string("title");
       t.text("description");
       t.string("url", 512);
-      t.boolean("best_offer_enabled").defaultTo(false);
       t.specificType("attributes", "INT[]").index(null, "GIN");
       t.specificType("attribute_options", "INT[]").index(null, "GIN");
       t.jsonb("temp_variations").defaultTo([])
+      t.bigInteger("policy_id")
+       .index()
+       .notNullable()
+       .references("id")
+       .inTable("listing_policies")
+       .onDelete("CASCADE");
       t.bigInteger("cover_id")
         .index()
         .references("id")
@@ -494,6 +516,44 @@ export function up(knex) {
     })
     .table("listing_sku_prices", (t) => {
       t.foreign("listing_sku_id").references("id").inTable("listing_skus").onDelete("CASCADE");
+    })
+    .createTable("best_offer_statuses", (t) => {
+      t.string("id").primary();
+      t.string("bg_hex", 7);
+      t.string("fg_hex", 7);
+    })
+    .createTable("best_offers", (t) => {
+      t.bigIncrements("id");
+      t.string("message", 512).defaultTo('');
+      t.timestamp("expires_at");
+      t.enu("type", ["BUYER_BEST_OFFER", "BUYER_COUNTER_OFFER", "SELLER_COUNTER_OFFER"]);
+      t.string("currency")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("currencies")
+        .onDelete("CASCADE");
+      t.bigInteger("unit_price").notNullable();
+      t.integer("quantity").defaultTo(1);
+      t.bigInteger("made_by")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE");
+      t.string("status_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("best_offer_statuses")
+        .onDelete("CASCADE");
+      t.bigInteger("listing_sku_id")
+        .unique()
+        .notNullable()
+        .references("id")
+        .inTable("listing_skus")
+        .onDelete("CASCADE");
+      t.timestamps(false, true);
     })
     .createTable("inventory", (t) => {
       t.bigIncrements("id");
@@ -672,6 +732,24 @@ export function up(knex) {
       t.string("name");
       t.string("description");
       t.unique(["type_id", "language_id"]);
+      t.timestamps(false, true);
+    })
+    .createTable("best_offer_status_translations", (t) => {
+      t.increments("id");
+      t.string("status_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("best_offer_statuses")
+        .onDelete("CASCADE");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("name");
+      t.unique(["status_id", "language_id"]);
       t.timestamps(false, true);
     })
     .createTable("orders", (t) => {
@@ -1344,7 +1422,7 @@ export async function down(knex) {
     listing_shipping_services, listing_sku_attributes, listing_skus, promotion_criterion_categories,
     promotion_criterion_conditions, promotion_criterion_skus, promotion_status_translations, promotion_statuses,
     promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations,
-    attributes_2, attribute_2_options
+    attributes_2, attribute_2_options, best_offers, best_offer_statuses, best_offer_status_translations, listing_policies
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
     `)
