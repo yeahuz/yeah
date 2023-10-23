@@ -56,7 +56,7 @@ export async function get_step(req, reply) {
       });
     } break;
     case "2": {
-      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true } });
+      let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, policy: true } });
       let variants = await ListingService.get_variants(listing);
       let attributes = [];
       let selected_attributes = [];
@@ -472,8 +472,12 @@ export async function submit_step(req, reply) {
         await ListingService.upsert_sku({ listing_id: id, created_by: user.id, currency, unit_price, quantity, attributes });
       }
 
-      await ListingService.update_one(ability, id, { description, cover_id, best_offer_enabled });
-      await PromotionService.add_volume_pricing({ rules: discount_rules, created_by: user.id })
+      await Promise.all([
+        ListingService.update_one(ability, id, { description, cover_id }),
+        ListingService.update_policy(listing.policy_id, { best_offer_enabled }),
+        PromotionService.add_volume_pricing({ rules: discount_rules, created_by: user.id })
+      ]);
+
       return reply.redirect(`/listings/wizard/${id}?step=${next_step}`);
     }
     default:

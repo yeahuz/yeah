@@ -10,11 +10,50 @@ import { hashids } from "../utils/hashids.js";
 import config from "../config/index.js";
 import { CATEGORY_REFERENCE } from "../constants/index.js";
 
+function create_policy_impl(trx = { query }) {
+  return async ({ best_offer_enabled = false, best_offer_minimum, best_offer_autoaccept, best_offer_minimum_currency, best_offer_autoaccept_currency } = {}) => {
+    let { rows: [policy] } = await trx.query(`insert into listing_policies
+      (best_offer_enabled, best_offer_minimum, best_offer_autoaccept, best_offer_minimum_currency, best_offer_autoaccept_currency)
+      values ($1, $2, $3, $4, $5) returning id
+    `, [best_offer_enabled, best_offer_minimum, best_offer_autoaccept, best_offer_minimum_currency, best_offer_autoaccept_currency])
+
+    return policy;
+  }
+}
+
+function update_policy_impl(trx = { query }) {
+  return async (id, update) => {
+    let sql = '';
+    let params = [id];
+    let keys = Object.keys(update);
+    for (let i = 0, len = keys.length; i < len; i++) {
+      params.push(update[keys[i]]);
+      sql += keys[i] + " = " + `$${params.length}`;
+      let is_last = i === len - 1;
+      if (!is_last) sql += ", ";
+    }
+
+    let { rows, rowCount } = await trx.query(`update listing_policies set ${sql} where id = $1`, params);
+    if (rowCount == 0) {
+      // TODO: policy does not exist.handle somehow ??
+    }
+
+    return rows[0];
+  }
+}
+
+export let create_policy_trx = (trx) => create_policy_impl(trx);
+export let create_policy = create_policy_impl();
+
+export let update_policy_trx = (trx) => update_policy_impl(trx);
+export let update_policy = update_policy_impl();
+
 export async function create_one({ title, description, status, created_by, category_id }) {
   let trx = await start_trx();
   try {
-    let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, category_id)
-      values ($1, $2, $3, $4, $5) returning id`, [title, description, status, created_by, category_id]);
+    let policy = await create_policy_trx(trx)();
+    let { rows: [listing] } = await trx.query(`insert into listings (title, description, status, created_by, category_id, policy_id)
+      values ($1, $2, $3, $4, $5, $6) returning id`, [title, description, status, created_by, category_id, policy.id]);
 
     let url = new URL(`listings/${hashids.encode([listing.id])}`, config.origin).href;
     await trx.query(`update listings set url = $1 where id = $2`, [url, listing.id]);
@@ -61,11 +100,13 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
     ${relation.location ? `, row_to_json(ll) as location` : ''}
     ${relation.attachments ? `, coalesce(array_agg(row_to_json(a) order by la.display_order asc) filter (where a.id is not null), '{}') as attachments` : ''}
     ${relation.discounts ? `, coalesce(ld.discounts, '[]') as discounts` : ''}
+    ${relation.policy ? `, row_to_json(lp) as policy` : ''}
     from listings l
     ${relation.attachments ? `
     left join listing_attachments la on la.listing_id = l.id
     left join attachments a on a.id = la.attachment_id` : ''}
     ${relation.location ? `left join listing_location ll on ll.listing_id = l.id` : ''}
+    ${relation.policy ? `left join listing_policies lp on lp.id = l.policy_id` : ''}
   `;
 
   // left join listing_skus ls on ls.listing_id = l.id
@@ -96,6 +137,7 @@ export async function get_one({ id, lang = "en", relation = {} } = {}) {
   sql += ` where l.id = $1 group by l.id`;
 
   if (relation.discounts) sql += `, ld.discounts`;
+  if (relation.policy) sql += `, lp.*`;
   // if (relation.price) sql += ', lp.*'
 
   let { rows } = await query(sql, params);

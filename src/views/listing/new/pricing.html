@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="flex flex-col justify-between py-6 px-4 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
-    <input form="listing-form" type="checkbox" name="best_offer_enabled" id="best-offer-enabled" class="checkbox-input appearance-none peer" />
+    <input form="listing-form" type="checkbox" name="best_offer_enabled" id="best-offer-enabled" class="checkbox-input appearance-none peer" <%= it.listing?.policy.best_offer_enabled ? "checked" : "" %>/>
     <div class="flex justify-between items-start w-full group">
       <div class="w-full">
         <label for="best-offer-enabled" class="font-semibold"><%= it.t("form.pricing.allow_offers", { ns: "new-listing" })%></label>
