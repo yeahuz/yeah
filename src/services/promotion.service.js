@@ -1,4 +1,4 @@
-import { query, rollback_trx, start_trx, commit_trx } from "./db.service.js";
+import { query, rollback_trx, start_trx, commit_trx, prepare_bulk_insert } from "./db.service.js";
 import { InternalError } from "../utils/errors.js";
 
 export let promotion_types = {
@@ -58,4 +58,25 @@ export async function add_volume_pricing({ name = "Volume Pricing Promotion", de
     rollback_trx(trx);
     throw new InternalError({ raw: err.message });
   }
+}
+
+
+export async function add_sku_criteria(id, skus = []) {
+  let sql = `insert into promotion_criterion_skus (listing_sku_id, promotion_id) values `
+  let params = [];
+  for (let i = 0; i < skus.length; i++) {
+    let sku = skus[i];
+    let is_last = i === skus.length - 1;
+    sql += `($${params.length + 1}, $${params.length + 2})`
+    params.push(sku, id);
+    if (!is_last) sql += ", ";
+  }
+
+  let { rows, rowCount } = await query(sql, params);
+
+  if (rowCount === 0) {
+    // TODO: something does not exist.handle somehow ??
+  }
+
+  return rows;
 }

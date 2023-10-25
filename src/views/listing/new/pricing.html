@@ -1,5 +1,7 @@
 <section>
   <input type="hidden" name="currency" form="listing-form" value="USD" />
+  <input type="hidden" name="best_offer_minimum_currency" form="listing-form" value="USD" />
+  <input type="hidden" name="best_offer_autoaccept_currency" form="listing-form" value="USD" />
   <% let groups = it.listing.discounts?.reduce((acc, curr) => { acc[curr.min_qty_value] = curr; return acc; }, {}) || {} %>
   <h2 class="font-semibold mb-4 uppercase"><%= it.t("form.pricing.heading", { ns: "new-listing" })%></h2>
   <div class="grid grid-cols-12 gap-4 <%= it.selected_attributes?.length ? '' : ''%>">
@@ -38,14 +40,14 @@
         <%= it.t("form.pricing.minimum", { ns: "new-listing" }) %>
         <div class="flex mt-2">
           <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
-          <input form="listing-form" type="number" class="form-control !rounded-l-none" value="1" name="best_offer_minimum" inputmode="numeric" min="1" autocomplete="off" required />
+          <input form="listing-form" type="number" class="form-control !rounded-l-none" value="<%= it.listing?.policy.best_offer_minimum ?? "1" %>" name="best_offer_minimum" inputmode="numeric" min="1" autocomplete="off" required />
         </div>
       </label>
       <label class="text-sm font-medium text-gray-700 dark:text-gray-200 col-span-4">
         <%= it.t("form.pricing.auto_accept", { ns: "new-listing" }) %>
         <div class="flex mt-2">
           <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
-          <input form="listing-form" type="number" class="form-control !rounded-l-none" value="1" name="best_offer_accept" inputmode="numeric" min="1" autocomplete="off" required />
+          <input form="listing-form" type="number" class="form-control !rounded-l-none" value="<%= it.listing?.policy.best_offer_autoaccept ?? "1" %>" name="best_offer_autoaccept" inputmode="numeric" min="1" autocomplete="off" required />
         </div>
       </label>
     </div>

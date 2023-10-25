@@ -459,7 +459,20 @@ export async function submit_step(req, reply) {
       return reply.redirect(`/listings/wizard/${listing.id}?step=${next_step}`);
     }
     case "2": {
-      let { description, currency, cover_id, unit_price, quantity, discount_rules = [], attributes = {}, best_offer_enabled } = req.body;
+      let {
+        description,
+        currency,
+        cover_id,
+        unit_price,
+        quantity,
+        discount_rules = [],
+        attributes = {},
+        best_offer_enabled,
+        best_offer_minimum,
+        best_offer_minimum_currency,
+        best_offer_autoaccept,
+        best_offer_autoaccept_currency,
+      } = req.body;
       let [listing] = await Promise.all([
         ListingService.get_one({ id }),
         ListingService.cleanup_skus({ listing_id: id })
@@ -474,7 +487,7 @@ export async function submit_step(req, reply) {
 
       await Promise.all([
         ListingService.update_one(ability, id, { description, cover_id }),
-        ListingService.update_policy(listing.policy_id, { best_offer_enabled }),
+        ListingService.update_policy(listing.policy_id, { best_offer_enabled, best_offer_minimum, best_offer_autoaccept, best_offer_minimum_currency, best_offer_autoaccept_currency }),
         PromotionService.add_volume_pricing({ rules: discount_rules, created_by: user.id })
       ]);
 
