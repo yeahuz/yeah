@@ -73,12 +73,22 @@
           <div class="gap-4 mt-4 w-full hidden peer-checked/calculated:flex">
             <ul class="flex flex-col w-full">
               <% it.shipping_services.forEach(function (service) {%>
-                <li class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800">
+                <li class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800 flex items-start justify-between">
                   <div class="flex gap-4">
                     <img class="w-24 object-contain" src="<%= service.logo_data_url %>"/>
                     <div class="flex flex-col">
-                      <span><%= service.name %></span>
-                      <span><%= service.description %></span>
+                      <span class="text-gray-900 dark:text-white"><%= service.name %></span>
+                      <span class="text-gray-600 dark:text-gray-400 text-sm"><%= service.description %></span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-3 max-w-xs w-full">
+                    <div class="flex flex-col gap-2">
+                      <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
+                        Buyer pays:
+                      </span>
+                      <span>
+                        $10
+                      </span>
                     </div>
                   </div>
                 </li>
@@ -92,11 +102,11 @@
                   <div class="flex gap-4">
                     <img class="w-24 object-contain" src="<%= service.logo_data_url %>"/>
                     <div class="flex flex-col">
-                      <span><%= service.name %></span>
-                      <span><%= service.description %></span>
+                      <span class="text-gray-900 dark:text-white"><%= service.name %></span>
+                      <span class="text-gray-600 dark:text-gray-400 text-sm"><%= service.description %></span>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-1">
+                  <div class="flex flex-col gap-3 max-w-xs w-full">
                     <div>
                       <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
                         Buyer pays
