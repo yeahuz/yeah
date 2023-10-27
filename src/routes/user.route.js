@@ -1,7 +1,7 @@
 import * as UserController from "../controllers/user.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export let user = async (fastify) => {
+export let user = (fastify, opts, done) => {
   fastify.route({
     method: "POST",
     url: "/:id/phones/otp",
@@ -67,5 +67,7 @@ export let user = async (fastify) => {
     url: "/:username",
     handler: UserController.get_one,
     config: { public: true }
-  })
+  });
+
+  done();
 };

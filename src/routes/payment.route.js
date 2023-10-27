@@ -1,6 +1,6 @@
 import * as PaymentController from "../controllers/payment.controller.js";
 
-export let payment = async (fastify) => {
+export let payment = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/new",
@@ -11,4 +11,6 @@ export let payment = async (fastify) => {
     url: "/new",
     handler: PaymentController.create_new_payment,
   });
+
+  done();
 };

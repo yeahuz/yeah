@@ -1,7 +1,7 @@
 import * as CategoryApiController from "../controllers/category-api.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export let category_api = async (fastify) => {
+export let category_api = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -20,4 +20,6 @@ export let category_api = async (fastify) => {
     handler: CategoryApiController.delete_one,
     onRequest: policy_guard((ability) => ability.can("manage", "Category"))
   });
+
+  done();
 };

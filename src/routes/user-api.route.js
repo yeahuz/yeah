@@ -1,7 +1,7 @@
 import * as UserApiController from "../controllers/user-api.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export let user_api = async (fastify) => {
+export let user_api = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/:id",
@@ -26,4 +26,6 @@ export let user_api = async (fastify) => {
     handler: UserApiController.delete_one,
     onRequest: policy_guard((ability) => ability.can("manage", "User")),
   });
+
+  done();
 };

@@ -25,6 +25,7 @@ import { chat_api } from "./chat-api.route.js";
 import { category_api } from "./category-api.route.js";
 import { attribute_api } from "./attribute-api.route.js";
 import { attachment_api } from "./attachment-api.route.js";
+import { shipping_service_api } from "./shipping-service-api.route.js";
 
 // Plugins
 import { is_xhr } from "../plugins/is-xhr.js";
@@ -34,7 +35,7 @@ import { init_stream } from "../plugins/init-stream.js";
 import { DomainError, ValidationError, InternalError } from "../utils/errors.js";
 import { api_auth_guard, auth_guard } from "../plugins/auth-guard.js";
 
-export const routes = async (fastify) => {
+export let routes = (fastify, opts, done) => {
   // Plugins
   fastify.register(fastify_accepts);
   fastify.register(fastify_etag);
@@ -63,9 +64,11 @@ export const routes = async (fastify) => {
   fastify.register(profile, { prefix: "/myp" });
   fastify.register(selling, { prefix: "/mys" });
   fastify.register(chat, { prefix: "/chats" });
+
+  done();
 };
 
-export const api_routes = async (fastify) => {
+export let api_routes = (fastify, opts, done) => {
   fastify.register(api_auth_guard);
   fastify.register(auth_api, { prefix: "/auth" });
   fastify.register(user_api, { prefix: "/users" });
@@ -74,10 +77,11 @@ export const api_routes = async (fastify) => {
   fastify.register(category_api, { prefix: "/categories" });
   fastify.register(attribute_api, { prefix: "/attributes" });
   fastify.register(attachment_api, { prefix: "/attachments" });
+  fastify.register(shipping_service_api, { prefix: "/shipping-services" });
 
   fastify.setErrorHandler(function errorHandler(err, req, reply) {
-    const accept_lang = req.headers["accept-language"]
-    const t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
+    let accept_lang = req.headers["accept-language"]
+    let t = req.t || i18next.getFixedT(accept_lang ? accept_lang : [])
     if (err.validation) {
       reply.code(422).send(new ValidationError({ errors: err.validation }).build(t));
       return reply;
@@ -91,4 +95,6 @@ export const api_routes = async (fastify) => {
     reply.code(500).send(new InternalError().build(t));
     return reply;
   });
+
+  done();
 };

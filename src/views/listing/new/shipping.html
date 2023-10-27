@@ -18,35 +18,66 @@
     <label for="shipping-pickup" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/pickup:dark:border-zinc-600 peer-checked/pickup:text-gray-900 dark:peer-checked/pickup:text-white">
       <%= it.t("form.shipping.pickup", { ns: "new-listing" }) %>
     </label>
-    <div class="grid-cols-12 gap-4 mt-4 hidden peer-checked/standard:grid">
-      <div class="col-span-2">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-          <%= it.t("form.shipping.pkg_weight", { ns: "new-listing" })%>
-          <div class="relative mt-2">
-            <input type="text" inputmode="numeric" class="form-control" placeholder="1" name="pkg_weight" required />
-            <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_weight_unit", { ns: "new-listing" })%></span>
+    <div class="gap-4 mt-4 flex-col hidden peer-checked/standard:flex">
+      <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+            <%= it.t("form.shipping.pkg_weight", { ns: "new-listing" })%>
+            <div class="relative mt-2">
+              <input type="text" inputmode="numeric" class="form-control" name="pkg_weight" required />
+              <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_weight_unit", { ns: "new-listing" })%></span>
+            </div>
+          </label>
+        </div>
+        <div class="col-span-6">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+            <%= it.t("form.shipping.pkg_dimensions", { ns: "new-listing" })%>
+          </span>
+          <div class="flex items-center mt-2 gap-2">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200 relative">
+              <input type="text" inputmode="numeric" class="form-control !pr-10" name="dimensions.length" required />
+              <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_dimensions_unit", { ns: "new-listing" })%></span>
+            </label>
+            &times;
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200 relative">
+              <input type="text" inputmode="numeric" class="form-control !pr-10" name="dimensions.width" required />
+              <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_dimensions_unit", { ns: "new-listing" })%></span>
+            </label>
+            &times;
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200 relative">
+              <input type="text" inputmode="numeric" class="form-control !pr-10" name="dimensions.height" required />
+              <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_dimensions_unit", { ns: "new-listing" })%></span>
+            </label>
           </div>
-        </label>
+        </div>
       </div>
-      <div class="col-span-6">
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
-          <%= it.t("form.shipping.pkg_dimensions", { ns: "new-listing" })%>
+      <div>
+        <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
+          Cost type
         </span>
-        <div class="flex items-center mt-2 gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 relative">
-            <input type="text" inputmode="numeric" class="form-control !pr-10" placeholder="1" name="dimensions.length" required />
-            <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_dimensions_unit", { ns: "new-listing" })%></span>
+        <div class="flex items-center flex-wrap mt-2">
+          <input type="radio" id="cost-calculated" name="cost_type_id" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+                                bg-white dark:bg-zinc-900 m-0 relative
+                                font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
+                                checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 -mr-8 ml-2 peer/calculated" checked >
+          <label for="cost-calculated" class="border dark:border-zinc-800 p-2 rounded-md pl-8 cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked/calculated:dark:border-zinc-600 peer-checked/calculated:text-gray-900 dark:peer-checked/calculated:text-white">
+            Calculated
           </label>
-          &times;
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 relative">
-            <input type="text" inputmode="numeric" class="form-control !pr-10" placeholder="1" name="dimensions.width" required />
-            <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_dimensions_unit", { ns: "new-listing" })%></span>
+          <input type="radio" id="cost-flat" name="cost_type_id" class="ml-4 appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+                                bg-white dark:bg-zinc-900 m-0 relative
+                                font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
+                                checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer/flat">
+          <label for="cost-flat" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/flat:dark:border-zinc-600 peer-checked/flat:text-gray-900 dark:peer-checked/flat:text-white">
+            Flat rate
           </label>
-          &times;
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200 relative">
-            <input type="text" inputmode="numeric" class="form-control !pr-10" placeholder="1" name="dimensions.height" required />
-            <span class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-500 pointer-events-none"><%= it.t("form.shipping.pkg_dimensions_unit", { ns: "new-listing" })%></span>
-          </label>
+          <div class="gap-4 mt-4 w-full hidden peer-checked/flat:flex">
+            <div>
+              Flat
+            </div>
+          </div>
+          <div class="gap-4 mt-4 w-full hidden peer-checked/calculated:flex">
+            <div>Calc</div>
+          </div>
         </div>
       </div>
     </div>

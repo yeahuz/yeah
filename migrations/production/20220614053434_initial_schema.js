@@ -821,16 +821,29 @@ export function up(knex) {
       t.enu("handling_time_unit", ["DAY"]);
     })
     .createTable("shipping_services", (t) => {
-      t.smallint("id").primary();
+      t.increments("id");
       t.string("name").notNullable();
-      t.bigInteger("logo_id")
+      t.boolean("active").defaultTo(false);
+      t.string("logo_url");
+      t.text("logo_data_url");
+    })
+    .createTable("shipping_service_translations", (t) => {
+      t.increments("id");
+      t.integer("shipping_service_id")
         .index()
         .notNullable()
         .references("id")
-        .inTable("attachments")
+        .inTable("shipping_services")
         .onDelete("CASCADE");
-      t.smallint("min_time");
-      t.smallint("max_time");
+      t.string("language_id")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable("languages")
+        .onDelete("CASCADE");
+      t.string("description");
+      t.unique(["shipping_service_id", "language_id"]);
+      t.timestamps(false, true);
     })
     .createTable("listing_shipping_services", (t) => {
       t.bigInteger("listing_id")
@@ -839,7 +852,7 @@ export function up(knex) {
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.smallint("shipping_service_id")
+      t.integer("shipping_service_id")
         .index()
         .notNullable()
         .references("id")

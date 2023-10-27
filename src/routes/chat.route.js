@@ -1,6 +1,6 @@
 import * as ChatController from "../controllers/chat.controller.js";
 
-export let chat = async (fastify) => {
+export let chat = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -18,4 +18,6 @@ export let chat = async (fastify) => {
     url: "/:id/messages",
     handler: ChatController.create_message,
   });
+
+  done();
 };

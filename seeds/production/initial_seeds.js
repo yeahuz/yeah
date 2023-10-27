@@ -27,6 +27,26 @@ export async function seed(knex) {
   await knex("promotion_types").del();
   await knex("promotion_statuses").del();
 
+  async function insert_shipping_services() {
+    let { services } = JSON.parse(fs.readFileSync(process.cwd() + "/src/data/shipping-services.json", "utf-8"));
+
+    for (let service of services) {
+      let response = await fetch(service.logo_url);
+      let blob = await response.blob();
+      let buf = Buffer.from(await blob.text());
+      let [inserted] = await knex("shipping_services").returning("id").insert({
+        logo_url: service.logo_url,
+        name: service.name,
+        logo_data_url: "data:" + blob.type + ";base64," + buf.toString("base64")
+      });
+
+      for (let lang in service.translations) {
+        let { description } = service.translations[lang];
+        await knex("shipping_service_translations").insert({ description, language_id: lang, shipping_service_id: inserted.id })
+      }
+    }
+  }
+
   async function insert_promotion_stuff() {
     let { types, statuses } = JSON.parse(fs.readFileSync(process.cwd() + "/src/data/promotions.json", "utf-8"));
     for (let type of types) {
@@ -1015,6 +1035,7 @@ export async function seed(knex) {
   await Promise.all([
     insert_regions(),
     insert_promotion_stuff(),
-    insert_best_offer_stuff()
+    insert_best_offer_stuff(),
+    insert_shipping_services()
   ]);
 }

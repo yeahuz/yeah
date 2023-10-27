@@ -2,7 +2,7 @@ import * as AuthController from "../controllers/auth.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 import { auth_schema } from "../schemas/auth.schema.js";
 
-export let auth = async (fastify) => {
+export let auth = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/login",
@@ -148,4 +148,6 @@ export let auth = async (fastify) => {
     handler: AuthController.update_session,
     onRequest: policy_guard((ability) => ability.can("manage", "Session"))
   });
+
+  done();
 };

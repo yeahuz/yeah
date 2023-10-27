@@ -1,6 +1,6 @@
 import * as SearchController from "../controllers/search.controller.js";
 
-export let search = async (fastify) => {
+export let search = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -13,4 +13,6 @@ export let search = async (fastify) => {
     handler: SearchController.get_completions,
     config: { public: true }
   });
+
+  done();
 };

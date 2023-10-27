@@ -3619,8 +3619,16 @@ j [data-tooltip][data-flow="right"]::before {
   display: block;
 }
 
-.peer\/standard:checked ~ .peer-checked\/standard\:grid {
-  display: grid;
+.peer\/calculated:checked ~ .peer-checked\/calculated\:flex {
+  display: flex;
+}
+
+.peer\/flat:checked ~ .peer-checked\/flat\:flex {
+  display: flex;
+}
+
+.peer\/standard:checked ~ .peer-checked\/standard\:flex {
+  display: flex;
 }
 
 .peer:checked ~ .peer-checked\:grid {
@@ -3645,6 +3653,14 @@ j [data-tooltip][data-flow="right"]::before {
 
 .peer:checked ~ .peer-checked\:bg-transparent {
   background-color: transparent;
+}
+
+.peer\/calculated:checked ~ .peer-checked\/calculated\:text-gray-900 {
+  color: rgb(var(--gray-900));
+}
+
+.peer\/flat:checked ~ .peer-checked\/flat\:text-gray-900 {
+  color: rgb(var(--gray-900));
 }
 
 .peer\/pickup:checked ~ .peer-checked\/pickup\:text-gray-900 {
@@ -3944,6 +3960,16 @@ j [data-tooltip][data-flow="right"]::before {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
+.peer\/calculated:checked ~ :is(.dark .peer-checked\/calculated\:dark\:border-zinc-600) {
+  --tw-border-opacity: 1;
+  border-color: rgb(82 82 91 / var(--tw-border-opacity));
+}
+
+.peer\/flat:checked ~ :is(.dark .peer-checked\/flat\:dark\:border-zinc-600) {
+  --tw-border-opacity: 1;
+  border-color: rgb(82 82 91 / var(--tw-border-opacity));
+}
+
 .peer\/pickup:checked ~ :is(.dark .peer-checked\/pickup\:dark\:border-zinc-600) {
   --tw-border-opacity: 1;
   border-color: rgb(82 82 91 / var(--tw-border-opacity));
@@ -3967,6 +3993,16 @@ j [data-tooltip][data-flow="right"]::before {
 .peer:checked ~ :is(.dark .peer-checked\:dark\:bg-zinc-800) {
   --tw-bg-opacity: 1;
   background-color: rgb(39 39 42 / var(--tw-bg-opacity));
+}
+
+:is(.dark .peer\/calculated:checked ~ .dark\:peer-checked\/calculated\:text-white) {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+:is(.dark .peer\/flat:checked ~ .dark\:peer-checked\/flat\:text-white) {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
 :is(.dark .peer\/pickup:checked ~ .dark\:peer-checked\/pickup\:text-white) {

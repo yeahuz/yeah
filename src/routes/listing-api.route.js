@@ -1,7 +1,7 @@
 import * as ListingController from "../controllers/listing-api.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export let listing_api = async (fastify) => {
+export let listing_api = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -35,4 +35,6 @@ export let listing_api = async (fastify) => {
     handler: ListingController.unlink_attachment,
     onRequest: policy_guard()
   });
+
+  done();
 };

@@ -2,7 +2,7 @@ import { new_listing_schema } from "../schemas/new-listing.schema.js";
 import * as ListingController from "../controllers/listing.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export let listing = async (fastify) => {
+export let listing = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/:hash_id",
@@ -64,4 +64,6 @@ export let listing = async (fastify) => {
     handler: ListingController.submit_step,
     onRequest: policy_guard(),
   });
+
+  done();
 };

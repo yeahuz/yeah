@@ -1,6 +1,6 @@
 import * as ChatApiController from "../controllers/chat-api.controller.js";
 
-export const chat_api = async (fastify) => {
+export const chat_api = (fastify, opts, done) => {
   fastify.route({
     method: "POST",
     url: "/:id/messages",
@@ -12,4 +12,6 @@ export const chat_api = async (fastify) => {
     url: "/:id/messages/:message_id",
     handler: ChatApiController.update_message
   });
+
+  done();
 };

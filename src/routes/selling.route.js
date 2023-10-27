@@ -1,6 +1,6 @@
 import * as SellingController from "../controllers/selling.controller.js";
 
-export let selling = async (fastify) => {
+export let selling = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -11,4 +11,6 @@ export let selling = async (fastify) => {
     url: "/overview",
     handler: SellingController.get_overview,
   });
+
+  done();
 };

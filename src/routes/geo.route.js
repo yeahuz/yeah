@@ -1,6 +1,6 @@
 import * as GeoController from "../controllers/geo.controller.js";
 
-export const geo = async (fastify) => {
+export const geo = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/predictions",
@@ -13,4 +13,6 @@ export const geo = async (fastify) => {
     handler: GeoController.geocode,
     config: { public: true }
   });
+
+  done();
 };

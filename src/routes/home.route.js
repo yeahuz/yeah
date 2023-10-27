@@ -1,6 +1,6 @@
 import * as HomeController from "../controllers/home.controller.js";
 
-export let home = async (fastify) => {
+export let home = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -30,4 +30,6 @@ export let home = async (fastify) => {
     handler: HomeController.get_time,
     config: { public: true }
   });
+
+  done();
 };

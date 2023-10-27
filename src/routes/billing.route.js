@@ -1,6 +1,6 @@
 import * as BillingController from "../controllers/billing.controller.js";
 
-export let billing = async (fastify) => {
+export let billing = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/payme",
@@ -21,4 +21,6 @@ export let billing = async (fastify) => {
     url: "/octo",
     handler: BillingController.octo,
   });
+
+  done();
 };

@@ -1,6 +1,6 @@
 import * as ProfileController from "../controllers/profile.controller.js";
 
-export let profile = async (fastify) => {
+export let profile = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -26,4 +26,6 @@ export let profile = async (fastify) => {
     url: "/purchases",
     handler: ProfileController.get_purchases,
   });
+
+  done();
 };

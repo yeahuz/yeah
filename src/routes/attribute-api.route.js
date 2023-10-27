@@ -1,7 +1,7 @@
 import * as AttributeApiController from "../controllers/attribute-api.controller.js";
 import { policy_guard } from "../plugins/policy-guard.js";
 
-export let attribute_api = async (fastify) => {
+export let attribute_api = (fastify, opts, done) => {
   fastify.route({
     method: "GET",
     url: "/",
@@ -25,5 +25,7 @@ export let attribute_api = async (fastify) => {
     url: "/:id/translations",
     handler: AttributeApiController.get_translations,
     onRequest: policy_guard((ability) => ability.can("read", "Attribute"))
-  })
+  });
+
+  done();
 };

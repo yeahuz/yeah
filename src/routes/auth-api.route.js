@@ -1,6 +1,6 @@
 import * as AuthApiController from "../controllers/auth-api.controller.js";
 
-export let auth_api = async (fastify) => {
+export let auth_api = (fastify, opts, done) => {
   fastify.route({
     method: "POST",
     url: "/login",
@@ -43,4 +43,6 @@ export let auth_api = async (fastify) => {
     url: "/session",
     handler: AuthApiController.logout,
   });
+
+  done();
 };
