@@ -70,13 +70,55 @@
           <label for="cost-flat" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/flat:dark:border-zinc-600 peer-checked/flat:text-gray-900 dark:peer-checked/flat:text-white">
             Flat rate
           </label>
-          <div class="gap-4 mt-4 w-full hidden peer-checked/flat:flex">
-            <div>
-              Flat
-            </div>
-          </div>
           <div class="gap-4 mt-4 w-full hidden peer-checked/calculated:flex">
-            <div>Calc</div>
+            <ul class="flex flex-col w-full">
+              <% it.shipping_services.forEach(function (service) {%>
+                <li class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800">
+                  <div class="flex gap-4">
+                    <img class="w-24 object-contain" src="<%= service.logo_data_url %>"/>
+                    <div class="flex flex-col">
+                      <span><%= service.name %></span>
+                      <span><%= service.description %></span>
+                    </div>
+                  </div>
+                </li>
+              <% }) %>
+            </ul>
+          </div>
+          <div class="gap-4 mt-4 w-full hidden peer-checked/flat:flex">
+            <ul class="flex flex-col w-full">
+              <% it.shipping_services.forEach(function (service) {%>
+                <li class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800 flex items-start justify-between">
+                  <div class="flex gap-4">
+                    <img class="w-24 object-contain" src="<%= service.logo_data_url %>"/>
+                    <div class="flex flex-col">
+                      <span><%= service.name %></span>
+                      <span><%= service.description %></span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <div>
+                      <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
+                        Buyer pays
+                      </span>
+                      <div class="flex mt-2">
+                        <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+                        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-l-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" <%= it.selected_attributes?.length ? "disabled" : "required"%> />
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
+                        Each additional cost
+                      </span>
+                      <div class="flex mt-2">
+                        <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+                        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-l-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" <%= it.selected_attributes?.length ? "disabled" : "required"%> />
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              <% }) %>
+            </ul>
           </div>
         </div>
       </div>

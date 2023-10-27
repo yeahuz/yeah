@@ -10,14 +10,13 @@ export async function get_one(req, reply) {
 export async function get_many(req, reply) {
   let { status, limit = 15, cursor, direction } = transform_object(req.query, {
     status: (v) => v ? v.trim() : ""
-  })
+  });
   return await ListingService.get_many({ status, limit, direction, cursor, lang: req.language });
 }
 
 export async function get_filters(req, reply) {
   let statuses = await ListingService.get_statuses({ lang: req.language });
-  reply.send({ statuses });
-  return reply;
+  return { statuses }
 }
 
 export async function update_one(req, reply) {

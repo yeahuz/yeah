@@ -244,8 +244,8 @@ export async function get_many({
 }
 
 export async function get_statuses({ lang = "en" }) {
-  let { rows } = await query(`select ls.id, ls.code, ls.bg_hex, ls.fg_hex, lst.name from listing_statuses ls
-    join listing_status_translations lst on lst.status_code = ls.code and language_id = $1
+  let { rows } = await query(`select ls.id, ls.bg_hex, ls.fg_hex, lst.name from listing_statuses ls
+    join listing_status_translations lst on lst.status_id = ls.id and language_id = $1
   `, [lang.substring(0, 2)]);
 
   return rows;

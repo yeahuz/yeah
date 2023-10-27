@@ -7,6 +7,7 @@ import * as InventoryService from "../services/inventory.service.js";
 import * as PromotionService from "../services/promotion.service.js";
 import * as AttributeService from "../services/attribute.service.js";
 import * as RegionService from "../services/region.service.js";
+import * as ShippingService from "../services/shipping.service.js";
 import * as ChatService from "../services/chat.service.js";
 import { render_file } from "../utils/eta.js";
 import { generate_srcset, option, add_t } from "../utils/index.js";
@@ -57,12 +58,17 @@ export async function get_step(req, reply) {
     } break;
     case "2": {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, policy: true } });
-      let variants = await ListingService.get_variants(listing);
+      let [variants, shipping_services] = await Promise.all([
+        ListingService.get_variants(listing),
+        ShippingService.get_services({ lang: req.language }),
+      ]);
       let attributes = [];
       let selected_attributes = [];
       if (listing) {
-        attributes = await AttributeService.get_category_attributes_2({ category_id: listing.category_id, lang: req.language });
-        selected_attributes = await ListingService.resolve_attribute_options(listing.attribute_options, req.language);
+        [attributes, selected_attributes] = await Promise.all([
+          AttributeService.get_category_attributes_2({ category_id: listing.category_id, lang: req.language }),
+          ListingService.resolve_attribute_options(listing.attribute_options, req.language),
+        ]);
       };
       rendered_step = await render_file(`/listing/new/step-${step}`, {
         flash,
@@ -72,7 +78,8 @@ export async function get_step(req, reply) {
         attributes,
         t,
         variants,
-        selected_attributes
+        selected_attributes,
+        shipping_services
       });
     } break;
     case "3": {
