@@ -1,4 +1,3 @@
-
 let ON_PAYMENT_STATUS_UPDATE_FUNCTION = `
   CREATE OR REPLACE FUNCTION on_payment_status_update() RETURNS trigger AS $$
   BEGIN
@@ -800,6 +799,7 @@ export function up(knex) {
         .inTable("languages")
         .onDelete("CASCADE");
       t.string("name");
+      t.string("description");
       t.unique(["cost_type_id", "language_id"]);
       t.timestamps(false, true);
     })

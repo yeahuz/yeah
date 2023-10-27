@@ -1459,10 +1459,6 @@ video {
   gap: 0.125rem;
 }
 
-.gap-1 {
-  gap: 0.25rem;
-}
-
 .gap-2 {
   gap: 0.5rem;
 }
@@ -3893,10 +3889,6 @@ j [data-tooltip][data-flow="right"]::before {
 :is(.dark .dark\:text-white) {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-:is(.dark .dark\:text-gray-500) {
-  color: rgb(var(--gray-500));
 }
 
 :is(.dark .dark\:shadow-\[0px_0px_0px_1px_rgba\(39\2c 39\2c 42\2c 1\)\]) {

@@ -61,6 +61,7 @@ export async function get_step(req, reply) {
       let [variants, shipping_services] = await Promise.all([
         ListingService.get_variants(listing),
         ShippingService.get_services({ lang: req.language }),
+        ShippingService.get_cost_types({ lang: req.language }),
       ]);
       let attributes = [];
       let selected_attributes = [];

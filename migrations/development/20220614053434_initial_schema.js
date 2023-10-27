@@ -799,6 +799,7 @@ export function up(knex) {
         .inTable("languages")
         .onDelete("CASCADE");
       t.string("name");
+      t.string("description");
       t.unique(["cost_type_id", "language_id"]);
       t.timestamps(false, true);
     })
