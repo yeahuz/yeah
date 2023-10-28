@@ -53,7 +53,7 @@
       </div>
       <div>
         <span class="text-sm block font-medium text-gray-700 dark:text-gray-200">
-          Cost type
+          <%= it.t("form.shipping.cost_type", { ns: "new-listing" }) %>
         </span>
         <div class="flex items-center flex-wrap mt-2">
           <input type="radio" id="cost-calculated" name="cost_type_id" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
@@ -61,14 +61,14 @@
                                 font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                                 checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 -mr-8 ml-2 peer/calculated" checked >
           <label for="cost-calculated" class="border dark:border-zinc-800 p-2 rounded-md pl-8 cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked/calculated:dark:border-zinc-600 peer-checked/calculated:text-gray-900 dark:peer-checked/calculated:text-white">
-            Calculated
+            <%= it.t("form.shipping.cost_calculated", { ns: "new-listing" }) %>
           </label>
           <input type="radio" id="cost-flat" name="cost_type_id" class="ml-4 appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                                 bg-white dark:bg-zinc-900 m-0 relative
                                 font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                                 checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer/flat">
           <label for="cost-flat" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/flat:dark:border-zinc-600 peer-checked/flat:text-gray-900 dark:peer-checked/flat:text-white">
-            Flat rate
+            <%= it.t("form.shipping.cost_flat", { ns: "new-listing" }) %>
           </label>
           <div class="gap-4 mt-4 w-full hidden peer-checked/calculated:flex">
             <ul class="flex flex-col w-full">
@@ -84,7 +84,7 @@
                   <div class="flex flex-col gap-3 max-w-xs w-full">
                     <div class="flex flex-col gap-2">
                       <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
-                        Buyer pays:
+                        <%= it.t("form.shipping.buyer_pays", { ns: "new-listing" }) %>
                       </span>
                       <span>
                         $10
@@ -109,7 +109,7 @@
                   <div class="flex flex-col gap-3 max-w-xs w-full">
                     <div>
                       <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
-                        Buyer pays
+                        <%= it.t("form.shipping.buyer_pays", { ns: "new-listing" }) %>
                       </span>
                       <div class="flex mt-2">
                         <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
@@ -118,7 +118,7 @@
                     </div>
                     <div>
                       <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
-                        Each additional cost
+                        <%= it.t("form.shipping.each_additional_cost", { ns: "new-listing" }) %>
                       </span>
                       <div class="flex mt-2">
                         <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>

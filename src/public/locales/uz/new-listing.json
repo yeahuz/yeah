@@ -1,23 +1,7 @@
 {
   "title": "E'lon yaratish",
-  "steps": {
-    "first": {
-      "title": "Muhim",
-      "description": "Sarlavha va toifa "
-    },
-    "second": {
-      "title": "Umumiy",
-      "description": "Batafsil ma'lumot"
-    },
-    "third": {
-      "title": "Kontaktlar",
-      "description": "Qanday bog'lanish kerak"
-    },
-    "fourth": {
-      "title": "Ko'rinish",
-      "description": "Reklama qanday ko'rinishga ega bo'ladi?"
-    }
-  },
+  "attributes": "Atributlar",
+  "variations": "Kombinatsiyalar",
   "form": {
     "title": {
       "label": "Sarlavha",
@@ -29,17 +13,57 @@
       "placeholder": "Toifani tanlang"
     },
     "description": {
-      "label": "Tavsif",
+      "heading": "Tavsif",
       "placeholder": "E'loningizni batafsilroq tasvirlab bering",
       "hint": "Kamida 80 ta belgi"
     },
     "photos": {
-      "label": "Rasm",
+      "heading": "Rasm",
       "hint": "Birinchi fotosurat e'lonning muqovasida bo'ladi (50 tagacha fotosurat)",
       "click_to_upload": "Yuklash uchun bosing",
       "or_drag_drop": "yoki sudrab olib tashlang",
       "choose_as_cover": "Asosiy sifatida tanlang",
       "cover": "Asosiy"
+    },
+    "pricing": {
+      "heading": "Narxlar",
+      "quantity": "Miqdori",
+      "price": "Narxi",
+      "allow_offers": "Takliflarga ruxsat berish",
+      "allow_offers_description": "Buyumingizga qiziqqan xaridorlar sizga taklif qilishlari mumkin - siz qabul qilishingiz, qarshi chiqishingiz yoki rad qilishingiz mumkin",
+      "minimum": "Eng kam",
+      "auto_accept": "Avtomatik qabul qilish",
+      "volume_pricing": "Hajmi narxini qo'shing",
+      "volume_pricing_description": "Xaridorlar bir vaqtning o'zida bir nechta mahsulotni sotib olganlarida chegirma taklif qiling"
+    },
+    "shipping": {
+      "heading": "Yetkazib berish",
+      "method": "Yetkazish usuli",
+      "standard": "Standart",
+      "pickup": "Faqat olib ketish",
+      "pkg_weight": "Og'irligi",
+      "pkg_weight_unit": "kg.",
+      "pkg_dimensions": "O'lchamlari",
+      "pkg_dimensions_unit": "sm.",
+      "pkg_length": "Uzunligi",
+      "pkg_height": "Balandligi",
+      "pkg_width": "Kengligi",
+      "cost_type": "Yetkazib berish to'lovi turi",
+      "cost_flat": "Yagona stavka",
+      "cost_calculated": "O'zgaruvchan",
+      "buyer_pays": "Xaridor to'laydi",
+      "you_pay": "Siz to'laysiz",
+      "offer_free": "Bepul yetkazib berish",
+      "each_additional_cost": "Har bir qo'shimcha xarajatlar"
+    },
+    "specs": {
+      "heading": "Xususiyatlar",
+      "required": "Majburiy",
+      "optional": "Ixtiyoriy"
+    },
+    "variations": {
+      "heading": "Variatsiyalar",
+      "description": "Xuddi shu ro'yxatning bir nechta variantini tanlang"
     },
     "location": {
       "label": "Manzil",

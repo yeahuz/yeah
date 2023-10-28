@@ -1,9 +1,9 @@
 <section>
   <div class="flex justify-between mb-4">
-    <h2 class="font-semibold">ВАРИАЦИИ</h2>
+    <h2 class="font-semibold uppercase"><%= it.t("form.variations.heading", { ns: "new-listing" })%></h2>
     <a class="btn btn-text btn-0 flex-shrink-0 underline decoration-transparent duration-300
             hover:decoration-primary-500 group-peer-checked:hidden group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(209,224,255)]
-            dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]" href="/listings/wizard/<%= it.listing.id %>/attrs">Edit</a>
+            dark:group-peer-focus-visible:shadow-[0px_0px_0px_2px_rgb(41,112,255)]" href="/listings/wizard/<%= it.listing.id %>/attrs"><%= it.t("edit", { ns: "common" })%></a>
   </div>
   <% if (it.selected_attributes?.length) { %>
     <% let stats = it.listing.temp_variations.reduce(function (ac, cur) { %>
@@ -13,7 +13,7 @@
     <% return ac; %>
     <% }, { min_price: Infinity, max_price: 0, quantity: 0 }) %>
     <div>
-      <h3 class="font-semibold my-3.5">Attributes</h3>
+      <h3 class="font-semibold my-3.5"><%= it.t("attributes", { ns: "new-listing" })%></h3>
       <dl class="grid grid-cols-2 gap-3.5">
         <% it.selected_attributes.forEach(function (attribute) {%>
           <div class="flex gap-4">
@@ -41,6 +41,6 @@
       </dl>
     </div>
   <% } else { %>
-    <p>Select multiple variants of the same listing</p>
+    <p><%= it.t("form.variations.description", { ns: "new-listing" })%></p>
   <% } %>
 </section>

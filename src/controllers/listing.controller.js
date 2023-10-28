@@ -60,7 +60,7 @@ export async function get_step(req, reply) {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, policy: true } });
       let [variants, shipping_services] = await Promise.all([
         ListingService.get_variants(listing),
-        ShippingService.get_services({ lang: req.language }),
+        ShippingService.get_services({ lang: req.language, active: true }),
         ShippingService.get_cost_types({ lang: req.language }),
       ]);
       let attributes = [];
