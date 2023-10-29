@@ -3623,6 +3623,10 @@ j [data-tooltip][data-flow="right"]::before {
   display: block;
 }
 
+.peer\/pickup:checked ~ .peer-checked\/pickup\:block {
+  display: block;
+}
+
 .peer\/calculated:checked ~ .peer-checked\/calculated\:flex {
   display: flex;
 }

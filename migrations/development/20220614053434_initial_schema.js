@@ -778,7 +778,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.integer("quantity");
       t.bigInteger("unit_price");
-      t.unique(["listing_sku_id", "order_id"])
+      t.unique(["listing_sku_id", "order_id"]);
       t.timestamps(false, true);
     })
     .createTable("shipping_cost_types", (t) => {
@@ -804,7 +804,7 @@ export function up(knex) {
       t.timestamps(false, true);
     })
     .createTable("listing_shipping_details", (t) => {
-      t.increments("id");
+      t.bigIncrements("id");
       t.bigInteger("listing_id")
         .index()
         .notNullable()
@@ -817,19 +817,26 @@ export function up(knex) {
         .references("id")
         .inTable("shipping_cost_types")
         .onDelete("CASCADE");
+      t.double("weight");
+      t.string("weight_unit");
+      t.string("dimensions_unit");
+      t.double("length");
+      t.double("width");
+      t.double("height");
       t.string("handling_time");
       t.enu("handling_time_unit", ["DAY"]);
     })
     .createTable("shipping_services", (t) => {
-      t.increments("id");
+      t.string("id").primary();
       t.string("name").notNullable();
       t.boolean("active").defaultTo(false);
+      t.boolean("visible").defaultTo(false);
       t.string("logo_url");
       t.text("logo_data_url");
     })
     .createTable("shipping_service_translations", (t) => {
       t.increments("id");
-      t.integer("shipping_service_id")
+      t.string("shipping_service_id")
         .index()
         .notNullable()
         .references("id")
@@ -852,7 +859,7 @@ export function up(knex) {
         .references("id")
         .inTable("listings")
         .onDelete("CASCADE");
-      t.integer("shipping_service_id")
+      t.string("shipping_service_id")
         .index()
         .notNullable()
         .references("id")
@@ -1408,7 +1415,7 @@ export function up(knex) {
       t.specificType("columns", "VARCHAR[]").defaultTo('{}');
     })
     .then(() => knex.raw(ON_PAYMENT_STATUS_UPDATE_FUNCTION))
-    .then(() => knex.raw(DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT))
+    .then(() => knex.raw(DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT));
 }
 
 export async function down(knex) {
@@ -1436,8 +1443,9 @@ export async function down(knex) {
     listing_shipping_services, listing_sku_attributes, listing_skus, promotion_criterion_categories,
     promotion_criterion_conditions, promotion_criterion_skus, promotion_status_translations, promotion_statuses,
     promotion_types, promotion_type_translations, shipping_cost_types, shipping_cost_type_translations,
-    attributes_2, attribute_2_options, best_offers, best_offer_statuses, best_offer_status_translations, listing_policies
+    attributes_2, attribute_2_options, best_offers, best_offer_statuses, best_offer_status_translations, listing_policies,
+    category_reference, shipping_service_translations, attribute_2_option_translations, attribute_2_translations
     CASCADE;
     ${DROP_ON_PAYMENT_STATUS_UPDATE_FUNCTION}
-    `)
+    `);
 }

@@ -1,14 +1,20 @@
 import { query } from "./db.service.js";
 
-export async function get_services({ lang = "en", active } = {}) {
+export async function get_services({ lang = "en", active, visible } = {}) {
   let params =  [lang.substring(0, 2)];
-  let sql = `select name, description, logo_url, logo_data_url, active
+  let sql = `select ss.id, name, description, logo_url, logo_data_url, active
     from shipping_services ss
-    left join shipping_service_translations sst on sst.shipping_service_id = ss.id and sst.language_id = $1`
+    left join shipping_service_translations sst on sst.shipping_service_id = ss.id and sst.language_id = $1`;
 
   if (active != undefined) {
     params.push(active);
     sql += ` where active = $${params.length}`;
+  }
+
+  if (visible != undefined) {
+    params.push(visible);
+    if (params.length >= 2) sql += ` and visible = $${params.length}`;
+    else sql += ` where visible = $${params.length}`;
   }
 
   let { rows } = await query(sql, params);

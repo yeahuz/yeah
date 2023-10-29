@@ -231,7 +231,7 @@ export async function get_many({
   }
 
   if (direction === "after") {
-    params.push(cursor)
+    params.push(cursor);
     sql += ` and l.id < $${params.length}`;
   } else if (direction === "before") {
     params.push(cursor);

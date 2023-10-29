@@ -60,7 +60,7 @@ export async function get_step(req, reply) {
       let listing = await ListingService.get_one({ id, relation: { attachments: true, price: true, policy: true } });
       let [variants, shipping_services] = await Promise.all([
         ListingService.get_variants(listing),
-        ShippingService.get_services({ lang: req.language, active: true }),
+        ShippingService.get_services({ lang: req.language, active: true, visible: true }),
         ShippingService.get_cost_types({ lang: req.language }),
       ]);
       let attributes = [];
@@ -480,14 +480,18 @@ export async function submit_step(req, reply) {
         best_offer_minimum_currency,
         best_offer_autoaccept,
         best_offer_autoaccept_currency,
+        shipping_services
       } = req.body;
+
+      console.log(shipping_services);
+
       let [listing] = await Promise.all([
         ListingService.get_one({ id }),
         ListingService.cleanup_skus({ listing_id: id })
       ]);
       if (listing.temp_variations.length) {
         await Promise.all(listing.temp_variations.map((variation) => {
-          return ListingService.upsert_sku({ listing_id: id, created_by: user.id, ...variation, attributes: { ...attributes, ...variation.attributes } })
+          return ListingService.upsert_sku({ listing_id: id, created_by: user.id, ...variation, attributes: { ...attributes, ...variation.attributes } });
         }));
       } else {
         await ListingService.upsert_sku({ listing_id: id, created_by: user.id, currency, unit_price, quantity, attributes });

@@ -31,18 +31,25 @@ export async function seed(knex) {
     let { services, cost_types } = JSON.parse(fs.readFileSync(process.cwd() + "/src/data/shipping.json", "utf-8"));
 
     for (let service of services) {
-      let response = await fetch(service.logo_url);
-      let blob = await response.blob();
-      let buf = Buffer.from(await blob.text());
+      let logo_data_url;
+      if (service.logo_url) {
+        let response = await fetch(service.logo_url);
+        let blob = await response.blob();
+        let buf = Buffer.from(await blob.text());
+        logo_data_url = "data:" + blob.type + ";base64," + buf.toString("base64");
+      }
       let [inserted] = await knex("shipping_services").returning("id").insert({
+        id: service.id,
         logo_url: service.logo_url,
         name: service.name,
-        logo_data_url: "data:" + blob.type + ";base64," + buf.toString("base64")
+        active: !!service.active,
+        logo_data_url,
+        visible: service.visible
       });
 
       for (let lang in service.translations) {
         let { description } = service.translations[lang];
-        await knex("shipping_service_translations").insert({ description, language_id: lang, shipping_service_id: inserted.id })
+        await knex("shipping_service_translations").insert({ description, language_id: lang, shipping_service_id: inserted.id });
       }
     }
 

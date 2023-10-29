@@ -4,21 +4,21 @@
     <%= it.t("form.shipping.method", { ns: "new-listing" }) %>
   </span>
   <div class="flex items-center flex-wrap mt-2">
-    <input type="radio" id="shipping-standard" name="shipping_method" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+    <input type="radio" id="shipping-standard" value="standard-method" name="shipping_method" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                           bg-white dark:bg-zinc-900 m-0 relative
                           font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                           checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 -mr-8 ml-2 peer/standard">
     <label for="shipping-standard" class="border dark:border-zinc-800 p-2 rounded-md pl-8 cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked/standard:dark:border-zinc-600 peer-checked/standard:text-gray-900 dark:peer-checked/standard:text-white">
       <%= it.t("form.shipping.standard", { ns: "new-listing" }) %>
     </label>
-    <input type="radio" id="shipping-pickup" name="shipping_method" class="ml-4 appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+    <input type="radio" id="shipping-pickup" value="pickup-method" name="shipping_method" class="ml-4 appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                           bg-white dark:bg-zinc-900 m-0 relative
                           font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                           checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer/pickup">
     <label for="shipping-pickup" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/pickup:dark:border-zinc-600 peer-checked/pickup:text-gray-900 dark:peer-checked/pickup:text-white">
       <%= it.t("form.shipping.pickup", { ns: "new-listing" }) %>
     </label>
-    <div class="gap-4 mt-4 flex-col hidden peer-checked/standard:flex">
+    <fieldset class="gap-4 mt-4 flex-col hidden peer-checked/standard:flex" form="listing-form" id="standard-method">
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -56,24 +56,25 @@
           <%= it.t("form.shipping.cost_type", { ns: "new-listing" }) %>
         </span>
         <div class="flex items-center flex-wrap mt-2">
-          <input type="radio" id="cost-calculated" name="cost_type_id" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+          <input type="radio" id="cost-calculated" value="calculated-type" name="cost_type_id" class="appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                                 bg-white dark:bg-zinc-900 m-0 relative
                                 font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                                 checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 -mr-8 ml-2 peer/calculated" checked >
           <label for="cost-calculated" class="border dark:border-zinc-800 p-2 rounded-md pl-8 cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked/calculated:dark:border-zinc-600 peer-checked/calculated:text-gray-900 dark:peer-checked/calculated:text-white">
             <%= it.t("form.shipping.cost_calculated", { ns: "new-listing" }) %>
           </label>
-          <input type="radio" id="cost-flat" name="cost_type_id" class="ml-4 appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
+          <input type="radio" id="cost-flat" value="flat-type" name="cost_type_id" class="ml-4 appearance-none outline-none ring-offset-white dark:ring-offset-zinc-900 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2
                                 bg-white dark:bg-zinc-900 m-0 relative
                                 font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                                 checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer/flat">
           <label for="cost-flat" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/flat:dark:border-zinc-600 peer-checked/flat:text-gray-900 dark:peer-checked/flat:text-white">
             <%= it.t("form.shipping.cost_flat", { ns: "new-listing" }) %>
           </label>
-          <div class="gap-4 mt-4 w-full hidden peer-checked/calculated:flex">
+          <fieldset class="gap-4 mt-4 w-full hidden peer-checked/calculated:flex" id="calculated-type" form="listing-form">
             <ul class="flex flex-col w-full">
-              <% it.shipping_services.forEach(function (service) {%>
+              <% it.shipping_services.forEach(function (service, idx) {%>
                 <li class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800 flex items-start justify-between">
+                  <input type="hidden" name="shipping_services[<%= idx %>].id" value="<%= service.id %>" form="listing-form" />
                   <div class="flex gap-4">
                     <img class="w-24 object-contain" src="<%= service.logo_data_url %>"/>
                     <div class="flex flex-col">
@@ -89,16 +90,30 @@
                       <span>
                         $10
                       </span>
+                      <% if (idx === 0) { %>
+                        <div class="flex items-start mt-2">
+                          <input type="checkbox" name="shipping_services[<%= idx %>].free" id="calculated-free-shipping" class="checkbox-input appearance-none peer" />
+                          <label for="calculated-free-shipping" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+                              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </label>
+                          <label for="calculated-free-shipping" class="whitespace-nowrap checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
+                            <%= it.t("form.shipping.offer_free", { ns: "new-listing" })%>
+                          </label>
+                        </div>
+                      <% } %>
                     </div>
                   </div>
                 </li>
               <% }) %>
             </ul>
-          </div>
-          <div class="gap-4 mt-4 w-full hidden peer-checked/flat:flex">
+          </fieldset>
+          <fieldset class="gap-4 mt-4 w-full hidden peer-checked/flat:flex" id="flat-type" disabled form="listing-form">
             <ul class="flex flex-col w-full">
-              <% it.shipping_services.forEach(function (service) {%>
+              <% it.shipping_services.forEach(function (service, idx) {%>
                 <li class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800 flex items-start justify-between">
+                  <input type="hidden" name="shipping_services[<%= idx %>].id" value="<%= service.id %>" form="listing-form" />
                   <div class="flex gap-4">
                     <img class="w-24 object-contain" src="<%= service.logo_data_url %>"/>
                     <div class="flex flex-col">
@@ -113,7 +128,7 @@
                       </span>
                       <div class="flex mt-2">
                         <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
-                        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-l-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" <%= it.selected_attributes?.length ? "disabled" : "required"%> />
+                        <input form="listing-form" type="number" class="form-control !rounded-l-none" name="shipping_services[<%= idx %>].shipping_cost" inputmode="numeric" min="0" autocomplete="off" />
                       </div>
                     </div>
                     <div>
@@ -122,16 +137,47 @@
                       </span>
                       <div class="flex mt-2">
                         <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
-                        <input form="listing-form" type="number" value="<%= it.variants?.[0]?.unit_price ?? "" %>" class="form-control !rounded-l-none" name="unit_price" inputmode="numeric" min="0" autocomplete="off" <%= it.selected_attributes?.length ? "disabled" : "required"%> />
+                        <input form="listing-form" type="number" class="form-control !rounded-l-none" name="shipping_services[<%= idx %>].each_additional_cost" inputmode="numeric" min="0" autocomplete="off" />
                       </div>
                     </div>
+                    <% if (idx === 0) { %>
+                      <div class="flex items-start mt-2">
+                        <input type="checkbox" name="shipping_services[<%= idx %>].free" id="flat-free-shipping" class="checkbox-input appearance-none peer" />
+                        <label for="flat-free-shipping" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </label>
+                        <label for="flat-free-shipping" class="whitespace-nowrap checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
+                          <%= it.t("form.shipping.offer_free", { ns: "new-listing" })%>
+                        </label>
+                      </div>
+                    <% } %>
                   </div>
                 </li>
               <% }) %>
             </ul>
-          </div>
+          </fieldset>
         </div>
       </div>
-    </div>
+    </fieldset>
+    <fieldest class="hidden peer-checked/pickup:block" id="pickup-method" form="listing-form">
+      <input type="hidden" name="shipping_services[0].id" value="LocalPickup" form="listing-form" />
+    </fieldset>
   </div>
 </section>
+<script>
+  let methods = document.querySelectorAll("[name=shipping_method]");
+  let types = document.querySelectorAll("[name=cost_type_id]");
+  methods.forEach(input => input.addEventListener("change", on_change(methods)));
+  types.forEach(input => input.addEventListener("change", on_change(types)));
+
+  function on_change(inputs) {
+    return (e) => {
+      for (let input of inputs) {
+        let fieldset = document.getElementById(input.value);
+        fieldset.toggleAttribute("disabled", input.value !== e.target.value);
+      }
+    }
+  }
+</script>

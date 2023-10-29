@@ -8,13 +8,12 @@ const subdomain_detector = {
   lookup: (req) => {
     const host = req.headers["host"];
     const parts = host.split(".");
-    let lang
+    let lang;
     if (parts.length > 2) {
       lang = parts[0];
     }
 
-    return "uz"
-    // return lang;
+    return lang;
   }
 }
 
