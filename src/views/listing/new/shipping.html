@@ -16,7 +16,7 @@
                           font-inherit w-4 h-4 border border-gray-300 dark:border-zinc-500 rounded-full checked:border-[5px]
                           checked:before:scale-100 checked:border-primary-600 dark:checked:border-primary-600 duration-200 peer/pickup">
     <label for="shipping-pickup" class="border dark:border-zinc-800 p-2 rounded-md pl-8 -ml-6 cursor-pointer text-gray-500 dark:text-gray-400 peer-checked/pickup:dark:border-zinc-600 peer-checked/pickup:text-gray-900 dark:peer-checked/pickup:text-white">
-      <%= it.t("form.shipping.pickup", { ns: "new-listing" }) %>
+      <%= it.t("form.shipping.only_local_pickup", { ns: "new-listing" }) %>
     </label>
     <fieldset class="gap-4 mt-4 flex-col hidden peer-checked/standard:flex" form="listing-form" id="standard-method">
       <div class="grid grid-cols-12 gap-4">
@@ -82,27 +82,29 @@
                       <span class="text-gray-600 dark:text-gray-400 text-sm"><%= service.description %></span>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-3 max-w-xs w-full">
-                    <div class="flex flex-col gap-2">
+                  <div class="flex flex-col gap-4 max-w-xs w-full flex-col-reverse">
+                    <% if (idx === 0) { %>
+                      <input type="checkbox" name="shipping_services[<%= idx %>].free" id="calculated-free-shipping" class="checkbox-input appearance-none peer" />
+                      <div class="flex items-start group">
+                        <label for="calculated-free-shipping" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900
+                            peer-focus:group-[]:ring-2 peer-focus:group-[]:ring-primary-600 peer-focus:group-[]:ring-offset-2">
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </label>
+                        <label for="calculated-free-shipping" class="whitespace-nowrap checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400
+                            peer-checked:group-[]:text-gray-900 dark:peer-checked:group-[]:text-gray-200">
+                          <%= it.t("form.shipping.offer_free", { ns: "new-listing" })%>
+                        </label>
+                      </div>
+                    <% } %>
+                    <div class="flex flex-col gap-2 peer-checked:opacity-70 peer-checked:pointer-events-none">
                       <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
                         <%= it.t("form.shipping.buyer_pays", { ns: "new-listing" }) %>
                       </span>
                       <span>
                         $10
                       </span>
-                      <% if (idx === 0) { %>
-                        <div class="flex items-start mt-2">
-                          <input type="checkbox" name="shipping_services[<%= idx %>].free" id="calculated-free-shipping" class="checkbox-input appearance-none peer" />
-                          <label for="calculated-free-shipping" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
-                              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </label>
-                          <label for="calculated-free-shipping" class="whitespace-nowrap checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
-                            <%= it.t("form.shipping.offer_free", { ns: "new-listing" })%>
-                          </label>
-                        </div>
-                      <% } %>
                     </div>
                   </div>
                 </li>
@@ -121,44 +123,51 @@
                       <span class="text-gray-600 dark:text-gray-400 text-sm"><%= service.description %></span>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-3 max-w-xs w-full">
-                    <div>
-                      <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
-                        <%= it.t("form.shipping.buyer_pays", { ns: "new-listing" }) %>
-                      </span>
-                      <div class="flex mt-2">
-                        <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
-                        <input form="listing-form" type="number" class="form-control !rounded-l-none" name="shipping_services[<%= idx %>].shipping_cost" inputmode="numeric" min="0" autocomplete="off" />
-                      </div>
-                    </div>
-                    <div>
-                      <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
-                        <%= it.t("form.shipping.each_additional_cost", { ns: "new-listing" }) %>
-                      </span>
-                      <div class="flex mt-2">
-                        <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
-                        <input form="listing-form" type="number" class="form-control !rounded-l-none" name="shipping_services[<%= idx %>].each_additional_cost" inputmode="numeric" min="0" autocomplete="off" />
-                      </div>
-                    </div>
+                  <div class="flex flex-col gap-4 max-w-xs w-full flex-col-reverse">
                     <% if (idx === 0) { %>
-                      <div class="flex items-start mt-2">
-                        <input type="checkbox" name="shipping_services[<%= idx %>].free" id="flat-free-shipping" class="checkbox-input appearance-none peer" />
-                        <label for="flat-free-shipping" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900 peer-focus:ring-2 peer-focus:ring-primary-600 peer-focus:ring-offset-2">
+                      <input type="checkbox" name="shipping_services[<%= idx %>].free" id="flat-free-shipping" class="checkbox-input appearance-none peer" />
+                      <div class="flex items-start group">
+                        <label for="flat-free-shipping" class="checkbox-control cursor-pointer border border-gray-300 dark:border-zinc-600 rounded p-px ring-offset-white dark:ring-offset-zinc-900
+                            peer-focus:group-[]:ring-2 peer-focus:group-[]:ring-primary-600 peer-focus:group-[]:ring-offset-2">
                           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 checkbox-icon">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                           </svg>
                         </label>
-                        <label for="flat-free-shipping" class="whitespace-nowrap checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:text-gray-900 dark:peer-checked:text-gray-200">
+                        <label for="flat-free-shipping" class="whitespace-nowrap checkbox-label cursor-pointer ml-2 text-gray-500 dark:text-gray-400 peer-checked:group-[]:text-gray-900 dark:peer-checked:group-[]:text-gray-200">
                           <%= it.t("form.shipping.offer_free", { ns: "new-listing" })%>
                         </label>
                       </div>
                     <% } %>
+                    <div class="flex flex-col gap-2 peer-checked:opacity-70 peer-checked:pointer-events-none">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
+                          <%= it.t("form.shipping.buyer_pays", { ns: "new-listing" }) %>
+                        </span>
+                        <div class="flex mt-2">
+                          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+                          <input form="listing-form" type="number" class="form-control !rounded-l-none" name="shipping_services[<%= idx %>].shipping_cost" inputmode="numeric" min="0" autocomplete="off" />
+                        </div>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700 relative dark:text-gray-200">
+                          <%= it.t("form.shipping.each_additional_cost", { ns: "new-listing" }) %>
+                        </span>
+                        <div class="flex mt-2">
+                          <span class="border-l border-t border-b border-gray-300 py-2.5 px-3.5 text-gray-500 rounded-l-lg dark:border-zinc-800 dark:text-gray-400">$</span>
+                          <input form="listing-form" type="number" class="form-control !rounded-l-none" name="shipping_services[<%= idx %>].each_additional_cost" inputmode="numeric" min="0" autocomplete="off" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </li>
               <% }) %>
             </ul>
           </fieldset>
         </div>
+      </div>
+      <div class="px-4 py-6 rounded-lg border border-gray-200 dark:border-zinc-800 mt-4">
+        <span class="font-semibold"><%= it.t("form.shipping.add_local_pickup", { ns: "new-listing" })%></span>
+        <p class="text-gray-600 dark:text-gray-300 text-sm"><%= it.t("form.shipping.local_pickup_description", { ns: "new-listing" })%></p>
       </div>
     </fieldset>
     <fieldest class="hidden peer-checked/pickup:block" id="pickup-method" form="listing-form">

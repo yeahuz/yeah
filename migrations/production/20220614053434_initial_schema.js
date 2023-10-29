@@ -20,7 +20,7 @@ let DISCOUNT_BENEFIT_CURRENCY_CONSTRAINT = `ALTER TABLE discount_benefits ADD CO
   CHECK (
     unit = 'PERCENTAGE'
     OR currency is not null
-  )`
+  )`;
 
 export function up(knex) {
   return knex.schema
@@ -47,7 +47,7 @@ export function up(knex) {
         .notNullable()
         .references("id")
         .inTable("users")
-        .onDelete("CASCADE")
+        .onDelete("CASCADE");
     })
     .createTable("user_preferences", (t) => {
       t.bigIncrements("id");
@@ -383,7 +383,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.string("name");
       t.string("description");
-      t.unique(["language_id", "condition_id"])
+      t.unique(["language_id", "condition_id"]);
       t.timestamps(false, true);
     })
     .createTable("category_conditions", (t) => {
@@ -459,7 +459,7 @@ export function up(knex) {
       t.string("url", 512);
       t.specificType("attributes", "INT[]").index(null, "GIN");
       t.specificType("attribute_options", "INT[]").index(null, "GIN");
-      t.jsonb("temp_variations").defaultTo([])
+      t.jsonb("temp_variations").defaultTo([]);
       t.bigInteger("policy_id")
        .index()
        .notNullable()
@@ -1118,7 +1118,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.bigInteger("last_message_id")
         .index()
-        .nullable()
+        .nullable();
       t.string("url");
       t.timestamps(false, true);
       t.index("created_at");
@@ -1138,7 +1138,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.bigInteger("last_read_message_id")
         .index()
-        .nullable()
+        .nullable();
       t.integer("unread_count").defaultTo(0);
       t.unique(["chat_id", "user_id"]);
     })
@@ -1343,7 +1343,7 @@ export function up(knex) {
         .onDelete("CASCADE");
       t.string("postal_code");
       t.string("address").notNullable();
-      t.string("address2")
+      t.string("address2");
       t.timestamps(false, true);
     })
     .createTable("attributes_2", (t) => {
