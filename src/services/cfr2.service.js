@@ -9,7 +9,8 @@ let client = new S3Client({
   credentials: {
     accessKeyId: config.cf_r2_access_key,
     secretAccessKey: config.cf_r2_secret_key,
-  }, region: "auto"
+  },
+  region: "auto"
 });
 
 export async function update_bucket_cors() {

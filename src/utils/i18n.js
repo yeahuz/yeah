@@ -13,8 +13,8 @@ const subdomain_detector = {
       lang = parts[0];
     }
 
-    return "uz"
-    // return lang;
+    // return "uz"
+    return lang;
   }
 }
 

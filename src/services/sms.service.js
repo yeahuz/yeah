@@ -42,7 +42,9 @@ export class SMSClient {
     await update_env({ SMS_API_TOKEN: '' });
     let token = await SMSClient.get_token(true).catch((err) => console.log({ err }));
     this.token = token;
-  } async request(url, { method, data } = {}) {
+  }
+
+  async request(url, { method, data } = {}) {
     let response = await fetch(config.sms_api_uri + url, {
       method: method || (data ? "POST" : "GET"),
       body: data,
